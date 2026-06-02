@@ -22,10 +22,10 @@ type MainTabsProps = {
 
 export default function MainTabs({ onSignOut }: MainTabsProps) {
   const [activeTab, setActiveTab] = useState<TabId>('discover');
-  const [openChatId, setOpenChatId] = useState<string | null>(null);
+  const [openChatMatchId, setOpenChatMatchId] = useState<string | null>(null);
 
   const handleStartChat = (matchId: string) => {
-    setOpenChatId(matchId);
+    setOpenChatMatchId(matchId);
     setActiveTab('messages');
   };
 
@@ -38,8 +38,8 @@ export default function MainTabs({ onSignOut }: MainTabsProps) {
       case 'messages':
         return (
           <Messages
-            initialChatId={openChatId}
-            onChatOpened={() => setOpenChatId(null)}
+            initialChatMatchId={openChatMatchId}
+            onChatOpened={() => setOpenChatMatchId(null)}
           />
         );
       case 'profile':
@@ -49,14 +49,9 @@ export default function MainTabs({ onSignOut }: MainTabsProps) {
     }
   };
 
-  const statusBarStyle =
-    activeTab === 'discover' || activeTab === 'matches' || activeTab === 'messages' || activeTab === 'profile'
-      ? 'dark'
-      : 'light';
-
   return (
     <View style={styles.root}>
-      <StatusBar style={statusBarStyle} />
+      <StatusBar style="dark" />
       <View style={styles.content}>{renderContent()}</View>
 
       <View style={styles.tabBar}>

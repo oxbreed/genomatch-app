@@ -1,0 +1,92 @@
+import { getCurrentUserId } from './profiles';
+import { supabase } from './supabase';
+
+function orderedPair(a: string, b: string): [string, string] {
+  return a < b ? [a, b] : [b, a];
+}
+
+export type LikeResult = {
+  isMutualMatch: boolean;
+  matchId: string | null;
+};
+
+/** Record a like; creates a match row when both users have liked each other. */
+export async function recordLike(likedId: string): Promise<LikeResult> {
+  const likerId = await getCurrentUserId();
+  if (!likerId) throw new Error('Not signed in');
+
+  const { error: likeError } = await supabase.from('likes').upsert(
+    { liker_id: likerId, liked_id: likedId },
+    { onConflict: 'liker_id,liked_id' }
+  );
+
+  if (likeError) throw likeError;
+
+  const { data: mutual, error: mutualError } = await supabase
+    .from('likes')
+    .select('id')
+    .eq('liker_id', likedId)
+    .eq('liked_id', likerId)
+    .maybeSingle();
+
+  if (mutualError) throw mutualError;
+  if (!mutual) {
+    return { isMutualMatch: false, matchId: null };
+  }
+
+  const [userAId, userBId] = orderedPair(likerId, likedId);
+
+  const { data: existing, error: existingError } = await supabase
+    .from('matches')
+    .select('id')
+    .eq('user_a_id', userAId)
+    .eq('user_b_id', userBId)
+    .maybeSingle();
+
+  if (existingError) throw existingError;
+  if (existing) {
+    return { isMutualMatch: true, matchId: existing.id };
+  }
+
+  const { data: created, error: createError } = await supabase
+    .from('matches')
+    .insert({ user_a_id: userAId, user_b_id: userBId })
+    .select('id')
+    .single();
+
+  if (createError) throw createError;
+
+  return { isMutualMatch: true, matchId: created.id };
+}
+
+/** Record a pass so this profile is hidden from Discovery. */
+export async function recordPass(passedId: string): Promise<void> {
+  const passerId = await getCurrentUserId();
+  if (!passerId) throw new Error('Not signed in');
+
+  const { error } = await supabase.from('passes').upsert(
+    { passer_id: passerId, passed_id: passedId },
+    { onConflict: 'passer_id,passed_id' }
+  );
+
+  if (error) throw error;
+}
+
+/** Profile ids the current user has already liked or passed. */
+export async function getSeenProfileIds(userId: string): Promise<Set<string>> {
+  const seen = new Set<string>();
+
+  const [{ data: likes, error: likesError }, { data: passes, error: passesError }] =
+    await Promise.all([
+      supabase.from('likes').select('liked_id').eq('liker_id', userId),
+      supabase.from('passes').select('passed_id').eq('passer_id', userId),
+    ]);
+
+  if (likesError) throw likesError;
+  if (passesError) throw passesError;
+
+  for (const row of likes ?? []) seen.add(row.liked_id);
+  for (const row of passes ?? []) seen.add(row.passed_id);
+
+  return seen;
+}

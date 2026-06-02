@@ -29,7 +29,15 @@ const GENOTYPES = [
   { id: 'AC', icon: '🌊', name: 'AC Carrier', accent: '#185FA5' },
 ];
 
-export default function Register({ onBack, onSuccess }: { onBack: () => void; onSuccess: () => void }) {
+export default function Register({
+  onBack,
+  onSignIn,
+  onSuccess,
+}: {
+  onBack: () => void;
+  onSignIn: () => void;
+  onSuccess: () => void;
+}) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [genotype, setGenotype] = useState('');
@@ -117,8 +125,16 @@ export default function Register({ onBack, onSuccess }: { onBack: () => void; on
         return;
       }
 
-      setSuccessMessage('Check your email to verify your account');
-      onSuccess();
+      if (data.session) {
+        console.log('[Register] signUp session active', { userId: data.user.id });
+        onSuccess();
+        return;
+      }
+
+      console.log('[Register] signUp — email confirmation required, no session yet');
+      setSuccessMessage(
+        'Check your email to verify your account, then sign in to continue.'
+      );
     } catch (err) {
       const message =
         err instanceof Error ? err.message : 'Something went wrong. Please try again.';
@@ -303,7 +319,7 @@ export default function Register({ onBack, onSuccess }: { onBack: () => void; on
             </Pressable>
           </Animated.View>
 
-          <Pressable style={styles.signInRow} onPress={onBack}>
+          <Pressable style={styles.signInRow} onPress={onSignIn}>
             <Text style={styles.signInText}>
               Already have an account? <Text style={styles.signInBold}>Sign In</Text>
             </Text>

@@ -1,3 +1,5 @@
+import type { DiscoveryProfile } from '../types/database';
+
 export const COLORS = {
   forest: '#074D2E',
   sage: '#A8D5BA',
@@ -109,4 +111,21 @@ export function getInitials(name: string) {
 
 export function getFirstName(name: string) {
   return name.split(' ')[0];
+}
+
+/** Mock cards shown in Discovery when no real profiles exist yet. */
+export function getMockDiscoveryProfiles(): DiscoveryProfile[] {
+  return MOCK_MATCHES.map((p) => ({
+    id: `mock-${p.id}`,
+    name: p.name,
+    age: p.age,
+    city: p.city,
+    genotype: p.genotype,
+    compatibility: p.compatibility,
+    bio: p.bio,
+    interests: p.interests,
+    gradient: p.gradient,
+    avatarUrl: null,
+    isMock: true,
+  }));
 }

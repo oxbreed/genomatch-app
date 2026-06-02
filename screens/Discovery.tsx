@@ -1,5 +1,6 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
+  ActivityIndicator,
   Animated,
   Dimensions,
   Easing,
@@ -12,17 +13,14 @@ import {
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import GenotypeBadge from '../src/components/GenotypeBadge';
-import {
-  COLORS,
-  MOCK_MATCHES,
-  MockProfile,
-  getInitials,
-} from '../src/data/mockData';
+import ProfileAvatar from '../src/components/ProfileAvatar';
+import { COLORS, getMockDiscoveryProfiles } from '../src/data/mockData';
+import { fetchDiscoveryProfiles } from '../src/lib/profiles';
+import { recordLike, recordPass } from '../src/lib/likes';
+import type { DiscoveryProfile } from '../src/types/database';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const SWIPE_THRESHOLD = SCREEN_WIDTH * 0.22;
-
-const MOCK_PROFILES = MOCK_MATCHES;
 
 function ScoreRing({ percent }: { percent: number }) {
   const ringColor = percent >= 90 ? COLORS.gold : COLORS.sage;
@@ -57,7 +55,7 @@ function ScoreRing({ percent }: { percent: number }) {
   );
 }
 
-function ProfileCard({ profile }: { profile: MockProfile }) {
+function ProfileCard({ profile }: { profile: DiscoveryProfile }) {
   return (
     <ScrollView
       style={styles.cardScroll}
@@ -65,29 +63,19 @@ function ProfileCard({ profile }: { profile: MockProfile }) {
       showsVerticalScrollIndicator={false}
     >
       <View style={styles.cardHeader}>
-        <View
-          style={[
-            styles.avatar,
-            {
-              backgroundColor: profile.gradient[0],
-            },
-          ]}
-        >
-          <View
-            style={[
-              styles.avatarInner,
-              { backgroundColor: profile.gradient[1] },
-            ]}
-          >
-            <Text style={styles.avatarInitials}>{getInitials(profile.name)}</Text>
-          </View>
-        </View>
+        <ProfileAvatar
+          name={profile.name}
+          gradient={profile.gradient}
+          avatarUrl={profile.avatarUrl}
+          size={96}
+        />
         <ScoreRing percent={profile.compatibility} />
       </View>
 
       <View style={styles.nameRow}>
         <Text style={styles.name}>
-          {profile.name}, {profile.age}
+          {profile.name}
+          {profile.age != null ? `, ${profile.age}` : ''}
         </Text>
         <GenotypeBadge genotype={profile.genotype} />
       </View>
@@ -110,9 +98,41 @@ function ProfileCard({ profile }: { profile: MockProfile }) {
 }
 
 export default function Discovery() {
+  const [profiles, setProfiles] = useState<DiscoveryProfile[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
   const [index, setIndex] = useState(0);
   const [showMatch, setShowMatch] = useState(false);
   const [matchedName, setMatchedName] = useState('');
+
+  const [actionError, setActionError] = useState('');
+  const [usingMockFallback, setUsingMockFallback] = useState(false);
+
+  const loadProfiles = useCallback(async () => {
+    setLoadError('');
+    setLoading(true);
+    try {
+      const { profiles: rows } = await fetchDiscoveryProfiles();
+      if (rows.length > 0) {
+        setProfiles(rows);
+        setUsingMockFallback(false);
+      } else {
+        setProfiles(getMockDiscoveryProfiles());
+        setUsingMockFallback(true);
+      }
+      setIndex(0);
+    } catch {
+      setProfiles(getMockDiscoveryProfiles());
+      setUsingMockFallback(true);
+      setIndex(0);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadProfiles();
+  }, [loadProfiles]);
 
   const position = useRef(new Animated.ValueXY()).current;
   const cardOpacity = useRef(new Animated.Value(1)).current;
@@ -121,8 +141,9 @@ export default function Discovery() {
   const matchScale = useRef(new Animated.Value(0.85)).current;
   const nextCardScale = useRef(new Animated.Value(0.95)).current;
 
-  const profile = MOCK_PROFILES[index];
-  const isEmpty = index >= MOCK_PROFILES.length;
+  const profile = profiles[index];
+  const isEmpty = !loading && !loadError && profiles.length === 0;
+  const seenAll = !loading && !loadError && profiles.length > 0 && index >= profiles.length;
 
   const resetCardAnimation = useCallback(() => {
     position.setValue({ x: 0, y: 0 });
@@ -204,16 +225,63 @@ export default function Discovery() {
     [cardOpacity, cardScale, nextCardScale, position]
   );
 
+  const processSwipe = useCallback(
+    async (direction: 'like' | 'pass') => {
+      if (seenAll || showMatch || !profile || loading) return;
+
+      setActionError('');
+      const firstName = profile.name.split(' ')[0];
+
+      const afterSwipe = async () => {
+        if (profile.isMock) {
+          if (direction === 'like') {
+            showMatchOverlay(firstName);
+          } else {
+            advanceProfile();
+          }
+          return;
+        }
+
+        if (direction === 'like') {
+          try {
+            const { isMutualMatch } = await recordLike(profile.id);
+            if (isMutualMatch) {
+              showMatchOverlay(firstName);
+            } else {
+              advanceProfile();
+            }
+          } catch (err) {
+            setActionError(
+              err instanceof Error ? err.message : 'Could not save your like'
+            );
+            advanceProfile();
+          }
+        } else {
+          try {
+            await recordPass(profile.id);
+          } catch (err) {
+            setActionError(
+              err instanceof Error ? err.message : 'Could not save your pass'
+            );
+          }
+          advanceProfile();
+        }
+      };
+
+      animateSwipe(direction === 'like' ? 'right' : 'left', () => {
+        afterSwipe();
+      });
+    },
+    [advanceProfile, animateSwipe, loading, profile, seenAll, showMatch, showMatchOverlay]
+  );
+
   const handlePass = useCallback(() => {
-    if (isEmpty || showMatch) return;
-    animateSwipe('left', advanceProfile);
-  }, [advanceProfile, animateSwipe, isEmpty, showMatch]);
+    processSwipe('pass');
+  }, [processSwipe]);
 
   const handleLike = useCallback(() => {
-    if (isEmpty || showMatch || !profile) return;
-    const name = profile.name.split(' ')[0];
-    animateSwipe('right', () => showMatchOverlay(name));
-  }, [animateSwipe, isEmpty, profile, showMatch, showMatchOverlay]);
+    processSwipe('like');
+  }, [processSwipe]);
 
   const handleLikeRef = useRef(handleLike);
   const handlePassRef = useRef(handlePass);
@@ -267,19 +335,42 @@ export default function Discovery() {
 
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Discover</Text>
-        <Text style={styles.headerSubtitle}>Genotype-aware matches near you</Text>
+        <Text style={styles.headerSubtitle}>
+          {usingMockFallback
+            ? 'Preview profiles — real matches appear as members join'
+            : 'Genotype-aware matches near you'}
+        </Text>
       </View>
 
       <View style={styles.deckArea}>
-        {isEmpty ? (
+        {loading ? (
+          <View style={styles.loadingState}>
+            <ActivityIndicator size="large" color={COLORS.forest} />
+            <Text style={styles.loadingText}>Finding compatible profiles...</Text>
+          </View>
+        ) : loadError ? (
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyEmoji}>⚠️</Text>
+            <Text style={styles.emptyTitle}>{loadError}</Text>
+            <Pressable style={styles.retryBtn} onPress={loadProfiles}>
+              <Text style={styles.retryText}>Try again</Text>
+            </Pressable>
+          </View>
+        ) : isEmpty ? (
           <View style={styles.emptyState}>
             <Text style={styles.emptyEmoji}>🌿</Text>
-            <Text style={styles.emptyTitle}>You've seen everyone nearby.</Text>
+            <Text style={styles.emptyTitle}>No profiles to show</Text>
+            <Text style={styles.emptyBody}>Check back soon for new people nearby.</Text>
+          </View>
+        ) : seenAll ? (
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyEmoji}>🌿</Text>
+            <Text style={styles.emptyTitle}>You&apos;ve seen everyone nearby.</Text>
             <Text style={styles.emptyBody}>Check back tomorrow.</Text>
           </View>
         ) : (
           <>
-            {index + 1 < MOCK_PROFILES.length && (
+            {index + 1 < profiles.length && (
               <Animated.View
                 style={[
                   styles.card,
@@ -287,7 +378,7 @@ export default function Discovery() {
                   { transform: [{ scale: nextCardScale }] },
                 ]}
               >
-                <ProfileCard profile={MOCK_PROFILES[index + 1]} />
+                <ProfileCard profile={profiles[index + 1]} />
               </Animated.View>
             )}
 
@@ -318,8 +409,9 @@ export default function Discovery() {
         )}
       </View>
 
-      {!isEmpty && (
+      {!seenAll && !isEmpty && !loading && !loadError && (
         <View style={styles.actions}>
+          {actionError ? <Text style={styles.actionError}>{actionError}</Text> : null}
           <Pressable
             style={({ pressed }) => [styles.passBtn, pressed && styles.btnPressed]}
             onPress={handlePass}
@@ -424,23 +516,38 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     marginBottom: 18,
   },
-  avatar: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    padding: 3,
-  },
-  avatarInner: {
+  loadingState: {
     flex: 1,
-    borderRadius: 45,
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 12,
   },
-  avatarInitials: {
-    fontSize: 32,
+  loadingText: {
+    fontSize: 15,
+    color: 'rgba(7, 77, 46, 0.6)',
+    fontWeight: '600',
+  },
+  retryBtn: {
+    marginTop: 16,
+    backgroundColor: COLORS.forest,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 12,
+  },
+  retryText: {
+    color: COLORS.ivory,
     fontWeight: '800',
-    color: COLORS.white,
-    letterSpacing: 1,
+    fontSize: 15,
+  },
+  actionError: {
+    position: 'absolute',
+    top: -28,
+    alignSelf: 'center',
+    color: '#A32D2D',
+    fontSize: 12,
+    fontWeight: '600',
+    textAlign: 'center',
+    maxWidth: '90%',
   },
   scoreRingWrap: {
     width: 76,

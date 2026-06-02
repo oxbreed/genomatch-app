@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
+  ActivityIndicator,
   Animated,
   Dimensions,
   Easing,
@@ -10,8 +11,12 @@ import {
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import Register from './screens/Register';
+import SignIn from './screens/SignIn';
 import ProfileSetup from './screens/ProfileSetup';
 import MainTabs from './screens/MainTabs';
+import { resolveInitialScreen } from './src/lib/profiles';
+import { logAuthState } from './src/lib/auth';
+import { supabase } from './src/lib/supabase';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -47,11 +52,69 @@ const ONBOARDING_SLIDES = [
 ];
 
 export default function App() {
+  const [bootstrapping, setBootstrapping] = useState(true);
   const [screen, setScreen] = useState<
-    'onboarding' | 'register' | 'profileSetup' | 'main'
+    'onboarding' | 'register' | 'signIn' | 'profileSetup' | 'main'
   >('onboarding');
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
+
+  useEffect(() => {
+    let mounted = true;
+
+    (async () => {
+      try {
+        const {
+          data: { session },
+          error: sessionError,
+        } = await supabase.auth.getSession();
+
+        console.log('[App] startup session', {
+          hasSession: !!session,
+          userId: session?.user?.id ?? null,
+          email: session?.user?.email ?? null,
+          emailConfirmed: !!session?.user?.email_confirmed_at,
+          expiresAt: session?.expires_at ?? null,
+          sessionError: sessionError?.message ?? null,
+        });
+
+        await logAuthState('App.startup');
+
+        const initial = await resolveInitialScreen();
+        console.log('[App] resolveInitialScreen →', initial);
+
+        if (mounted && initial !== 'onboarding') {
+          setScreen(initial);
+        }
+      } catch (err) {
+        console.error('[App] bootstrap failed', err);
+        // Stay on onboarding if profile check fails
+      } finally {
+        if (mounted) setBootstrapping(false);
+      }
+    })();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('[App] auth state change', {
+        event,
+        hasSession: !!session,
+        userId: session?.user?.id ?? null,
+      });
+
+      if (!session) {
+        setScreen('onboarding');
+        setShowOnboarding(true);
+        setCurrentSlide(0);
+      }
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const splashOpacity = useRef(new Animated.Value(1)).current;
   const splashScale = useRef(new Animated.Value(0.88)).current;
@@ -225,11 +288,31 @@ export default function App() {
     }).start();
   };
 
+  if (bootstrapping) {
+    return (
+      <View style={styles.bootstrap}>
+        <StatusBar style="light" />
+        <ActivityIndicator size="large" color={COLORS.gold} />
+      </View>
+    );
+  }
+
   if (screen === 'register') {
     return (
       <Register
         onBack={() => setScreen('onboarding')}
+        onSignIn={() => setScreen('signIn')}
         onSuccess={() => setScreen('profileSetup')}
+      />
+    );
+  }
+
+  if (screen === 'signIn') {
+    return (
+      <SignIn
+        onBack={() => setScreen('register')}
+        onCreateAccount={() => setScreen('register')}
+        onSignedIn={(destination) => setScreen(destination)}
       />
     );
   }
@@ -541,5 +624,11 @@ const styles = StyleSheet.create({
     fontSize: 13,
     textAlign: 'center',
     fontWeight: '500',
+  },
+  bootstrap: {
+    flex: 1,
+    backgroundColor: COLORS.teal,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

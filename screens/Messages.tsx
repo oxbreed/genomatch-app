@@ -1,140 +1,119 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
+  ActivityIndicator,
   FlatList,
-  KeyboardAvoidingView,
-  Platform,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import ProfileAvatar from '../src/components/ProfileAvatar';
-import {
-  COLORS,
-  MOCK_MATCHES,
-  MockProfile,
-  getFirstName,
-} from '../src/data/mockData';
-
-type ChatMessage = {
-  id: string;
-  text: string;
-  sent: boolean;
-};
+import { logAuthState } from '../src/lib/auth';
+import { COLORS } from '../src/data/mockData';
+import { fetchConversations, formatMessageTime } from '../src/lib/messages';
+import { fetchMatches } from '../src/lib/matches';
+import type { ConversationPreview, DiscoveryProfile, MatchWithProfile } from '../src/types/database';
+import ChatScreen from './ChatScreen';
+import MatchProfile from './MatchProfile';
 
 type MessagesProps = {
-  initialChatId?: string | null;
+  initialChatMatchId?: string | null;
   onChatOpened?: () => void;
 };
 
-export default function Messages({ initialChatId, onChatOpened }: MessagesProps) {
-  const [activeChat, setActiveChat] = useState<MockProfile | null>(null);
-  const [draft, setDraft] = useState('');
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const listRef = useRef<ScrollView>(null);
+function conversationToMatch(item: ConversationPreview): MatchWithProfile {
+  return {
+    matchId: item.matchId,
+    profile: item.profile,
+    matchedAt: item.lastMessageAt ?? new Date().toISOString(),
+  };
+}
+
+export default function Messages({ initialChatMatchId, onChatOpened }: MessagesProps) {
+  const [conversations, setConversations] = useState<ConversationPreview[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [activeChat, setActiveChat] = useState<{
+    matchId: string;
+    profile: DiscoveryProfile;
+  } | null>(null);
+  const [selectedMatch, setSelectedMatch] = useState<MatchWithProfile | null>(null);
+
+  const openChat = (matchId: string, profile: DiscoveryProfile) => {
+    setSelectedMatch(null);
+    setActiveChat({ matchId, profile });
+  };
+
+  const loadConversations = useCallback(async () => {
+    setError('');
+    setLoading(true);
+    try {
+      await logAuthState('Messages.loadConversations');
+      const rows = await fetchConversations();
+      console.log('[Messages] fetch result', { count: rows.length, conversations: rows });
+      setConversations(rows);
+    } catch (err) {
+      console.error('[Messages] load failed', err);
+      setError(err instanceof Error ? err.message : 'Could not load messages');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    if (!initialChatId) return;
-    const match = MOCK_MATCHES.find((m) => m.id === initialChatId);
-    if (match) {
-      setActiveChat(match);
-      setMessages([]);
-      onChatOpened?.();
+    loadConversations();
+  }, [loadConversations]);
+
+  useEffect(() => {
+    if (!initialChatMatchId) return;
+
+    const openFromDeepLink = async () => {
+      const existing = conversations.find((c) => c.matchId === initialChatMatchId);
+      if (existing) {
+        openChat(existing.matchId, existing.profile);
+        onChatOpened?.();
+        return;
+      }
+
+      try {
+        const matches = await fetchMatches();
+        const match = matches.find((m) => m.matchId === initialChatMatchId);
+        if (match) {
+          openChat(match.matchId, match.profile);
+        }
+      } catch {
+        // ignore
+      } finally {
+        onChatOpened?.();
+      }
+    };
+
+    if (!loading) {
+      openFromDeepLink();
     }
-  }, [initialChatId, onChatOpened]);
-
-  const openChat = (match: MockProfile) => {
-    setActiveChat(match);
-    setMessages([]);
-    setDraft('');
-  };
-
-  const closeChat = () => {
-    setActiveChat(null);
-    setMessages([]);
-    setDraft('');
-  };
-
-  const sendMessage = () => {
-    const text = draft.trim();
-    if (!text || !activeChat) return;
-
-    setMessages((prev) => [
-      ...prev,
-      { id: `${Date.now()}`, text, sent: true },
-    ]);
-    setDraft('');
-
-    setTimeout(() => {
-      listRef.current?.scrollToEnd({ animated: true });
-    }, 100);
-  };
+  }, [conversations, initialChatMatchId, loading, onChatOpened]);
 
   if (activeChat) {
     return (
-      <KeyboardAvoidingView
-        style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
-      >
-        <StatusBar style="dark" />
+      <ChatScreen
+        matchId={activeChat.matchId}
+        profile={activeChat.profile}
+        onBack={() => {
+          setActiveChat(null);
+          loadConversations();
+        }}
+      />
+    );
+  }
 
-        <View style={styles.chatHeader}>
-          <Pressable style={styles.backBtn} onPress={closeChat}>
-            <Text style={styles.backBtnText}>←</Text>
-          </Pressable>
-          <ProfileAvatar name={activeChat.name} gradient={activeChat.gradient} size={40} />
-          <View style={styles.chatHeaderText}>
-            <Text style={styles.chatName}>{activeChat.name}</Text>
-            <Text style={styles.chatMeta}>{activeChat.compatibility}% compatible</Text>
-          </View>
-        </View>
-
-        <ScrollView
-          ref={listRef}
-          style={styles.chatMessages}
-          contentContainerStyle={styles.chatMessagesContent}
-          onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: true })}
-        >
-          <View style={styles.chatHint}>
-            <Text style={styles.chatHintText}>
-              You matched with {getFirstName(activeChat.name)}. Say hello! 👋
-            </Text>
-          </View>
-          {messages.map((msg) => (
-            <View
-              key={msg.id}
-              style={[styles.bubble, msg.sent ? styles.bubbleSent : styles.bubbleReceived]}
-            >
-              <Text style={[styles.bubbleText, msg.sent && styles.bubbleTextSent]}>
-                {msg.text}
-              </Text>
-            </View>
-          ))}
-        </ScrollView>
-
-        <View style={styles.composer}>
-          <TextInput
-            style={styles.composerInput}
-            value={draft}
-            onChangeText={setDraft}
-            placeholder="Type a message..."
-            placeholderTextColor="rgba(7, 77, 46, 0.35)"
-            multiline
-            maxLength={500}
-          />
-          <Pressable
-            style={[styles.sendBtn, !draft.trim() && styles.sendBtnDisabled]}
-            onPress={sendMessage}
-            disabled={!draft.trim()}
-          >
-            <Text style={styles.sendBtnText}>Send</Text>
-          </Pressable>
-        </View>
-      </KeyboardAvoidingView>
+  if (selectedMatch) {
+    return (
+      <MatchProfile
+        match={selectedMatch}
+        onBack={() => setSelectedMatch(null)}
+        onSendMessage={() => openChat(selectedMatch.matchId, selectedMatch.profile)}
+      />
     );
   }
 
@@ -147,29 +126,69 @@ export default function Messages({ initialChatId, onChatOpened }: MessagesProps)
         <Text style={styles.subtitle}>Start a conversation with your matches</Text>
       </View>
 
-      <FlatList
-        data={MOCK_MATCHES}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.list}
-        showsVerticalScrollIndicator={false}
-        renderItem={({ item }) => (
-          <Pressable
-            style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
-            onPress={() => openChat(item)}
-          >
-            <ProfileAvatar name={item.name} gradient={item.gradient} size={54} />
-            <View style={styles.rowBody}>
-              <View style={styles.rowTop}>
-                <Text style={styles.name}>{item.name}</Text>
-                <Text style={styles.time}>{item.lastMessageAt ?? 'Now'}</Text>
-              </View>
-              <Text style={styles.preview} numberOfLines={1}>
-                Say hello! 👋
-              </Text>
-            </View>
+      {loading ? (
+        <View style={styles.centered}>
+          <ActivityIndicator size="large" color={COLORS.forest} />
+        </View>
+      ) : error ? (
+        <View style={styles.centered}>
+          <Text style={styles.errorText}>{error}</Text>
+          <Pressable style={styles.retryBtn} onPress={loadConversations}>
+            <Text style={styles.retryText}>Retry</Text>
           </Pressable>
-        )}
-      />
+        </View>
+      ) : (
+        <FlatList
+          data={conversations}
+          keyExtractor={(item) => item.matchId}
+          contentContainerStyle={styles.list}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            <View style={styles.empty}>
+              <Text style={styles.emptyBody}>No conversations yet.</Text>
+            </View>
+          }
+          renderItem={({ item }) => (
+            <View style={styles.row}>
+              <Pressable
+                style={({ pressed }) => [styles.profileTap, pressed && styles.rowPressed]}
+                onPress={() => setSelectedMatch(conversationToMatch(item))}
+              >
+                <ProfileAvatar
+                  name={item.profile.name}
+                  gradient={item.profile.gradient}
+                  avatarUrl={item.profile.avatarUrl}
+                  size={54}
+                />
+                <Text style={styles.name} numberOfLines={1}>
+                  {item.profile.name}
+                </Text>
+              </Pressable>
+
+              <Pressable
+                style={({ pressed }) => [styles.previewTap, pressed && styles.rowPressed]}
+                onPress={() => openChat(item.matchId, item.profile)}
+              >
+                <View style={styles.rowTop}>
+                  <Text style={styles.preview} numberOfLines={1}>
+                    {item.lastMessage ?? 'Say hello! 👋'}
+                  </Text>
+                  <Text style={styles.time}>
+                    {item.lastMessageAt ? formatMessageTime(item.lastMessageAt) : 'New'}
+                  </Text>
+                </View>
+              </Pressable>
+
+              <Pressable
+                style={({ pressed }) => [styles.chatBtn, pressed && styles.chatBtnPressed]}
+                onPress={() => openChat(item.matchId, item.profile)}
+              >
+                <Text style={styles.chatBtnText}>Chat</Text>
+              </Pressable>
+            </View>
+          )}
+        />
+      )}
     </View>
   );
 }
@@ -196,10 +215,34 @@ const styles = StyleSheet.create({
     color: 'rgba(7, 77, 46, 0.6)',
     fontWeight: '500',
   },
+  centered: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 32,
+  },
+  errorText: {
+    color: '#A32D2D',
+    fontSize: 14,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  retryBtn: {
+    backgroundColor: COLORS.forest,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 12,
+  },
+  retryText: {
+    color: COLORS.ivory,
+    fontWeight: '800',
+  },
   list: {
     paddingHorizontal: 20,
     paddingBottom: 16,
     gap: 10,
+    flexGrow: 1,
   },
   row: {
     flexDirection: 'row',
@@ -207,160 +250,87 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     borderRadius: 18,
     padding: 14,
-    gap: 12,
+    gap: 10,
     borderWidth: 1,
     borderColor: 'rgba(7, 77, 46, 0.08)',
   },
   rowPressed: {
     backgroundColor: 'rgba(168, 213, 186, 0.15)',
   },
-  rowBody: {
+  profileTap: {
+    alignItems: 'center',
+    width: 72,
+    gap: 6,
+    borderRadius: 12,
+    paddingVertical: 2,
+  },
+  previewTap: {
     flex: 1,
+    justifyContent: 'center',
+    borderRadius: 12,
+    paddingVertical: 4,
+    paddingHorizontal: 4,
   },
   rowTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 4,
+    gap: 8,
   },
   name: {
-    fontSize: 17,
+    fontSize: 12,
     fontWeight: '800',
     color: COLORS.forest,
+    textAlign: 'center',
+    maxWidth: 72,
   },
   time: {
-    fontSize: 12,
+    fontSize: 11,
     color: 'rgba(7, 77, 46, 0.45)',
     fontWeight: '600',
+    flexShrink: 0,
   },
   preview: {
+    flex: 1,
     fontSize: 14,
     color: 'rgba(7, 77, 46, 0.6)',
     fontWeight: '500',
+    marginRight: 8,
   },
-  chatHeader: {
-    flexDirection: 'row',
+  chatBtn: {
+    backgroundColor: COLORS.forest,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 12,
+  },
+  chatBtnPressed: {
+    opacity: 0.88,
+  },
+  chatBtnText: {
+    color: COLORS.ivory,
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  empty: {
     alignItems: 'center',
-    paddingTop: 54,
-    paddingHorizontal: 16,
-    paddingBottom: 12,
-    backgroundColor: COLORS.white,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(7, 77, 46, 0.08)',
-    gap: 10,
+    paddingHorizontal: 24,
+    paddingTop: 48,
   },
-  backBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(168, 213, 186, 0.25)',
-    alignItems: 'center',
-    justifyContent: 'center',
+  emptyEmoji: {
+    fontSize: 48,
+    marginBottom: 12,
   },
-  backBtnText: {
-    fontSize: 22,
-    color: COLORS.forest,
-    fontWeight: '700',
-  },
-  chatHeaderText: {
-    flex: 1,
-  },
-  chatName: {
-    fontSize: 17,
+  emptyTitle: {
+    fontSize: 20,
     fontWeight: '800',
     color: COLORS.forest,
-  },
-  chatMeta: {
-    fontSize: 12,
-    color: 'rgba(7, 77, 46, 0.55)',
-    fontWeight: '600',
-    marginTop: 2,
-  },
-  chatMessages: {
-    flex: 1,
-  },
-  chatMessagesContent: {
-    padding: 16,
-    paddingBottom: 8,
-    gap: 10,
-  },
-  chatHint: {
-    alignSelf: 'center',
-    backgroundColor: 'rgba(168, 213, 186, 0.3)',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 999,
     marginBottom: 8,
   },
-  chatHintText: {
-    fontSize: 13,
-    color: COLORS.forest,
-    fontWeight: '600',
-  },
-  bubble: {
-    maxWidth: '80%',
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 18,
-  },
-  bubbleSent: {
-    alignSelf: 'flex-end',
-    backgroundColor: COLORS.forest,
-    borderBottomRightRadius: 4,
-  },
-  bubbleReceived: {
-    alignSelf: 'flex-start',
-    backgroundColor: COLORS.white,
-    borderWidth: 1,
-    borderColor: 'rgba(7, 77, 46, 0.1)',
-    borderBottomLeftRadius: 4,
-  },
-  bubbleText: {
+  emptyBody: {
     fontSize: 15,
-    lineHeight: 21,
-    color: COLORS.forest,
+    lineHeight: 22,
+    color: 'rgba(7, 77, 46, 0.6)',
+    textAlign: 'center',
     fontWeight: '500',
-  },
-  bubbleTextSent: {
-    color: COLORS.ivory,
-  },
-  composer: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    gap: 10,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    paddingBottom: 8,
-    backgroundColor: COLORS.white,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(7, 77, 46, 0.08)',
-  },
-  composerInput: {
-    flex: 1,
-    minHeight: 44,
-    maxHeight: 100,
-    borderRadius: 14,
-    borderWidth: 1.5,
-    borderColor: 'rgba(7, 77, 46, 0.12)',
-    backgroundColor: COLORS.ivory,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    fontSize: 16,
-    color: COLORS.forest,
-    fontWeight: '500',
-  },
-  sendBtn: {
-    backgroundColor: COLORS.gold,
-    paddingHorizontal: 18,
-    paddingVertical: 12,
-    borderRadius: 14,
-  },
-  sendBtnDisabled: {
-    opacity: 0.45,
-  },
-  sendBtnText: {
-    fontSize: 15,
-    fontWeight: '800',
-    color: COLORS.forest,
   },
 });

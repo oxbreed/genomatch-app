@@ -13,6 +13,10 @@ import {
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import AvatarPhotoPicker from '../src/components/AvatarPhotoPicker';
+import { gradientFromId } from '../src/lib/profileMapper';
+import { pickAndUploadProfilePhoto } from '../src/lib/photoUpload';
+import { getCurrentProfile } from '../src/lib/profiles';
 import { supabase } from '../src/lib/supabase';
 
 const COLORS = {
@@ -80,6 +84,9 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
   const [bio, setBio] = useState('');
   const [interests, setInterests] = useState<string[]>([]);
   const [relationshipGoal, setRelationshipGoal] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [avatarGradient, setAvatarGradient] = useState<[string, string]>(['#074D2E', '#1B7A6E']);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
 
@@ -96,6 +103,17 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
       useNativeDriver: false,
     }).start();
   }, [progressAnim, step]);
+
+  useEffect(() => {
+    (async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (session?.user?.id) {
+        setAvatarGradient(gradientFromId(session.user.id));
+      }
+    })();
+  }, []);
 
   const animateStepChange = (nextStep: number, direction: 'forward' | 'back') => {
     const exitX = direction === 'forward' ? -24 : 24;
@@ -158,6 +176,19 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
     return null;
   };
 
+  const handlePhotoUpload = async () => {
+    setUploadingPhoto(true);
+    setError('');
+    try {
+      const url = await pickAndUploadProfilePhoto();
+      if (url) setAvatarUrl(url);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Photo upload failed');
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
+
   const handleNext = async () => {
     const validationError = validateStep();
     if (validationError) {
@@ -174,37 +205,65 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
     setSaving(true);
     try {
       const {
-        data: { user },
-      } = await supabase.auth.getUser();
+        data: { session },
+      } = await supabase.auth.getSession();
+      const user = session?.user;
 
-      if (user) {
-        const ageNum = parseInt(age, 10);
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .update({
-            display_name: displayName.trim(),
-            city: city.trim(),
-            bio: bio.trim(),
-            date_of_birth: ageToDateOfBirth(ageNum),
-            onboarding_completed: true,
-          })
-          .eq('id', user.id);
+      if (!user) {
+        throw new Error('You must be signed in to complete your profile.');
+      }
 
-        if (profileError) {
-          throw profileError;
-        }
+      const ageNum = parseInt(age, 10);
+      const profilePayload = {
+        display_name: displayName.trim(),
+        city: city.trim(),
+        bio: bio.trim(),
+        date_of_birth: ageToDateOfBirth(ageNum),
+        gender,
+        interests,
+        relationship_goal: relationshipGoal,
+        onboarding_completed: true,
+        ...(avatarUrl ? { avatar_url: avatarUrl } : {}),
+      };
 
-        const { error: metaError } = await supabase.auth.updateUser({
-          data: {
-            gender,
-            interests,
-            relationship_goal: relationshipGoal,
-          },
-        });
+      const existing = await getCurrentProfile();
+      const saveResult = existing
+        ? await supabase
+            .from('profiles')
+            .update(profilePayload)
+            .eq('id', user.id)
+            .select('id, display_name, onboarding_completed')
+            .single()
+        : await supabase
+            .from('profiles')
+            .insert({
+              id: user.id,
+              email: user.email ?? null,
+              ...profilePayload,
+            })
+            .select('id, display_name, onboarding_completed')
+            .single();
 
-        if (metaError) {
-          throw metaError;
-        }
+      console.log('[ProfileSetup] save result', saveResult.data, saveResult.error);
+
+      if (saveResult.error) {
+        throw saveResult.error;
+      }
+
+      if (!saveResult.data?.onboarding_completed) {
+        throw new Error('Profile saved but onboarding flag was not set. Please try again.');
+      }
+
+      const { error: metaError } = await supabase.auth.updateUser({
+        data: {
+          gender,
+          interests,
+          relationship_goal: relationshipGoal,
+        },
+      });
+
+      if (metaError) {
+        throw metaError;
       }
 
       onComplete();
@@ -235,6 +294,18 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
           <View style={styles.stepContent}>
             <Text style={styles.stepHeading}>Let's get to know you</Text>
             <Text style={styles.stepSubheading}>Basic details help us personalize your matches.</Text>
+
+            <View style={styles.photoSection}>
+              <AvatarPhotoPicker
+                name={displayName.trim() || 'You'}
+                gradient={avatarGradient}
+                avatarUrl={avatarUrl}
+                size={96}
+                uploading={uploadingPhoto}
+                onPress={handlePhotoUpload}
+              />
+              <Text style={styles.photoHint}>Optional — add a photo to stand out</Text>
+            </View>
 
             <Text style={styles.label}>Display name</Text>
             <TextInput
@@ -567,6 +638,17 @@ const styles = StyleSheet.create({
     color: 'rgba(7, 77, 46, 0.65)',
     fontWeight: '500',
     marginBottom: 20,
+  },
+  photoSection: {
+    alignItems: 'center',
+    marginBottom: 8,
+    gap: 10,
+  },
+  photoHint: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: 'rgba(7, 77, 46, 0.5)',
+    textAlign: 'center',
   },
   label: {
     fontSize: 14,
