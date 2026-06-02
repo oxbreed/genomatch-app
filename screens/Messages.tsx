@@ -171,7 +171,7 @@ export default function Messages({ initialChatMatchId, onChatOpened }: MessagesP
               >
                 <View style={styles.rowTop}>
                   <Text style={styles.preview} numberOfLines={1}>
-                    {item.lastMessage ?? 'Say hello! 👋'}
+                    {item.lastMessage ?? 'Say hello'}
                   </Text>
                   <Text style={styles.time}>
                     {item.lastMessageAt ? formatMessageTime(item.lastMessageAt) : 'New'}
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   chatBtn: {
-    backgroundColor: COLORS.forest,
+    backgroundColor: COLORS.gold,
     paddingHorizontal: 12,
     paddingVertical: 10,
     borderRadius: 12,
@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
     opacity: 0.88,
   },
   chatBtnText: {
-    color: COLORS.ivory,
+    color: COLORS.forest,
     fontSize: 12,
     fontWeight: '800',
   },

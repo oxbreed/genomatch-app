@@ -9,7 +9,12 @@ import {
   Text,
   View,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import type { ComponentProps } from 'react';
 import { StatusBar } from 'expo-status-bar';
+import GenoMatchLogo from './src/components/GenoMatchLogo';
+import { COLORS, TYPOGRAPHY } from './src/theme';
+
 import Register from './screens/Register';
 import SignIn from './screens/SignIn';
 import ProfileSetup from './screens/ProfileSetup';
@@ -20,30 +25,30 @@ import { supabase } from './src/lib/supabase';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
-const COLORS = {
-  teal: '#1B7A6E',
-  gold: '#C9872B',
-  ivory: '#FAFAF7',
-  white: '#FFFFFF',
-};
+type IonName = ComponentProps<typeof Ionicons>['name'];
 
-const ONBOARDING_SLIDES = [
+const ONBOARDING_SLIDES: {
+  icon: IonName;
+  title: string;
+  subtitle: string;
+  body: string;
+}[] = [
   {
-    emoji: '🧬',
+    icon: 'git-network-outline',
     title: 'Science-Led Compatibility',
     subtitle: 'GENOTYPE-AWARE MATCHING',
     body:
       'Meet people with confidence through thoughtful genotype compatibility, designed for modern West African love stories.',
   },
   {
-    emoji: '💚',
+    icon: 'heart-outline',
     title: 'Emotionally Intelligent Profiles',
     subtitle: 'DEEPER SIGNALS, BETTER DATES',
     body:
       'Every profile blends emotional style, communication rhythm, and long-term intent so connections feel meaningful from day one.',
   },
   {
-    emoji: '🌟',
+    icon: 'sparkles-outline',
     title: 'Premium Journey to Forever',
     subtitle: 'TRUSTED BY INTENTIONAL SINGLES',
     body:
@@ -56,7 +61,7 @@ export default function App() {
   const [screen, setScreen] = useState<
     'onboarding' | 'register' | 'signIn' | 'profileSetup' | 'main'
   >('onboarding');
-  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [splashFinished, setSplashFinished] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
@@ -105,7 +110,6 @@ export default function App() {
 
       if (!session) {
         setScreen('onboarding');
-        setShowOnboarding(true);
         setCurrentSlide(0);
       }
     });
@@ -119,6 +123,7 @@ export default function App() {
   const splashOpacity = useRef(new Animated.Value(1)).current;
   const splashScale = useRef(new Animated.Value(0.88)).current;
   const logoFloat = useRef(new Animated.Value(0)).current;
+  const logoPulse = useRef(new Animated.Value(0.94)).current;
   const glowPulse = useRef(new Animated.Value(0.85)).current;
   const onboardingOpacity = useRef(new Animated.Value(0)).current;
   const onboardingTranslateY = useRef(new Animated.Value(28)).current;
@@ -189,8 +194,26 @@ export default function App() {
       ])
     );
 
+    const pulseLoop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(logoPulse, {
+          toValue: 1,
+          duration: 1400,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }),
+        Animated.timing(logoPulse, {
+          toValue: 0.94,
+          duration: 1400,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }),
+      ])
+    );
+
     splashIn.start();
     floatingLoop.start();
+    pulseLoop.start();
 
     const transitionTimeout = setTimeout(() => {
       Animated.parallel([
@@ -211,7 +234,7 @@ export default function App() {
           return;
         }
 
-        setShowOnboarding(true);
+        setSplashFinished(true);
         Animated.parallel([
           Animated.timing(onboardingOpacity, {
             toValue: 1,
@@ -232,12 +255,14 @@ export default function App() {
     return () => {
       clearTimeout(transitionTimeout);
       floatingLoop.stop();
+      pulseLoop.stop();
       ringLoop.stop();
       ringInnerLoop.stop();
     };
   }, [
     glowPulse,
     logoFloat,
+    logoPulse,
     onboardingOpacity,
     onboardingTranslateY,
     ringRotate,
@@ -288,11 +313,49 @@ export default function App() {
     }).start();
   };
 
-  if (bootstrapping) {
+  if (!splashFinished || bootstrapping) {
     return (
-      <View style={styles.bootstrap}>
+      <View style={styles.root}>
         <StatusBar style="light" />
-        <ActivityIndicator size="large" color={COLORS.gold} />
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            styles.splashLayer,
+            {
+              opacity: splashOpacity,
+              transform: [{ scale: splashScale }],
+            },
+          ]}
+        >
+          <Animated.View style={[styles.splashGlow, { transform: [{ scale: glowPulse }] }]} />
+          <View style={styles.logoStack}>
+            <Animated.View
+              style={[styles.logoRingOuter, { transform: [{ rotate: ringSpin }] }]}
+            />
+            <Animated.View
+              style={[styles.logoRingInner, { transform: [{ rotate: ringSpinInner }] }]}
+            />
+            <Animated.View
+              style={[
+                styles.logoOrb,
+                {
+                  transform: [{ translateY: logoFloat }, { scale: logoPulse }],
+                },
+              ]}
+            >
+              <GenoMatchLogo size={88} />
+            </Animated.View>
+          </View>
+          <Text style={styles.brandWordmark}>GenoMatch</Text>
+          <Text style={styles.brandTagline}>Connecting Hearts. Aligning Genes.</Text>
+          {bootstrapping ? (
+            <ActivityIndicator
+              style={styles.splashSpinner}
+              size="small"
+              color={COLORS.gold}
+            />
+          ) : null}
+        </Animated.View>
       </View>
     );
   }
@@ -326,7 +389,6 @@ export default function App() {
       <MainTabs
         onSignOut={() => {
           setScreen('onboarding');
-          setShowOnboarding(true);
           setCurrentSlide(0);
         }}
       />
@@ -336,34 +398,6 @@ export default function App() {
   return (
     <View style={styles.root}>
       <StatusBar style="light" />
-
-      {!showOnboarding && (
-        <Animated.View
-          pointerEvents="none"
-          style={[
-            styles.splashLayer,
-            {
-              opacity: splashOpacity,
-              transform: [{ scale: splashScale }],
-            },
-          ]}
-        >
-          <Animated.View style={[styles.splashGlow, { transform: [{ scale: glowPulse }] }]} />
-          <View style={styles.logoStack}>
-            <Animated.View
-              style={[styles.logoRingOuter, { transform: [{ rotate: ringSpin }] }]}
-            />
-            <Animated.View
-              style={[styles.logoRingInner, { transform: [{ rotate: ringSpinInner }] }]}
-            />
-            <Animated.View style={[styles.logoOrb, { transform: [{ translateY: logoFloat }] }]}>
-              <Text style={styles.logoEmoji}>🧬</Text>
-            </Animated.View>
-          </View>
-          <Text style={styles.brandWordmark}>GenoMatch</Text>
-          <Text style={styles.brandTagline}>Connecting Hearts. Aligning Genes.</Text>
-        </Animated.View>
-      )}
 
       <Animated.View
         style={[
@@ -396,7 +430,7 @@ export default function App() {
           {ONBOARDING_SLIDES.map((slide) => (
             <View key={slide.title} style={styles.slide}>
               <View style={styles.iconCard}>
-                <Text style={styles.slideEmoji}>{slide.emoji}</Text>
+                <Ionicons name={slide.icon} size={40} color={COLORS.gold} />
               </View>
               <Text style={styles.slideSubtitle}>{slide.subtitle}</Text>
               <Text style={styles.slideTitle}>{slide.title}</Text>
@@ -449,11 +483,11 @@ export default function App() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: COLORS.teal,
+    backgroundColor: COLORS.forest,
   },
   splashLayer: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: COLORS.teal,
+    backgroundColor: COLORS.forest,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -462,7 +496,7 @@ const styles = StyleSheet.create({
     width: 310,
     height: 310,
     borderRadius: 155,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    backgroundColor: 'rgba(168, 213, 186, 0.12)',
   },
   logoStack: {
     width: 168,
@@ -479,7 +513,7 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: COLORS.gold,
     borderTopColor: 'transparent',
-    borderRightColor: 'rgba(201, 135, 43, 0.35)',
+    borderRightColor: 'rgba(255, 224, 130, 0.35)',
   },
   logoRingInner: {
     position: 'absolute',
@@ -487,7 +521,7 @@ const styles = StyleSheet.create({
     height: 148,
     borderRadius: 74,
     borderWidth: 2,
-    borderColor: 'rgba(255, 255, 255, 0.45)',
+    borderColor: COLORS.sage,
     borderBottomColor: 'transparent',
     borderLeftColor: 'transparent',
   },
@@ -497,25 +531,26 @@ const styles = StyleSheet.create({
     borderRadius: 60,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    backgroundColor: 'rgba(168, 213, 186, 0.08)',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.28)',
+    borderColor: 'rgba(255, 224, 130, 0.2)',
   },
-  logoEmoji: {
-    fontSize: 54,
+  splashSpinner: {
+    marginTop: 20,
   },
   brandWordmark: {
-    color: COLORS.ivory,
+    color: COLORS.white,
     fontSize: 46,
-    fontWeight: '800',
+    fontWeight: '700',
     letterSpacing: -1.1,
   },
   brandTagline: {
     marginTop: 8,
-    color: 'rgba(250, 250, 247, 0.72)',
+    color: COLORS.sage,
     fontSize: 16,
     letterSpacing: 0.2,
-    fontWeight: '500',
+    fontWeight: '400',
+    lineHeight: 24,
   },
   onboardingLayer: {
     flex: 1,
@@ -549,6 +584,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     justifyContent: 'center',
   },
+  slideSubtitle: {
+    color: COLORS.gold,
+    fontSize: 12,
+    fontWeight: '600',
+    letterSpacing: 2,
+    marginBottom: 10,
+  },
   iconCard: {
     width: 96,
     height: 96,
@@ -560,21 +602,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.18)',
   },
-  slideEmoji: {
-    fontSize: 44,
-  },
-  slideSubtitle: {
-    color: COLORS.gold,
-    fontSize: 12,
-    fontWeight: '700',
-    letterSpacing: 2,
-    marginBottom: 10,
-  },
   slideTitle: {
     color: COLORS.ivory,
     fontSize: 39,
     lineHeight: 45,
-    fontWeight: '800',
+    fontWeight: '600',
     letterSpacing: -0.8,
     marginBottom: 14,
     maxWidth: '95%',
@@ -582,8 +614,8 @@ const styles = StyleSheet.create({
   slideBody: {
     color: 'rgba(250, 250, 247, 0.78)',
     fontSize: 17,
-    lineHeight: 29,
-    fontWeight: '500',
+    lineHeight: 25.5,
+    fontWeight: '400',
     maxWidth: '96%',
   },
   footer: {
@@ -613,9 +645,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   ctaLabel: {
-    color: COLORS.white,
+    color: COLORS.forest,
     fontSize: 17,
-    fontWeight: '800',
+    fontWeight: '700',
     letterSpacing: 0.2,
   },
   helperText: {
@@ -624,11 +656,5 @@ const styles = StyleSheet.create({
     fontSize: 13,
     textAlign: 'center',
     fontWeight: '500',
-  },
-  bootstrap: {
-    flex: 1,
-    backgroundColor: COLORS.teal,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });

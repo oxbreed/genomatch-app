@@ -1,0 +1,45 @@
+import Svg, { Line, Path } from 'react-native-svg';
+
+type GenoMatchLogoProps = {
+  size?: number;
+};
+
+export default function GenoMatchLogo({ size = 120 }: GenoMatchLogoProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 100 100" fill="none">
+      <Path
+        d="M28 18 C38 28, 22 38, 32 48 C42 58, 26 68, 36 78 C46 88, 30 92, 40 92"
+        stroke="#A8D5BA"
+        strokeWidth={4}
+        strokeLinecap="round"
+      />
+      <Path
+        d="M22 24 C32 34, 16 44, 26 54 C36 64, 20 74, 30 84"
+        stroke="#A8D5BA"
+        strokeWidth={2.5}
+        strokeLinecap="round"
+        opacity={0.55}
+      />
+      <Path
+        d="M72 18 C62 28, 78 38, 68 48 C58 58, 74 68, 64 78 C54 88, 70 92, 60 92"
+        stroke="#A8D5BA"
+        strokeWidth={4}
+        strokeLinecap="round"
+      />
+      <Path
+        d="M78 24 C68 34, 84 44, 74 54 C64 64, 80 74, 70 84"
+        stroke="#A8D5BA"
+        strokeWidth={2.5}
+        strokeLinecap="round"
+        opacity={0.55}
+      />
+      <Line x1={30} y1={32} x2={70} y2={32} stroke="#A8D5BA" strokeWidth={2} opacity={0.45} strokeLinecap="round" />
+      <Line x1={26} y1={48} x2={74} y2={48} stroke="#A8D5BA" strokeWidth={2} opacity={0.45} strokeLinecap="round" />
+      <Line x1={30} y1={64} x2={70} y2={64} stroke="#A8D5BA" strokeWidth={2} opacity={0.45} strokeLinecap="round" />
+      <Path
+        d="M50 76 C50 76 24 58 24 40 C24 30 32 24 40 24 C45 24 50 28 50 33 C50 28 55 24 60 24 C68 24 76 30 76 40 C76 58 50 76 50 76 Z"
+        fill="#FFE082"
+      />
+    </Svg>
+  );
+}

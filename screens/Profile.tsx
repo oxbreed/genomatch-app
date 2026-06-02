@@ -10,6 +10,7 @@ import {
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { LinearGradient } from 'expo-linear-gradient';
 import AvatarPhotoPicker from '../src/components/AvatarPhotoPicker';
 import GenotypeBadge from '../src/components/GenotypeBadge';
 import { COLORS, RELATIONSHIP_GOAL_LABELS } from '../src/data/mockData';
@@ -235,37 +236,47 @@ export default function Profile({ onSignOut }: ProfileProps) {
       {error ? <Text style={styles.errorBanner}>{error}</Text> : null}
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <View style={styles.heroCard}>
+        <View style={styles.heroArea}>
           <AvatarPhotoPicker
             name={data.displayName}
             gradient={data.gradient}
             avatarUrl={data.avatarUrl}
-            size={100}
+            variant="hero"
+            heroHeight={280}
             uploading={uploadingPhoto}
             onPress={pickAndUploadPhoto}
           />
+          <LinearGradient
+            colors={['transparent', 'rgba(0, 0, 0, 0.78)']}
+            style={styles.heroGradient}
+            pointerEvents="none"
+          />
+          <View style={styles.heroOverlay} pointerEvents="box-none">
+            {editing ? (
+              <TextInput
+                style={styles.heroNameInput}
+                value={draft?.displayName}
+                onChangeText={(text) =>
+                  setDraft((p) => (p ? { ...p, displayName: text } : p))
+                }
+                placeholder="Display name"
+                placeholderTextColor="rgba(255, 255, 255, 0.5)"
+              />
+            ) : (
+              <Text style={styles.heroDisplayName}>{data.displayName}</Text>
+            )}
 
-          {editing ? (
-            <TextInput
-              style={styles.nameInput}
-              value={draft?.displayName}
-              onChangeText={(text) =>
-                setDraft((p) => (p ? { ...p, displayName: text } : p))
-              }
-            />
-          ) : (
-            <Text style={styles.displayName}>{data.displayName}</Text>
-          )}
-
-          <View style={styles.heroMeta}>
-            <GenotypeBadge genotype={data.genotype} />
-            <Text style={styles.ageCity}>
-              {data.age ? `${data.age} · ` : ''}
-              {data.city}
-            </Text>
+            <View style={styles.heroMeta}>
+              <GenotypeBadge genotype={data.genotype} />
+              <Text style={styles.heroAgeCity}>
+                {data.age ? `${data.age} · ` : ''}
+                {data.city}
+              </Text>
+            </View>
           </View>
         </View>
 
+        <View style={styles.scrollContent}>
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>City</Text>
           {editing ? (
@@ -326,6 +337,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
             {signingOut ? 'Signing out...' : 'Sign Out'}
           </Text>
         </Pressable>
+        </View>
       </ScrollView>
     </View>
   );
@@ -344,7 +356,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
-    fontWeight: '800',
+    fontWeight: '700',
     color: COLORS.forest,
     letterSpacing: -0.8,
   },
@@ -354,7 +366,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: COLORS.forest,
   },
-  editBtnText: { color: COLORS.ivory, fontSize: 14, fontWeight: '800' },
+  editBtnText: { color: COLORS.ivory, fontSize: 14, fontWeight: '700' },
   editActions: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   cancelText: { fontSize: 14, fontWeight: '700', color: 'rgba(7, 77, 46, 0.6)' },
   saveBtn: {
@@ -363,14 +375,14 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: COLORS.gold,
   },
-  saveBtnText: { fontSize: 14, fontWeight: '800', color: COLORS.forest },
+  saveBtnText: { fontSize: 14, fontWeight: '700', color: COLORS.forest },
   errorBanner: {
     marginHorizontal: 20,
     marginBottom: 8,
     padding: 10,
     borderRadius: 10,
-    backgroundColor: '#FFEBEE',
-    color: '#A32D2D',
+    backgroundColor: COLORS.errorBg,
+    color: COLORS.error,
     fontSize: 13,
     fontWeight: '600',
     textAlign: 'center',
@@ -383,42 +395,59 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 12,
   },
-  retryText: { color: COLORS.ivory, fontWeight: '800' },
-  scroll: { paddingHorizontal: 20, paddingBottom: 24 },
-  heroCard: {
-    backgroundColor: COLORS.white,
-    borderRadius: 24,
-    paddingVertical: 28,
-    paddingHorizontal: 20,
-    alignItems: 'center',
+  retryText: { color: COLORS.ivory, fontWeight: '700' },
+  scroll: { paddingBottom: 24 },
+  scrollContent: { paddingHorizontal: 20 },
+  heroArea: {
+    width: '100%',
+    height: 280,
+    position: 'relative',
     marginBottom: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(7, 77, 46, 0.08)',
   },
-  displayName: {
-    marginTop: 14,
+  heroGradient: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 120,
+    zIndex: 2,
+  },
+  heroOverlay: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    paddingHorizontal: 16,
+    paddingBottom: 14,
+    paddingRight: 58,
+    zIndex: 3,
+  },
+  heroDisplayName: {
     fontSize: 26,
-    fontWeight: '800',
-    color: COLORS.forest,
+    fontWeight: '700',
+    color: COLORS.white,
+    letterSpacing: -0.5,
   },
-  nameInput: {
-    marginTop: 14,
+  heroNameInput: {
     fontSize: 22,
-    fontWeight: '800',
-    color: COLORS.forest,
-    textAlign: 'center',
+    fontWeight: '700',
+    color: COLORS.white,
     borderBottomWidth: 2,
-    borderBottomColor: COLORS.sage,
-    minWidth: 200,
+    borderBottomColor: 'rgba(255, 255, 255, 0.45)',
     paddingVertical: 4,
   },
   heroMeta: {
     flexDirection: 'row',
     alignItems: 'center',
+    flexWrap: 'wrap',
     gap: 10,
-    marginTop: 10,
+    marginTop: 8,
   },
-  ageCity: { fontSize: 14, fontWeight: '600', color: 'rgba(7, 77, 46, 0.65)' },
+  heroAgeCity: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: 'rgba(255, 255, 255, 0.88)',
+  },
   section: {
     backgroundColor: COLORS.white,
     borderRadius: 18,
@@ -469,17 +498,17 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(201, 135, 43, 0.25)',
   },
-  goalText: { fontSize: 16, fontWeight: '800', color: COLORS.forest },
+  goalText: { fontSize: 16, fontWeight: '600', color: COLORS.forest },
   signOutBtn: {
     marginTop: 8,
     height: 54,
     borderRadius: 16,
     borderWidth: 1.5,
     borderColor: 'rgba(163, 45, 45, 0.35)',
-    backgroundColor: '#FFEBEE',
+    backgroundColor: COLORS.errorBg,
     alignItems: 'center',
     justifyContent: 'center',
   },
   signOutBtnDisabled: { opacity: 0.6 },
-  signOutText: { fontSize: 16, fontWeight: '800', color: '#A32D2D' },
+  signOutText: { fontSize: 16, fontWeight: '600', color: COLORS.error },
 });

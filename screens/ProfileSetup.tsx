@@ -13,19 +13,10 @@ import {
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { Ionicons } from '@expo/vector-icons';
+import type { ComponentProps } from 'react';
 import AvatarPhotoPicker from '../src/components/AvatarPhotoPicker';
-import { gradientFromId } from '../src/lib/profileMapper';
-import { pickAndUploadProfilePhoto } from '../src/lib/photoUpload';
-import { getCurrentProfile } from '../src/lib/profiles';
-import { supabase } from '../src/lib/supabase';
-
-const COLORS = {
-  forest: '#074D2E',
-  sage: '#A8D5BA',
-  gold: '#FFE082',
-  ivory: '#FAFAF7',
-  white: '#FFFFFF',
-};
+import { COLORS } from '../src/theme';
 
 const STEPS = ['Basic Info', 'About You', 'Your Goal'];
 const TOTAL_STEPS = STEPS.length;
@@ -47,23 +38,35 @@ const INTERESTS = [
 
 const GENDERS = ['Male', 'Female', 'Other'] as const;
 
-const RELATIONSHIP_GOALS = [
+import { gradientFromId } from '../src/lib/profileMapper';
+import { pickAndUploadProfilePhoto } from '../src/lib/photoUpload';
+import { getCurrentProfile } from '../src/lib/profiles';
+import { supabase } from '../src/lib/supabase';
+
+type IonName = ComponentProps<typeof Ionicons>['name'];
+
+const RELATIONSHIP_GOALS: {
+  id: string;
+  title: string;
+  icon: IonName;
+  description: string;
+}[] = [
   {
     id: 'serious',
     title: 'Serious Relationship',
-    icon: '💚',
+    icon: 'heart',
     description: 'Ready to build something real with someone who shares your values.',
   },
   {
     id: 'marriage',
     title: 'Marriage',
-    icon: '💍',
+    icon: 'infinite',
     description: 'Looking for a lifelong partner and a future built together.',
   },
   {
     id: 'friendship',
     title: 'Friendship',
-    icon: '🤝',
+    icon: 'people',
     description: 'Open to meaningful connections that may grow into more over time.',
   },
 ];
@@ -415,7 +418,7 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
                   style={[styles.goalCard, selected && styles.goalCardSelected]}
                 >
                   <View style={styles.goalIconWrap}>
-                    <Text style={styles.goalIcon}>{goal.icon}</Text>
+                    <Ionicons name={goal.icon} size={26} color={COLORS.forest} />
                   </View>
                   <View style={styles.goalTextWrap}>
                     <Text style={[styles.goalTitle, selected && styles.goalTitleSelected]}>
@@ -425,7 +428,7 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
                   </View>
                   {selected && (
                     <View style={styles.goalCheck}>
-                      <Text style={styles.goalCheckText}>✓</Text>
+                      <Ionicons name="checkmark" size={16} color={COLORS.ivory} />
                     </View>
                   )}
                 </Pressable>
@@ -464,14 +467,18 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
                     done && styles.stepDotDone,
                   ]}
                 >
-                  <Text
-                    style={[
-                      styles.stepDotText,
-                      (active || done) && styles.stepDotTextActive,
-                    ]}
-                  >
-                    {done ? '✓' : index + 1}
-                  </Text>
+                  {done ? (
+                    <Ionicons name="checkmark" size={14} color={COLORS.ivory} />
+                  ) : (
+                    <Text
+                      style={[
+                        styles.stepDotText,
+                        (active || done) && styles.stepDotTextActive,
+                      ]}
+                    >
+                      {index + 1}
+                    </Text>
+                  )}
                 </View>
                 <Text style={[styles.stepLabel, active && styles.stepLabelActive]}>{label}</Text>
               </View>

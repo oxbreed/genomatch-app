@@ -1,12 +1,7 @@
 import type { DiscoveryProfile } from '../types/database';
 
-export const COLORS = {
-  forest: '#074D2E',
-  sage: '#A8D5BA',
-  gold: '#FFE082',
-  ivory: '#FAFAF7',
-  white: '#FFFFFF',
-};
+export { COLORS, TYPOGRAPHY, RADIUS, SHADOWS } from '../theme';
+import { COLORS } from '../theme';
 
 export const GENOTYPE_STYLES: Record<
   string,

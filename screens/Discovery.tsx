@@ -12,88 +12,81 @@ import {
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import GenotypeBadge from '../src/components/GenotypeBadge';
 import ProfileAvatar from '../src/components/ProfileAvatar';
-import { COLORS, getMockDiscoveryProfiles } from '../src/data/mockData';
+import { COLORS, RADIUS, SHADOWS, TYPOGRAPHY, getMockDiscoveryProfiles } from '../src/data/mockData';
 import { fetchDiscoveryProfiles } from '../src/lib/profiles';
 import { recordLike, recordPass } from '../src/lib/likes';
 import type { DiscoveryProfile } from '../src/types/database';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const SWIPE_THRESHOLD = SCREEN_WIDTH * 0.22;
+const PHOTO_HEIGHT = 220;
 
-function ScoreRing({ percent }: { percent: number }) {
-  const ringColor = percent >= 90 ? COLORS.gold : COLORS.sage;
-  const accentStrength = percent >= 75 ? 1 : 0.65;
-
+function MatchPill({ percent }: { percent: number }) {
   return (
-    <View style={styles.scoreRingWrap}>
-      <View
-        style={[
-          styles.scoreRingOuter,
-          {
-            borderColor: `rgba(168, 213, 186, 0.45)`,
-          },
-        ]}
-      />
-      <View
-        style={[
-          styles.scoreRingAccent,
-          {
-            borderTopColor: ringColor,
-            borderRightColor: percent > 50 ? ringColor : 'transparent',
-            borderBottomColor: percent > 75 ? ringColor : 'transparent',
-            borderLeftColor: percent > 25 ? `rgba(168, 213, 186, ${accentStrength})` : 'transparent',
-          },
-        ]}
-      />
-      <View style={styles.scoreRingInner}>
-        <Text style={styles.scorePercent}>{percent}%</Text>
-        <Text style={styles.scoreLabel}>Match</Text>
-      </View>
+    <View style={styles.matchPill}>
+      <Text style={styles.matchPillText}>{percent}%</Text>
     </View>
   );
 }
 
 function ProfileCard({ profile }: { profile: DiscoveryProfile }) {
   return (
-    <ScrollView
-      style={styles.cardScroll}
-      contentContainerStyle={styles.cardScrollContent}
-      showsVerticalScrollIndicator={false}
-    >
-      <View style={styles.cardHeader}>
+    <View style={styles.cardBody}>
+      <View style={styles.photoArea}>
         <ProfileAvatar
           name={profile.name}
           gradient={profile.gradient}
           avatarUrl={profile.avatarUrl}
-          size={96}
+          width="100%"
+          height={PHOTO_HEIGHT}
+          borderRadius={0}
+          initialsPosition="top"
+          initialsOpacity={0.15}
         />
-        <ScoreRing percent={profile.compatibility} />
-      </View>
-
-      <View style={styles.nameRow}>
-        <Text style={styles.name}>
-          {profile.name}
-          {profile.age != null ? `, ${profile.age}` : ''}
-        </Text>
-        <GenotypeBadge genotype={profile.genotype} />
-      </View>
-
-      <Text style={styles.city}>📍 {profile.city}</Text>
-
-      <Text style={styles.bio} numberOfLines={3}>
-        {profile.bio}
-      </Text>
-
-      <View style={styles.interestRow}>
-        {profile.interests.map((interest) => (
-          <View key={interest} style={styles.interestChip}>
-            <Text style={styles.interestText}>{interest}</Text>
+        <MatchPill percent={profile.compatibility} />
+        <LinearGradient
+          colors={['transparent', 'rgba(0, 0, 0, 0.78)']}
+          style={styles.photoGradient}
+          pointerEvents="none"
+        />
+        <View style={styles.photoOverlay} pointerEvents="none">
+          <View style={styles.photoNameRow}>
+            <Text style={styles.photoName}>
+              {profile.name}
+              {profile.age != null ? `, ${profile.age}` : ''}
+            </Text>
+            <GenotypeBadge genotype={profile.genotype} />
           </View>
-        ))}
+        </View>
       </View>
-    </ScrollView>
+
+      <ScrollView
+        style={styles.cardScroll}
+        contentContainerStyle={styles.cardScrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.cityRow}>
+          <Ionicons name="location-outline" size={15} color={COLORS.sage} />
+          <Text style={styles.city}>{profile.city}</Text>
+        </View>
+
+        <Text style={styles.bio} numberOfLines={3}>
+          {profile.bio}
+        </Text>
+
+        <View style={styles.interestRow}>
+          {profile.interests.map((interest) => (
+            <View key={interest} style={styles.interestChip}>
+              <Text style={styles.interestText}>{interest}</Text>
+            </View>
+          ))}
+        </View>
+      </ScrollView>
+    </View>
   );
 }
 
@@ -350,7 +343,9 @@ export default function Discovery() {
           </View>
         ) : loadError ? (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyEmoji}>⚠️</Text>
+            <View style={styles.emptyIconWrap}>
+              <Ionicons name="alert-circle-outline" size={28} color={COLORS.forest} />
+            </View>
             <Text style={styles.emptyTitle}>{loadError}</Text>
             <Pressable style={styles.retryBtn} onPress={loadProfiles}>
               <Text style={styles.retryText}>Try again</Text>
@@ -358,13 +353,17 @@ export default function Discovery() {
           </View>
         ) : isEmpty ? (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyEmoji}>🌿</Text>
+            <View style={styles.emptyIconWrap}>
+              <Ionicons name="people-outline" size={28} color={COLORS.forest} />
+            </View>
             <Text style={styles.emptyTitle}>No profiles to show</Text>
             <Text style={styles.emptyBody}>Check back soon for new people nearby.</Text>
           </View>
         ) : seenAll ? (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyEmoji}>🌿</Text>
+            <View style={styles.emptyIconWrap}>
+              <Ionicons name="checkmark-circle-outline" size={28} color={COLORS.forest} />
+            </View>
             <Text style={styles.emptyTitle}>You&apos;ve seen everyone nearby.</Text>
             <Text style={styles.emptyBody}>Check back tomorrow.</Text>
           </View>
@@ -417,14 +416,14 @@ export default function Discovery() {
             onPress={handlePass}
             disabled={showMatch}
           >
-            <Text style={styles.passIcon}>✕</Text>
+            <Ionicons name="close" size={30} color={COLORS.textSubtle} />
           </Pressable>
           <Pressable
             style={({ pressed }) => [styles.likeBtn, pressed && styles.btnPressed]}
             onPress={handleLike}
             disabled={showMatch}
           >
-            <Text style={styles.likeIcon}>❤️</Text>
+            <Ionicons name="heart" size={30} color={COLORS.ivory} />
           </Pressable>
         </View>
       )}
@@ -440,15 +439,20 @@ export default function Discovery() {
           ]}
           pointerEvents="none"
         >
-          <Text style={styles.confetti}>🎉 ✨ 🎊 ✨ 🎉</Text>
+          <View style={styles.matchSparkRow}>
+            {[0, 1, 2, 3, 4].map((i) => (
+              <View key={i} style={[styles.matchSpark, i % 2 === 0 && styles.matchSparkAlt]} />
+            ))}
+          </View>
           <View style={styles.matchCard}>
             <Text style={styles.matchTitle}>It's a Match!</Text>
             <Text style={styles.matchSubtitle}>
               You and {matchedName} liked each other
             </Text>
-            <Text style={styles.matchEmoji}>💚</Text>
+            <View style={styles.matchIconWrap}>
+              <Ionicons name="heart" size={40} color={COLORS.forest} />
+            </View>
           </View>
-          <Text style={styles.confettiBottom}>🎊 🎉 ✨ 🎉 🎊</Text>
         </Animated.View>
       )}
     </View>
@@ -466,16 +470,12 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
   },
   headerTitle: {
-    fontSize: 32,
-    fontWeight: '800',
-    color: COLORS.forest,
-    letterSpacing: -0.8,
+    ...TYPOGRAPHY.display,
   },
   headerSubtitle: {
     marginTop: 4,
-    fontSize: 14,
-    color: 'rgba(7, 77, 46, 0.6)',
-    fontWeight: '500',
+    ...TYPOGRAPHY.caption,
+    color: COLORS.textMuted,
   },
   deckArea: {
     flex: 1,
@@ -489,15 +489,64 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     backgroundColor: COLORS.white,
-    borderRadius: 24,
+    borderRadius: RADIUS.lg,
     borderWidth: 1,
-    borderColor: 'rgba(7, 77, 46, 0.08)',
-    shadowColor: COLORS.forest,
-    shadowOpacity: 0.12,
-    shadowRadius: 20,
-    shadowOffset: { width: 0, height: 10 },
-    elevation: 6,
+    borderColor: COLORS.border,
+    ...SHADOWS.cardElevated,
     overflow: 'hidden',
+  },
+  cardBody: {
+    flex: 1,
+  },
+  photoArea: {
+    width: '100%',
+    height: PHOTO_HEIGHT,
+    position: 'relative',
+  },
+  photoGradient: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 96,
+    zIndex: 2,
+  },
+  photoOverlay: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    paddingHorizontal: 16,
+    paddingBottom: 14,
+    zIndex: 3,
+  },
+  photoNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  photoName: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: COLORS.white,
+    letterSpacing: -0.4,
+    flexShrink: 1,
+  },
+  matchPill: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    backgroundColor: COLORS.gold,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 999,
+    zIndex: 4,
+  },
+  matchPillText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: COLORS.forest,
   },
   cardBehind: {
     transform: [{ scale: 0.95 }],
@@ -507,14 +556,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   cardScrollContent: {
-    padding: 22,
+    paddingHorizontal: 22,
+    paddingTop: 16,
     paddingBottom: 28,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 18,
   },
   loadingState: {
     flex: 1,
@@ -549,61 +593,23 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     maxWidth: '90%',
   },
-  scoreRingWrap: {
-    width: 76,
-    height: 76,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  scoreRingOuter: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: 38,
-    borderWidth: 5,
-  },
-  scoreRingAccent: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: 38,
-    borderWidth: 5,
-  },
-  scoreRingInner: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  scorePercent: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: COLORS.forest,
-  },
-  scoreLabel: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: 'rgba(7, 77, 46, 0.55)',
-    letterSpacing: 0.5,
-  },
-  nameRow: {
+  cityRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: 10,
-    marginBottom: 6,
-  },
-  name: {
-    fontSize: 26,
-    fontWeight: '800',
-    color: COLORS.forest,
-    letterSpacing: -0.4,
+    gap: 6,
+    marginBottom: 14,
   },
   city: {
     fontSize: 15,
-    color: 'rgba(7, 77, 46, 0.65)',
-    fontWeight: '600',
-    marginBottom: 14,
+    color: COLORS.textMuted,
+    fontWeight: '400',
+    lineHeight: 22.5,
   },
   bio: {
     fontSize: 15,
-    lineHeight: 23,
-    color: 'rgba(7, 77, 46, 0.78)',
-    fontWeight: '500',
+    lineHeight: 22.5,
+    color: COLORS.textMuted,
+    fontWeight: '400',
     marginBottom: 16,
   },
   interestRow: {
@@ -633,24 +639,24 @@ const styles = StyleSheet.create({
   },
   stampLike: {
     left: 24,
-    borderColor: '#2E7D32',
+    borderColor: COLORS.forest,
     transform: [{ rotate: '-12deg' }],
   },
   stampPass: {
     right: 24,
-    borderColor: '#9CA3AF',
+    borderColor: COLORS.textSubtle,
     transform: [{ rotate: '12deg' }],
   },
   stampLikeText: {
     fontSize: 22,
-    fontWeight: '900',
-    color: '#2E7D32',
+    fontWeight: '700',
+    color: COLORS.forest,
     letterSpacing: 2,
   },
   stampPassText: {
     fontSize: 22,
-    fontWeight: '900',
-    color: '#9CA3AF',
+    fontWeight: '700',
+    color: COLORS.textSubtle,
     letterSpacing: 2,
   },
   actions: {
@@ -665,32 +671,21 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: '#E8E8E4',
+    backgroundColor: COLORS.ivory,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(7, 77, 46, 0.1)',
+    borderColor: COLORS.border,
+    ...SHADOWS.card,
   },
   likeBtn: {
     width: 72,
     height: 72,
     borderRadius: 36,
-    backgroundColor: '#2E7D32',
+    backgroundColor: COLORS.forest,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#2E7D32',
-    shadowOpacity: 0.35,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 5,
-  },
-  passIcon: {
-    fontSize: 28,
-    color: '#6B7280',
-    fontWeight: '700',
-  },
-  likeIcon: {
-    fontSize: 30,
+    ...SHADOWS.button,
   },
   btnPressed: {
     opacity: 0.85,
@@ -702,26 +697,28 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 32,
     backgroundColor: COLORS.white,
-    borderRadius: 24,
+    borderRadius: RADIUS.lg,
     borderWidth: 1,
-    borderColor: 'rgba(7, 77, 46, 0.08)',
+    borderColor: COLORS.border,
     marginBottom: 8,
+    ...SHADOWS.card,
   },
-  emptyEmoji: {
-    fontSize: 48,
+  emptyIconWrap: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: 'rgba(168, 213, 186, 0.35)',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 16,
   },
   emptyTitle: {
-    fontSize: 22,
-    fontWeight: '800',
-    color: COLORS.forest,
+    ...TYPOGRAPHY.headingSm,
     textAlign: 'center',
     marginBottom: 8,
   },
   emptyBody: {
-    fontSize: 16,
-    color: 'rgba(7, 77, 46, 0.6)',
-    fontWeight: '500',
+    ...TYPOGRAPHY.body,
     textAlign: 'center',
   },
   matchOverlay: {
@@ -732,44 +729,51 @@ const styles = StyleSheet.create({
     paddingHorizontal: 28,
     zIndex: 100,
   },
-  confetti: {
-    fontSize: 28,
+  matchSparkRow: {
+    flexDirection: 'row',
+    gap: 10,
     marginBottom: 20,
-    letterSpacing: 4,
   },
-  confettiBottom: {
-    fontSize: 28,
-    marginTop: 20,
-    letterSpacing: 4,
+  matchSpark: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: COLORS.gold,
+  },
+  matchSparkAlt: {
+    backgroundColor: COLORS.sage,
+    marginTop: 6,
   },
   matchCard: {
     backgroundColor: COLORS.gold,
-    borderRadius: 24,
+    borderRadius: RADIUS.lg,
     paddingVertical: 36,
     paddingHorizontal: 28,
     alignItems: 'center',
     width: '100%',
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 24,
-    shadowOffset: { width: 0, height: 12 },
-    elevation: 8,
+    ...SHADOWS.cardElevated,
   },
   matchTitle: {
     fontSize: 34,
-    fontWeight: '900',
+    fontWeight: '700',
     color: COLORS.forest,
     letterSpacing: -0.5,
     marginBottom: 8,
   },
   matchSubtitle: {
     fontSize: 16,
-    fontWeight: '600',
-    color: 'rgba(7, 77, 46, 0.75)',
+    fontWeight: '400',
+    lineHeight: 24,
+    color: COLORS.textMuted,
     textAlign: 'center',
   },
-  matchEmoji: {
-    fontSize: 48,
+  matchIconWrap: {
     marginTop: 16,
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: COLORS.ivory,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

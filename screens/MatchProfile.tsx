@@ -9,6 +9,7 @@ import {
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { Ionicons } from '@expo/vector-icons';
 import GenotypeBadge from '../src/components/GenotypeBadge';
 import ProfileAvatar from '../src/components/ProfileAvatar';
 import { COLORS, RELATIONSHIP_GOAL_LABELS } from '../src/data/mockData';
@@ -125,11 +126,15 @@ export default function MatchProfile({ match, onBack, onSendMessage }: MatchProf
 
           <View style={styles.heroMeta}>
             <GenotypeBadge genotype={profile.genotype} />
-            <Text style={styles.city}>📍 {profile.city}</Text>
+            <View style={styles.cityRow}>
+              <Ionicons name="location-outline" size={14} color={COLORS.sage} />
+              <Text style={styles.city}>{profile.city}</Text>
+            </View>
           </View>
 
           <View style={styles.matchBadge}>
-            <Text style={styles.matchBadgeText}>💚 Mutual Match</Text>
+            <Ionicons name="heart" size={12} color={COLORS.forest} />
+            <Text style={styles.matchBadgeText}>Mutual Match</Text>
           </View>
         </View>
 
@@ -291,10 +296,16 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'center',
   },
+  cityRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
   city: {
     fontSize: 14,
-    fontWeight: '600',
-    color: 'rgba(7, 77, 46, 0.65)',
+    fontWeight: '400',
+    lineHeight: 21,
+    color: COLORS.textMuted,
   },
   matchBadge: {
     marginTop: 16,
@@ -304,6 +315,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 224, 130, 0.45)',
     borderWidth: 1,
     borderColor: 'rgba(201, 135, 43, 0.25)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   matchBadgeText: {
     fontSize: 12,

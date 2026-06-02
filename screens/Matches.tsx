@@ -92,7 +92,7 @@ export default function Matches({ onStartChat }: MatchesProps) {
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             <View style={styles.empty}>
-              <Text style={styles.emptyBody}>No matches yet. Start swiping! 💚</Text>
+              <Text style={styles.emptyBody}>No matches yet. Start swiping!</Text>
             </View>
           }
           renderItem={({ item }) => (
@@ -105,7 +105,7 @@ export default function Matches({ onStartChat }: MatchesProps) {
                   name={item.profile.name}
                   gradient={item.profile.gradient}
                   avatarUrl={item.profile.avatarUrl}
-                  size={58}
+                  size={64}
                 />
                 <View style={styles.rowBody}>
                   <View style={styles.nameRow}>
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   chatBtn: {
-    backgroundColor: COLORS.forest,
+    backgroundColor: COLORS.gold,
     paddingHorizontal: 12,
     paddingVertical: 10,
     borderRadius: 12,
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
     opacity: 0.88,
   },
   chatBtnText: {
-    color: COLORS.ivory,
+    color: COLORS.forest,
     fontSize: 12,
     fontWeight: '800',
   },

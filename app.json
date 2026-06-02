@@ -1,36 +1,39 @@
 {
   "expo": {
-    "name": "genomatch-app",
-    "slug": "genomatch-app",
+    "name": "GenoMatch",
+    "slug": "genomatch",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+    "description": "GenoMatch is the world's first genotype-aware dating app. Find compatible partners based on AA, AS, SS, AC genotype matching.",
+    "primaryColor": "#074D2E",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#074D2E"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "enabled": true,
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0
     },
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
+      "bundleIdentifier": "ng.genomatch.app",
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "GenoMatch needs access to your photos so you can upload a profile picture."
       }
     },
-    "plugins": [
-      [
-        "expo-image-picker",
-        {
-          "photosPermission": "GenoMatch needs access to your photos so you can upload a profile picture."
-        }
-      ],
-      "expo-secure-store"
-    ],
     "android": {
+      "package": "ng.genomatch.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#074D2E"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
@@ -41,6 +44,16 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "GenoMatch needs access to your photos so you can upload a profile picture."
+        }
+      ],
+      "expo-secure-store",
+      "expo-updates"
+    ]
   }
 }

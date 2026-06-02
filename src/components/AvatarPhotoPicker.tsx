@@ -1,5 +1,6 @@
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
-import { COLORS } from '../data/mockData';
+import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { COLORS } from '../theme';
 import ProfileAvatar from './ProfileAvatar';
 
 type AvatarPhotoPickerProps = {
@@ -10,6 +11,8 @@ type AvatarPhotoPickerProps = {
   uploading?: boolean;
   disabled?: boolean;
   onPress: () => void;
+  variant?: 'circle' | 'hero';
+  heroHeight?: number;
 };
 
 export default function AvatarPhotoPicker({
@@ -20,8 +23,50 @@ export default function AvatarPhotoPicker({
   uploading = false,
   disabled = false,
   onPress,
+  variant = 'circle',
+  heroHeight = 280,
 }: AvatarPhotoPickerProps) {
-  const badgeSize = Math.max(Math.round(size * 0.34), 30);
+  const isHero = variant === 'hero';
+  const badgeSize = isHero ? 36 : Math.max(Math.round(size * 0.34), 30);
+
+  if (isHero) {
+    return (
+      <Pressable
+        onPress={onPress}
+        disabled={disabled || uploading}
+        style={[styles.heroWrap, { height: heroHeight }]}
+        accessibilityLabel="Upload profile photo"
+        accessibilityRole="button"
+      >
+        <ProfileAvatar
+          name={name}
+          gradient={gradient}
+          avatarUrl={avatarUrl}
+          width="100%"
+          height={heroHeight}
+          borderRadius={0}
+          initialsPosition="top"
+          initialsOpacity={0.15}
+        />
+        <View
+          style={[
+            styles.heroCameraBadge,
+            {
+              width: badgeSize,
+              height: badgeSize,
+              borderRadius: badgeSize / 2,
+            },
+          ]}
+        >
+          {uploading ? (
+            <ActivityIndicator color={COLORS.forest} size="small" />
+          ) : (
+            <Ionicons name="camera" size={16} color={COLORS.forest} />
+          )}
+        </View>
+      </Pressable>
+    );
+  }
 
   return (
     <Pressable
@@ -31,12 +76,7 @@ export default function AvatarPhotoPicker({
       accessibilityLabel="Upload profile photo"
       accessibilityRole="button"
     >
-      <ProfileAvatar
-        name={name}
-        gradient={gradient}
-        avatarUrl={avatarUrl}
-        size={size}
-      />
+      <ProfileAvatar name={name} gradient={gradient} avatarUrl={avatarUrl} size={size} />
       <View
         style={[
           styles.cameraBadge,
@@ -50,7 +90,7 @@ export default function AvatarPhotoPicker({
         {uploading ? (
           <ActivityIndicator color={COLORS.forest} size="small" />
         ) : (
-          <Text style={[styles.cameraIcon, { fontSize: badgeSize * 0.42 }]}>📷</Text>
+          <Ionicons name="camera" size={badgeSize * 0.45} color={COLORS.forest} />
         )}
       </View>
     </Pressable>
@@ -58,6 +98,27 @@ export default function AvatarPhotoPicker({
 }
 
 const styles = StyleSheet.create({
+  heroWrap: {
+    width: '100%',
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  heroCameraBadge: {
+    position: 'absolute',
+    bottom: 14,
+    right: 14,
+    backgroundColor: COLORS.gold,
+    borderWidth: 2,
+    borderColor: COLORS.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 5,
+    shadowColor: COLORS.forest,
+    shadowOpacity: 0.22,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 4,
+  },
   wrap: {
     alignSelf: 'center',
     position: 'relative',
@@ -76,8 +137,5 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 2 },
     elevation: 4,
-  },
-  cameraIcon: {
-    lineHeight: undefined,
   },
 });

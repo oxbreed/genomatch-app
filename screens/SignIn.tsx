@@ -13,15 +13,11 @@ import {
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { Ionicons } from '@expo/vector-icons';
+import GenoMatchLogo from '../src/components/GenoMatchLogo';
+import { COLORS } from '../src/theme';
 import { resolvePostSignInScreen } from '../src/lib/profiles';
 import { supabase } from '../src/lib/supabase';
-
-const COLORS = {
-  teal: '#1B7A6E',
-  gold: '#C9872B',
-  ivory: '#FAFAF7',
-  white: '#FFFFFF',
-};
 
 type SignInProps = {
   onBack: () => void;
@@ -150,7 +146,7 @@ export default function SignIn({ onBack, onCreateAccount, onSignedIn }: SignInPr
             <Text style={styles.brandChipText}>WELCOME BACK</Text>
           </View>
           <Animated.View style={[styles.logoOrb, { transform: [{ scale: logoPulse }] }]}>
-            <Text style={styles.logoEmoji}>🧬</Text>
+            <GenoMatchLogo size={56} />
           </Animated.View>
           <Text style={styles.title}>Sign In to GenoMatch</Text>
           <Text style={styles.subtitle}>
@@ -198,9 +194,12 @@ export default function SignIn({ onBack, onCreateAccount, onSignedIn }: SignInPr
           />
 
           <View style={styles.trustBox}>
-            <Text style={styles.trustText}>
-              🔒 Secure sign-in with encrypted genotype-aware matching.
-            </Text>
+            <View style={styles.trustRow}>
+              <Ionicons name="lock-closed" size={16} color={COLORS.forest} />
+              <Text style={styles.trustText}>
+                Secure sign-in with encrypted genotype-aware matching.
+              </Text>
+            </View>
           </View>
 
           {error ? <Text style={styles.error}>{error}</Text> : null}
@@ -215,7 +214,7 @@ export default function SignIn({ onBack, onCreateAccount, onSignedIn }: SignInPr
             >
               {loading ? (
                 <View style={styles.submitContent}>
-                  <ActivityIndicator color={COLORS.white} size="small" />
+                  <ActivityIndicator color={COLORS.forest} size="small" />
                   <Text style={styles.submitText}>Signing in...</Text>
                 </View>
               ) : (
@@ -238,7 +237,7 @@ export default function SignIn({ onBack, onCreateAccount, onSignedIn }: SignInPr
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.teal,
+    backgroundColor: COLORS.forest,
   },
   scroll: {
     paddingHorizontal: 20,
@@ -298,7 +297,7 @@ const styles = StyleSheet.create({
     fontSize: 34,
     lineHeight: 39,
     letterSpacing: -0.7,
-    fontWeight: '800',
+    fontWeight: '700',
     marginBottom: 10,
     maxWidth: '95%',
   },
@@ -316,7 +315,7 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   label: {
-    color: COLORS.teal,
+    color: COLORS.forest,
     fontSize: 14,
     fontWeight: '700',
     marginBottom: 8,
@@ -341,7 +340,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   togglePassText: {
-    color: COLORS.teal,
+    color: COLORS.forest,
     fontSize: 13,
     fontWeight: '700',
     marginBottom: 8,
@@ -356,11 +355,17 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 12,
   },
+  trustRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+  },
   trustText: {
-    color: COLORS.teal,
+    flex: 1,
+    color: COLORS.forest,
     fontSize: 12,
     lineHeight: 18,
-    fontWeight: '500',
+    fontWeight: '400',
   },
   error: {
     marginTop: 12,
@@ -385,9 +390,9 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   submitText: {
-    color: COLORS.white,
+    color: COLORS.forest,
     fontSize: 17,
-    fontWeight: '800',
+    fontWeight: '700',
     letterSpacing: 0.1,
   },
   createRow: {
@@ -400,7 +405,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   createBold: {
-    color: COLORS.teal,
-    fontWeight: '800',
+    color: COLORS.forest,
+    fontWeight: '700',
   },
 });

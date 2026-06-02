@@ -13,20 +13,18 @@ import {
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { Ionicons } from '@expo/vector-icons';
+import type { ComponentProps } from 'react';
+import { COLORS } from '../src/theme';
 import { supabase } from '../src/lib/supabase';
 
-const COLORS = {
-  teal: '#1B7A6E',
-  gold: '#C9872B',
-  ivory: '#FAFAF7',
-  white: '#FFFFFF',
-};
+type IonName = ComponentProps<typeof Ionicons>['name'];
 
-const GENOTYPES = [
-  { id: 'AA', icon: '💚', name: 'Double Healthy', accent: '#2E7D32' },
-  { id: 'AS', icon: '✨', name: 'Carrier', accent: '#BA7517' },
-  { id: 'SS', icon: '❤️', name: 'Sickle Cell', accent: '#A32D2D' },
-  { id: 'AC', icon: '🌊', name: 'AC Carrier', accent: '#185FA5' },
+const GENOTYPES: { id: string; icon: IonName; name: string; accent: string }[] = [
+  { id: 'AA', icon: 'heart', name: 'Double Healthy', accent: COLORS.forest },
+  { id: 'AS', icon: 'star-half', name: 'Carrier', accent: '#BA7517' },
+  { id: 'SS', icon: 'medical', name: 'Sickle Cell', accent: COLORS.error },
+  { id: 'AC', icon: 'water', name: 'AC Carrier', accent: '#185FA5' },
 ];
 
 export default function Register({
@@ -261,7 +259,7 @@ export default function Register({
                         isSelected && { backgroundColor: `${item.accent}20` },
                       ]}
                     >
-                      <Text style={styles.genoEmoji}>{item.icon}</Text>
+                      <Ionicons name={item.icon} size={22} color={isSelected ? item.accent : COLORS.forest} />
                     </View>
                     <Text style={[styles.genoId, isSelected && { color: item.accent }]}>{item.id}</Text>
                     <Text style={styles.genoName}>{item.name}</Text>
@@ -308,7 +306,7 @@ export default function Register({
             >
               {loading ? (
                 <View style={styles.submitContent}>
-                  <ActivityIndicator color={COLORS.white} size="small" />
+                  <ActivityIndicator color={COLORS.forest} size="small" />
                   <Text style={styles.submitText}>Creating account...</Text>
                 </View>
               ) : (
@@ -333,7 +331,7 @@ export default function Register({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.teal,
+    backgroundColor: COLORS.forest,
   },
   scroll: {
     paddingHorizontal: 20,
@@ -397,7 +395,7 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   label: {
-    color: COLORS.teal,
+    color: COLORS.forest,
     fontSize: 14,
     fontWeight: '700',
     marginBottom: 8,
@@ -422,7 +420,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   togglePassText: {
-    color: COLORS.teal,
+    color: COLORS.forest,
     fontSize: 13,
     fontWeight: '700',
     marginBottom: 8,
@@ -467,7 +465,7 @@ const styles = StyleSheet.create({
   },
   genoCardSelected: {
     backgroundColor: '#F8FBF9',
-    shadowColor: COLORS.teal,
+    shadowColor: COLORS.forest,
     shadowOpacity: 0.14,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 5 },
@@ -520,7 +518,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   privacyText: {
-    color: COLORS.teal,
+    color: COLORS.forest,
     fontSize: 12,
     lineHeight: 18,
     fontWeight: '500',
@@ -547,7 +545,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
   },
   successText: {
-    color: COLORS.teal,
+    color: COLORS.forest,
     fontSize: 14,
     lineHeight: 21,
     fontWeight: '700',
@@ -570,9 +568,9 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   submitText: {
-    color: COLORS.white,
+    color: COLORS.forest,
     fontSize: 17,
-    fontWeight: '800',
+    fontWeight: '700',
     letterSpacing: 0.1,
   },
   signInRow: {
@@ -585,7 +583,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   signInBold: {
-    color: COLORS.teal,
+    color: COLORS.forest,
     fontWeight: '800',
   },
 });

@@ -1,19 +1,22 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import type { ComponentProps } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import Discovery from './Discovery';
 import Matches from './Matches';
 import Messages from './Messages';
 import Profile from './Profile';
-import { COLORS } from '../src/data/mockData';
+import { COLORS } from '../src/theme';
 
 type TabId = 'discover' | 'matches' | 'messages' | 'profile';
+type IonName = ComponentProps<typeof Ionicons>['name'];
 
-const TABS: { id: TabId; label: string; icon: string }[] = [
-  { id: 'discover', label: 'Discover', icon: '🔍' },
-  { id: 'matches', label: 'Matches', icon: '💚' },
-  { id: 'messages', label: 'Messages', icon: '💬' },
-  { id: 'profile', label: 'Profile', icon: '👤' },
+const TABS: { id: TabId; label: string; icon: IonName; iconActive: IonName }[] = [
+  { id: 'discover', label: 'Discover', icon: 'search-outline', iconActive: 'search' },
+  { id: 'matches', label: 'Matches', icon: 'heart-outline', iconActive: 'heart' },
+  { id: 'messages', label: 'Messages', icon: 'chatbubble-outline', iconActive: 'chatbubble' },
+  { id: 'profile', label: 'Profile', icon: 'person-outline', iconActive: 'person' },
 ];
 
 type MainTabsProps = {
@@ -63,7 +66,11 @@ export default function MainTabs({ onSignOut }: MainTabsProps) {
               style={styles.tabItem}
               onPress={() => setActiveTab(tab.id)}
             >
-              <Text style={[styles.tabIcon, active && styles.tabIconActive]}>{tab.icon}</Text>
+              <Ionicons
+                name={active ? tab.iconActive : tab.icon}
+                size={22}
+                color={active ? COLORS.gold : 'rgba(250, 250, 247, 0.55)'}
+              />
               <Text style={[styles.tabLabel, active && styles.tabLabelActive]}>{tab.label}</Text>
               {active && <View style={styles.tabIndicator} />}
             </Pressable>
@@ -98,13 +105,6 @@ const styles = StyleSheet.create({
     gap: 4,
     minHeight: 52,
   },
-  tabIcon: {
-    fontSize: 22,
-    opacity: 0.55,
-  },
-  tabIconActive: {
-    opacity: 1,
-  },
   tabLabel: {
     fontSize: 11,
     fontWeight: '600',
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
   },
   tabLabelActive: {
     color: COLORS.gold,
-    fontWeight: '800',
+    fontWeight: '700',
   },
   tabIndicator: {
     position: 'absolute',

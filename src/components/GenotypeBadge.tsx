@@ -13,14 +13,14 @@ export default function GenotypeBadge({ genotype }: { genotype: string }) {
 
 const styles = StyleSheet.create({
   badge: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 999,
     borderWidth: 1,
   },
   text: {
-    fontSize: 11,
-    fontWeight: '800',
-    letterSpacing: 0.4,
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 0.6,
   },
 });

@@ -11,6 +11,7 @@ import {
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { Ionicons } from '@expo/vector-icons';
 import ProfileAvatar from '../src/components/ProfileAvatar';
 import { COLORS } from '../src/data/mockData';
 import type { DiscoveryProfile, MatchWithProfile } from '../src/types/database';
@@ -154,7 +155,7 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
           onPress={() => setShowProfile(true)}
           accessibilityLabel="View profile"
         >
-          <Text style={styles.profileBtnIcon}>👤</Text>
+          <Ionicons name="person-circle-outline" size={24} color={COLORS.forest} />
         </Pressable>
       </View>
 
@@ -175,7 +176,7 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
           ListEmptyComponent={
             <View style={styles.emptyHint}>
               <Text style={styles.emptyHintText}>
-                You matched! Say hello and start your compatibility journey 👋
+                You matched! Say hello and start your compatibility journey.
               </Text>
             </View>
           }
