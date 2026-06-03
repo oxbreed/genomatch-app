@@ -8,6 +8,8 @@ import {
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import * as Haptics from 'expo-haptics';
+import EmptyState from '../src/components/EmptyState';
 import GenotypeBadge from '../src/components/GenotypeBadge';
 import ProfileAvatar from '../src/components/ProfileAvatar';
 import { logAuthState } from '../src/lib/auth';
@@ -91,9 +93,11 @@ export default function Matches({ onStartChat }: MatchesProps) {
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
-            <View style={styles.empty}>
-              <Text style={styles.emptyBody}>No matches yet. Start swiping!</Text>
-            </View>
+            <EmptyState
+              type="no-matches"
+              title="No matches yet"
+              subtitle="Start swiping in Discover to find people who like you back."
+            />
           }
           renderItem={({ item }) => (
             <View style={styles.row}>
@@ -124,7 +128,10 @@ export default function Matches({ onStartChat }: MatchesProps) {
               </Pressable>
               <Pressable
                 style={({ pressed }) => [styles.chatBtn, pressed && styles.chatBtnPressed]}
-                onPress={() => onStartChat?.(item.matchId)}
+                onPress={() => {
+                  void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  onStartChat?.(item.matchId);
+                }}
               >
                 <Text style={styles.chatBtnText}>Start Chat</Text>
               </Pressable>
@@ -280,27 +287,5 @@ const styles = StyleSheet.create({
     color: COLORS.forest,
     fontSize: 12,
     fontWeight: '800',
-  },
-  empty: {
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 48,
-  },
-  emptyEmoji: {
-    fontSize: 48,
-    marginBottom: 12,
-  },
-  emptyTitle: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: COLORS.forest,
-    marginBottom: 8,
-  },
-  emptyBody: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: 'rgba(7, 77, 46, 0.6)',
-    textAlign: 'center',
-    fontWeight: '500',
   },
 });

@@ -11,6 +11,7 @@ import {
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import ProfileAvatar from '../src/components/ProfileAvatar';
 import ReportBlockSheet from '../src/components/ReportBlockSheet';
@@ -22,16 +23,29 @@ import {
   ChatMessage,
   fetchMessages,
   formatMessageTime,
+  markMessagesAsRead,
   sendMessage,
-  subscribeToMessages,
+  subscribeToChatRealtime,
 } from '../src/lib/messages';
 import MatchProfile from './MatchProfile';
+
+const TYPING_STOP_MS = 2000;
 
 type ChatScreenProps = {
   matchId: string;
   profile: DiscoveryProfile;
   onBack: () => void;
 };
+
+function mergeMessage(prev: ChatMessage[], next: ChatMessage): ChatMessage[] {
+  const idx = prev.findIndex((m) => m.id === next.id);
+  if (idx >= 0) {
+    const copy = [...prev];
+    copy[idx] = next;
+    return copy;
+  }
+  return [...prev, next];
+}
 
 export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -41,7 +55,11 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
   const [error, setError] = useState('');
   const [showProfile, setShowProfile] = useState(false);
   const [showModerationSheet, setShowModerationSheet] = useState(false);
+  const [otherTyping, setOtherTyping] = useState(false);
   const listRef = useRef<FlatList<ChatMessage>>(null);
+  const realtimeRef = useRef<ReturnType<typeof subscribeToChatRealtime> | null>(null);
+  const typingStopRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isTypingRef = useRef(false);
 
   const match: MatchWithProfile = {
     matchId,
@@ -49,38 +67,85 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
     matchedAt: new Date().toISOString(),
   };
 
+  const markRead = useCallback(async () => {
+    try {
+      await markMessagesAsRead(matchId);
+    } catch {
+      // non-blocking
+    }
+  }, [matchId]);
+
   const loadMessages = useCallback(async () => {
     setError('');
     try {
       const rows = await fetchMessages(matchId);
       setMessages(rows);
+      await markRead();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not load messages');
     } finally {
       setLoading(false);
     }
-  }, [matchId]);
+  }, [matchId, markRead]);
 
   useEffect(() => {
     loadMessages();
   }, [loadMessages]);
 
   useEffect(() => {
-    const unsubscribe = subscribeToMessages(matchId, (incoming) => {
-      let shouldNotify = false;
-      setMessages((prev) => {
-        if (prev.some((m) => m.id === incoming.id)) return prev;
-        if (!incoming.isMine) shouldNotify = true;
-        return [...prev, incoming];
-      });
-      if (shouldNotify) {
-        const senderName = profile.name?.trim() || 'Someone';
-        void sendLocalNotification(senderName, incoming.body).catch(() => {});
-      }
-      setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 80);
+    const handle = subscribeToChatRealtime(matchId, profile.id, {
+      onMessage: (incoming) => {
+        let shouldNotify = false;
+        setMessages((prev) => {
+          if (prev.some((m) => m.id === incoming.id)) return prev;
+          if (!incoming.isMine) shouldNotify = true;
+          return [...prev, incoming];
+        });
+        if (shouldNotify) {
+          const senderName = profile.name?.trim() || 'Someone';
+          void sendLocalNotification(senderName, incoming.body).catch(() => {});
+          void markRead();
+        }
+        setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 80);
+      },
+      onMessageUpdated: (updated) => {
+        setMessages((prev) => mergeMessage(prev, updated));
+      },
+      onTyping: (isTyping) => {
+        setOtherTyping(isTyping);
+      },
     });
-    return unsubscribe;
-  }, [matchId, profile.name]);
+    realtimeRef.current = handle;
+    return () => {
+      handle.unsubscribe();
+      realtimeRef.current = null;
+    };
+  }, [matchId, profile.id, profile.name, markRead]);
+
+  const setTyping = useCallback((isTyping: boolean) => {
+    if (isTypingRef.current === isTyping) return;
+    isTypingRef.current = isTyping;
+    realtimeRef.current?.broadcastTyping(isTyping);
+  }, []);
+
+  const handleDraftChange = (text: string) => {
+    setDraft(text);
+    if (typingStopRef.current) clearTimeout(typingStopRef.current);
+
+    if (text.trim()) {
+      setTyping(true);
+      typingStopRef.current = setTimeout(() => setTyping(false), TYPING_STOP_MS);
+    } else {
+      setTyping(false);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (typingStopRef.current) clearTimeout(typingStopRef.current);
+      setTyping(false);
+    };
+  }, [setTyping]);
 
   const handleSend = async () => {
     const text = draft.trim();
@@ -91,10 +156,12 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
       return;
     }
 
+    setTyping(false);
     setSending(true);
     setDraft('');
     try {
       const sent = await sendMessage(matchId, text);
+      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       setMessages((prev) => {
         if (prev.some((m) => m.id === sent.id)) return prev;
         return [...prev, sent];
@@ -108,11 +175,14 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
     }
   };
 
+  const lastMineId = [...messages].reverse().find((m) => m.isMine)?.id;
+
   const renderItem = ({ item, index }: { item: ChatMessage; index: number }) => {
     const prev = index > 0 ? messages[index - 1] : null;
     const showTime =
       !prev ||
       new Date(item.createdAt).getTime() - new Date(prev.createdAt).getTime() > 5 * 60 * 1000;
+    const showRead = item.isMine && !!item.readAt && item.id === lastMineId;
 
     return (
       <View>
@@ -121,13 +191,26 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
         )}
         <View
           style={[
-            styles.bubble,
-            item.isMine ? styles.bubbleSent : styles.bubbleReceived,
+            styles.bubbleRow,
+            item.isMine ? styles.bubbleRowSent : styles.bubbleRowReceived,
           ]}
         >
-          <Text style={[styles.bubbleText, item.isMine && styles.bubbleTextSent]}>
-            {item.body}
-          </Text>
+          <View
+            style={[
+              styles.bubble,
+              item.isMine ? styles.bubbleSent : styles.bubbleReceived,
+            ]}
+          >
+            <Text style={[styles.bubbleText, item.isMine && styles.bubbleTextSent]}>
+              {item.body}
+            </Text>
+          </View>
+          {showRead ? (
+            <View style={styles.readReceipt}>
+              <Ionicons name="checkmark-done" size={14} color="rgba(7, 77, 46, 0.5)" />
+              <Text style={styles.readReceiptText}>Read</Text>
+            </View>
+          ) : null}
         </View>
       </View>
     );
@@ -163,7 +246,11 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
         />
         <View style={styles.headerText}>
           <Text style={styles.chatName}>{profile.name}</Text>
-          <Text style={styles.chatMeta}>{profile.compatibility}% genotype match</Text>
+          {otherTyping ? (
+            <Text style={styles.typingMeta}>typing…</Text>
+          ) : (
+            <Text style={styles.chatMeta}>{profile.compatibility}% genotype match</Text>
+          )}
         </View>
         <Pressable
           style={({ pressed }) => [styles.profileBtn, pressed && styles.profileBtnPressed]}
@@ -217,7 +304,7 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
         <TextInput
           style={styles.composerInput}
           value={draft}
-          onChangeText={setDraft}
+          onChangeText={handleDraftChange}
           placeholder="Type a message..."
           placeholderTextColor="rgba(7, 77, 46, 0.35)"
           multiline
@@ -281,6 +368,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: 'rgba(7, 77, 46, 0.55)',
     fontWeight: '600',
+    marginTop: 2,
+  },
+  typingMeta: {
+    fontSize: 12,
+    color: COLORS.sage,
+    fontWeight: '600',
+    fontStyle: 'italic',
     marginTop: 2,
   },
   profileBtn: {
@@ -350,20 +444,28 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 19,
   },
-  bubble: {
+  bubbleRow: {
+    marginBottom: 6,
     maxWidth: '82%',
+  },
+  bubbleRowSent: {
+    alignSelf: 'flex-end',
+    alignItems: 'flex-end',
+  },
+  bubbleRowReceived: {
+    alignSelf: 'flex-start',
+    alignItems: 'flex-start',
+  },
+  bubble: {
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: 18,
-    marginBottom: 6,
   },
   bubbleSent: {
-    alignSelf: 'flex-end',
     backgroundColor: COLORS.forest,
     borderBottomRightRadius: 4,
   },
   bubbleReceived: {
-    alignSelf: 'flex-start',
     backgroundColor: COLORS.white,
     borderWidth: 1,
     borderColor: 'rgba(7, 77, 46, 0.1)',
@@ -377,6 +479,18 @@ const styles = StyleSheet.create({
   },
   bubbleTextSent: {
     color: COLORS.ivory,
+  },
+  readReceipt: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    marginTop: 3,
+    marginRight: 2,
+  },
+  readReceiptText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: 'rgba(7, 77, 46, 0.5)',
   },
   composer: {
     flexDirection: 'row',

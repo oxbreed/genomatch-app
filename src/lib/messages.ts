@@ -15,8 +15,20 @@ export type ChatMessage = {
   body: string;
   senderId: string;
   createdAt: string;
+  readAt: string | null;
   isMine: boolean;
 };
+
+function rowToChatMessage(row: MessageRow, userId: string | null): ChatMessage {
+  return {
+    id: row.id,
+    body: row.body,
+    senderId: row.sender_id,
+    createdAt: row.created_at,
+    readAt: row.read_at ?? null,
+    isMine: row.sender_id === userId,
+  };
+}
 
 export function formatMessageTime(iso: string): string {
   const date = parseISO(iso);
@@ -80,7 +92,7 @@ export async function fetchConversations(): Promise<ConversationPreview[]> {
   const matchIds = visibleMatches.map((m) => m.id);
   const { data: latestMessages, error: messagesError } = await supabase
     .from('messages')
-    .select('id, match_id, sender_id, body, created_at')
+    .select('id, match_id, sender_id, body, created_at, read_at')
     .in('match_id', matchIds)
     .order('created_at', { ascending: false });
 
@@ -118,19 +130,29 @@ export async function fetchMessages(matchId: string): Promise<ChatMessage[]> {
 
   const { data, error } = await supabase
     .from('messages')
-    .select('*')
+    .select('id, match_id, sender_id, body, created_at, read_at')
     .eq('match_id', matchId)
     .order('created_at', { ascending: true });
 
   if (error) throw error;
 
-  return ((data ?? []) as MessageRow[]).map((row) => ({
-    id: row.id,
-    body: row.body,
-    senderId: row.sender_id,
-    createdAt: row.created_at,
-    isMine: row.sender_id === userId,
-  }));
+  return ((data ?? []) as MessageRow[]).map((row) => rowToChatMessage(row, userId));
+}
+
+/** Mark all unread messages from the other person in this match as read. */
+export async function markMessagesAsRead(matchId: string): Promise<void> {
+  const userId = await getCurrentUserId();
+  if (!userId) return;
+
+  const now = new Date().toISOString();
+  const { error } = await supabase
+    .from('messages')
+    .update({ read_at: now })
+    .eq('match_id', matchId)
+    .neq('sender_id', userId)
+    .is('read_at', null);
+
+  if (error) throw error;
 }
 
 export async function sendMessage(matchId: string, body: string): Promise<ChatMessage> {
@@ -147,27 +169,36 @@ export async function sendMessage(matchId: string, body: string): Promise<ChatMe
       sender_id: userId,
       body: trimmed,
     })
-    .select('*')
+    .select('id, match_id, sender_id, body, created_at, read_at')
     .single();
 
   if (error) throw error;
 
-  const row = data as MessageRow;
-  return {
-    id: row.id,
-    body: row.body,
-    senderId: row.sender_id,
-    createdAt: row.created_at,
-    isMine: true,
-  };
+  return rowToChatMessage(data as MessageRow, userId);
 }
 
-export function subscribeToMessages(
+export type ChatRealtimeCallbacks = {
+  onMessage: (message: ChatMessage) => void;
+  onMessageUpdated: (message: ChatMessage) => void;
+  onTyping: (isTyping: boolean) => void;
+};
+
+export type ChatRealtimeHandle = {
+  broadcastTyping: (isTyping: boolean) => void;
+  unsubscribe: () => void;
+};
+
+/** Realtime: new messages, read receipt updates, and typing broadcasts. */
+export function subscribeToChatRealtime(
   matchId: string,
-  onMessage: (message: ChatMessage) => void
-) {
-  const channel = supabase
-    .channel(`messages:${matchId}`)
+  otherUserId: string,
+  callbacks: ChatRealtimeCallbacks
+): ChatRealtimeHandle {
+  const channel = supabase.channel(`chat:${matchId}`, {
+    config: { broadcast: { self: false } },
+  });
+
+  channel
     .on(
       'postgres_changes',
       {
@@ -178,19 +209,56 @@ export function subscribeToMessages(
       },
       async (payload) => {
         const userId = await getCurrentUserId();
-        const row = payload.new as MessageRow;
-        onMessage({
-          id: row.id,
-          body: row.body,
-          senderId: row.sender_id,
-          createdAt: row.created_at,
-          isMine: row.sender_id === userId,
-        });
+        callbacks.onMessage(rowToChatMessage(payload.new as MessageRow, userId));
       }
     )
+    .on(
+      'postgres_changes',
+      {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'messages',
+        filter: `match_id=eq.${matchId}`,
+      },
+      async (payload) => {
+        const userId = await getCurrentUserId();
+        callbacks.onMessageUpdated(rowToChatMessage(payload.new as MessageRow, userId));
+      }
+    )
+    .on('broadcast', { event: 'typing' }, ({ payload }) => {
+      const data = payload as { userId?: string; isTyping?: boolean };
+      if (data.userId === otherUserId) {
+        callbacks.onTyping(!!data.isTyping);
+      }
+    })
     .subscribe();
 
-  return () => {
-    supabase.removeChannel(channel);
+  return {
+    broadcastTyping(isTyping: boolean) {
+      void getCurrentUserId().then((userId) => {
+        if (!userId) return;
+        void channel.send({
+          type: 'broadcast',
+          event: 'typing',
+          payload: { userId, isTyping },
+        });
+      });
+    },
+    unsubscribe() {
+      supabase.removeChannel(channel);
+    },
   };
+}
+
+/** @deprecated Use subscribeToChatRealtime */
+export function subscribeToMessages(
+  matchId: string,
+  onMessage: (message: ChatMessage) => void
+) {
+  const handle = subscribeToChatRealtime(matchId, '', {
+    onMessage,
+    onMessageUpdated: () => {},
+    onTyping: () => {},
+  });
+  return handle.unsubscribe;
 }

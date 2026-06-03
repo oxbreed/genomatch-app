@@ -8,6 +8,7 @@ import {
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import EmptyState from '../src/components/EmptyState';
 import ProfileAvatar from '../src/components/ProfileAvatar';
 import { logAuthState } from '../src/lib/auth';
 import { COLORS } from '../src/data/mockData';
@@ -144,9 +145,11 @@ export default function Messages({ initialChatMatchId, onChatOpened }: MessagesP
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
-            <View style={styles.empty}>
-              <Text style={styles.emptyBody}>No conversations yet.</Text>
-            </View>
+            <EmptyState
+              type="no-messages"
+              title="No conversations yet"
+              subtitle="When you match with someone, your chats will show up here."
+            />
           }
           renderItem={({ item }) => (
             <View style={styles.row}>
@@ -310,27 +313,5 @@ const styles = StyleSheet.create({
     color: COLORS.forest,
     fontSize: 12,
     fontWeight: '800',
-  },
-  empty: {
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 48,
-  },
-  emptyEmoji: {
-    fontSize: 48,
-    marginBottom: 12,
-  },
-  emptyTitle: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: COLORS.forest,
-    marginBottom: 8,
-  },
-  emptyBody: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: 'rgba(7, 77, 46, 0.6)',
-    textAlign: 'center',
-    fontWeight: '500',
   },
 });

@@ -32,6 +32,7 @@ export type MessageRow = {
   sender_id: string;
   body: string;
   created_at: string;
+  read_at: string | null;
 };
 
 export type DiscoveryProfile = {

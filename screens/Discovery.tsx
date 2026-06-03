@@ -13,8 +13,15 @@ import {
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import EmptyState from '../src/components/EmptyState';
+import FilterSheet, {
+  DEFAULT_DISCOVERY_FILTERS,
+  hasActiveDiscoveryFilters,
+  type DiscoveryFilters,
+} from '../src/components/FilterSheet';
 import GenotypeBadge from '../src/components/GenotypeBadge';
 import ProfileAvatar from '../src/components/ProfileAvatar';
 import { COLORS, RADIUS, SHADOWS, TYPOGRAPHY, getMockDiscoveryProfiles } from '../src/data/mockData';
@@ -25,6 +32,52 @@ import type { DiscoveryProfile } from '../src/types/database';
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const SWIPE_THRESHOLD = SCREEN_WIDTH * 0.22;
 const PHOTO_HEIGHT = 220;
+const HIGH_COMPATIBILITY_MIN = 75;
+
+function triggerLikeHaptic() {
+  void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+}
+
+function triggerPassHaptic() {
+  void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+}
+
+function triggerMatchCelebrationHaptic() {
+  void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  setTimeout(() => {
+    void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  }, 300);
+}
+
+function applyDiscoveryFilters(
+  profiles: DiscoveryProfile[],
+  filters: DiscoveryFilters
+): DiscoveryProfile[] {
+  return profiles.filter((p) => {
+    if (filters.compatibilityMode === 'high' && p.compatibility < HIGH_COMPATIBILITY_MIN) {
+      return false;
+    }
+
+    const cityQuery = filters.city.trim().toLowerCase();
+    if (cityQuery && !p.city.toLowerCase().includes(cityQuery)) {
+      return false;
+    }
+
+    if (filters.minAge.trim() || filters.maxAge.trim()) {
+      if (p.age == null) return false;
+      const min = filters.minAge.trim() ? parseInt(filters.minAge, 10) : 18;
+      const max = filters.maxAge.trim() ? parseInt(filters.maxAge, 10) : 65;
+      if (p.age < min || p.age > max) return false;
+    }
+
+    if (filters.relationshipGoal !== 'any') {
+      const goal = (p.relationshipGoal ?? '').toLowerCase();
+      if (goal !== filters.relationshipGoal) return false;
+    }
+
+    return true;
+  });
+}
 
 function MatchPill({ percent }: { percent: number }) {
   return (
@@ -142,7 +195,9 @@ function ProfileCard({ profile }: { profile: DiscoveryProfile }) {
 }
 
 export default function Discovery() {
-  const [profiles, setProfiles] = useState<DiscoveryProfile[]>([]);
+  const [allProfiles, setAllProfiles] = useState<DiscoveryProfile[]>([]);
+  const [filters, setFilters] = useState<DiscoveryFilters>(DEFAULT_DISCOVERY_FILTERS);
+  const [showFilterSheet, setShowFilterSheet] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
   const [index, setIndex] = useState(0);
@@ -152,21 +207,28 @@ export default function Discovery() {
   const [actionError, setActionError] = useState('');
   const [usingMockFallback, setUsingMockFallback] = useState(false);
 
+  const profiles = useMemo(
+    () => applyDiscoveryFilters(allProfiles, filters),
+    [allProfiles, filters]
+  );
+
+  const filtersActive = hasActiveDiscoveryFilters(filters);
+
   const loadProfiles = useCallback(async () => {
     setLoadError('');
     setLoading(true);
     try {
       const { profiles: rows } = await fetchDiscoveryProfiles();
       if (rows.length > 0) {
-        setProfiles(rows);
+        setAllProfiles(rows);
         setUsingMockFallback(false);
       } else {
-        setProfiles(getMockDiscoveryProfiles());
+        setAllProfiles(getMockDiscoveryProfiles());
         setUsingMockFallback(true);
       }
       setIndex(0);
     } catch {
-      setProfiles(getMockDiscoveryProfiles());
+      setAllProfiles(getMockDiscoveryProfiles());
       setUsingMockFallback(true);
       setIndex(0);
     } finally {
@@ -186,7 +248,9 @@ export default function Discovery() {
   const nextCardScale = useRef(new Animated.Value(0.95)).current;
 
   const profile = profiles[index];
-  const isEmpty = !loading && !loadError && profiles.length === 0;
+  const isEmpty = !loading && !loadError && allProfiles.length === 0;
+  const isFilteredEmpty =
+    !loading && !loadError && allProfiles.length > 0 && profiles.length === 0;
   const seenAll = !loading && !loadError && profiles.length > 0 && index >= profiles.length;
 
   const resetCardAnimation = useCallback(() => {
@@ -196,6 +260,11 @@ export default function Discovery() {
     nextCardScale.setValue(0.95);
   }, [cardOpacity, cardScale, nextCardScale, position]);
 
+  useEffect(() => {
+    setIndex(0);
+    resetCardAnimation();
+  }, [filters, resetCardAnimation]);
+
   const advanceProfile = useCallback(() => {
     setIndex((prev) => prev + 1);
     resetCardAnimation();
@@ -203,6 +272,7 @@ export default function Discovery() {
 
   const showMatchOverlay = useCallback(
     (name: string) => {
+      triggerMatchCelebrationHaptic();
       setMatchedName(name);
       setShowMatch(true);
       matchOpacity.setValue(0);
@@ -272,6 +342,12 @@ export default function Discovery() {
   const processSwipe = useCallback(
     async (direction: 'like' | 'pass') => {
       if (seenAll || showMatch || !profile || loading) return;
+
+      if (direction === 'like') {
+        triggerLikeHaptic();
+      } else {
+        triggerPassHaptic();
+      }
 
       setActionError('');
       const firstName = profile.name.split(' ')[0];
@@ -378,13 +454,30 @@ export default function Discovery() {
       <StatusBar style="dark" />
 
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Discover</Text>
+        <View style={styles.headerRow}>
+          <Text style={styles.headerTitle}>Discover</Text>
+          <Pressable
+            style={({ pressed }) => [styles.filterBtn, pressed && styles.filterBtnPressed]}
+            onPress={() => setShowFilterSheet(true)}
+            accessibilityLabel="Filter discovery profiles"
+          >
+            <Ionicons name="options-outline" size={24} color={COLORS.forest} />
+            {filtersActive ? <View style={styles.filterDot} /> : null}
+          </Pressable>
+        </View>
         <Text style={styles.headerSubtitle}>
           {usingMockFallback
             ? 'Preview profiles — real matches appear as members join'
             : 'Genotype-aware matches near you'}
         </Text>
       </View>
+
+      <FilterSheet
+        visible={showFilterSheet}
+        filters={filters}
+        onClose={() => setShowFilterSheet(false)}
+        onApply={setFilters}
+      />
 
       <View style={styles.deckArea}>
         {loading ? (
@@ -404,19 +497,29 @@ export default function Discovery() {
           </View>
         ) : isEmpty ? (
           <View style={styles.emptyState}>
-            <View style={styles.emptyIconWrap}>
-              <Ionicons name="people-outline" size={28} color={COLORS.forest} />
-            </View>
-            <Text style={styles.emptyTitle}>No profiles to show</Text>
-            <Text style={styles.emptyBody}>Check back soon for new people nearby.</Text>
+            <EmptyState
+              type="no-profiles"
+              title="No profiles to show"
+              subtitle="Check back soon for new people nearby."
+            />
+          </View>
+        ) : isFilteredEmpty ? (
+          <View style={styles.emptyState}>
+            <EmptyState
+              type="no-results"
+              title="No profiles match your filters"
+              subtitle="Try adjusting or resetting your filters."
+              actionLabel="Adjust filters"
+              onAction={() => setShowFilterSheet(true)}
+            />
           </View>
         ) : seenAll ? (
           <View style={styles.emptyState}>
-            <View style={styles.emptyIconWrap}>
-              <Ionicons name="checkmark-circle-outline" size={28} color={COLORS.forest} />
-            </View>
-            <Text style={styles.emptyTitle}>You&apos;ve seen everyone nearby.</Text>
-            <Text style={styles.emptyBody}>Check back tomorrow.</Text>
+            <EmptyState
+              type="seen-all"
+              title="You've seen everyone nearby"
+              subtitle="Check back tomorrow for new matches."
+            />
           </View>
         ) : (
           <>
@@ -459,7 +562,7 @@ export default function Discovery() {
         )}
       </View>
 
-      {!seenAll && !isEmpty && !loading && !loadError && (
+      {!seenAll && !isEmpty && !isFilteredEmpty && !loading && !loadError && (
         <View style={styles.actions}>
           {actionError ? <Text style={styles.actionError}>{actionError}</Text> : null}
           <Pressable
@@ -520,8 +623,38 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingBottom: 12,
   },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   headerTitle: {
     ...TYPOGRAPHY.display,
+    flex: 1,
+  },
+  filterBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(168, 213, 186, 0.35)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  filterBtnPressed: {
+    opacity: 0.88,
+  },
+  filterDot: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: COLORS.gold,
+    borderWidth: 1.5,
+    borderColor: COLORS.white,
   },
   headerSubtitle: {
     marginTop: 4,
