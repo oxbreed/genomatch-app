@@ -1,3 +1,4 @@
+import { sendLocalNotification } from './notifications';
 import { getCurrentUserId } from './profiles';
 import { supabase } from './supabase';
 
@@ -44,19 +45,39 @@ export async function recordLike(likedId: string): Promise<LikeResult> {
     .maybeSingle();
 
   if (existingError) throw existingError;
+
+  let matchId: string;
   if (existing) {
-    return { isMutualMatch: true, matchId: existing.id };
+    matchId = existing.id;
+  } else {
+    const { data: created, error: createError } = await supabase
+      .from('matches')
+      .insert({ user_a_id: userAId, user_b_id: userBId })
+      .select('id')
+      .single();
+
+    if (createError) throw createError;
+    matchId = created.id;
   }
 
-  const { data: created, error: createError } = await supabase
-    .from('matches')
-    .insert({ user_a_id: userAId, user_b_id: userBId })
-    .select('id')
-    .single();
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('display_name')
+    .eq('id', likedId)
+    .maybeSingle();
 
-  if (createError) throw createError;
+  const name = profile?.display_name?.trim().split(/\s+/)[0] || 'Someone';
 
-  return { isMutualMatch: true, matchId: created.id };
+  try {
+    await sendLocalNotification(
+      "It's a Match! 💚",
+      `You and ${name} liked each other. Start a conversation!`
+    );
+  } catch {
+    // Non-fatal if notification permission or delivery fails
+  }
+
+  return { isMutualMatch: true, matchId };
 }
 
 /** Record a pass so this profile is hidden from Discovery. */

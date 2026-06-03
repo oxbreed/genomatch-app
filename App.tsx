@@ -21,6 +21,7 @@ import ProfileSetup from './screens/ProfileSetup';
 import MainTabs from './screens/MainTabs';
 import { resolveInitialScreen } from './src/lib/profiles';
 import { logAuthState } from './src/lib/auth';
+import { registerForPushNotifications } from './src/lib/notifications';
 import { supabase } from './src/lib/supabase';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -84,6 +85,8 @@ export default function App() {
         });
 
         await logAuthState('App.startup');
+
+        const pushToken = await registerForPushNotifications();
 
         const initial = await resolveInitialScreen();
         console.log('[App] resolveInitialScreen →', initial);

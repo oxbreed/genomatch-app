@@ -15,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import ProfileAvatar from '../src/components/ProfileAvatar';
 import { COLORS } from '../src/data/mockData';
 import type { DiscoveryProfile, MatchWithProfile } from '../src/types/database';
+import { sendLocalNotification } from '../src/lib/notifications';
 import {
   ChatMessage,
   fetchMessages,
@@ -63,14 +64,20 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
 
   useEffect(() => {
     const unsubscribe = subscribeToMessages(matchId, (incoming) => {
+      let shouldNotify = false;
       setMessages((prev) => {
         if (prev.some((m) => m.id === incoming.id)) return prev;
+        if (!incoming.isMine) shouldNotify = true;
         return [...prev, incoming];
       });
+      if (shouldNotify) {
+        const senderName = profile.name?.trim() || 'Someone';
+        void sendLocalNotification(senderName, incoming.body).catch(() => {});
+      }
       setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 80);
     });
     return unsubscribe;
-  }, [matchId]);
+  }, [matchId, profile.name]);
 
   const handleSend = async () => {
     const text = draft.trim();
