@@ -17,6 +17,7 @@ import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps } from 'react';
 import { COLORS } from '../src/theme';
 import { supabase } from '../src/lib/supabase';
+import { validateEmail } from '../src/lib/validation';
 
 type IonName = ComponentProps<typeof Ionicons>['name'];
 
@@ -93,6 +94,10 @@ export default function Register({
 
     if (!trimmedEmail || !password || !genotype) {
       setError('Please fill in all fields and select your genotype.');
+      return;
+    }
+    if (!validateEmail(trimmedEmail)) {
+      setError('Please enter a valid email address.');
       return;
     }
     if (password.length < 8) {

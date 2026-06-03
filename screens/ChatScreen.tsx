@@ -16,6 +16,7 @@ import ProfileAvatar from '../src/components/ProfileAvatar';
 import { COLORS } from '../src/data/mockData';
 import type { DiscoveryProfile, MatchWithProfile } from '../src/types/database';
 import { sendLocalNotification } from '../src/lib/notifications';
+import { rateLimitAction } from '../src/lib/rateLimit';
 import {
   ChatMessage,
   fetchMessages,
@@ -82,6 +83,11 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
   const handleSend = async () => {
     const text = draft.trim();
     if (!text || sending) return;
+
+    if (!rateLimitAction('message_send', 50, 3_600_000)) {
+      setError('Message limit reached. You can send up to 50 messages per hour.');
+      return;
+    }
 
     setSending(true);
     setDraft('');

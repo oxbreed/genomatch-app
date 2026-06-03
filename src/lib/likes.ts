@@ -1,6 +1,18 @@
 import { sendLocalNotification } from './notifications';
 import { getCurrentUserId } from './profiles';
+import { rateLimitAction } from './rateLimit';
 import { supabase } from './supabase';
+
+const SWIPE_RATE_KEY = 'swipe';
+const SWIPE_MAX_PER_HOUR = 100;
+const SWIPE_WINDOW_MS = 3_600_000;
+
+function assertSwipeRateLimit(userId: string): void {
+  const key = `${SWIPE_RATE_KEY}:${userId}`;
+  if (!rateLimitAction(key, SWIPE_MAX_PER_HOUR, SWIPE_WINDOW_MS)) {
+    throw new Error('Swipe limit reached. Please try again later.');
+  }
+}
 
 function orderedPair(a: string, b: string): [string, string] {
   return a < b ? [a, b] : [b, a];
@@ -15,6 +27,8 @@ export type LikeResult = {
 export async function recordLike(likedId: string): Promise<LikeResult> {
   const likerId = await getCurrentUserId();
   if (!likerId) throw new Error('Not signed in');
+
+  assertSwipeRateLimit(likerId);
 
   const { error: likeError } = await supabase.from('likes').upsert(
     { liker_id: likerId, liked_id: likedId },
@@ -84,6 +98,8 @@ export async function recordLike(likedId: string): Promise<LikeResult> {
 export async function recordPass(passedId: string): Promise<void> {
   const passerId = await getCurrentUserId();
   if (!passerId) throw new Error('Not signed in');
+
+  assertSwipeRateLimit(passerId);
 
   const { error } = await supabase.from('passes').upsert(
     { passer_id: passerId, passed_id: passedId },

@@ -10,17 +10,30 @@ if (!supabaseAnonKey) {
   );
 }
 
+/** Encrypted session storage for React Native (not AsyncStorage). */
 const secureStoreAdapter = {
-  getItem: (key: string) => SecureStore.getItemAsync(key),
-  setItem: (key: string, value: string) => SecureStore.setItemAsync(key, value),
-  removeItem: (key: string) => SecureStore.deleteItemAsync(key),
+  getItem: async (key: string): Promise<string | null> => {
+    try {
+      return await SecureStore.getItemAsync(key);
+    } catch {
+      return null;
+    }
+  },
+  setItem: async (key: string, value: string): Promise<void> => {
+    await SecureStore.setItemAsync(key, value);
+  },
+  removeItem: async (key: string): Promise<void> => {
+    await SecureStore.deleteItemAsync(key);
+  },
 };
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     storage: secureStoreAdapter,
+    storageKey: 'genomatch-auth',
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: false,
+    flowType: 'pkce',
   },
 });

@@ -3,6 +3,7 @@ import type { DiscoveryProfile, Genotype, ProfileRow } from '../types/database';
 import { getAuthenticatedUserId, logSupabaseResult } from './auth';
 import { mapProfileRow } from './profileMapper';
 import { supabase } from './supabase';
+import { sanitizeText } from './validation';
 
 const PROFILE_FIELDS =
   'id, email, genotype, display_name, avatar_url, bio, date_of_birth, city, country, gender, interests, relationship_goal, onboarding_completed, created_at, updated_at';
@@ -200,6 +201,17 @@ export async function updateProfileFields(
   const userId = await getCurrentUserId();
   if (!userId) throw new Error('Not signed in');
 
-  const { error } = await supabase.from('profiles').update(fields).eq('id', userId);
+  const payload = { ...fields };
+  if (payload.display_name != null) {
+    payload.display_name = sanitizeText(payload.display_name);
+  }
+  if (payload.city != null) {
+    payload.city = sanitizeText(payload.city);
+  }
+  if (payload.bio != null) {
+    payload.bio = sanitizeText(payload.bio);
+  }
+
+  const { error } = await supabase.from('profiles').update(payload).eq('id', userId);
   if (error) throw error;
 }
