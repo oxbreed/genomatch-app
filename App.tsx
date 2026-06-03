@@ -11,9 +11,10 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps } from 'react';
+import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
 import GenoMatchLogo from './src/components/GenoMatchLogo';
-import { COLORS, TYPOGRAPHY } from './src/theme';
+import { COLORS, FONTS_TO_LOAD, TYPOGRAPHY } from './src/theme';
 
 import Register from './screens/Register';
 import SignIn from './screens/SignIn';
@@ -58,6 +59,7 @@ const ONBOARDING_SLIDES: {
 ];
 
 export default function App() {
+  const [fontsLoaded] = useFonts(FONTS_TO_LOAD);
   const [bootstrapping, setBootstrapping] = useState(true);
   const [screen, setScreen] = useState<
     'onboarding' | 'register' | 'signIn' | 'profileSetup' | 'main'
@@ -316,7 +318,7 @@ export default function App() {
     }).start();
   };
 
-  if (!splashFinished || bootstrapping) {
+  if (!fontsLoaded || !splashFinished || bootstrapping) {
     return (
       <View style={styles.root}>
         <StatusBar style="light" />
@@ -346,10 +348,16 @@ export default function App() {
                 },
               ]}
             >
-              <GenoMatchLogo size={88} />
+              <GenoMatchLogo size={155} />
             </Animated.View>
           </View>
-          <Text style={styles.brandWordmark}>GenoMatch</Text>
+          <Text
+            style={styles.brandWordmark}
+            adjustsFontSizeToFit
+            numberOfLines={1}
+          >
+            GenoMatch
+          </Text>
           <Text style={styles.brandTagline}>Connecting Hearts. Aligning Genes.</Text>
           {bootstrapping ? (
             <ActivityIndicator
@@ -486,11 +494,11 @@ export default function App() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: COLORS.forest,
+    backgroundColor: COLORS.forestDeep,
   },
   splashLayer: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: COLORS.forest,
+    backgroundColor: COLORS.splash,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -499,7 +507,7 @@ const styles = StyleSheet.create({
     width: 310,
     height: 310,
     borderRadius: 155,
-    backgroundColor: 'rgba(168, 213, 186, 0.12)',
+    backgroundColor: 'rgba(143, 175, 149, 0.15)',
   },
   logoStack: {
     width: 168,
@@ -516,7 +524,7 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: COLORS.gold,
     borderTopColor: 'transparent',
-    borderRightColor: 'rgba(255, 224, 130, 0.35)',
+    borderRightColor: 'rgba(212, 168, 67, 0.35)',
   },
   logoRingInner: {
     position: 'absolute',
@@ -529,30 +537,32 @@ const styles = StyleSheet.create({
     borderLeftColor: 'transparent',
   },
   logoOrb: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: 180,
+    height: 180,
+    borderRadius: 90,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(168, 213, 186, 0.08)',
+    backgroundColor: 'rgba(143, 175, 149, 0.1)',
     borderWidth: 1,
-    borderColor: 'rgba(255, 224, 130, 0.2)',
+    borderColor: 'rgba(212, 168, 67, 0.25)',
   },
   splashSpinner: {
     marginTop: 20,
   },
   brandWordmark: {
+    fontFamily: 'ClashDisplay-Semibold',
+    fontSize: 38,
     color: COLORS.white,
-    fontSize: 46,
-    fontWeight: '700',
     letterSpacing: -1.1,
+    maxWidth: '90%',
+    textAlign: 'center',
   },
   brandTagline: {
+    ...TYPOGRAPHY.body,
     marginTop: 8,
     color: COLORS.sage,
     fontSize: 16,
     letterSpacing: 0.2,
-    fontWeight: '400',
     lineHeight: 24,
   },
   onboardingLayer: {
@@ -574,7 +584,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   skipText: {
-    color: 'rgba(250, 250, 247, 0.72)',
+    color: 'rgba(245, 239, 230, 0.72)',
     fontSize: 15,
     fontWeight: '600',
   },
@@ -606,7 +616,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.18)',
   },
   slideTitle: {
-    color: COLORS.ivory,
+    color: COLORS.linen,
     fontSize: 39,
     lineHeight: 45,
     fontWeight: '600',
@@ -615,7 +625,7 @@ const styles = StyleSheet.create({
     maxWidth: '95%',
   },
   slideBody: {
-    color: 'rgba(250, 250, 247, 0.78)',
+    color: 'rgba(245, 239, 230, 0.78)',
     fontSize: 17,
     lineHeight: 25.5,
     fontWeight: '400',
@@ -634,7 +644,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 8,
-    backgroundColor: 'rgba(250, 250, 247, 0.28)',
+    backgroundColor: 'rgba(245, 239, 230, 0.28)',
   },
   dotActive: {
     width: 28,
@@ -648,14 +658,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   ctaLabel: {
-    color: COLORS.forest,
+    color: COLORS.forestDeep,
     fontSize: 17,
     fontWeight: '700',
     letterSpacing: 0.2,
   },
   helperText: {
     marginTop: 14,
-    color: 'rgba(250, 250, 247, 0.6)',
+    color: 'rgba(245, 239, 230, 0.6)',
     fontSize: 13,
     textAlign: 'center',
     fontWeight: '500',

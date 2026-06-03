@@ -10,10 +10,12 @@
     "description": "GenoMatch is the world's first genotype-aware dating app. Find compatible partners based on AA, AS, SS, AC genotype matching.",
     "primaryColor": "#0D2818",
     "fonts": [
-      "./assets/fonts/ClashDisplay-Semibold.ttf",
-      "./assets/fonts/ClashDisplay-Medium.ttf",
-      "./assets/fonts/Satoshi-Medium.ttf",
-      "./assets/fonts/Satoshi-Regular.ttf"
+      "./assets/fonts/ClashDisplay-Semibold.otf",
+      "./assets/fonts/ClashDisplay-Medium.otf",
+      "./assets/fonts/ClashDisplay-Regular.otf",
+      "./assets/fonts/Satoshi-Regular.otf",
+      "./assets/fonts/Satoshi-Medium.otf",
+      "./assets/fonts/Satoshi-Bold.otf"
     ],
     "splash": {
       "image": "./assets/splash-icon.png",
@@ -78,10 +80,12 @@
         "expo-font",
         {
           "fonts": [
-            "./assets/fonts/ClashDisplay-Semibold.ttf",
-            "./assets/fonts/ClashDisplay-Medium.ttf",
-            "./assets/fonts/Satoshi-Medium.ttf",
-            "./assets/fonts/Satoshi-Regular.ttf"
+            "./assets/fonts/ClashDisplay-Semibold.otf",
+            "./assets/fonts/ClashDisplay-Medium.otf",
+            "./assets/fonts/ClashDisplay-Regular.otf",
+            "./assets/fonts/Satoshi-Regular.otf",
+            "./assets/fonts/Satoshi-Medium.otf",
+            "./assets/fonts/Satoshi-Bold.otf"
           ]
         }
       ]

@@ -174,11 +174,11 @@ export default function ReportBlockSheet({
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(7, 77, 46, 0.45)',
+    backgroundColor: 'rgba(13, 40, 24, 0.45)',
     justifyContent: 'flex-end',
   },
   sheet: {
-    backgroundColor: COLORS.ivory,
+    backgroundColor: COLORS.linen,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 20,
@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 4,
     borderRadius: 2,
-    backgroundColor: 'rgba(7, 77, 46, 0.2)',
+    backgroundColor: 'rgba(13, 40, 24, 0.2)',
     marginBottom: 16,
   },
   sheetTitle: {

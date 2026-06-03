@@ -238,11 +238,11 @@ export default function FilterSheet({
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(7, 77, 46, 0.45)',
+    backgroundColor: 'rgba(13, 40, 24, 0.45)',
     justifyContent: 'flex-end',
   },
   sheet: {
-    backgroundColor: COLORS.ivory,
+    backgroundColor: COLORS.linen,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     paddingHorizontal: 20,
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 4,
     borderRadius: 2,
-    backgroundColor: 'rgba(7, 77, 46, 0.2)',
+    backgroundColor: 'rgba(13, 40, 24, 0.2)',
     marginTop: 10,
     marginBottom: 12,
   },
@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
   },
   toggleChipActive: {
     borderColor: COLORS.forest,
-    backgroundColor: 'rgba(168, 213, 186, 0.35)',
+    backgroundColor: 'rgba(143, 175, 149, 0.35)',
   },
   toggleChipText: {
     fontSize: 14,
@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
   textInput: {
     borderRadius: 12,
     borderWidth: 1.5,
-    borderColor: 'rgba(7, 77, 46, 0.12)',
+    borderColor: 'rgba(13, 40, 24, 0.12)',
     backgroundColor: COLORS.white,
     paddingHorizontal: 14,
     paddingVertical: 12,

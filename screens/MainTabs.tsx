@@ -7,7 +7,7 @@ import Discovery from './Discovery';
 import Matches from './Matches';
 import Messages from './Messages';
 import Profile from './Profile';
-import { COLORS } from '../src/theme';
+import { COLORS, TYPOGRAPHY } from '../src/theme';
 
 type TabId = 'discover' | 'matches' | 'messages' | 'profile';
 type IonName = ComponentProps<typeof Ionicons>['name'];
@@ -69,7 +69,7 @@ export default function MainTabs({ onSignOut }: MainTabsProps) {
               <Ionicons
                 name={active ? tab.iconActive : tab.icon}
                 size={22}
-                color={active ? COLORS.gold : 'rgba(250, 250, 247, 0.55)'}
+                color={active ? COLORS.gold : 'rgba(245, 239, 230, 0.55)'}
               />
               <Text style={[styles.tabLabel, active && styles.tabLabelActive]}>{tab.label}</Text>
               {active && <View style={styles.tabIndicator} />}
@@ -84,14 +84,14 @@ export default function MainTabs({ onSignOut }: MainTabsProps) {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: COLORS.ivory,
+    backgroundColor: COLORS.linen,
   },
   content: {
     flex: 1,
   },
   tabBar: {
     flexDirection: 'row',
-    backgroundColor: COLORS.forest,
+    backgroundColor: COLORS.tabBar,
     paddingTop: 10,
     paddingBottom: 28,
     paddingHorizontal: 8,
@@ -106,14 +106,14 @@ const styles = StyleSheet.create({
     minHeight: 52,
   },
   tabLabel: {
+    ...TYPOGRAPHY.caption,
     fontSize: 11,
-    fontWeight: '600',
-    color: 'rgba(250, 250, 247, 0.55)',
+    color: 'rgba(245, 239, 230, 0.55)',
     letterSpacing: 0.2,
   },
   tabLabelActive: {
     color: COLORS.gold,
-    fontWeight: '700',
+    fontFamily: TYPOGRAPHY.label.fontFamily,
   },
   tabIndicator: {
     position: 'absolute',

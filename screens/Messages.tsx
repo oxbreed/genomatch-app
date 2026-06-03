@@ -11,7 +11,7 @@ import { StatusBar } from 'expo-status-bar';
 import EmptyState from '../src/components/EmptyState';
 import ProfileAvatar from '../src/components/ProfileAvatar';
 import { logAuthState } from '../src/lib/auth';
-import { COLORS } from '../src/data/mockData';
+import { COLORS, TYPOGRAPHY } from '../src/data/mockData';
 import { fetchConversations, formatMessageTime } from '../src/lib/messages';
 import { fetchMatches } from '../src/lib/matches';
 import type { ConversationPreview, DiscoveryProfile, MatchWithProfile } from '../src/types/database';
@@ -199,7 +199,7 @@ export default function Messages({ initialChatMatchId, onChatOpened }: MessagesP
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.ivory,
+    backgroundColor: COLORS.linen,
   },
   header: {
     paddingTop: 58,
@@ -207,16 +207,13 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   title: {
-    fontSize: 32,
-    fontWeight: '800',
-    color: COLORS.forest,
-    letterSpacing: -0.8,
+    ...TYPOGRAPHY.display,
+    fontFamily: 'ClashDisplay-Semibold',
   },
   subtitle: {
+    ...TYPOGRAPHY.caption,
     marginTop: 6,
-    fontSize: 14,
-    color: 'rgba(7, 77, 46, 0.6)',
-    fontWeight: '500',
+    color: COLORS.textMuted,
   },
   centered: {
     flex: 1,
@@ -238,7 +235,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   retryText: {
-    color: COLORS.ivory,
+    color: COLORS.linen,
     fontWeight: '800',
   },
   list: {
@@ -255,10 +252,10 @@ const styles = StyleSheet.create({
     padding: 14,
     gap: 10,
     borderWidth: 1,
-    borderColor: 'rgba(7, 77, 46, 0.08)',
+    borderColor: 'rgba(13, 40, 24, 0.08)',
   },
   rowPressed: {
-    backgroundColor: 'rgba(168, 213, 186, 0.15)',
+    backgroundColor: 'rgba(143, 175, 149, 0.15)',
   },
   profileTap: {
     alignItems: 'center',
@@ -289,14 +286,14 @@ const styles = StyleSheet.create({
   },
   time: {
     fontSize: 11,
-    color: 'rgba(7, 77, 46, 0.45)',
+    color: 'rgba(13, 40, 24, 0.45)',
     fontWeight: '600',
     flexShrink: 0,
   },
   preview: {
     flex: 1,
     fontSize: 14,
-    color: 'rgba(7, 77, 46, 0.6)',
+    color: 'rgba(13, 40, 24, 0.6)',
     fontWeight: '500',
     marginRight: 8,
   },

@@ -154,9 +154,9 @@ const styles = StyleSheet.create({
   addCell: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(168, 213, 186, 0.25)',
+    backgroundColor: 'rgba(143, 175, 149, 0.25)',
     borderStyle: 'dashed',
-    borderColor: 'rgba(7, 77, 46, 0.25)',
+    borderColor: 'rgba(13, 40, 24, 0.25)',
   },
   addPressed: {
     opacity: 0.88,

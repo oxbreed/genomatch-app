@@ -16,7 +16,7 @@ import PhotoGrid from '../src/components/PhotoGrid';
 import CommunityGuidelines from './CommunityGuidelines';
 import PrivacyPolicy from './PrivacyPolicy';
 import GenotypeBadge from '../src/components/GenotypeBadge';
-import { COLORS, RELATIONSHIP_GOAL_LABELS } from '../src/data/mockData';
+import { COLORS, RELATIONSHIP_GOAL_LABELS, TYPOGRAPHY } from '../src/data/mockData';
 import { uploadAdditionalPhoto } from '../src/lib/photoUpload';
 import { mapProfileRow } from '../src/lib/profileMapper';
 import { logAuthState } from '../src/lib/auth';
@@ -327,13 +327,13 @@ export default function Profile({ onSignOut }: ProfileProps) {
                 <Ionicons
                   name="shield-checkmark"
                   size={22}
-                  color="#2E7D32"
+                  color={COLORS.verified}
                   accessibilityLabel="Genotype verified"
                 />
               ) : null}
             </View>
             <Text style={styles.summaryMetaText}>
-              {data.age ? `${data.age} ù ` : ''}
+              {data.age ? `${data.age} ¬∑ ` : ''}
               {data.city}
             </Text>
           </View>
@@ -473,7 +473,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.ivory },
+  container: { flex: 1, backgroundColor: COLORS.linen },
   centered: { alignItems: 'center', justifyContent: 'center' },
   header: {
     flexDirection: 'row',
@@ -484,10 +484,8 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
   },
   title: {
-    fontSize: 32,
-    fontWeight: '700',
-    color: COLORS.forest,
-    letterSpacing: -0.8,
+    ...TYPOGRAPHY.display,
+    fontFamily: 'ClashDisplay-Semibold',
   },
   editBtn: {
     paddingHorizontal: 14,
@@ -495,9 +493,9 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: COLORS.forest,
   },
-  editBtnText: { color: COLORS.ivory, fontSize: 14, fontWeight: '700' },
+  editBtnText: { color: COLORS.linen, fontSize: 14, fontWeight: '700' },
   editActions: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  cancelText: { fontSize: 14, fontWeight: '700', color: 'rgba(7, 77, 46, 0.6)' },
+  cancelText: { fontSize: 14, fontWeight: '700', color: 'rgba(13, 40, 24, 0.6)' },
   saveBtn: {
     paddingHorizontal: 14,
     paddingVertical: 8,
@@ -516,7 +514,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
   },
-  errorText: { color: 'rgba(7, 77, 46, 0.6)', fontSize: 15, fontWeight: '600', textAlign: 'center' },
+  errorText: { color: 'rgba(13, 40, 24, 0.6)', fontSize: 15, fontWeight: '600', textAlign: 'center' },
   retryBtn: {
     marginTop: 16,
     backgroundColor: COLORS.forest,
@@ -524,7 +522,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 12,
   },
-  retryText: { color: COLORS.ivory, fontWeight: '700' },
+  retryText: { color: COLORS.linen, fontWeight: '700' },
   scroll: { paddingBottom: 24 },
   scrollContent: { paddingHorizontal: 20 },
   profileSummary: {
@@ -573,7 +571,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 12,
-    backgroundColor: 'rgba(255, 224, 130, 0.35)',
+    backgroundColor: 'rgba(212, 168, 67, 0.35)',
     borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 14,
@@ -603,7 +601,7 @@ const styles = StyleSheet.create({
   },
   modalBackdrop: {
     flex: 1,
-    backgroundColor: 'rgba(7, 77, 46, 0.5)',
+    backgroundColor: 'rgba(13, 40, 24, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 24,
@@ -661,7 +659,7 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: 'rgba(7, 77, 46, 0.08)',
+    borderColor: 'rgba(13, 40, 24, 0.08)',
   },
   sectionLabel: {
     fontSize: 12,
@@ -677,17 +675,17 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: COLORS.forest,
     borderWidth: 1.5,
-    borderColor: 'rgba(7, 77, 46, 0.12)',
+    borderColor: 'rgba(13, 40, 24, 0.12)',
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    backgroundColor: COLORS.ivory,
+    backgroundColor: COLORS.linen,
   },
   bioInput: { minHeight: 100 },
   bio: {
     fontSize: 15,
     lineHeight: 23,
-    color: 'rgba(7, 77, 46, 0.78)',
+    color: 'rgba(13, 40, 24, 0.78)',
     fontWeight: '500',
   },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
@@ -695,11 +693,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: 999,
-    backgroundColor: 'rgba(168, 213, 186, 0.35)',
+    backgroundColor: 'rgba(143, 175, 149, 0.35)',
   },
   chipText: { fontSize: 13, fontWeight: '600', color: COLORS.forest },
   goalCard: {
-    backgroundColor: 'rgba(255, 224, 130, 0.35)',
+    backgroundColor: 'rgba(212, 168, 67, 0.35)',
     borderRadius: 12,
     padding: 14,
     borderWidth: 1,

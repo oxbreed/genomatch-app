@@ -1,12 +1,7 @@
 import type { ReactElement } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Line, Path, Rect } from 'react-native-svg';
-import { COLORS } from '../theme';
-
-const FOREST = '#074D2E';
-const SAGE = '#A8D5BA';
-const GOLD = '#FFE082';
-const IVORY = '#FAFAF7';
+import { COLORS, FOREST, FOREST_DEEP, GOLD, LINEN, SAGE } from '../theme';
 
 const ILLUS_SIZE = 136;
 
@@ -29,7 +24,7 @@ function NoProfilesIllustration() {
   return (
     <Svg width={ILLUS_SIZE} height={ILLUS_SIZE} viewBox="0 0 120 120" fill="none">
       <Circle cx={44} cy={58} r={30} fill={SAGE} opacity={0.45} />
-      <Circle cx={76} cy={58} r={30} fill={IVORY} stroke={FOREST} strokeWidth={2.5} opacity={0.9} />
+      <Circle cx={76} cy={58} r={30} fill={LINEN} stroke={FOREST} strokeWidth={2.5} opacity={0.9} />
       <Path
         d="M52 28 C58 38, 46 48, 54 58 C62 68, 50 78, 58 88 C66 98, 54 102, 60 102"
         stroke={SAGE}
@@ -76,7 +71,7 @@ function NoMatchesIllustration() {
 function SeenAllIllustration() {
   return (
     <Svg width={ILLUS_SIZE} height={ILLUS_SIZE} viewBox="0 0 120 120" fill="none">
-      <Circle cx={60} cy={56} r={34} fill={IVORY} stroke={SAGE} strokeWidth={3} />
+      <Circle cx={60} cy={56} r={34} fill={LINEN} stroke={SAGE} strokeWidth={3} />
       <Circle cx={60} cy={56} r={34} fill={SAGE} opacity={0.2} />
       <Path
         d="M44 56 L54 66 L78 42"
@@ -98,7 +93,7 @@ function SeenAllIllustration() {
 function NoResultsIllustration() {
   return (
     <Svg width={ILLUS_SIZE} height={ILLUS_SIZE} viewBox="0 0 120 120" fill="none">
-      <Circle cx={52} cy={52} r={28} fill={IVORY} stroke={FOREST} strokeWidth={3} />
+      <Circle cx={52} cy={52} r={28} fill={LINEN} stroke={FOREST_DEEP} strokeWidth={3} />
       <Circle cx={52} cy={52} r={22} fill={SAGE} opacity={0.25} />
       <Line x1={72} y1={72} x2={96} y2={96} stroke={FOREST} strokeWidth={4} strokeLinecap="round" />
       <Line x1={42} y1={42} x2={62} y2={62} stroke={FOREST} strokeWidth={3.5} strokeLinecap="round" />
@@ -203,7 +198,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     lineHeight: 22,
     fontWeight: '500',
-    color: '#5A8A6E',
+    color: COLORS.sage,
     textAlign: 'center',
     maxWidth: 280,
   },

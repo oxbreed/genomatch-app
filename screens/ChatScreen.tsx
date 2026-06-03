@@ -15,7 +15,7 @@ import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import ProfileAvatar from '../src/components/ProfileAvatar';
 import ReportBlockSheet from '../src/components/ReportBlockSheet';
-import { COLORS } from '../src/data/mockData';
+import { COLORS, TYPOGRAPHY } from '../src/data/mockData';
 import type { DiscoveryProfile, MatchWithProfile } from '../src/types/database';
 import { sendLocalNotification } from '../src/lib/notifications';
 import { rateLimitAction } from '../src/lib/rateLimit';
@@ -207,7 +207,7 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
           </View>
           {showRead ? (
             <View style={styles.readReceipt}>
-              <Ionicons name="checkmark-done" size={14} color="rgba(7, 77, 46, 0.5)" />
+              <Ionicons name="checkmark-done" size={14} color="rgba(13, 40, 24, 0.5)" />
               <Text style={styles.readReceiptText}>Read</Text>
             </View>
           ) : null}
@@ -306,7 +306,7 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
           value={draft}
           onChangeText={handleDraftChange}
           placeholder="Type a message..."
-          placeholderTextColor="rgba(7, 77, 46, 0.35)"
+          placeholderTextColor="rgba(13, 40, 24, 0.35)"
           multiline
           maxLength={1000}
           editable={!sending}
@@ -330,7 +330,7 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.ivory,
+    backgroundColor: COLORS.linen,
   },
   header: {
     flexDirection: 'row',
@@ -340,14 +340,14 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
     backgroundColor: COLORS.white,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(7, 77, 46, 0.08)',
+    borderBottomColor: 'rgba(13, 40, 24, 0.08)',
     gap: 10,
   },
   backBtn: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(168, 213, 186, 0.25)',
+    backgroundColor: 'rgba(143, 175, 149, 0.25)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -360,13 +360,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   chatName: {
+    ...TYPOGRAPHY.name,
     fontSize: 17,
-    fontWeight: '800',
-    color: COLORS.forest,
+    fontWeight: '600',
   },
   chatMeta: {
     fontSize: 12,
-    color: 'rgba(7, 77, 46, 0.55)',
+    color: 'rgba(13, 40, 24, 0.55)',
     fontWeight: '600',
     marginTop: 2,
   },
@@ -381,21 +381,21 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(168, 213, 186, 0.35)',
+    backgroundColor: 'rgba(143, 175, 149, 0.35)',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(7, 77, 46, 0.08)',
+    borderColor: 'rgba(13, 40, 24, 0.08)',
   },
   menuBtn: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(168, 213, 186, 0.35)',
+    backgroundColor: 'rgba(143, 175, 149, 0.35)',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(7, 77, 46, 0.08)',
+    borderColor: 'rgba(13, 40, 24, 0.08)',
   },
   profileBtnPressed: {
     opacity: 0.85,
@@ -424,14 +424,14 @@ const styles = StyleSheet.create({
   timeDivider: {
     alignSelf: 'center',
     fontSize: 11,
-    color: 'rgba(7, 77, 46, 0.45)',
+    color: 'rgba(13, 40, 24, 0.45)',
     fontWeight: '600',
     marginVertical: 10,
   },
   emptyHint: {
     alignSelf: 'center',
     marginTop: 40,
-    backgroundColor: 'rgba(168, 213, 186, 0.3)',
+    backgroundColor: 'rgba(143, 175, 149, 0.3)',
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 999,
@@ -462,13 +462,13 @@ const styles = StyleSheet.create({
     borderRadius: 18,
   },
   bubbleSent: {
-    backgroundColor: COLORS.forest,
+    backgroundColor: COLORS.forestDeep,
     borderBottomRightRadius: 4,
   },
   bubbleReceived: {
     backgroundColor: COLORS.white,
     borderWidth: 1,
-    borderColor: 'rgba(7, 77, 46, 0.1)',
+    borderColor: 'rgba(13, 40, 24, 0.1)',
     borderBottomLeftRadius: 4,
   },
   bubbleText: {
@@ -478,7 +478,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   bubbleTextSent: {
-    color: COLORS.ivory,
+    color: COLORS.linen,
   },
   readReceipt: {
     flexDirection: 'row',
@@ -490,7 +490,7 @@ const styles = StyleSheet.create({
   readReceiptText: {
     fontSize: 11,
     fontWeight: '600',
-    color: 'rgba(7, 77, 46, 0.5)',
+    color: 'rgba(13, 40, 24, 0.5)',
   },
   composer: {
     flexDirection: 'row',
@@ -501,7 +501,7 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
     backgroundColor: COLORS.white,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(7, 77, 46, 0.08)',
+    borderTopColor: 'rgba(13, 40, 24, 0.08)',
   },
   composerInput: {
     flex: 1,
@@ -509,8 +509,8 @@ const styles = StyleSheet.create({
     maxHeight: 120,
     borderRadius: 14,
     borderWidth: 1.5,
-    borderColor: 'rgba(7, 77, 46, 0.12)',
-    backgroundColor: COLORS.ivory,
+    borderColor: 'rgba(13, 40, 24, 0.12)',
+    backgroundColor: COLORS.linen,
     paddingHorizontal: 14,
     paddingVertical: 10,
     fontSize: 16,

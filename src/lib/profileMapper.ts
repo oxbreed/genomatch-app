@@ -2,11 +2,11 @@ import type { DiscoveryProfile, Genotype, ProfileRow } from '../types/database';
 import { computeCompatibility } from './compatibility';
 
 const GRADIENTS: [string, string][] = [
-  ['#1B7A6E', '#074D2E'],
-  ['#2E7D32', '#1B5E20'],
+  ['#2A5C40', '#0D2818'],
+  ['#3D7A52', '#1A3D28'],
   ['#185FA5', '#0D47A1'],
   ['#6A4C93', '#4A2C6A'],
-  ['#C9872B', '#8B5A14'],
+  ['#D4A843', '#8B6914'],
 ];
 
 export function ageFromDateOfBirth(dob: string | null): number | null {

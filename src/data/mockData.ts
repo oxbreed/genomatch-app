@@ -8,7 +8,7 @@ export const GENOTYPE_STYLES: Record<
   { bg: string; text: string; border: string }
 > = {
   AA: { bg: '#E8F5E9', text: '#2E7D32', border: '#A5D6A7' },
-  AS: { bg: '#FFF8E6', text: '#BA7517', border: '#FFE082' },
+  AS: { bg: '#FFF8E6', text: '#BA7517', border: '#D4A843' },
   SS: { bg: '#FFEBEE', text: '#A32D2D', border: '#EF9A9A' },
   AC: { bg: '#E3F2FD', text: '#185FA5', border: '#90CAF9' },
 };
@@ -38,7 +38,7 @@ export const MOCK_MATCHES: MockProfile[] = [
     compatibility: 94,
     bio: 'Architect who loves live music and long walks. Looking for someone intentional, kind, and ready for something real.',
     interests: ['Music', 'Travel', 'Art', 'Food'],
-    gradient: ['#1B7A6E', '#074D2E'],
+    gradient: ['#2A5C40', '#1A3D28'],
     lastMessageAt: '2h ago',
   },
   {
@@ -92,7 +92,7 @@ export const MOCK_CURRENT_USER: CurrentUserProfile = {
   bio: 'Passionate about meaningful connections, good food, and building a future with the right person. Genotype-aware and intentional about love.',
   interests: ['Music', 'Travel', 'Tech', 'Food'],
   relationshipGoal: 'serious',
-  gradient: ['#074D2E', '#1B7A6E'],
+  gradient: ['#1A3D28', '#2A5C40'],
 };
 
 export function getInitials(name: string) {

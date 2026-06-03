@@ -1,4 +1,4 @@
-import { getCurrentUserId } from './profiles';
+import { getAuthenticatedUserId } from './auth';
 import { supabase } from './supabase';
 import { sanitizeText } from './validation';
 
@@ -18,7 +18,7 @@ export async function reportUser(
   reason: string,
   details?: string
 ): Promise<void> {
-  const reporterId = await getCurrentUserId();
+  const reporterId = await getAuthenticatedUserId();
   if (!reporterId) throw new Error('Not signed in');
   if (reporterId === reportedId) throw new Error('Cannot report yourself');
 
@@ -37,7 +37,7 @@ export async function reportUser(
 
 /** Block another user so they no longer appear in your experience. */
 export async function blockUser(blockedId: string): Promise<void> {
-  const blockerId = await getCurrentUserId();
+  const blockerId = await getAuthenticatedUserId();
   if (!blockerId) throw new Error('Not signed in');
   if (blockerId === blockedId) throw new Error('Cannot block yourself');
 

@@ -13,7 +13,7 @@ import EmptyState from '../src/components/EmptyState';
 import GenotypeBadge from '../src/components/GenotypeBadge';
 import ProfileAvatar from '../src/components/ProfileAvatar';
 import { logAuthState } from '../src/lib/auth';
-import { COLORS } from '../src/data/mockData';
+import { COLORS, TYPOGRAPHY } from '../src/data/mockData';
 import { fetchMatches } from '../src/lib/matches';
 import type { MatchWithProfile } from '../src/types/database';
 import MatchProfile from './MatchProfile';
@@ -146,7 +146,7 @@ export default function Matches({ onStartChat }: MatchesProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.ivory,
+    backgroundColor: COLORS.linen,
   },
   header: {
     paddingTop: 58,
@@ -159,10 +159,8 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   title: {
-    fontSize: 32,
-    fontWeight: '800',
-    color: COLORS.forest,
-    letterSpacing: -0.8,
+    ...TYPOGRAPHY.display,
+    fontFamily: 'ClashDisplay-Semibold',
   },
   countBadge: {
     minWidth: 28,
@@ -179,10 +177,9 @@ const styles = StyleSheet.create({
     color: COLORS.forest,
   },
   subtitle: {
+    ...TYPOGRAPHY.caption,
     marginTop: 6,
-    fontSize: 14,
-    color: 'rgba(7, 77, 46, 0.6)',
-    fontWeight: '500',
+    color: COLORS.textMuted,
   },
   centered: {
     flex: 1,
@@ -204,7 +201,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   retryText: {
-    color: COLORS.ivory,
+    color: COLORS.linen,
     fontWeight: '800',
   },
   list: {
@@ -221,7 +218,7 @@ const styles = StyleSheet.create({
     padding: 14,
     gap: 12,
     borderWidth: 1,
-    borderColor: 'rgba(7, 77, 46, 0.08)',
+    borderColor: 'rgba(13, 40, 24, 0.08)',
     shadowColor: COLORS.forest,
     shadowOpacity: 0.06,
     shadowRadius: 8,
@@ -259,7 +256,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   compatPill: {
-    backgroundColor: 'rgba(168, 213, 186, 0.35)',
+    backgroundColor: 'rgba(143, 175, 149, 0.35)',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 999,
@@ -271,7 +268,7 @@ const styles = StyleSheet.create({
   },
   city: {
     fontSize: 12,
-    color: 'rgba(7, 77, 46, 0.55)',
+    color: 'rgba(13, 40, 24, 0.55)',
     fontWeight: '500',
   },
   chatBtn: {

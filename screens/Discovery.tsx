@@ -169,7 +169,7 @@ function ProfileCard({ profile }: { profile: DiscoveryProfile }) {
                 <Ionicons
                   name="shield-checkmark"
                   size={20}
-                  color="#66BB6A"
+                  color={COLORS.verified}
                   accessibilityLabel="Genotype verified"
                 />
               ) : null}
@@ -587,7 +587,7 @@ export default function Discovery() {
             onPress={handleLike}
             disabled={showMatch}
           >
-            <Ionicons name="heart" size={30} color={COLORS.ivory} />
+            <Ionicons name="heart" size={30} color={COLORS.linen} />
           </Pressable>
         </View>
       )}
@@ -614,7 +614,7 @@ export default function Discovery() {
               You and {matchedName} liked each other
             </Text>
             <View style={styles.matchIconWrap}>
-              <Ionicons name="heart" size={40} color={COLORS.forest} />
+              <Ionicons name="heart" size={40} color={COLORS.gold} />
             </View>
           </View>
         </Animated.View>
@@ -626,7 +626,7 @@ export default function Discovery() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.ivory,
+    backgroundColor: COLORS.linen,
   },
   header: {
     paddingTop: 58,
@@ -640,13 +640,14 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     ...TYPOGRAPHY.display,
+    fontFamily: 'ClashDisplay-Semibold',
     flex: 1,
   },
   filterBtn: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: 'rgba(168, 213, 186, 0.35)',
+    backgroundColor: 'rgba(143, 175, 149, 0.35)',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
@@ -809,7 +810,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 15,
-    color: 'rgba(7, 77, 46, 0.6)',
+    color: 'rgba(13, 40, 24, 0.6)',
     fontWeight: '600',
   },
   retryBtn: {
@@ -820,7 +821,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   retryText: {
-    color: COLORS.ivory,
+    color: COLORS.linen,
     fontWeight: '800',
     fontSize: 15,
   },
@@ -862,7 +863,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: 999,
-    backgroundColor: 'rgba(168, 213, 186, 0.35)',
+    backgroundColor: 'rgba(143, 175, 149, 0.35)',
   },
   interestText: {
     fontSize: 13,
@@ -912,7 +913,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: COLORS.ivory,
+    backgroundColor: COLORS.linen,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
@@ -948,7 +949,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: 'rgba(168, 213, 186, 0.35)',
+    backgroundColor: 'rgba(143, 175, 149, 0.35)',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
@@ -964,7 +965,7 @@ const styles = StyleSheet.create({
   },
   matchOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(7, 77, 46, 0.72)',
+    backgroundColor: COLORS.overlay,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 28,
@@ -986,8 +987,10 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   matchCard: {
-    backgroundColor: COLORS.gold,
+    backgroundColor: '#0D2818',
     borderRadius: RADIUS.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(212, 168, 67, 0.3)',
     paddingVertical: 36,
     paddingHorizontal: 28,
     alignItems: 'center',
@@ -997,7 +1000,7 @@ const styles = StyleSheet.create({
   matchTitle: {
     fontSize: 34,
     fontWeight: '700',
-    color: COLORS.forest,
+    color: '#D4A843',
     letterSpacing: -0.5,
     marginBottom: 8,
   },
@@ -1005,7 +1008,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '400',
     lineHeight: 24,
-    color: COLORS.textMuted,
+    color: 'rgba(255, 255, 255, 0.7)',
     textAlign: 'center',
   },
   matchIconWrap: {
@@ -1013,7 +1016,7 @@ const styles = StyleSheet.create({
     width: 72,
     height: 72,
     borderRadius: 36,
-    backgroundColor: COLORS.ivory,
+    backgroundColor: 'rgba(212, 168, 67, 0.15)',
     alignItems: 'center',
     justifyContent: 'center',
   },
