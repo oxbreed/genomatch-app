@@ -163,7 +163,17 @@ function ProfileCard({ profile }: { profile: DiscoveryProfile }) {
               {profile.name}
               {profile.age != null ? `, ${profile.age}` : ''}
             </Text>
-            <GenotypeBadge genotype={profile.genotype} />
+            <View style={styles.genotypeRow}>
+              <GenotypeBadge genotype={profile.genotype} />
+              {profile.genotypeVerified ? (
+                <Ionicons
+                  name="shield-checkmark"
+                  size={20}
+                  color="#66BB6A"
+                  accessibilityLabel="Genotype verified"
+                />
+              ) : null}
+            </View>
           </View>
         </View>
       </View>
@@ -751,6 +761,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexWrap: 'wrap',
     gap: 10,
+  },
+  genotypeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   photoName: {
     fontSize: 24,

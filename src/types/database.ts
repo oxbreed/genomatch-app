@@ -15,6 +15,8 @@ export type ProfileRow = {
   interests: string[] | null;
   relationship_goal: string | null;
   onboarding_completed: boolean;
+  verification_status: string;
+  genotype_verified: boolean;
   created_at: string;
   updated_at: string;
 };
@@ -48,6 +50,8 @@ export type DiscoveryProfile = {
   avatarUrl: string | null;
   photos: string[];
   relationshipGoal?: string | null;
+  genotypeVerified: boolean;
+  verificationStatus?: string | null;
   isMock?: boolean;
 };
 

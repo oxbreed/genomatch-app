@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -10,7 +11,9 @@ import {
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { Ionicons } from '@expo/vector-icons';
 import PhotoGrid from '../src/components/PhotoGrid';
+import CommunityGuidelines from './CommunityGuidelines';
 import PrivacyPolicy from './PrivacyPolicy';
 import GenotypeBadge from '../src/components/GenotypeBadge';
 import { COLORS, RELATIONSHIP_GOAL_LABELS } from '../src/data/mockData';
@@ -21,6 +24,7 @@ import {
   getCurrentProfile,
   updateProfileFields,
   updateProfilePhotos,
+  verifyGenotype,
 } from '../src/lib/profiles';
 import { supabase } from '../src/lib/supabase';
 import type { DiscoveryProfile, Genotype } from '../src/types/database';
@@ -40,6 +44,7 @@ type EditableProfile = {
   avatarUrl: string | null;
   photos: string[];
   gradient: [string, string];
+  genotypeVerified: boolean;
 };
 
 export default function Profile({ onSignOut }: ProfileProps) {
@@ -50,7 +55,10 @@ export default function Profile({ onSignOut }: ProfileProps) {
   const [saving, setSaving] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
+  const [showCommunityGuidelines, setShowCommunityGuidelines] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
+  const [showVerifyModal, setShowVerifyModal] = useState(false);
+  const [verifying, setVerifying] = useState(false);
   const [error, setError] = useState('');
   const [authUserId, setAuthUserId] = useState<string | null>(null);
 
@@ -92,6 +100,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
         avatarUrl: mapped.avatarUrl,
         photos: mapped.photos,
         gradient: mapped.gradient,
+        genotypeVerified: mapped.genotypeVerified,
       };
       setProfile(loaded);
       setDraft(loaded);
@@ -172,6 +181,22 @@ export default function Profile({ onSignOut }: ProfileProps) {
     }
   };
 
+  const handleConfirmVerification = async () => {
+    setVerifying(true);
+    setError('');
+    try {
+      await verifyGenotype();
+      const applyVerified = (p: EditableProfile) => ({ ...p, genotypeVerified: true });
+      setProfile((p) => (p ? applyVerified(p) : p));
+      setDraft((p) => (p ? applyVerified(p) : p));
+      setShowVerifyModal(false);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not verify genotype');
+    } finally {
+      setVerifying(false);
+    }
+  };
+
   const handleDeletePhoto = async (index: number) => {
     const current = editing ? draft : profile;
     if (!current) return;
@@ -237,6 +262,12 @@ export default function Profile({ onSignOut }: ProfileProps) {
     );
   }
 
+  if (showCommunityGuidelines) {
+    return (
+      <CommunityGuidelines onBack={() => setShowCommunityGuidelines(false)} />
+    );
+  }
+
   if (showPrivacy) {
     return <PrivacyPolicy onBack={() => setShowPrivacy(false)} />;
   }
@@ -290,12 +321,36 @@ export default function Profile({ onSignOut }: ProfileProps) {
             <Text style={styles.summaryName}>{data.displayName}</Text>
           )}
           <View style={styles.summaryMeta}>
-            <GenotypeBadge genotype={data.genotype} />
+            <View style={styles.genotypeRow}>
+              <GenotypeBadge genotype={data.genotype} />
+              {data.genotypeVerified ? (
+                <Ionicons
+                  name="shield-checkmark"
+                  size={22}
+                  color="#2E7D32"
+                  accessibilityLabel="Genotype verified"
+                />
+              ) : null}
+            </View>
             <Text style={styles.summaryMetaText}>
-              {data.age ? `${data.age} ∑ ` : ''}
+              {data.age ? `${data.age} ù ` : ''}
               {data.city}
             </Text>
           </View>
+
+          {!data.genotypeVerified ? (
+            <View style={styles.verifyBanner}>
+              <Text style={styles.verifyBannerText}>
+                Verify your genotype to build trust with matches
+              </Text>
+              <Pressable
+                style={({ pressed }) => [styles.verifyBtn, pressed && styles.verifyBtnPressed]}
+                onPress={() => setShowVerifyModal(true)}
+              >
+                <Text style={styles.verifyBtnText}>Verify</Text>
+              </Pressable>
+            </View>
+          ) : null}
         </View>
 
         <View style={styles.section}>
@@ -351,6 +406,13 @@ export default function Profile({ onSignOut }: ProfileProps) {
 
         <Pressable
           style={({ pressed }) => [styles.privacyLink, pressed && styles.privacyLinkPressed]}
+          onPress={() => setShowCommunityGuidelines(true)}
+        >
+          <Text style={styles.privacyLinkText}>Community Guidelines</Text>
+        </Pressable>
+
+        <Pressable
+          style={({ pressed }) => [styles.privacyLink, pressed && styles.privacyLinkPressed]}
           onPress={() => setShowPrivacy(true)}
         >
           <Text style={styles.privacyLinkText}>Privacy Policy</Text>
@@ -367,6 +429,45 @@ export default function Profile({ onSignOut }: ProfileProps) {
         </Pressable>
         </View>
       </ScrollView>
+
+      <Modal
+        visible={showVerifyModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => !verifying && setShowVerifyModal(false)}
+      >
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalCard}>
+            <Text style={styles.modalTitle}>Confirm Your Genotype</Text>
+            <Text style={styles.modalBody}>
+              By verifying, you confirm that your genotype ({data.genotype}) is accurate to
+              the best of your knowledge. This builds trust with your matches.
+            </Text>
+            <Pressable
+              style={({ pressed }) => [
+                styles.modalConfirmBtn,
+                pressed && styles.verifyBtnPressed,
+                verifying && styles.modalBtnDisabled,
+              ]}
+              onPress={handleConfirmVerification}
+              disabled={verifying}
+            >
+              {verifying ? (
+                <ActivityIndicator color={COLORS.forest} size="small" />
+              ) : (
+                <Text style={styles.modalConfirmText}>Yes, I confirm</Text>
+              )}
+            </Pressable>
+            <Pressable
+              style={styles.modalCancelBtn}
+              onPress={() => setShowVerifyModal(false)}
+              disabled={verifying}
+            >
+              <Text style={styles.modalCancelText}>Cancel</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -460,6 +561,99 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: COLORS.textMuted,
+  },
+  genotypeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  verifyBanner: {
+    marginTop: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+    backgroundColor: 'rgba(255, 224, 130, 0.35)',
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(201, 135, 43, 0.2)',
+  },
+  verifyBannerText: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: '600',
+    color: COLORS.forest,
+    lineHeight: 18,
+  },
+  verifyBtn: {
+    backgroundColor: COLORS.gold,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 10,
+  },
+  verifyBtnPressed: {
+    opacity: 0.9,
+  },
+  verifyBtnText: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: COLORS.forest,
+  },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(7, 77, 46, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  modalCard: {
+    width: '100%',
+    maxWidth: 340,
+    backgroundColor: COLORS.white,
+    borderRadius: 18,
+    padding: 24,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: COLORS.forest,
+    marginBottom: 12,
+    letterSpacing: -0.3,
+  },
+  modalBody: {
+    fontSize: 15,
+    lineHeight: 22,
+    color: COLORS.textMuted,
+    fontWeight: '500',
+    marginBottom: 20,
+  },
+  modalConfirmBtn: {
+    backgroundColor: COLORS.gold,
+    borderRadius: 14,
+    paddingVertical: 14,
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  modalBtnDisabled: {
+    opacity: 0.6,
+  },
+  modalConfirmText: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: COLORS.forest,
+  },
+  modalCancelBtn: {
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  modalCancelText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: COLORS.forest,
   },
   section: {
     backgroundColor: COLORS.white,

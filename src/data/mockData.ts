@@ -122,6 +122,8 @@ export function getMockDiscoveryProfiles(): DiscoveryProfile[] {
     gradient: p.gradient,
     avatarUrl: null,
     photos: [],
+    genotypeVerified: false,
+    verificationStatus: 'unverified',
     isMock: true,
   }));
 }

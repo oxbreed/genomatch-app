@@ -49,6 +49,10 @@ export function resolveProfilePhotos(
   return avatar ? [avatar] : [];
 }
 
+export function isGenotypeVerified(row: Pick<ProfileRow, 'genotype_verified' | 'verification_status'>): boolean {
+  return row.genotype_verified === true || row.verification_status === 'verified';
+}
+
 export function mapProfileRow(
   row: ProfileRow,
   viewerGenotype: Genotype | null
@@ -68,5 +72,7 @@ export function mapProfileRow(
     avatarUrl: photos[0] ?? row.avatar_url,
     photos,
     relationshipGoal: row.relationship_goal,
+    genotypeVerified: isGenotypeVerified(row),
+    verificationStatus: row.verification_status ?? 'unverified',
   };
 }

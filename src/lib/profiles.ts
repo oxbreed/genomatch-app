@@ -7,7 +7,7 @@ import { supabase } from './supabase';
 import { sanitizeText } from './validation';
 
 const PROFILE_FIELDS =
-  'id, email, genotype, display_name, avatar_url, photos, bio, date_of_birth, city, country, gender, interests, relationship_goal, onboarding_completed, created_at, updated_at';
+  'id, email, genotype, display_name, avatar_url, photos, bio, date_of_birth, city, country, gender, interests, relationship_goal, onboarding_completed, verification_status, genotype_verified, created_at, updated_at';
 
 export { resolveProfilePhotos };
 
@@ -238,5 +238,21 @@ export async function updateProfileFields(
   }
 
   const { error } = await supabase.from('profiles').update(payload).eq('id', userId);
+  if (error) throw error;
+}
+
+/** Self-declare genotype accuracy (builds trust with matches). */
+export async function verifyGenotype(): Promise<void> {
+  const userId = await getCurrentUserId();
+  if (!userId) throw new Error('Not signed in');
+
+  const { error } = await supabase
+    .from('profiles')
+    .update({
+      verification_status: 'verified',
+      genotype_verified: true,
+    })
+    .eq('id', userId);
+
   if (error) throw error;
 }
