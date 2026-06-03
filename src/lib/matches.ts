@@ -1,6 +1,7 @@
 import type { MatchWithProfile, ProfileRow } from '../types/database';
 import { logSupabaseResult } from './auth';
 import { mapProfileRow } from './profileMapper';
+import { getBlockedUserIds } from './moderation';
 import { getCurrentUserId } from './profiles';
 import { supabase } from './supabase';
 
@@ -21,6 +22,13 @@ export async function fetchMatches(): Promise<MatchWithProfile[]> {
   if (matchError) throw matchError;
   if (!matchRows?.length) return [];
 
+  const blockedSet = await getBlockedUserIds(userId);
+  const visibleMatches = matchRows.filter((match) => {
+    const otherId = match.user_a_id === userId ? match.user_b_id : match.user_a_id;
+    return !blockedSet.has(otherId);
+  });
+  if (!visibleMatches.length) return [];
+
   const { data: me, error: meError } = await supabase
     .from('profiles')
     .select('genotype')
@@ -31,14 +39,14 @@ export async function fetchMatches(): Promise<MatchWithProfile[]> {
   if (meError) throw meError;
   const viewerGenotype = (me as { genotype: ProfileRow['genotype'] } | null)?.genotype ?? null;
 
-  const otherIds = matchRows.map((m) =>
+  const otherIds = visibleMatches.map((m) =>
     m.user_a_id === userId ? m.user_b_id : m.user_a_id
   );
 
   const { data: profiles, error: profilesError } = await supabase
     .from('profiles')
     .select(
-      'id, display_name, genotype, city, bio, interests, relationship_goal, avatar_url, date_of_birth'
+      'id, display_name, genotype, city, bio, interests, relationship_goal, avatar_url, photos, date_of_birth'
     )
     .in('id', otherIds);
 
@@ -49,7 +57,7 @@ export async function fetchMatches(): Promise<MatchWithProfile[]> {
     ((profiles ?? []) as ProfileRow[]).map((p) => [p.id, p])
   );
 
-  return matchRows
+  return visibleMatches
     .map((match) => {
       const otherId = match.user_a_id === userId ? match.user_b_id : match.user_a_id;
       const row = profileMap.get(otherId);

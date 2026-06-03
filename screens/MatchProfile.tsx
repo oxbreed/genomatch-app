@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Animated,
   Easing,
@@ -12,6 +12,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import GenotypeBadge from '../src/components/GenotypeBadge';
 import ProfileAvatar from '../src/components/ProfileAvatar';
+import ReportBlockSheet from '../src/components/ReportBlockSheet';
 import { COLORS, RELATIONSHIP_GOAL_LABELS } from '../src/data/mockData';
 import type { MatchWithProfile } from '../src/types/database';
 
@@ -48,6 +49,7 @@ function CompatibilityRing({ percent }: { percent: number }) {
 
 export default function MatchProfile({ match, onBack, onSendMessage }: MatchProfileProps) {
   const { profile } = match;
+  const [showModerationSheet, setShowModerationSheet] = useState(false);
   const goalKey = profile.relationshipGoal ?? '';
   const goalLabel =
     RELATIONSHIP_GOAL_LABELS[goalKey] ?? (goalKey || 'Not specified');
@@ -100,8 +102,22 @@ export default function MatchProfile({ match, onBack, onSendMessage }: MatchProf
           <Text style={styles.backText}>← Back</Text>
         </Pressable>
         <Text style={styles.headerTitle}>Match Profile</Text>
-        <View style={styles.headerSpacer} />
+        <Pressable
+          style={({ pressed }) => [styles.menuBtn, pressed && styles.menuBtnPressed]}
+          onPress={() => setShowModerationSheet(true)}
+          accessibilityLabel="Report or block"
+        >
+          <Ionicons name="ellipsis-vertical" size={22} color={COLORS.forest} />
+        </Pressable>
       </View>
+
+      <ReportBlockSheet
+        visible={showModerationSheet}
+        onClose={() => setShowModerationSheet(false)}
+        targetUserId={profile.id}
+        targetName={profile.name}
+        onBlocked={onBack}
+      />
 
       <Animated.ScrollView
         style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}
@@ -215,8 +231,18 @@ const styles = StyleSheet.create({
     color: COLORS.forest,
     letterSpacing: 0.2,
   },
-  headerSpacer: {
-    width: 72,
+  menuBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(168, 213, 186, 0.35)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(7, 77, 46, 0.08)',
+  },
+  menuBtnPressed: {
+    opacity: 0.85,
   },
   scroll: {
     paddingHorizontal: 20,

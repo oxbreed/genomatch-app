@@ -121,6 +121,7 @@ export function getMockDiscoveryProfiles(): DiscoveryProfile[] {
     interests: p.interests,
     gradient: p.gradient,
     avatarUrl: null,
+    photos: [],
     isMock: true,
   }));
 }

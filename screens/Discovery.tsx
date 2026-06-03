@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Animated,
   Dimensions,
   Easing,
+  Image,
   PanResponder,
   Pressable,
   ScrollView,
@@ -34,19 +35,69 @@ function MatchPill({ percent }: { percent: number }) {
 }
 
 function ProfileCard({ profile }: { profile: DiscoveryProfile }) {
+  const gallery = useMemo(() => {
+    if (profile.photos.length > 0) return profile.photos;
+    if (profile.avatarUrl) return [profile.avatarUrl];
+    return [];
+  }, [profile.photos, profile.avatarUrl]);
+
+  const [photoIndex, setPhotoIndex] = useState(0);
+  const hasMultiple = gallery.length > 1;
+  const currentUri = gallery[photoIndex] ?? gallery[0];
+
+  useEffect(() => {
+    setPhotoIndex(0);
+  }, [profile.id]);
+
+  const showPrev = () => {
+    setPhotoIndex((i) => (i <= 0 ? gallery.length - 1 : i - 1));
+  };
+
+  const showNext = () => {
+    setPhotoIndex((i) => (i >= gallery.length - 1 ? 0 : i + 1));
+  };
+
   return (
     <View style={styles.cardBody}>
       <View style={styles.photoArea}>
-        <ProfileAvatar
-          name={profile.name}
-          gradient={profile.gradient}
-          avatarUrl={profile.avatarUrl}
-          width="100%"
-          height={PHOTO_HEIGHT}
-          borderRadius={0}
-          initialsPosition="top"
-          initialsOpacity={0.15}
-        />
+        {currentUri ? (
+          <Image source={{ uri: currentUri }} style={styles.photoImage} resizeMode="cover" />
+        ) : (
+          <ProfileAvatar
+            name={profile.name}
+            gradient={profile.gradient}
+            avatarUrl={profile.avatarUrl}
+            width="100%"
+            height={PHOTO_HEIGHT}
+            borderRadius={0}
+            initialsPosition="top"
+            initialsOpacity={0.15}
+          />
+        )}
+
+        {hasMultiple ? (
+          <>
+            <View style={styles.photoDots} pointerEvents="none">
+              {gallery.map((_, i) => (
+                <View
+                  key={i}
+                  style={[styles.photoDot, i === photoIndex && styles.photoDotActive]}
+                />
+              ))}
+            </View>
+            <Pressable
+              style={styles.photoTapLeft}
+              onPress={showPrev}
+              accessibilityLabel="Previous photo"
+            />
+            <Pressable
+              style={styles.photoTapRight}
+              onPress={showNext}
+              accessibilityLabel="Next photo"
+            />
+          </>
+        ) : null}
+
         <MatchPill percent={profile.compatibility} />
         <LinearGradient
           colors={['transparent', 'rgba(0, 0, 0, 0.78)']}
@@ -502,6 +553,48 @@ const styles = StyleSheet.create({
     width: '100%',
     height: PHOTO_HEIGHT,
     position: 'relative',
+  },
+  photoImage: {
+    width: '100%',
+    height: PHOTO_HEIGHT,
+  },
+  photoDots: {
+    position: 'absolute',
+    top: 12,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 6,
+    zIndex: 5,
+  },
+  photoDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.45)',
+  },
+  photoDotActive: {
+    backgroundColor: COLORS.white,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  photoTapLeft: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: '38%',
+    zIndex: 4,
+  },
+  photoTapRight: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    bottom: 0,
+    width: '38%',
+    zIndex: 4,
   },
   photoGradient: {
     position: 'absolute',

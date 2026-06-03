@@ -13,6 +13,7 @@ import {
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import ProfileAvatar from '../src/components/ProfileAvatar';
+import ReportBlockSheet from '../src/components/ReportBlockSheet';
 import { COLORS } from '../src/data/mockData';
 import type { DiscoveryProfile, MatchWithProfile } from '../src/types/database';
 import { sendLocalNotification } from '../src/lib/notifications';
@@ -39,6 +40,7 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
   const [showProfile, setShowProfile] = useState(false);
+  const [showModerationSheet, setShowModerationSheet] = useState(false);
   const listRef = useRef<FlatList<ChatMessage>>(null);
 
   const match: MatchWithProfile = {
@@ -170,7 +172,22 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
         >
           <Ionicons name="person-circle-outline" size={24} color={COLORS.forest} />
         </Pressable>
+        <Pressable
+          style={({ pressed }) => [styles.menuBtn, pressed && styles.profileBtnPressed]}
+          onPress={() => setShowModerationSheet(true)}
+          accessibilityLabel="Report or block"
+        >
+          <Ionicons name="ellipsis-vertical" size={22} color={COLORS.forest} />
+        </Pressable>
       </View>
+
+      <ReportBlockSheet
+        visible={showModerationSheet}
+        onClose={() => setShowModerationSheet(false)}
+        targetUserId={profile.id}
+        targetName={profile.name}
+        onBlocked={onBack}
+      />
 
       {error ? <Text style={styles.errorBanner}>{error}</Text> : null}
 
@@ -267,6 +284,16 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   profileBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(168, 213, 186, 0.35)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(7, 77, 46, 0.08)',
+  },
+  menuBtn: {
     width: 40,
     height: 40,
     borderRadius: 20,

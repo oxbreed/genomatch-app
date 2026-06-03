@@ -6,6 +6,7 @@ export type ProfileRow = {
   genotype: Genotype | null;
   display_name: string | null;
   avatar_url: string | null;
+  photos: string[] | null;
   bio: string | null;
   date_of_birth: string | null;
   city: string | null;
@@ -44,6 +45,7 @@ export type DiscoveryProfile = {
   interests: string[];
   gradient: [string, string];
   avatarUrl: string | null;
+  photos: string[];
   relationshipGoal?: string | null;
   isMock?: boolean;
 };

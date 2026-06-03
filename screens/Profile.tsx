@@ -10,17 +10,17 @@ import {
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { LinearGradient } from 'expo-linear-gradient';
-import AvatarPhotoPicker from '../src/components/AvatarPhotoPicker';
+import PhotoGrid from '../src/components/PhotoGrid';
+import PrivacyPolicy from './PrivacyPolicy';
 import GenotypeBadge from '../src/components/GenotypeBadge';
 import { COLORS, RELATIONSHIP_GOAL_LABELS } from '../src/data/mockData';
-import { pickAndUploadProfilePhoto } from '../src/lib/photoUpload';
+import { uploadAdditionalPhoto } from '../src/lib/photoUpload';
 import { mapProfileRow } from '../src/lib/profileMapper';
 import { logAuthState } from '../src/lib/auth';
 import {
   getCurrentProfile,
-  updateProfileAvatar,
   updateProfileFields,
+  updateProfilePhotos,
 } from '../src/lib/profiles';
 import { supabase } from '../src/lib/supabase';
 import type { DiscoveryProfile, Genotype } from '../src/types/database';
@@ -38,6 +38,7 @@ type EditableProfile = {
   interests: string[];
   relationshipGoal: string;
   avatarUrl: string | null;
+  photos: string[];
   gradient: [string, string];
 };
 
@@ -49,6 +50,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
   const [saving, setSaving] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
+  const [showPrivacy, setShowPrivacy] = useState(false);
   const [error, setError] = useState('');
   const [authUserId, setAuthUserId] = useState<string | null>(null);
 
@@ -88,6 +90,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
         interests: mapped.interests,
         relationshipGoal: row.relationship_goal ?? 'serious',
         avatarUrl: mapped.avatarUrl,
+        photos: mapped.photos,
         gradient: mapped.gradient,
       };
       setProfile(loaded);
@@ -138,25 +141,48 @@ export default function Profile({ onSignOut }: ProfileProps) {
     }
   };
 
-  const pickAndUploadPhoto = async () => {
+  const applyPhotosLocally = (photos: string[]) => {
+    const avatarUrl = photos[0] ?? null;
+    const next = {
+      ...(editing ? draft : profile)!,
+      photos,
+      avatarUrl,
+    };
+    if (editing) setDraft(next);
+    setProfile(next);
+  };
+
+  const handleAddPhoto = async () => {
+    const current = editing ? draft : profile;
+    if (!current || current.photos.length >= 6) return;
+
     setUploadingPhoto(true);
     setError('');
     try {
-      const url = await pickAndUploadProfilePhoto();
+      const url = await uploadAdditionalPhoto();
       if (!url) return;
 
-      await updateProfileAvatar(url);
-
-      const next = {
-        ...(editing ? draft : profile)!,
-        avatarUrl: url,
-      };
-      if (editing) setDraft(next);
-      setProfile(next);
+      const nextPhotos = [...current.photos, url];
+      await updateProfilePhotos(nextPhotos);
+      applyPhotosLocally(nextPhotos);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Photo upload failed');
     } finally {
       setUploadingPhoto(false);
+    }
+  };
+
+  const handleDeletePhoto = async (index: number) => {
+    const current = editing ? draft : profile;
+    if (!current) return;
+
+    setError('');
+    try {
+      const nextPhotos = current.photos.filter((_, i) => i !== index);
+      await updateProfilePhotos(nextPhotos);
+      applyPhotosLocally(nextPhotos);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not remove photo');
     }
   };
 
@@ -211,6 +237,10 @@ export default function Profile({ onSignOut }: ProfileProps) {
     );
   }
 
+  if (showPrivacy) {
+    return <PrivacyPolicy onBack={() => setShowPrivacy(false)} />;
+  }
+
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
@@ -236,47 +266,38 @@ export default function Profile({ onSignOut }: ProfileProps) {
       {error ? <Text style={styles.errorBanner}>{error}</Text> : null}
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <View style={styles.heroArea}>
-          <AvatarPhotoPicker
-            name={data.displayName}
-            gradient={data.gradient}
-            avatarUrl={data.avatarUrl}
-            variant="hero"
-            heroHeight={280}
-            uploading={uploadingPhoto}
-            onPress={pickAndUploadPhoto}
-          />
-          <LinearGradient
-            colors={['transparent', 'rgba(0, 0, 0, 0.78)']}
-            style={styles.heroGradient}
-            pointerEvents="none"
-          />
-          <View style={styles.heroOverlay} pointerEvents="box-none">
-            {editing ? (
-              <TextInput
-                style={styles.heroNameInput}
-                value={draft?.displayName}
-                onChangeText={(text) =>
-                  setDraft((p) => (p ? { ...p, displayName: text } : p))
-                }
-                placeholder="Display name"
-                placeholderTextColor="rgba(255, 255, 255, 0.5)"
-              />
-            ) : (
-              <Text style={styles.heroDisplayName}>{data.displayName}</Text>
-            )}
+        <PhotoGrid
+          photos={data.photos}
+          onAddPhoto={handleAddPhoto}
+          onDeletePhoto={handleDeletePhoto}
+          uploading={uploadingPhoto}
+          maxPhotos={6}
+        />
 
-            <View style={styles.heroMeta}>
-              <GenotypeBadge genotype={data.genotype} />
-              <Text style={styles.heroAgeCity}>
-                {data.age ? `${data.age} Â· ` : ''}
-                {data.city}
-              </Text>
-            </View>
+        <View style={styles.scrollContent}>
+        <View style={styles.profileSummary}>
+          {editing ? (
+            <TextInput
+              style={styles.summaryNameInput}
+              value={draft?.displayName}
+              onChangeText={(text) =>
+                setDraft((p) => (p ? { ...p, displayName: text } : p))
+              }
+              placeholder="Display name"
+              placeholderTextColor={COLORS.textMuted}
+            />
+          ) : (
+            <Text style={styles.summaryName}>{data.displayName}</Text>
+          )}
+          <View style={styles.summaryMeta}>
+            <GenotypeBadge genotype={data.genotype} />
+            <Text style={styles.summaryMetaText}>
+              {data.age ? `${data.age} · ` : ''}
+              {data.city}
+            </Text>
           </View>
         </View>
 
-        <View style={styles.scrollContent}>
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>City</Text>
           {editing ? (
@@ -327,6 +348,13 @@ export default function Profile({ onSignOut }: ProfileProps) {
             <Text style={styles.goalText}>{goalLabel}</Text>
           </View>
         </View>
+
+        <Pressable
+          style={({ pressed }) => [styles.privacyLink, pressed && styles.privacyLinkPressed]}
+          onPress={() => setShowPrivacy(true)}
+        >
+          <Text style={styles.privacyLinkText}>Privacy Policy</Text>
+        </Pressable>
 
         <Pressable
           style={[styles.signOutBtn, signingOut && styles.signOutBtnDisabled]}
@@ -398,55 +426,40 @@ const styles = StyleSheet.create({
   retryText: { color: COLORS.ivory, fontWeight: '700' },
   scroll: { paddingBottom: 24 },
   scrollContent: { paddingHorizontal: 20 },
-  heroArea: {
-    width: '100%',
-    height: 280,
-    position: 'relative',
-    marginBottom: 16,
+  profileSummary: {
+    backgroundColor: COLORS.white,
+    borderRadius: 18,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
-  heroGradient: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: 120,
-    zIndex: 2,
-  },
-  heroOverlay: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    paddingHorizontal: 16,
-    paddingBottom: 14,
-    paddingRight: 58,
-    zIndex: 3,
-  },
-  heroDisplayName: {
+  summaryName: {
     fontSize: 26,
     fontWeight: '700',
-    color: COLORS.white,
+    color: COLORS.forest,
     letterSpacing: -0.5,
   },
-  heroNameInput: {
+  summaryNameInput: {
     fontSize: 22,
     fontWeight: '700',
-    color: COLORS.white,
+    color: COLORS.forest,
     borderBottomWidth: 2,
-    borderBottomColor: 'rgba(255, 255, 255, 0.45)',
+    borderBottomColor: COLORS.sage,
     paddingVertical: 4,
+    marginBottom: 4,
   },
-  heroMeta: {
+  summaryMeta: {
     flexDirection: 'row',
     alignItems: 'center',
     flexWrap: 'wrap',
     gap: 10,
     marginTop: 8,
   },
-  heroAgeCity: {
+  summaryMetaText: {
     fontSize: 14,
     fontWeight: '600',
-    color: 'rgba(255, 255, 255, 0.88)',
+    color: COLORS.textMuted,
   },
   section: {
     backgroundColor: COLORS.white,
@@ -499,6 +512,20 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(201, 135, 43, 0.25)',
   },
   goalText: { fontSize: 16, fontWeight: '600', color: COLORS.forest },
+  privacyLink: {
+    marginTop: 4,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  privacyLinkPressed: {
+    opacity: 0.75,
+  },
+  privacyLinkText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: COLORS.forest,
+    textDecorationLine: 'underline',
+  },
   signOutBtn: {
     marginTop: 8,
     height: 54,

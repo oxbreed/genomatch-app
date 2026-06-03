@@ -25,3 +25,10 @@ export async function pickAndUploadProfilePhoto(): Promise<string | null> {
   if (!uri) return null;
   return uploadImageToCloudinary(uri);
 }
+
+/** Pick and upload a gallery photo without updating avatar_url. */
+export async function uploadAdditionalPhoto(): Promise<string | null> {
+  const uri = await pickProfilePhotoUri();
+  if (!uri) return null;
+  return uploadImageToCloudinary(uri);
+}

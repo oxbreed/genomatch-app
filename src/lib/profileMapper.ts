@@ -30,11 +30,31 @@ export function gradientFromId(id: string): [string, string] {
   return GRADIENTS[hash % GRADIENTS.length];
 }
 
+/** Ordered gallery URLs; avatar_url is always first when present. */
+export function resolveProfilePhotos(
+  avatarUrl: string | null,
+  photos: string[] | null | undefined
+): string[] {
+  const fromColumn = (photos ?? []).map((u) => u?.trim()).filter(Boolean) as string[];
+  const avatar = avatarUrl?.trim();
+
+  if (fromColumn.length > 0) {
+    if (avatar && fromColumn[0] !== avatar) {
+      const rest = fromColumn.filter((u) => u !== avatar);
+      return [avatar, ...rest];
+    }
+    return fromColumn;
+  }
+
+  return avatar ? [avatar] : [];
+}
+
 export function mapProfileRow(
   row: ProfileRow,
   viewerGenotype: Genotype | null
 ): DiscoveryProfile {
   const genotype = row.genotype ?? 'AA';
+  const photos = resolveProfilePhotos(row.avatar_url, row.photos);
   return {
     id: row.id,
     name: row.display_name?.trim() || 'GenoMatch Member',
@@ -45,7 +65,8 @@ export function mapProfileRow(
     bio: row.bio?.trim() || '',
     interests: row.interests ?? [],
     gradient: gradientFromId(row.id),
-    avatarUrl: row.avatar_url,
+    avatarUrl: photos[0] ?? row.avatar_url,
+    photos,
     relationshipGoal: row.relationship_goal,
   };
 }

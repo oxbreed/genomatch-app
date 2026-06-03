@@ -1,12 +1,15 @@
 import { getSeenProfileIds } from './likes';
+import { getBlockedUserIds } from './moderation';
 import type { DiscoveryProfile, Genotype, ProfileRow } from '../types/database';
 import { getAuthenticatedUserId, logSupabaseResult } from './auth';
-import { mapProfileRow } from './profileMapper';
+import { mapProfileRow, resolveProfilePhotos } from './profileMapper';
 import { supabase } from './supabase';
 import { sanitizeText } from './validation';
 
 const PROFILE_FIELDS =
-  'id, email, genotype, display_name, avatar_url, bio, date_of_birth, city, country, gender, interests, relationship_goal, onboarding_completed, created_at, updated_at';
+  'id, email, genotype, display_name, avatar_url, photos, bio, date_of_birth, city, country, gender, interests, relationship_goal, onboarding_completed, created_at, updated_at';
+
+export { resolveProfilePhotos };
 
 export async function getCurrentUserId(): Promise<string | null> {
   return getAuthenticatedUserId();
@@ -155,6 +158,8 @@ export async function fetchDiscoveryProfiles(): Promise<{
     // likes/passes tables may not exist yet — still show profiles
   }
 
+  const blockedSet = await getBlockedUserIds(userId);
+
   const { data, error } = await supabase
     .from('profiles')
     .select('*')
@@ -165,7 +170,7 @@ export async function fetchDiscoveryProfiles(): Promise<{
   if (error) throw error;
 
   const profiles = ((data ?? []) as ProfileRow[])
-    .filter((row) => !seenSet.has(row.id))
+    .filter((row) => !seenSet.has(row.id) && !blockedSet.has(row.id))
     .map((row) => mapProfileRow(row, viewerGenotype));
 
   return { profiles, viewerGenotype };
@@ -175,9 +180,29 @@ export async function updateProfileAvatar(avatarUrl: string): Promise<void> {
   const userId = await getCurrentUserId();
   if (!userId) throw new Error('Not signed in');
 
+  const row = await getCurrentProfile();
+  const photos = resolveProfilePhotos(avatarUrl, row?.photos);
+  const nextPhotos = photos.length > 0 ? photos : [avatarUrl];
+
   const { error } = await supabase
     .from('profiles')
-    .update({ avatar_url: avatarUrl })
+    .update({ avatar_url: avatarUrl, photos: nextPhotos })
+    .eq('id', userId);
+
+  if (error) throw error;
+}
+
+/** Persist the full photo gallery; first photo syncs to avatar_url. */
+export async function updateProfilePhotos(photos: string[]): Promise<void> {
+  const userId = await getCurrentUserId();
+  if (!userId) throw new Error('Not signed in');
+
+  const cleaned = photos.map((u) => u.trim()).filter(Boolean);
+  const avatar_url = cleaned[0] ?? null;
+
+  const { error } = await supabase
+    .from('profiles')
+    .update({ photos: cleaned, avatar_url })
     .eq('id', userId);
 
   if (error) throw error;

@@ -6,6 +6,7 @@ import type {
 } from '../types/database';
 import { logSupabaseResult } from './auth';
 import { mapProfileRow } from './profileMapper';
+import { getBlockedUserIds } from './moderation';
 import { getCurrentUserId } from './profiles';
 import { supabase } from './supabase';
 
@@ -41,6 +42,13 @@ export async function fetchConversations(): Promise<ConversationPreview[]> {
   if (matchError) throw matchError;
   if (!matchRows?.length) return [];
 
+  const blockedSet = await getBlockedUserIds(userId);
+  const visibleMatches = matchRows.filter((match) => {
+    const otherId = match.user_a_id === userId ? match.user_b_id : match.user_a_id;
+    return !blockedSet.has(otherId);
+  });
+  if (!visibleMatches.length) return [];
+
   const { data: me, error: meError } = await supabase
     .from('profiles')
     .select('genotype')
@@ -51,14 +59,14 @@ export async function fetchConversations(): Promise<ConversationPreview[]> {
   if (meError) throw meError;
   const viewerGenotype = (me as { genotype: ProfileRow['genotype'] } | null)?.genotype ?? null;
 
-  const otherIds = matchRows.map((m) =>
+  const otherIds = visibleMatches.map((m) =>
     m.user_a_id === userId ? m.user_b_id : m.user_a_id
   );
 
   const { data: profiles, error: profilesError } = await supabase
     .from('profiles')
     .select(
-      'id, display_name, genotype, city, bio, interests, relationship_goal, avatar_url, date_of_birth'
+      'id, display_name, genotype, city, bio, interests, relationship_goal, avatar_url, photos, date_of_birth'
     )
     .in('id', otherIds);
 
@@ -69,7 +77,7 @@ export async function fetchConversations(): Promise<ConversationPreview[]> {
     ((profiles ?? []) as ProfileRow[]).map((p) => [p.id, p])
   );
 
-  const matchIds = matchRows.map((m) => m.id);
+  const matchIds = visibleMatches.map((m) => m.id);
   const { data: latestMessages, error: messagesError } = await supabase
     .from('messages')
     .select('id, match_id, sender_id, body, created_at')
@@ -86,7 +94,7 @@ export async function fetchConversations(): Promise<ConversationPreview[]> {
     }
   }
 
-  return matchRows
+  return visibleMatches
     .map((match) => {
       const otherId = match.user_a_id === userId ? match.user_b_id : match.user_a_id;
       const row = profileMap.get(otherId);
