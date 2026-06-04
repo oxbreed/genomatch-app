@@ -723,9 +723,9 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   editPill: {
-    paddingHorizontal: 18,
+    paddingHorizontal: 20,
     paddingVertical: 10,
-    borderRadius: 999,
+    borderRadius: 24,
     backgroundColor: '#D4A843',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -734,9 +734,10 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   editPillText: {
-    color: '#0D2818',
+    fontFamily: 'ClashDisplay-Semibold',
     fontSize: 14,
-    fontWeight: '700',
+    letterSpacing: 0.5,
+    color: '#0D2818',
   },
   editPillRow: {
     flexDirection: 'row',
@@ -844,6 +845,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   statValue: {
+    fontFamily: 'Satoshi-Bold',
     fontSize: 24,
     fontWeight: '800',
     color: '#D4A843',
@@ -958,16 +960,17 @@ const styles = StyleSheet.create({
   },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   chipMint: {
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 999,
-    backgroundColor: COLORS.mint,
+    backgroundColor: '#EDF3EE',
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    marginRight: 8,
+    marginBottom: 8,
   },
   chipMintText: {
     fontFamily: 'Satoshi-Medium',
     fontSize: 13,
-    fontWeight: '600',
-    color: COLORS.forest,
+    color: '#1A3D28',
   },
   errorBanner: {
     fontFamily: 'Satoshi-Medium',
