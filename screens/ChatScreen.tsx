@@ -240,7 +240,7 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
           onPress={onBack}
           accessibilityLabel="Go back"
         >
-          <Ionicons name="chevron-back" size={24} color="#0D2818" />
+          <Ionicons name="chevron-back" size={24} color="#FFFFFF" />
         </Pressable>
         {profile.avatarUrl?.trim() || profile.photos[0]?.trim() ? (
           <ProfileAvatar
@@ -271,14 +271,14 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
           onPress={() => setShowProfile(true)}
           accessibilityLabel="View profile"
         >
-          <Ionicons name="person-circle-outline" size={22} color="#0D2818" />
+          <Ionicons name="person-circle-outline" size={22} color="#FFFFFF" />
         </Pressable>
         <Pressable
           style={({ pressed }) => [styles.headerIconBtn, pressed && styles.headerIconBtnPressed]}
           onPress={() => setShowModerationSheet(true)}
           accessibilityLabel="Report or block"
         >
-          <Ionicons name="ellipsis-vertical" size={22} color="#0D2818" />
+          <Ionicons name="ellipsis-vertical" size={22} color="#FFFFFF" />
         </Pressable>
       </View>
 
@@ -354,10 +354,10 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   headerIconBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#EDF3EE',
+    width: 36,
+    height: 36,
+    borderRadius: 20,
+    backgroundColor: '#0D2818',
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
