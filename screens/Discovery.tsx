@@ -4,10 +4,10 @@ import {
   Animated,
   Dimensions,
   Easing,
-  Image,
+  ImageBackground,
+  Modal,
   PanResponder,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -15,7 +15,6 @@ import {
 import { StatusBar } from 'expo-status-bar';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import EmptyState from '../src/components/EmptyState';
 import FilterSheet, {
   DEFAULT_DISCOVERY_FILTERS,
@@ -23,16 +22,20 @@ import FilterSheet, {
   type DiscoveryFilters,
 } from '../src/components/FilterSheet';
 import GenotypeBadge from '../src/components/GenotypeBadge';
-import ProfileAvatar from '../src/components/ProfileAvatar';
-import { COLORS, RADIUS, SHADOWS, TYPOGRAPHY, getMockDiscoveryProfiles } from '../src/data/mockData';
+import { COLORS, RADIUS, SHADOWS, TYPOGRAPHY, getInitials, getMockDiscoveryProfiles } from '../src/data/mockData';
 import { fetchDiscoveryProfiles } from '../src/lib/profiles';
 import { recordLike, recordPass } from '../src/lib/likes';
-import type { DiscoveryProfile } from '../src/types/database';
+import type { DiscoveryProfile, Genotype } from '../src/types/database';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const SWIPE_THRESHOLD = SCREEN_WIDTH * 0.22;
-const PHOTO_HEIGHT = 220;
+const CARD_HEIGHT = SCREEN_HEIGHT * 0.55;
+const BACK_CARD_PEEK = 12;
+const BACK_CARD_VISIBLE = 60;
 const HIGH_COMPATIBILITY_MIN = 75;
+const SWIPE_UP_THRESHOLD = 55;
+const PROFILE_SHEET_HEIGHT = SCREEN_HEIGHT * 0.65;
+const SUPER_LIKE_STAR_COUNT = 6;
 
 function triggerLikeHaptic() {
   void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -79,15 +82,150 @@ function applyDiscoveryFilters(
   });
 }
 
-function MatchPill({ percent }: { percent: number }) {
+function getMatchLabel(percent: number): string {
+  if (percent >= 80) return 'Great match';
+  if (percent >= 60) return 'Good match';
+  return 'Compatible';
+}
+
+
+function getGenotypeCompatibilityLine(
+  viewerGenotype: Genotype | null,
+  candidateGenotype: Genotype
+): string {
+  const viewer = viewerGenotype ?? 'AA';
+  const pairLabel = `${viewer} × ${candidateGenotype}`;
+  const pairKey = [viewer, candidateGenotype].sort().join('');
+  const riskByPair: Record<string, string> = {
+    AAAA: 'Very low sickle cell risk',
+    AAAS: 'Low sickle cell risk',
+    AAAC: 'Low sickle cell risk',
+    AASS: 'Elevated sickle cell risk',
+    ASAS: 'Moderate sickle cell risk',
+    ASAC: 'Moderate sickle cell risk',
+    ASSS: 'Higher sickle cell risk',
+    ACAC: 'Moderate sickle cell risk',
+    ACCC: 'Moderate sickle cell risk',
+    SSSS: 'Higher sickle cell risk',
+  };
+  const risk = riskByPair[pairKey] ?? 'Genotype-compatible match';
+  return `${pairLabel} — ${risk}`;
+}
+
+
+function getCompatDotColor(percent: number): string {
+  if (percent >= 80) return '#D4A843';
+  if (percent >= 60) return '#8FAF95';
+  return '#FFFFFF';
+}
+
+function formatRelationshipGoal(goal: string | null | undefined): string {
+  if (!goal?.trim()) return 'Not specified';
+  return goal
+    .trim()
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+type SuperLikeButtonProps = {
+  onPress: () => void;
+  disabled?: boolean;
+};
+
+function SuperLikeButton({ onPress, disabled }: SuperLikeButtonProps) {
+  const burstStars = useRef(
+    Array.from({ length: SUPER_LIKE_STAR_COUNT }, () => ({
+      translate: new Animated.ValueXY({ x: 0, y: 0 }),
+      opacity: new Animated.Value(0),
+    }))
+  ).current;
+
+  const runBurst = useCallback(() => {
+    burstStars.forEach((star, index) => {
+      const angle = (index / SUPER_LIKE_STAR_COUNT) * Math.PI * 2;
+      const distance = 44;
+      const targetX = Math.cos(angle) * distance;
+      const targetY = Math.sin(angle) * distance;
+
+      star.translate.setValue({ x: 0, y: 0 });
+      star.opacity.setValue(1);
+
+      Animated.parallel([
+        Animated.timing(star.translate, {
+          toValue: { x: targetX, y: targetY },
+          duration: 600,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+        Animated.sequence([
+          Animated.delay(420),
+          Animated.timing(star.opacity, {
+            toValue: 0,
+            duration: 180,
+            useNativeDriver: true,
+          }),
+        ]),
+      ]).start();
+    });
+  }, [burstStars]);
+
+  const handlePress = () => {
+    runBurst();
+    onPress();
+  };
+
   return (
-    <View style={styles.matchPill}>
-      <Text style={styles.matchPillText}>{percent}%</Text>
+    <View style={styles.superLikeBtnWrap}>
+      {burstStars.map((star, index) => (
+        <Animated.Text
+          key={`burst-${index}`}
+          pointerEvents="none"
+          style={[
+            styles.superLikeBurstStar,
+            {
+              opacity: star.opacity,
+              transform: star.translate.getTranslateTransform(),
+            },
+          ]}
+        >
+          ⭐
+        </Animated.Text>
+      ))}
+      <Pressable
+        style={({ pressed }) => [
+          styles.superLikeBtn,
+          pressed && styles.btnPressed,
+          disabled && styles.btnDisabled,
+        ]}
+        onPress={handlePress}
+        disabled={disabled}
+      >
+        <Ionicons name="star" size={28} color="#D4A843" />
+      </Pressable>
     </View>
   );
 }
 
-function ProfileCard({ profile }: { profile: DiscoveryProfile }) {
+function MatchPill({ percent }: { percent: number }) {
+  return (
+    <View style={styles.matchPillWrap} pointerEvents="none">
+      <View style={styles.matchPill}>
+        <Text style={styles.matchPillText}>{percent}%</Text>
+      </View>
+      <Text style={styles.matchPillLabel}>{getMatchLabel(percent)}</Text>
+    </View>
+  );
+}
+
+type ProfileCardProps = {
+  profile: DiscoveryProfile;
+  swipeIndex?: number;
+  totalProfiles?: number;
+  viewerGenotype?: Genotype | null;
+  progressFillWidth?: Animated.AnimatedInterpolation<string | number>;
+};
+
+function ProfileCard({ profile, swipeIndex, totalProfiles, viewerGenotype, progressFillWidth }: ProfileCardProps) {
   const gallery = useMemo(() => {
     if (profile.photos.length > 0) return profile.photos;
     if (profile.avatarUrl) return [profile.avatarUrl];
@@ -110,96 +248,123 @@ function ProfileCard({ profile }: { profile: DiscoveryProfile }) {
     setPhotoIndex((i) => (i >= gallery.length - 1 ? 0 : i + 1));
   };
 
+  const progressRatio =
+    swipeIndex != null && totalProfiles != null && totalProfiles > 0
+      ? Math.min(1, Math.max(0, swipeIndex / totalProfiles))
+      : 0;
+
   return (
     <View style={styles.cardBody}>
-      <View style={styles.photoArea}>
-        {currentUri ? (
-          <Image source={{ uri: currentUri }} style={styles.photoImage} resizeMode="cover" />
-        ) : (
-          <ProfileAvatar
-            name={profile.name}
-            gradient={profile.gradient}
-            avatarUrl={profile.avatarUrl}
-            width="100%"
-            height={PHOTO_HEIGHT}
-            borderRadius={0}
-            initialsPosition="top"
-            initialsOpacity={0.15}
+      {totalProfiles != null && totalProfiles > 0 && swipeIndex != null ? (
+        <View style={styles.swipeProgressTrack} pointerEvents="none">
+          <Animated.View
+            style={[
+              styles.swipeProgressFill,
+              progressFillWidth
+                ? { width: progressFillWidth }
+                : { width: `${progressRatio * 100}%` },
+            ]}
           />
-        )}
+        </View>
+      ) : null}
 
-        {hasMultiple ? (
-          <>
-            <View style={styles.photoDots} pointerEvents="none">
-              {gallery.map((_, i) => (
-                <View
-                  key={i}
-                  style={[styles.photoDot, i === photoIndex && styles.photoDotActive]}
-                />
-              ))}
-            </View>
-            <Pressable
-              style={styles.photoTapLeft}
-              onPress={showPrev}
-              accessibilityLabel="Previous photo"
-            />
-            <Pressable
-              style={styles.photoTapRight}
-              onPress={showNext}
-              accessibilityLabel="Next photo"
-            />
-          </>
-        ) : null}
-
-        <MatchPill percent={profile.compatibility} />
-        <LinearGradient
-          colors={['transparent', 'rgba(0, 0, 0, 0.78)']}
-          style={styles.photoGradient}
-          pointerEvents="none"
+      {currentUri ? (
+        <ImageBackground
+          source={{ uri: currentUri }}
+          style={styles.cardMedia}
+          imageStyle={styles.cardMediaImage}
+          resizeMode="cover"
         />
-        <View style={styles.photoOverlay} pointerEvents="none">
-          <View style={styles.photoNameRow}>
-            <Text style={styles.photoName}>
-              {profile.name}
-              {profile.age != null ? `, ${profile.age}` : ''}
-            </Text>
-            <View style={styles.genotypeRow}>
-              <GenotypeBadge genotype={profile.genotype} />
-              {profile.genotypeVerified ? (
-                <Ionicons
-                  name="shield-checkmark"
-                  size={20}
-                  color={COLORS.verified}
-                  accessibilityLabel="Genotype verified"
-                />
-              ) : null}
+      ) : (
+        <View style={[styles.cardMedia, styles.cardNoPhoto]}>
+          <View style={styles.noPhotoPlaceholderWrap} pointerEvents="none">
+            <View style={styles.noPhotoCircle}>
+              <Text style={styles.noPhotoInitials}>{getInitials(profile.name)}</Text>
             </View>
+            <Text style={styles.noPhotoCaption}>No photo yet</Text>
           </View>
         </View>
-      </View>
+      )}
 
-      <ScrollView
-        style={styles.cardScroll}
-        contentContainerStyle={styles.cardScrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.cityRow}>
-          <Ionicons name="location-outline" size={15} color={COLORS.sage} />
-          <Text style={styles.city}>{profile.city}</Text>
+      {currentUri ? (
+        <Text style={styles.initialsWatermark} pointerEvents="none">
+          {getInitials(profile.name)}
+        </Text>
+      ) : null}
+
+      <View style={styles.cardBottomShade} pointerEvents="none" />
+
+      <View style={styles.cardInfoFooter} pointerEvents="box-none">
+        <View style={styles.nameBadgeRow}>
+          <Text style={styles.cardName} numberOfLines={1}>
+            {profile.name}
+            {profile.age != null ? `, ${profile.age}` : ''}
+          </Text>
+          <GenotypeBadge genotype={profile.genotype} />
+          {profile.genotypeVerified ? (
+            <Ionicons
+              name="shield-checkmark"
+              size={18}
+              color={COLORS.verified}
+              accessibilityLabel="Genotype verified"
+            />
+          ) : null}
         </View>
 
-        <Text style={styles.bio} numberOfLines={3}>
+        <View style={styles.cityRow}>
+          <Ionicons name="location-outline" size={14} color="#8FAF95" />
+          <Text style={styles.cityText}>{profile.city}</Text>
+        </View>
+
+        <View style={styles.genotypeCompatRow}>
+          <View
+            style={[
+              styles.compatDot,
+              { backgroundColor: getCompatDotColor(profile.compatibility) },
+            ]}
+          />
+          <Text style={styles.genotypeCompatText}>
+            {profile.compatibility}% · {getGenotypeCompatibilityLine(viewerGenotype ?? null, profile.genotype)}
+          </Text>
+        </View>
+
+        <Text style={styles.cardBio} numberOfLines={3} ellipsizeMode="tail">
           {profile.bio}
         </Text>
 
-        <View style={styles.interestRow}>
-          {profile.interests.map((interest) => (
-            <View key={interest} style={styles.interestChip}>
-              <Text style={styles.interestText}>{interest}</Text>
+        <View style={styles.tagsRow}>
+          {profile.interests.slice(0, 4).map((interest) => (
+            <View key={interest} style={styles.tagChip}>
+              <Text style={styles.tagText}>{interest}</Text>
             </View>
           ))}
         </View>
-      </ScrollView>
+      </View>
+
+      {hasMultiple ? (
+        <>
+          <View style={styles.photoDots} pointerEvents="none">
+            {gallery.map((_, i) => (
+              <View
+                key={i}
+                style={[styles.photoDot, i === photoIndex && styles.photoDotActive]}
+              />
+            ))}
+          </View>
+          <Pressable
+            style={styles.photoTapLeft}
+            onPress={showPrev}
+            accessibilityLabel="Previous photo"
+          />
+          <Pressable
+            style={styles.photoTapRight}
+            onPress={showNext}
+            accessibilityLabel="Next photo"
+          />
+        </>
+      ) : null}
+
+      <MatchPill percent={profile.compatibility} />
     </View>
   );
 }
@@ -213,9 +378,11 @@ export default function Discovery() {
   const [index, setIndex] = useState(0);
   const [showMatch, setShowMatch] = useState(false);
   const [matchedName, setMatchedName] = useState('');
-
   const [actionError, setActionError] = useState('');
   const [usingMockFallback, setUsingMockFallback] = useState(false);
+  const [viewerGenotype, setViewerGenotype] = useState<Genotype | null>(null);
+  const [superLikeToast, setSuperLikeToast] = useState(false);
+  const [profileSheetVisible, setProfileSheetVisible] = useState(false);
 
   const profiles = useMemo(
     () => applyDiscoveryFilters(allProfiles, filters),
@@ -228,18 +395,21 @@ export default function Discovery() {
     setLoadError('');
     setLoading(true);
     try {
-      const { profiles: rows } = await fetchDiscoveryProfiles();
+      const { profiles: rows, viewerGenotype: loadedViewerGenotype } = await fetchDiscoveryProfiles();
+      setViewerGenotype(loadedViewerGenotype);
       if (rows.length > 0) {
         setAllProfiles(rows);
         setUsingMockFallback(false);
       } else {
         setAllProfiles(getMockDiscoveryProfiles());
         setUsingMockFallback(true);
+        setViewerGenotype('AA');
       }
       setIndex(0);
     } catch {
       setAllProfiles(getMockDiscoveryProfiles());
       setUsingMockFallback(true);
+      setViewerGenotype('AA');
       setIndex(0);
     } finally {
       setLoading(false);
@@ -251,13 +421,149 @@ export default function Discovery() {
   }, [loadProfiles]);
 
   const position = useRef(new Animated.ValueXY()).current;
+  const isSwipeAnimatingRef = useRef(false);
   const cardOpacity = useRef(new Animated.Value(1)).current;
   const cardScale = useRef(new Animated.Value(1)).current;
-  const matchOpacity = useRef(new Animated.Value(0)).current;
-  const matchScale = useRef(new Animated.Value(0.85)).current;
-  const nextCardScale = useRef(new Animated.Value(0.95)).current;
+  const likePulseScale = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    const pulse = Animated.loop(
+      Animated.sequence([
+        Animated.timing(likePulseScale, {
+          toValue: 1.08,
+          duration: 750,
+          useNativeDriver: true,
+        }),
+        Animated.timing(likePulseScale, {
+          toValue: 1,
+          duration: 750,
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    pulse.start();
+    return () => {
+      pulse.stop();
+    };
+  }, [likePulseScale]);
+
+  const progressAnim = useRef(new Animated.Value(0)).current;
+  const sheetTranslateY = useRef(new Animated.Value(PROFILE_SHEET_HEIGHT)).current;
+  const sheetBackdropOpacity = useRef(new Animated.Value(0)).current;
+  const superLikeToastY = useRef(new Animated.Value(-80)).current;
+  const superLikeToastOpacity = useRef(new Animated.Value(0)).current;
+  const superLikeToastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const profile = profiles[index];
+
+  const progressFillWidth = progressAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0%', '100%'],
+  });
+
+  useEffect(() => {
+    const ratio = profiles.length > 0 ? Math.min(1, Math.max(0, index / profiles.length)) : 0;
+    Animated.timing(progressAnim, {
+      toValue: ratio,
+      duration: 300,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: false,
+    }).start();
+  }, [index, profiles.length, progressAnim]);
+
+  useEffect(() => {
+    return () => {
+      if (superLikeToastTimeoutRef.current) {
+        clearTimeout(superLikeToastTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const showSuperLikeToastMessage = useCallback(() => {
+    setSuperLikeToast(true);
+    superLikeToastY.setValue(-80);
+    superLikeToastOpacity.setValue(0);
+
+    Animated.parallel([
+      Animated.spring(superLikeToastY, {
+        toValue: 0,
+        friction: 8,
+        tension: 90,
+        useNativeDriver: true,
+      }),
+      Animated.timing(superLikeToastOpacity, {
+        toValue: 1,
+        duration: 220,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    if (superLikeToastTimeoutRef.current) {
+      clearTimeout(superLikeToastTimeoutRef.current);
+    }
+
+    superLikeToastTimeoutRef.current = setTimeout(() => {
+      Animated.parallel([
+        Animated.timing(superLikeToastOpacity, {
+          toValue: 0,
+          duration: 280,
+          useNativeDriver: true,
+        }),
+        Animated.timing(superLikeToastY, {
+          toValue: -80,
+          duration: 280,
+          easing: Easing.in(Easing.cubic),
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        setSuperLikeToast(false);
+      });
+    }, 2000);
+  }, [superLikeToastOpacity, superLikeToastY]);
+
+  const openProfileSheet = useCallback(() => {
+    if (showMatch || !profile) return;
+
+    setProfileSheetVisible(true);
+    sheetTranslateY.setValue(PROFILE_SHEET_HEIGHT);
+    sheetBackdropOpacity.setValue(0);
+
+    Animated.parallel([
+      Animated.spring(sheetTranslateY, {
+        toValue: 0,
+        friction: 9,
+        tension: 68,
+        useNativeDriver: true,
+      }),
+      Animated.timing(sheetBackdropOpacity, {
+        toValue: 1,
+        duration: 240,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [profile, sheetBackdropOpacity, sheetTranslateY, showMatch]);
+
+  const closeProfileSheet = useCallback(() => {
+    Animated.parallel([
+      Animated.spring(sheetTranslateY, {
+        toValue: PROFILE_SHEET_HEIGHT,
+        friction: 9,
+        tension: 68,
+        useNativeDriver: true,
+      }),
+      Animated.timing(sheetBackdropOpacity, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      setProfileSheetVisible(false);
+    });
+  }, [sheetBackdropOpacity, sheetTranslateY]);
+
+  const openProfileSheetRef = useRef(openProfileSheet);
+  openProfileSheetRef.current = openProfileSheet;
+
   const isEmpty = !loading && !loadError && allProfiles.length === 0;
   const isFilteredEmpty =
     !loading && !loadError && allProfiles.length > 0 && profiles.length === 0;
@@ -267,8 +573,7 @@ export default function Discovery() {
     position.setValue({ x: 0, y: 0 });
     cardOpacity.setValue(1);
     cardScale.setValue(1);
-    nextCardScale.setValue(0.95);
-  }, [cardOpacity, cardScale, nextCardScale, position]);
+  }, [cardOpacity, cardScale, position]);
 
   useEffect(() => {
     setIndex(0);
@@ -277,81 +582,56 @@ export default function Discovery() {
 
   const advanceProfile = useCallback(() => {
     setIndex((prev) => prev + 1);
+  }, []);
+
+  const goToNextProfile = useCallback(() => {
     resetCardAnimation();
-  }, [resetCardAnimation]);
+    advanceProfile();
+  }, [advanceProfile, resetCardAnimation]);
 
-  const showMatchOverlay = useCallback(
-    (name: string) => {
-      triggerMatchCelebrationHaptic();
-      setMatchedName(name);
-      setShowMatch(true);
-      matchOpacity.setValue(0);
-      matchScale.setValue(0.85);
+  const dismissMatchOverlay = useCallback(() => {
+    setShowMatch(false);
+  }, []);
 
-      Animated.parallel([
-        Animated.timing(matchOpacity, {
-          toValue: 1,
-          duration: 320,
-          easing: Easing.out(Easing.cubic),
-          useNativeDriver: true,
-        }),
-        Animated.spring(matchScale, {
-          toValue: 1,
-          friction: 7,
-          tension: 120,
-          useNativeDriver: true,
-        }),
-      ]).start();
-
-      setTimeout(() => {
-        Animated.timing(matchOpacity, {
-          toValue: 0,
-          duration: 280,
-          useNativeDriver: true,
-        }).start(() => {
-          setShowMatch(false);
-          advanceProfile();
-        });
-      }, 2200);
-    },
-    [advanceProfile, matchOpacity, matchScale]
-  );
+  const showMatchOverlay = useCallback((name: string) => {
+    triggerMatchCelebrationHaptic();
+    setMatchedName(name);
+    setShowMatch(true);
+  }, []);
 
   const animateSwipe = useCallback(
     (direction: 'left' | 'right', onDone: () => void) => {
       const toX = direction === 'right' ? SCREEN_WIDTH * 1.2 : -SCREEN_WIDTH * 1.2;
+      const toY = direction === 'right' ? -30 : 30;
+      const swipeEasing = Easing.out(Easing.exp);
+      isSwipeAnimatingRef.current = true;
 
       Animated.parallel([
         Animated.timing(position, {
-          toValue: { x: toX, y: direction === 'right' ? -30 : 30 },
-          duration: 320,
-          easing: Easing.out(Easing.cubic),
-          useNativeDriver: true,
-        }),
-        Animated.timing(cardOpacity, {
-          toValue: 0,
+          toValue: { x: toX, y: toY },
           duration: 280,
+          easing: swipeEasing,
           useNativeDriver: true,
         }),
         Animated.timing(cardScale, {
           toValue: 0.92,
           duration: 280,
+          easing: swipeEasing,
           useNativeDriver: true,
         }),
-        Animated.spring(nextCardScale, {
-          toValue: 1,
-          friction: 8,
-          tension: 80,
-          useNativeDriver: true,
-        }),
-      ]).start(() => onDone());
+      ]).start(({ finished }) => {
+        isSwipeAnimatingRef.current = false;
+        if (finished) {
+          onDone();
+        }
+      });
     },
-    [cardOpacity, cardScale, nextCardScale, position]
+    [cardScale, position]
   );
 
   const processSwipe = useCallback(
     async (direction: 'like' | 'pass') => {
-      if (seenAll || showMatch || !profile || loading) return;
+      if (seenAll || showMatch || !profile || loading || isSwipeAnimatingRef.current) return;
 
       if (direction === 'like') {
         triggerLikeHaptic();
@@ -366,8 +646,6 @@ export default function Discovery() {
         if (profile.isMock) {
           if (direction === 'like') {
             showMatchOverlay(firstName);
-          } else {
-            advanceProfile();
           }
           return;
         }
@@ -377,14 +655,11 @@ export default function Discovery() {
             const { isMutualMatch } = await recordLike(profile.id);
             if (isMutualMatch) {
               showMatchOverlay(firstName);
-            } else {
-              advanceProfile();
             }
           } catch (err) {
             setActionError(
               err instanceof Error ? err.message : 'Could not save your like'
             );
-            advanceProfile();
           }
         } else {
           try {
@@ -394,15 +669,16 @@ export default function Discovery() {
               err instanceof Error ? err.message : 'Could not save your pass'
             );
           }
-          advanceProfile();
         }
       };
 
       animateSwipe(direction === 'like' ? 'right' : 'left', () => {
-        afterSwipe();
+        advanceProfile();
+        resetCardAnimation();
+        void afterSwipe();
       });
     },
-    [advanceProfile, animateSwipe, loading, profile, seenAll, showMatch, showMatchOverlay]
+    [advanceProfile, animateSwipe, loading, profile, resetCardAnimation, seenAll, showMatch, showMatchOverlay]
   );
 
   const handlePass = useCallback(() => {
@@ -412,6 +688,14 @@ export default function Discovery() {
   const handleLike = useCallback(() => {
     processSwipe('like');
   }, [processSwipe]);
+
+  const handleSuperLike = useCallback(() => {
+    if (seenAll || showMatch || !profile || loading || isSwipeAnimatingRef.current) return;
+
+    triggerLikeHaptic();
+    showSuperLikeToastMessage();
+    processSwipe('like');
+  }, [loading, processSwipe, profile, seenAll, showMatch, showSuperLikeToastMessage]);
 
   const handleLikeRef = useRef(handleLike);
   const handlePassRef = useRef(handlePass);
@@ -426,6 +710,20 @@ export default function Discovery() {
         position.setValue({ x: gesture.dx, y: gesture.dy * 0.15 });
       },
       onPanResponderRelease: (_, gesture) => {
+        const absDx = Math.abs(gesture.dx);
+        const absDy = Math.abs(gesture.dy);
+
+        if (gesture.dy < -SWIPE_UP_THRESHOLD && absDy > absDx) {
+          openProfileSheetRef.current();
+          Animated.spring(position, {
+            toValue: { x: 0, y: 0 },
+            friction: 7,
+            tension: 80,
+            useNativeDriver: true,
+          }).start();
+          return;
+        }
+
         if (gesture.dx > SWIPE_THRESHOLD) {
           handleLikeRef.current();
         } else if (gesture.dx < -SWIPE_THRESHOLD) {
@@ -444,17 +742,42 @@ export default function Discovery() {
 
   const rotate = position.x.interpolate({
     inputRange: [-SCREEN_WIDTH, 0, SCREEN_WIDTH],
-    outputRange: ['-8deg', '0deg', '8deg'],
+    outputRange: ['-12deg', '0deg', '12deg'],
+    extrapolate: 'clamp',
+  });
+
+  const behindScale = position.x.interpolate({
+    inputRange: [-SCREEN_WIDTH, 0, SCREEN_WIDTH],
+    outputRange: [1, 0.95, 1],
+    extrapolate: 'clamp',
+  });
+
+  const behindOpacity = position.x.interpolate({
+    inputRange: [-SCREEN_WIDTH, 0, SCREEN_WIDTH],
+    outputRange: [1, 0.85, 1],
+    extrapolate: 'clamp',
   });
 
   const likeOpacity = position.x.interpolate({
-    inputRange: [0, SWIPE_THRESHOLD],
+    inputRange: [0, 80],
     outputRange: [0, 1],
     extrapolate: 'clamp',
   });
 
-  const passOpacity = position.x.interpolate({
-    inputRange: [-SWIPE_THRESHOLD, 0],
+  const nopeOpacity = position.x.interpolate({
+    inputRange: [-80, 0],
+    outputRange: [1, 0],
+    extrapolate: 'clamp',
+  });
+
+  const likeTintOpacity = position.x.interpolate({
+    inputRange: [0, 80],
+    outputRange: [0, 1],
+    extrapolate: 'clamp',
+  });
+
+  const nopeTintOpacity = position.x.interpolate({
+    inputRange: [-80, 0],
     outputRange: [1, 0],
     extrapolate: 'clamp',
   });
@@ -463,162 +786,293 @@ export default function Discovery() {
     <View style={styles.container}>
       <StatusBar style="dark" />
 
-      <View style={styles.header}>
-        <View style={styles.headerRow}>
-          <Text style={styles.headerTitle}>Discover</Text>
-          <Pressable
-            style={({ pressed }) => [styles.filterBtn, pressed && styles.filterBtnPressed]}
-            onPress={() => setShowFilterSheet(true)}
-            accessibilityLabel="Filter discovery profiles"
+      <View style={styles.screenRoot}>
+        {superLikeToast ? (
+          <Animated.View
+            pointerEvents="none"
+            style={[
+              styles.superLikeToast,
+              {
+                opacity: superLikeToastOpacity,
+                transform: [{ translateY: superLikeToastY }],
+              },
+            ]}
           >
-            <Ionicons name="options-outline" size={24} color={COLORS.forest} />
-            {filtersActive ? <View style={styles.filterDot} /> : null}
-          </Pressable>
-        </View>
-        <Text style={styles.headerSubtitle}>
-          {usingMockFallback
-            ? 'Preview profiles — real matches appear as members join'
-            : 'Genotype-aware matches near you'}
-        </Text>
-      </View>
-
-      <FilterSheet
-        visible={showFilterSheet}
-        filters={filters}
-        onClose={() => setShowFilterSheet(false)}
-        onApply={setFilters}
-      />
-
-      <View style={styles.deckArea}>
-        {loading ? (
-          <View style={styles.loadingState}>
-            <ActivityIndicator size="large" color={COLORS.forest} />
-            <Text style={styles.loadingText}>Finding compatible profiles...</Text>
-          </View>
-        ) : loadError ? (
-          <View style={styles.emptyState}>
-            <View style={styles.emptyIconWrap}>
-              <Ionicons name="alert-circle-outline" size={28} color={COLORS.forest} />
-            </View>
-            <Text style={styles.emptyTitle}>{loadError}</Text>
-            <Pressable style={styles.retryBtn} onPress={loadProfiles}>
-              <Text style={styles.retryText}>Try again</Text>
+            <Text style={styles.superLikeToastText}>⭐ Super Liked!</Text>
+          </Animated.View>
+        ) : null}
+        <View style={styles.header}>
+          <View style={styles.headerRow}>
+            <Text style={styles.headerTitle}>Discover</Text>
+            <Pressable
+              style={({ pressed }) => [styles.filterBtn, pressed && styles.filterBtnPressed]}
+              onPress={() => setShowFilterSheet(true)}
+              accessibilityLabel="Filter discovery profiles"
+            >
+              <Ionicons name="options-outline" size={24} color={COLORS.forest} />
+              {filtersActive ? <View style={styles.filterDot} /> : null}
             </Pressable>
           </View>
-        ) : isEmpty ? (
-          <View style={styles.emptyState}>
-            <EmptyState
-              type="no-profiles"
-              title="No profiles to show"
-              subtitle="Check back soon for new people nearby."
-            />
-          </View>
-        ) : isFilteredEmpty ? (
-          <View style={styles.emptyState}>
-            <EmptyState
-              type="no-results"
-              title="No profiles match your filters"
-              subtitle="Try adjusting or resetting your filters."
-              actionLabel="Adjust filters"
-              onAction={() => setShowFilterSheet(true)}
-            />
-          </View>
-        ) : seenAll ? (
-          <View style={styles.emptyState}>
-            <EmptyState
-              type="seen-all"
-              title="You've seen everyone nearby"
-              subtitle="Check back tomorrow for new matches."
-            />
-          </View>
-        ) : (
-          <>
-            {index + 1 < profiles.length && (
-              <Animated.View
-                style={[
-                  styles.card,
-                  styles.cardBehind,
-                  { transform: [{ scale: nextCardScale }] },
-                ]}
-              >
-                <ProfileCard profile={profiles[index + 1]} />
-              </Animated.View>
-            )}
+          <Text style={styles.headerSubtitle}>
+            {usingMockFallback
+              ? 'Preview profiles — real matches appear as members join'
+              : 'Genotype-aware matches near you'}
+          </Text>
+        </View>
 
-            <Animated.View
-              {...panResponder.panHandlers}
-              style={[
-                styles.card,
-                {
-                  opacity: cardOpacity,
-                  transform: [
-                    { translateX: position.x },
-                    { translateY: position.y },
-                    { rotate },
-                    { scale: cardScale },
-                  ],
-                },
-              ]}
-            >
-              <Animated.View style={[styles.stamp, styles.stampLike, { opacity: likeOpacity }]}>
-                <Text style={styles.stampLikeText}>LIKE</Text>
-              </Animated.View>
-              <Animated.View style={[styles.stamp, styles.stampPass, { opacity: passOpacity }]}>
-                <Text style={styles.stampPassText}>PASS</Text>
-              </Animated.View>
-              <ProfileCard profile={profile} />
-            </Animated.View>
-          </>
-        )}
+        <FilterSheet
+          visible={showFilterSheet}
+          filters={filters}
+          onClose={() => setShowFilterSheet(false)}
+          onApply={setFilters}
+        />
+
+        <View style={styles.deckArea}>
+          {loading ? (
+            <View style={styles.loadingState}>
+              <ActivityIndicator size="large" color={COLORS.forest} />
+              <Text style={styles.loadingText}>Finding compatible profiles...</Text>
+            </View>
+          ) : loadError ? (
+            <View style={styles.emptyState}>
+              <View style={styles.emptyIconWrap}>
+                <Ionicons name="alert-circle-outline" size={28} color={COLORS.forest} />
+              </View>
+              <Text style={styles.emptyTitle}>{loadError}</Text>
+              <Pressable style={styles.retryBtn} onPress={loadProfiles}>
+                <Text style={styles.retryText}>Try again</Text>
+              </Pressable>
+            </View>
+          ) : isEmpty ? (
+            <View style={styles.emptyState}>
+              <EmptyState
+                type="no-profiles"
+                title="No profiles to show"
+                subtitle="Check back soon for new people nearby."
+              />
+            </View>
+          ) : isFilteredEmpty ? (
+            <View style={styles.emptyState}>
+              <EmptyState
+                type="no-results"
+                title="No profiles match your filters"
+                subtitle="Try adjusting or resetting your filters."
+                actionLabel="Adjust filters"
+                onAction={() => setShowFilterSheet(true)}
+              />
+            </View>
+          ) : seenAll ? (
+            <View style={styles.emptyState}>
+              <EmptyState
+                type="seen-all"
+                title="You've seen everyone nearby"
+                subtitle="Check back tomorrow for new matches."
+              />
+            </View>
+          ) : (
+            <View style={styles.deckColumn}>
+              <View style={styles.deckCardSlot}>
+                <View style={styles.cardStackContainer}>
+                  {[...profiles.slice(index)].reverse().map((stackProfile, renderIdx) => {
+                    const stackSize = profiles.length - index;
+                    const depthFromTop = stackSize - 1 - renderIdx;
+                    const isTop = depthFromTop === 0;
+                    const isBehind = depthFromTop === 1;
+
+                    if (isTop) {
+                      return (
+                        <Animated.View
+                          key={stackProfile.id}
+                          {...panResponder.panHandlers}
+                          style={[
+                            styles.card,
+                            styles.cardInStack,
+                            {
+                              zIndex: stackSize + 1,
+                              opacity: cardOpacity,
+                              transform: [
+                                { translateX: position.x },
+                                { translateY: position.y },
+                                { rotate },
+                                { scale: cardScale },
+                              ],
+                            },
+                          ]}
+                        >
+                          <Animated.View
+                            style={[styles.stamp, styles.stampLike, { opacity: likeOpacity }]}
+                          >
+                            <Text style={styles.stampLikeText}>LIKE</Text>
+                          </Animated.View>
+                          <Animated.View
+                            style={[styles.stamp, styles.stampNope, { opacity: nopeOpacity }]}
+                          >
+                            <Text style={styles.stampNopeText}>NOPE</Text>
+                          </Animated.View>
+                          <Animated.View
+                            pointerEvents="none"
+                            style={[styles.cardDragTint, styles.cardDragTintLike, { opacity: likeTintOpacity }]}
+                          />
+                          <Animated.View
+                            pointerEvents="none"
+                            style={[styles.cardDragTint, styles.cardDragTintNope, { opacity: nopeTintOpacity }]}
+                          />
+                          <ProfileCard
+                            profile={stackProfile}
+                            swipeIndex={index}
+                            totalProfiles={profiles.length}
+                            viewerGenotype={viewerGenotype}
+                            progressFillWidth={progressFillWidth}
+                          />
+                        </Animated.View>
+                      );
+                    }
+
+                    if (isBehind) {
+                      return (
+                        <Animated.View
+                          key={stackProfile.id}
+                          pointerEvents="none"
+                          style={[
+                            styles.cardBehindPeek,
+                            styles.cardInStack,
+                            {
+                              zIndex: depthFromTop,
+                              opacity: 0.7,
+                              transform: [{ scale: 0.96 }],
+                            },
+                          ]}
+                        >
+                          <View style={styles.cardBehindClip}>
+                            <View style={styles.cardBehindClipInner}>
+                              <ProfileCard profile={stackProfile} />
+                            </View>
+                          </View>
+                        </Animated.View>
+                      );
+                    }
+
+                    return (
+                      <Animated.View
+                        key={stackProfile.id}
+                        pointerEvents="none"
+                        style={[
+                          styles.card,
+                          styles.cardInStack,
+                          styles.cardStackBack,
+                          { zIndex: depthFromTop, opacity: 0 },
+                        ]}
+                      >
+                        <ProfileCard profile={stackProfile} />
+                      </Animated.View>
+                    );
+                  })}
+                </View>
+              </View>
+
+              <View style={styles.actions}>
+                {actionError ? <Text style={styles.actionError}>{actionError}</Text> : null}
+                <Pressable
+                  style={({ pressed }) => [styles.passBtn, pressed && styles.btnPressed]}
+                  onPress={handlePass}
+                  disabled={showMatch}
+                >
+                  <Ionicons name="close" size={24} color="#8FAF95" />
+                </Pressable>
+                <SuperLikeButton onPress={handleSuperLike} disabled={showMatch} />
+                <Animated.View style={{ transform: [{ scale: likePulseScale }] }}>
+                  <Pressable
+                    style={({ pressed }) => [styles.likeBtn, pressed && styles.btnPressed]}
+                    onPress={handleLike}
+                    disabled={showMatch}
+                  >
+                    <Ionicons name="heart" size={28} color="#FFFFFF" />
+                  </Pressable>
+                </Animated.View>
+              </View>
+            </View>
+          )}
+        </View>
       </View>
 
-      {!seenAll && !isEmpty && !isFilteredEmpty && !loading && !loadError && (
-        <View style={styles.actions}>
-          {actionError ? <Text style={styles.actionError}>{actionError}</Text> : null}
-          <Pressable
-            style={({ pressed }) => [styles.passBtn, pressed && styles.btnPressed]}
-            onPress={handlePass}
-            disabled={showMatch}
-          >
-            <Ionicons name="close" size={30} color={COLORS.textSubtle} />
-          </Pressable>
-          <Pressable
-            style={({ pressed }) => [styles.likeBtn, pressed && styles.btnPressed]}
-            onPress={handleLike}
-            disabled={showMatch}
-          >
-            <Ionicons name="heart" size={30} color={COLORS.linen} />
-          </Pressable>
-        </View>
-      )}
 
-      {showMatch && (
-        <Animated.View
-          style={[
-            styles.matchOverlay,
-            {
-              opacity: matchOpacity,
-              transform: [{ scale: matchScale }],
-            },
-          ]}
-          pointerEvents="none"
-        >
-          <View style={styles.matchSparkRow}>
-            {[0, 1, 2, 3, 4].map((i) => (
-              <View key={i} style={[styles.matchSpark, i % 2 === 0 && styles.matchSparkAlt]} />
-            ))}
-          </View>
+      <Modal
+        visible={profileSheetVisible}
+        transparent
+        animationType="none"
+        statusBarTranslucent
+        onRequestClose={closeProfileSheet}
+      >
+        <View style={styles.profileSheetRoot}>
+          <Pressable style={styles.profileSheetBackdropPress} onPress={closeProfileSheet}>
+            <Animated.View
+              style={[styles.profileSheetBackdrop, { opacity: sheetBackdropOpacity }]}
+            />
+          </Pressable>
+          <Animated.View
+            style={[styles.profileSheet, { transform: [{ translateY: sheetTranslateY }] }]}
+          >
+            <View style={styles.profileSheetHandle} />
+            <Text style={styles.profileSheetName}>{profile?.name}</Text>
+            <Text style={styles.profileSheetBio}>{profile?.bio}</Text>
+            {profile?.interests?.length ? (
+              <View style={styles.profileSheetTags}>
+                {profile.interests.map((interest) => (
+                  <View key={interest} style={styles.profileSheetTagChip}>
+                    <Text style={styles.profileSheetTagText}>{interest}</Text>
+                  </View>
+                ))}
+              </View>
+            ) : null}
+            <Text style={styles.profileSheetMeta}>
+              Relationship goal: {formatRelationshipGoal(profile?.relationshipGoal)}
+            </Text>
+            <Pressable
+              style={({ pressed }) => [
+                styles.profileSheetChatBtn,
+                pressed && styles.profileSheetChatBtnPressed,
+              ]}
+              onPress={() => {
+                closeProfileSheet();
+                processSwipe('like');
+              }}
+            >
+              <Text style={styles.profileSheetChatBtnText}>Start Chat</Text>
+            </Pressable>
+          </Animated.View>
+        </View>
+      </Modal>
+
+      <Modal
+        visible={showMatch}
+        transparent
+        animationType="fade"
+        statusBarTranslucent
+        onRequestClose={dismissMatchOverlay}
+      >
+        <View style={styles.matchModalBackdrop}>
           <View style={styles.matchCard}>
-            <Text style={styles.matchTitle}>It's a Match!</Text>
-            <Text style={styles.matchSubtitle}>
-              You and {matchedName} liked each other
+            <Text style={styles.matchTitle} numberOfLines={1}>
+              It's a Match!
+            </Text>
+            <Text style={styles.matchSubtitle} numberOfLines={1}>
+              You matched with {matchedName}!
             </Text>
             <View style={styles.matchIconWrap}>
-              <Ionicons name="heart" size={40} color={COLORS.gold} />
+              <Ionicons name="heart" size={44} color="#D4A843" />
             </View>
+            <Pressable
+              style={({ pressed }) => [
+                styles.matchContinueBtn,
+                pressed && styles.matchContinueBtnPressed,
+              ]}
+              onPress={dismissMatchOverlay}
+            >
+              <Text style={styles.matchContinueText}>Continue</Text>
+            </Pressable>
           </View>
-        </Animated.View>
-      )}
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -628,10 +1082,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.linen,
   },
+  screenRoot: {
+    flex: 1,
+  },
   header: {
     paddingTop: 58,
     paddingHorizontal: 24,
-    paddingBottom: 12,
+    paddingBottom: 0,
   },
   headerRow: {
     flexDirection: 'row',
@@ -670,41 +1127,349 @@ const styles = StyleSheet.create({
   headerSubtitle: {
     marginTop: 4,
     ...TYPOGRAPHY.caption,
+    fontFamily: 'Satoshi-Medium',
     color: COLORS.textMuted,
   },
   deckArea: {
     flex: 1,
     paddingHorizontal: 20,
-    justifyContent: 'center',
+    paddingTop: 12,
   },
-  card: {
-    position: 'absolute',
-    left: 20,
-    right: 20,
-    top: 0,
-    bottom: 0,
-    backgroundColor: COLORS.white,
-    borderRadius: RADIUS.lg,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    ...SHADOWS.cardElevated,
+  deckColumn: {
+    flex: 1,
+    width: '100%',
+    alignItems: 'center',
+  },
+  deckCardSlot: {
+    width: '100%',
+    height: CARD_HEIGHT + BACK_CARD_PEEK,
     overflow: 'hidden',
   },
-  cardBody: {
-    flex: 1,
-  },
-  photoArea: {
+  cardStackContainer: {
+    position: 'relative',
     width: '100%',
-    height: PHOTO_HEIGHT,
+    height: CARD_HEIGHT + BACK_CARD_PEEK,
+    overflow: 'hidden',
+  },
+  cardInStack: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+  },
+  cardBehindPeek: {
+    position: 'absolute',
+    top: CARD_HEIGHT - BACK_CARD_VISIBLE + BACK_CARD_PEEK,
+    left: 0,
+    right: 0,
+    height: BACK_CARD_VISIBLE,
+    overflow: 'hidden',
+    borderRadius: 24,
+    width: '100%',
+  },
+  cardBehindClip: {
+    height: BACK_CARD_VISIBLE,
+    overflow: 'hidden',
+    width: '100%',
+  },
+  cardBehindClipInner: {
+    marginTop: -(CARD_HEIGHT - BACK_CARD_VISIBLE),
+  },
+  cardStackBack: {
+    opacity: 0,
+  },
+  card: {
+    width: '100%',
+    height: CARD_HEIGHT,
+    borderRadius: 24,
+    overflow: 'hidden',
+    backgroundColor: '#1A3D28',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.22,
+    shadowRadius: 20,
+    elevation: 12,
+  },
+  cardBody: {
+    width: '100%',
+    height: CARD_HEIGHT,
+    borderRadius: 24,
+    overflow: 'hidden',
     position: 'relative',
   },
-  photoImage: {
+  swipeProgressTrack: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 3,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 2,
+    zIndex: 7,
+    overflow: 'hidden',
+  },
+  swipeProgressFill: {
+    height: 3,
+    backgroundColor: '#D4A843',
+    borderRadius: 2,
+  },
+  genotypeCompatRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 8,
+  },
+  compatDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  genotypeCompatText: {
+    flex: 1,
+    fontFamily: 'Satoshi-Medium',
+    fontSize: 12,
+    color: '#FFFFFF',
+    opacity: 0.9,
+    lineHeight: 16,
+  },
+  superLikeToast: {
+    position: 'absolute',
+    top: 52,
+    alignSelf: 'center',
+    left: 24,
+    right: 24,
+    zIndex: 100,
+    backgroundColor: '#D4A843',
+    borderRadius: 999,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    alignItems: 'center',
+  },
+  superLikeToastText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#0D2818',
+    textAlign: 'center',
+  },
+  superLikeBtnWrap: {
+    width: 52,
+    height: 52,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  superLikeBurstStar: {
+    position: 'absolute',
+    fontSize: 14,
+    color: '#D4A843',
+  },
+  profileSheetRoot: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  profileSheetBackdropPress: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  profileSheetBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(13, 40, 24, 0.72)',
+  },
+  profileSheet: {
+    backgroundColor: '#1A3D28',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: 24,
+    paddingTop: 12,
+    paddingBottom: 32,
+    maxHeight: PROFILE_SHEET_HEIGHT,
+  },
+  profileSheetHandle: {
+    alignSelf: 'center',
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: 'rgba(255,255,255,0.35)',
+    marginBottom: 16,
+  },
+  profileSheetName: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginBottom: 12,
+  },
+  profileSheetBio: {
+    fontFamily: 'Satoshi-Medium',
+    fontSize: 15,
+    lineHeight: 22,
+    color: '#FFFFFF',
+    opacity: 0.92,
+    marginBottom: 16,
+  },
+  profileSheetTags: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 16,
+  },
+  profileSheetTagChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 999,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+  },
+  profileSheetTagText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  profileSheetMeta: {
+    fontFamily: 'Satoshi-Medium',
+    fontSize: 14,
+    color: '#8FAF95',
+    marginBottom: 20,
+  },
+  profileSheetChatBtn: {
+    backgroundColor: '#D4A843',
+    borderRadius: 999,
+    paddingVertical: 16,
+    alignItems: 'center',
+  },
+  profileSheetChatBtnPressed: {
+    opacity: 0.9,
+  },
+  profileSheetChatBtnText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#0D2818',
+  },
+  btnDisabled: {
+    opacity: 0.5,
+  },
+  cardMedia: {
+    ...StyleSheet.absoluteFillObject,
     width: '100%',
-    height: PHOTO_HEIGHT,
+    height: '100%',
+  },
+  cardMediaImage: {
+    borderRadius: 24,
+  },
+  cardNoPhoto: {
+    backgroundColor: '#0F2F1A',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  noPhotoPlaceholderWrap: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: '45%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1,
+  },
+  noPhotoCircle: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: 'rgba(212,168,67,0.15)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(212,168,67,0.4)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  noPhotoInitials: {
+    fontFamily: 'ClashDisplay-Semibold',
+    fontSize: 36,
+    color: 'rgba(212,168,67,0.6)',
+    textAlign: 'center',
+  },
+  noPhotoCaption: {
+    fontFamily: 'Satoshi-Regular',
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.3)',
+    marginTop: 8,
+    textAlign: 'center',
+  },
+  initialsWatermark: {
+    position: 'absolute',
+    top: '22%',
+    left: 0,
+    right: 0,
+    textAlign: 'center',
+    fontSize: 80,
+    fontWeight: '800',
+    color: 'rgba(255,255,255,0.15)',
+    letterSpacing: 4,
+    zIndex: 1,
+  },
+  cardBottomShade: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: '45%',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    zIndex: 2,
+  },
+  cardInfoFooter: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 20,
+    zIndex: 3,
+  },
+  nameBadgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 8,
+  },
+  cardName: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    flexShrink: 1,
+  },
+  cityRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 8,
+  },
+  cityText: {
+    fontFamily: 'Satoshi-Medium',
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#8FAF95',
+  },
+  cardBio: {
+    fontFamily: 'Satoshi-Medium',
+    fontSize: 13,
+    lineHeight: 18,
+    color: '#FFFFFF',
+    marginBottom: 10,
+  },
+  tagsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  tagChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 999,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+  },
+  tagText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#FFFFFF',
   },
   photoDots: {
     position: 'absolute',
-    top: 12,
+    top: 14,
     left: 0,
     right: 0,
     flexDirection: 'row',
@@ -740,67 +1505,136 @@ const styles = StyleSheet.create({
     width: '38%',
     zIndex: 4,
   },
-  photoGradient: {
+  matchPillWrap: {
     position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: 96,
-    zIndex: 2,
-  },
-  photoOverlay: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    paddingHorizontal: 16,
-    paddingBottom: 14,
-    zIndex: 3,
-  },
-  photoNameRow: {
-    flexDirection: 'row',
+    top: 14,
+    right: 14,
     alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: 10,
-  },
-  genotypeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  photoName: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: COLORS.white,
-    letterSpacing: -0.4,
-    flexShrink: 1,
+    zIndex: 6,
   },
   matchPill: {
-    position: 'absolute',
-    top: 12,
-    right: 12,
     backgroundColor: COLORS.gold,
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 999,
-    zIndex: 4,
   },
   matchPillText: {
     fontSize: 13,
     fontWeight: '700',
     color: COLORS.forest,
   },
-  cardBehind: {
-    transform: [{ scale: 0.95 }],
-    opacity: 0.92,
+  matchPillLabel: {
+    marginTop: 4,
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    opacity: 0.9,
+    textAlign: 'center',
   },
-  cardScroll: {
-    flex: 1,
+  cardDragTint: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 24,
+    zIndex: 8,
   },
-  cardScrollContent: {
-    paddingHorizontal: 22,
-    paddingTop: 16,
-    paddingBottom: 28,
+  cardDragTintLike: {
+    backgroundColor: 'rgba(13, 40, 24, 0.3)',
+  },
+  cardDragTintNope: {
+    backgroundColor: 'rgba(143, 175, 149, 0.3)',
+  },
+  stamp: {
+    position: 'absolute',
+    top: 40,
+    zIndex: 10,
+    borderRadius: 8,
+    borderWidth: 3,
+    padding: 8,
+  },
+  stampLike: {
+    left: 24,
+    borderColor: '#D4A843',
+    transform: [{ rotate: '-15deg' }],
+  },
+  stampNope: {
+    right: 24,
+    borderColor: '#8FAF95',
+    transform: [{ rotate: '15deg' }],
+  },
+  stampLikeText: {
+    fontSize: 32,
+    fontWeight: '900',
+    color: '#D4A843',
+  },
+  stampNopeText: {
+    fontSize: 32,
+    fontWeight: '900',
+    color: '#8FAF95',
+  },
+  superLikeBtn: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  superLikeStar: {
+    fontSize: 22,
+    color: '#D4A843',
+  },
+  actions: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 24,
+    marginTop: 20,
+    zIndex: 20,
+  },
+  passBtn: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  likeBtn: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: '#D4A843',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  btnPressed: {
+    opacity: 0.85,
+    transform: [{ scale: 0.96 }],
+  },
+  actionError: {
+    fontFamily: 'Satoshi-Medium',
+    position: 'absolute',
+    top: -28,
+    alignSelf: 'center',
+    color: '#A32D2D',
+    fontSize: 12,
+    fontWeight: '600',
+    textAlign: 'center',
+    maxWidth: '90%',
   },
   loadingState: {
     flex: 1,
@@ -809,6 +1643,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   loadingText: {
+    fontFamily: 'Satoshi-Medium',
     fontSize: 15,
     color: 'rgba(13, 40, 24, 0.6)',
     fontWeight: '600',
@@ -824,114 +1659,6 @@ const styles = StyleSheet.create({
     color: COLORS.linen,
     fontWeight: '800',
     fontSize: 15,
-  },
-  actionError: {
-    position: 'absolute',
-    top: -28,
-    alignSelf: 'center',
-    color: '#A32D2D',
-    fontSize: 12,
-    fontWeight: '600',
-    textAlign: 'center',
-    maxWidth: '90%',
-  },
-  cityRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginBottom: 14,
-  },
-  city: {
-    fontSize: 15,
-    color: COLORS.textMuted,
-    fontWeight: '400',
-    lineHeight: 22.5,
-  },
-  bio: {
-    fontSize: 15,
-    lineHeight: 22.5,
-    color: COLORS.textMuted,
-    fontWeight: '400',
-    marginBottom: 16,
-  },
-  interestRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  interestChip: {
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 999,
-    backgroundColor: 'rgba(143, 175, 149, 0.35)',
-  },
-  interestText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: COLORS.forest,
-  },
-  stamp: {
-    position: 'absolute',
-    top: 24,
-    zIndex: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 8,
-    borderWidth: 3,
-  },
-  stampLike: {
-    left: 24,
-    borderColor: COLORS.forest,
-    transform: [{ rotate: '-12deg' }],
-  },
-  stampPass: {
-    right: 24,
-    borderColor: COLORS.textSubtle,
-    transform: [{ rotate: '12deg' }],
-  },
-  stampLikeText: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: COLORS.forest,
-    letterSpacing: 2,
-  },
-  stampPassText: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: COLORS.textSubtle,
-    letterSpacing: 2,
-  },
-  actions: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 28,
-    paddingBottom: 8,
-    paddingTop: 8,
-  },
-  passBtn: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: COLORS.linen,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    ...SHADOWS.card,
-  },
-  likeBtn: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: COLORS.forest,
-    alignItems: 'center',
-    justifyContent: 'center',
-    ...SHADOWS.button,
-  },
-  btnPressed: {
-    opacity: 0.85,
-    transform: [{ scale: 0.96 }],
   },
   emptyState: {
     flex: 1,
@@ -956,68 +1683,65 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     ...TYPOGRAPHY.headingSm,
+    fontFamily: 'Satoshi-Medium',
     textAlign: 'center',
     marginBottom: 8,
   },
   emptyBody: {
     ...TYPOGRAPHY.body,
+    fontFamily: 'Satoshi-Medium',
     textAlign: 'center',
   },
-  matchOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: COLORS.overlay,
-    alignItems: 'center',
+  matchModalBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(13,40,24,0.97)',
     justifyContent: 'center',
-    paddingHorizontal: 28,
-    zIndex: 100,
-  },
-  matchSparkRow: {
-    flexDirection: 'row',
-    gap: 10,
-    marginBottom: 20,
-  },
-  matchSpark: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: COLORS.gold,
-  },
-  matchSparkAlt: {
-    backgroundColor: COLORS.sage,
-    marginTop: 6,
+    alignItems: 'center',
+    paddingHorizontal: 32,
   },
   matchCard: {
-    backgroundColor: '#0D2818',
-    borderRadius: RADIUS.lg,
-    borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.3)',
-    paddingVertical: 36,
-    paddingHorizontal: 28,
-    alignItems: 'center',
+    backgroundColor: '#1A3D28',
+    borderRadius: 24,
+    padding: 40,
     width: '100%',
-    ...SHADOWS.cardElevated,
+    alignItems: 'center',
   },
   matchTitle: {
     fontSize: 34,
     fontWeight: '700',
     color: '#D4A843',
-    letterSpacing: -0.5,
-    marginBottom: 8,
+    width: '100%',
+    textAlign: 'center',
+    marginBottom: 12,
   },
   matchSubtitle: {
-    fontSize: 16,
+    fontFamily: 'Satoshi-Medium',
+    fontSize: 18,
     fontWeight: '400',
-    lineHeight: 24,
-    color: 'rgba(255, 255, 255, 0.7)',
+    color: '#FFFFFF',
     textAlign: 'center',
+    marginBottom: 8,
   },
   matchIconWrap: {
-    marginTop: 16,
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: 'rgba(212, 168, 67, 0.15)',
+    marginTop: 20,
+    marginBottom: 28,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  matchContinueBtn: {
+    width: '100%',
+    backgroundColor: COLORS.gold,
+    borderRadius: 999,
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  matchContinueBtnPressed: {
+    opacity: 0.88,
+  },
+  matchContinueText: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: COLORS.forest,
   },
 });

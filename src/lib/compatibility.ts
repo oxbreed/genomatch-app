@@ -24,3 +24,26 @@ export function computeCompatibility(
 
   return scores[pair] ?? 65;
 }
+
+export function getGenotypeCompatibilityLine(
+  viewerGenotype: Genotype | null,
+  candidateGenotype: Genotype
+): string {
+  const viewer = viewerGenotype ?? 'AA';
+  const pairLabel = `${viewer} × ${candidateGenotype}`;
+  const pairKey = [viewer, candidateGenotype].sort().join('');
+  const riskByPair: Record<string, string> = {
+    AAAA: 'Very low sickle cell risk',
+    AAAS: 'Low sickle cell risk',
+    AAAC: 'Low sickle cell risk',
+    AASS: 'Elevated sickle cell risk',
+    ASAS: 'Moderate sickle cell risk',
+    ASAC: 'Moderate sickle cell risk',
+    ASSS: 'Higher sickle cell risk',
+    ACAC: 'Moderate sickle cell risk',
+    ACCC: 'Moderate sickle cell risk',
+    SSSS: 'Higher sickle cell risk',
+  };
+  const risk = riskByPair[pairKey] ?? 'Genotype-compatible match';
+  return `${pairLabel} — ${risk}`;
+}

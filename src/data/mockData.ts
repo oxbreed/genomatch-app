@@ -3,14 +3,20 @@ import type { DiscoveryProfile } from '../types/database';
 export { COLORS, TYPOGRAPHY, RADIUS, SHADOWS } from '../theme';
 import { COLORS } from '../theme';
 
+const GENOTYPE_BADGE_STYLE = {
+  bg: '#EDF3EE',
+  text: '#0D2818',
+  border: 'rgba(13, 40, 24, 0.12)',
+} as const;
+
 export const GENOTYPE_STYLES: Record<
   string,
   { bg: string; text: string; border: string }
 > = {
-  AA: { bg: '#E8F5E9', text: '#2E7D32', border: '#A5D6A7' },
-  AS: { bg: '#FFF8E6', text: '#BA7517', border: '#D4A843' },
-  SS: { bg: '#FFEBEE', text: '#A32D2D', border: '#EF9A9A' },
-  AC: { bg: '#E3F2FD', text: '#185FA5', border: '#90CAF9' },
+  AA: { ...GENOTYPE_BADGE_STYLE },
+  AS: { ...GENOTYPE_BADGE_STYLE },
+  SS: { ...GENOTYPE_BADGE_STYLE },
+  AC: { ...GENOTYPE_BADGE_STYLE },
 };
 
 export type Genotype = 'AA' | 'AS' | 'SS' | 'AC';

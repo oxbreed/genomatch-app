@@ -1,6 +1,7 @@
 import { TextStyle } from 'react-native';
 import { COLORS } from './colors';
 
+/** Keys must match `FONTS_TO_LOAD` in src/theme/index.ts (PostScript names used by expo-font). */
 export const FONT_FAMILY = {
   clashSemibold: 'ClashDisplay-Semibold',
   clashMedium: 'ClashDisplay-Medium',

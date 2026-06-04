@@ -15,7 +15,7 @@ import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import ProfileAvatar from '../src/components/ProfileAvatar';
 import ReportBlockSheet from '../src/components/ReportBlockSheet';
-import { COLORS, TYPOGRAPHY } from '../src/data/mockData';
+import { COLORS, TYPOGRAPHY, getInitials } from '../src/data/mockData';
 import type { DiscoveryProfile, MatchWithProfile } from '../src/types/database';
 import { sendLocalNotification } from '../src/lib/notifications';
 import { rateLimitAction } from '../src/lib/rateLimit';
@@ -235,15 +235,29 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
       <StatusBar style="dark" />
 
       <View style={styles.header}>
-        <Pressable style={styles.backBtn} onPress={onBack}>
-          <Text style={styles.backBtnText}>←</Text>
+        <Pressable
+          style={({ pressed }) => [styles.headerIconBtn, pressed && styles.headerIconBtnPressed]}
+          onPress={onBack}
+          accessibilityLabel="Go back"
+        >
+          <Ionicons name="chevron-back" size={24} color="#0D2818" />
         </Pressable>
-        <ProfileAvatar
-          name={profile.name}
-          gradient={profile.gradient}
-          avatarUrl={profile.avatarUrl}
-          size={42}
-        />
+        {profile.avatarUrl?.trim() || profile.photos[0]?.trim() ? (
+          <ProfileAvatar
+            name={profile.name}
+            gradient={profile.gradient}
+            avatarUrl={profile.avatarUrl ?? profile.photos[0]}
+            size={42}
+            noPhotoBackground="#1A3D28"
+            noPhotoInitialColor="#FFFFFF"
+          />
+        ) : (
+          <View style={styles.chatHeaderAvatarFallback}>
+            <Text style={styles.chatHeaderAvatarInitials}>
+              {getInitials(profile.name)}
+            </Text>
+          </View>
+        )}
         <View style={styles.headerText}>
           <Text style={styles.chatName}>{profile.name}</Text>
           {otherTyping ? (
@@ -253,18 +267,18 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
           )}
         </View>
         <Pressable
-          style={({ pressed }) => [styles.profileBtn, pressed && styles.profileBtnPressed]}
+          style={({ pressed }) => [styles.headerIconBtn, pressed && styles.headerIconBtnPressed]}
           onPress={() => setShowProfile(true)}
           accessibilityLabel="View profile"
         >
-          <Ionicons name="person-circle-outline" size={24} color={COLORS.forest} />
+          <Ionicons name="person-circle-outline" size={22} color="#0D2818" />
         </Pressable>
         <Pressable
-          style={({ pressed }) => [styles.menuBtn, pressed && styles.profileBtnPressed]}
+          style={({ pressed }) => [styles.headerIconBtn, pressed && styles.headerIconBtnPressed]}
           onPress={() => setShowModerationSheet(true)}
           accessibilityLabel="Report or block"
         >
-          <Ionicons name="ellipsis-vertical" size={22} color={COLORS.forest} />
+          <Ionicons name="ellipsis-vertical" size={22} color="#0D2818" />
         </Pressable>
       </View>
 
@@ -311,13 +325,9 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
           maxLength={1000}
           editable={!sending}
         />
-        <Pressable
-          style={[styles.sendBtn, (!draft.trim() || sending) && styles.sendBtnDisabled]}
-          onPress={handleSend}
-          disabled={!draft.trim() || sending}
-        >
+        <Pressable style={styles.sendBtn} onPress={handleSend}>
           {sending ? (
-            <ActivityIndicator color={COLORS.forest} size="small" />
+            <ActivityIndicator color="#0D2818" size="small" />
           ) : (
             <Text style={styles.sendBtnText}>Send</Text>
           )}
@@ -343,67 +353,62 @@ const styles = StyleSheet.create({
     borderBottomColor: 'rgba(13, 40, 24, 0.08)',
     gap: 10,
   },
-  backBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(143, 175, 149, 0.25)',
+  headerIconBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#EDF3EE',
     alignItems: 'center',
     justifyContent: 'center',
+    flexShrink: 0,
+    overflow: 'hidden',
   },
-  backBtnText: {
-    fontSize: 22,
-    color: COLORS.forest,
-    fontWeight: '700',
+  headerIconBtnPressed: {
+    opacity: 0.88,
   },
   headerText: {
     flex: 1,
   },
+  chatHeaderAvatarFallback: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(212,168,67,0.15)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(212,168,67,0.4)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  chatHeaderAvatarInitials: {
+    fontFamily: 'ClashDisplay-Semibold',
+    fontSize: 16,
+    color: 'rgba(212,168,67,0.8)',
+    textAlign: 'center',
+  },
   chatName: {
     ...TYPOGRAPHY.name,
+    fontFamily: 'ClashDisplay-Semibold',
     fontSize: 17,
     fontWeight: '600',
   },
   chatMeta: {
+    fontFamily: 'Satoshi-Medium',
     fontSize: 12,
     color: 'rgba(13, 40, 24, 0.55)',
     fontWeight: '600',
     marginTop: 2,
   },
   typingMeta: {
+    fontFamily: 'Satoshi-Medium',
     fontSize: 12,
     color: COLORS.sage,
     fontWeight: '600',
     fontStyle: 'italic',
     marginTop: 2,
   },
-  profileBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(143, 175, 149, 0.35)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(13, 40, 24, 0.08)',
-  },
-  menuBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(143, 175, 149, 0.35)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(13, 40, 24, 0.08)',
-  },
-  profileBtnPressed: {
-    opacity: 0.85,
-  },
-  profileBtnIcon: {
-    fontSize: 18,
-  },
   errorBanner: {
+    fontFamily: 'Satoshi-Medium',
     backgroundColor: '#FFEBEE',
     color: '#A32D2D',
     textAlign: 'center',
@@ -422,6 +427,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   timeDivider: {
+    fontFamily: 'Satoshi-Medium',
     alignSelf: 'center',
     fontSize: 11,
     color: 'rgba(13, 40, 24, 0.45)',
@@ -438,6 +444,7 @@ const styles = StyleSheet.create({
     maxWidth: '90%',
   },
   emptyHintText: {
+    fontFamily: 'Satoshi-Medium',
     fontSize: 13,
     color: COLORS.forest,
     fontWeight: '600',
@@ -472,6 +479,7 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 4,
   },
   bubbleText: {
+    fontFamily: 'Satoshi-Medium',
     fontSize: 15,
     lineHeight: 21,
     color: COLORS.forest,
@@ -488,6 +496,7 @@ const styles = StyleSheet.create({
     marginRight: 2,
   },
   readReceiptText: {
+    fontFamily: 'Satoshi-Medium',
     fontSize: 11,
     fontWeight: '600',
     color: 'rgba(13, 40, 24, 0.5)',
@@ -513,25 +522,24 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.linen,
     paddingHorizontal: 14,
     paddingVertical: 10,
+    fontFamily: 'Satoshi-Medium',
     fontSize: 16,
     color: COLORS.forest,
     fontWeight: '500',
   },
   sendBtn: {
-    minWidth: 72,
-    height: 44,
+    minWidth: 80,
+    minHeight: 44,
     borderRadius: 14,
-    backgroundColor: COLORS.gold,
+    backgroundColor: '#D4A843',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 14,
-  },
-  sendBtnDisabled: {
-    opacity: 0.45,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
   },
   sendBtnText: {
     fontSize: 15,
-    fontWeight: '800',
-    color: COLORS.forest,
+    fontWeight: '700',
+    color: '#0D2818',
   },
 });

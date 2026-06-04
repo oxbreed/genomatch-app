@@ -1,7 +1,11 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Animated,
+  Dimensions,
+  Easing,
+  Image,
   Modal,
   Pressable,
   ScrollView,
@@ -11,15 +15,16 @@ import {
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import PhotoGrid from '../src/components/PhotoGrid';
 import CommunityGuidelines from './CommunityGuidelines';
 import PrivacyPolicy from './PrivacyPolicy';
 import GenotypeBadge from '../src/components/GenotypeBadge';
-import { COLORS, RELATIONSHIP_GOAL_LABELS, TYPOGRAPHY } from '../src/data/mockData';
+import { COLORS, RELATIONSHIP_GOAL_LABELS, getInitials } from '../src/data/mockData';
 import { uploadAdditionalPhoto } from '../src/lib/photoUpload';
 import { mapProfileRow } from '../src/lib/profileMapper';
 import { logAuthState } from '../src/lib/auth';
+import { fetchMatches } from '../src/lib/matches';
 import {
   getCurrentProfile,
   updateProfileFields,
@@ -28,6 +33,14 @@ import {
 } from '../src/lib/profiles';
 import { supabase } from '../src/lib/supabase';
 import type { DiscoveryProfile, Genotype } from '../src/types/database';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const HERO_HEIGHT = 320;
+const PHOTO_COLS = 3;
+const PHOTO_GAP = 8;
+const PHOTO_MARGIN = 16;
+const PHOTO_CELL_SIZE =
+  (SCREEN_WIDTH - PHOTO_MARGIN * 2 - PHOTO_GAP * (PHOTO_COLS - 1)) / PHOTO_COLS;
 
 type ProfileProps = {
   onSignOut?: () => void;
@@ -47,6 +60,26 @@ type EditableProfile = {
   genotypeVerified: boolean;
 };
 
+type ProfileStats = {
+  matches: number;
+  likesReceived: number;
+  profileViews: number;
+};
+
+function calculateProfileCompletion(data: EditableProfile): number {
+  let score = 0;
+  if (data.photos.length > 0 || data.avatarUrl) score += 20;
+  if (data.bio.trim().length > 0) score += 20;
+  if (data.interests.length > 0) score += 20;
+  if (data.city.trim().length > 0) score += 20;
+  if (data.relationshipGoal.trim().length > 0) score += 20;
+  return score;
+}
+
+function getStrengthLabel(percent: number): string {
+  return percent >= 80 ? 'Strong Profile' : 'Complete your profile';
+}
+
 export default function Profile({ onSignOut }: ProfileProps) {
   const [profile, setProfile] = useState<EditableProfile | null>(null);
   const [draft, setDraft] = useState<EditableProfile | null>(null);
@@ -61,6 +94,13 @@ export default function Profile({ onSignOut }: ProfileProps) {
   const [verifying, setVerifying] = useState(false);
   const [error, setError] = useState('');
   const [authUserId, setAuthUserId] = useState<string | null>(null);
+  const [stats, setStats] = useState<ProfileStats>({
+    matches: 0,
+    likesReceived: 0,
+    profileViews: 0,
+  });
+
+  const completionAnim = useRef(new Animated.Value(0)).current;
 
   const loadProfile = useCallback(async () => {
     setError('');
@@ -81,7 +121,8 @@ export default function Profile({ onSignOut }: ProfileProps) {
       const {
         data: { session },
       } = await supabase.auth.getSession();
-      setAuthUserId(session?.user?.id ?? null);
+      const userId = session?.user?.id ?? null;
+      setAuthUserId(userId);
 
       if (!row) {
         setProfile(null);
@@ -104,6 +145,29 @@ export default function Profile({ onSignOut }: ProfileProps) {
       };
       setProfile(loaded);
       setDraft(loaded);
+
+      if (userId) {
+        try {
+          const [matchRows, likesResult] = await Promise.all([
+            fetchMatches(),
+            supabase
+              .from('likes')
+              .select('id', { count: 'exact', head: true })
+              .eq('liked_id', userId),
+          ]);
+
+          const likesReceived =
+            likesResult.error || likesResult.count == null ? 0 : likesResult.count;
+
+          setStats({
+            matches: matchRows.length,
+            likesReceived,
+            profileViews: 0,
+          });
+        } catch {
+          setStats({ matches: 0, likesReceived: 0, profileViews: 0 });
+        }
+      }
     } catch (err) {
       console.error('[Profile] load failed', err);
       setError(err instanceof Error ? err.message : 'Could not load profile');
@@ -115,6 +179,18 @@ export default function Profile({ onSignOut }: ProfileProps) {
   useEffect(() => {
     loadProfile();
   }, [loadProfile]);
+
+  const data = editing ? draft : profile;
+  const completionPercent = data ? calculateProfileCompletion(data) : 0;
+
+  useEffect(() => {
+    Animated.timing(completionAnim, {
+      toValue: completionPercent / 100,
+      duration: 400,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: false,
+    }).start();
+  }, [completionAnim, completionPercent]);
 
   const startEdit = () => {
     if (!profile) return;
@@ -232,10 +308,15 @@ export default function Profile({ onSignOut }: ProfileProps) {
     ]);
   };
 
-  const data = editing ? draft : profile;
   const goalLabel = data
     ? RELATIONSHIP_GOAL_LABELS[data.relationshipGoal] ?? data.relationshipGoal
     : '';
+  const heroPhotoUri = data?.photos[0] ?? data?.avatarUrl ?? null;
+  const canAddPhoto = data ? data.photos.length < 6 : false;
+  const completionWidth = completionAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0%', '100%'],
+  });
 
   if (loading) {
     return (
@@ -274,54 +355,41 @@ export default function Profile({ onSignOut }: ProfileProps) {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
-
-      <View style={styles.header}>
-        <Text style={styles.title}>Profile</Text>
-        {!editing ? (
-          <Pressable style={styles.editBtn} onPress={startEdit}>
-            <Text style={styles.editBtnText}>Edit</Text>
-          </Pressable>
-        ) : (
-          <View style={styles.editActions}>
-            <Pressable onPress={() => { setDraft(profile); setEditing(false); }}>
-              <Text style={styles.cancelText}>Cancel</Text>
-            </Pressable>
-            <Pressable style={styles.saveBtn} onPress={saveEdit} disabled={saving}>
-              <Text style={styles.saveBtnText}>{saving ? 'Saving...' : 'Save'}</Text>
-            </Pressable>
-          </View>
-        )}
-      </View>
+      <StatusBar style="light" />
 
       {error ? <Text style={styles.errorBanner}>{error}</Text> : null}
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <PhotoGrid
-          photos={data.photos}
-          onAddPhoto={handleAddPhoto}
-          onDeletePhoto={handleDeletePhoto}
-          uploading={uploadingPhoto}
-          maxPhotos={6}
-        />
-
-        <View style={styles.scrollContent}>
-        <View style={styles.profileSummary}>
-          {editing ? (
-            <TextInput
-              style={styles.summaryNameInput}
-              value={draft?.displayName}
-              onChangeText={(text) =>
-                setDraft((p) => (p ? { ...p, displayName: text } : p))
-              }
-              placeholder="Display name"
-              placeholderTextColor={COLORS.textMuted}
-            />
+        <View style={styles.hero}>
+          {heroPhotoUri ? (
+            <Image source={{ uri: heroPhotoUri }} style={styles.heroImage} resizeMode="cover" />
           ) : (
-            <Text style={styles.summaryName}>{data.displayName}</Text>
+            <View style={styles.heroPlaceholder}>
+              <Text style={styles.heroInitials}>{getInitials(data.displayName)}</Text>
+            </View>
           )}
-          <View style={styles.summaryMeta}>
-            <View style={styles.genotypeRow}>
+
+          <LinearGradient
+            colors={['transparent', 'rgba(13,40,24,0.95)']}
+            style={styles.heroGradient}
+            pointerEvents="none"
+          />
+
+          <View style={styles.heroOverlayContent}>
+            <View style={styles.heroNameRow}>
+              {editing ? (
+                <TextInput
+                  style={styles.heroNameInput}
+                  value={draft?.displayName}
+                  onChangeText={(text) =>
+                    setDraft((p) => (p ? { ...p, displayName: text } : p))
+                  }
+                  placeholder="Display name"
+                  placeholderTextColor="rgba(255,255,255,0.5)"
+                />
+              ) : (
+                <Text style={styles.heroName}>{data.displayName}</Text>
+              )}
               <GenotypeBadge genotype={data.genotype} />
               {data.genotypeVerified ? (
                 <Ionicons
@@ -332,41 +400,135 @@ export default function Profile({ onSignOut }: ProfileProps) {
                 />
               ) : null}
             </View>
-            <Text style={styles.summaryMetaText}>
-              {data.age ? `${data.age} · ` : ''}
-              {data.city}
-            </Text>
+
+            {editing ? (
+              <TextInput
+                style={styles.heroLocationInput}
+                value={draft?.city}
+                onChangeText={(text) => setDraft((p) => (p ? { ...p, city: text } : p))}
+                placeholder="City"
+                placeholderTextColor="rgba(143, 175, 149, 0.7)"
+              />
+            ) : (
+              <Text style={styles.heroLocation}>
+                {data.age ? `${data.age} · ` : ''}
+                {data.city}
+              </Text>
+            )}
           </View>
 
-          {!data.genotypeVerified ? (
+          <View style={styles.heroEditFloating}>
+            {!editing ? (
+              <Pressable style={styles.editPill} onPress={startEdit}>
+                <Text style={styles.editPillText}>Edit</Text>
+              </Pressable>
+            ) : (
+              <View style={styles.editPillRow}>
+                <Pressable
+                  style={styles.cancelPill}
+                  onPress={() => {
+                    setDraft(profile);
+                    setEditing(false);
+                  }}
+                >
+                  <Text style={styles.cancelPillText}>Cancel</Text>
+                </Pressable>
+                <Pressable style={styles.savePill} onPress={saveEdit} disabled={saving}>
+                  <Text style={styles.savePillText}>{saving ? 'Saving...' : 'Save'}</Text>
+                </Pressable>
+              </View>
+            )}
+          </View>
+        </View>
+
+        <View style={styles.infoCard}>
+          <View style={styles.strengthHeader}>
+            <Text style={styles.strengthTitle}>Profile Strength</Text>
+            <Text style={styles.strengthPercent}>{completionPercent}%</Text>
+          </View>
+          <View style={styles.strengthTrack}>
+            <Animated.View style={[styles.strengthFill, { width: completionWidth }]} />
+          </View>
+          <Text style={styles.strengthHint}>{getStrengthLabel(completionPercent)}</Text>
+        </View>
+
+        <View style={styles.statsCard}>
+          <View style={styles.statItem}>
+            <Text style={styles.statValue}>{stats.matches}</Text>
+            <Text style={styles.statLabel}>Matches</Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statItem}>
+            <Text style={styles.statValue}>{stats.likesReceived}</Text>
+            <Text style={styles.statLabel}>Likes Received</Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statItem}>
+            <Text style={styles.statValue}>{stats.profileViews}</Text>
+            <Text style={styles.statLabel}>Profile Views</Text>
+          </View>
+        </View>
+
+        <View style={styles.infoCard}>
+          <Text style={styles.sectionLabel}>Photos</Text>
+          <View style={styles.photoGrid}>
+            {data.photos.map((uri, index) => (
+              <View key={`${uri}-${index}`} style={styles.photoCell}>
+                <Image source={{ uri }} style={styles.photoThumb} resizeMode="cover" />
+                {index === 0 ? (
+                  <View style={styles.mainPhotoBadge}>
+                    <Text style={styles.mainPhotoBadgeText}>Main</Text>
+                  </View>
+                ) : null}
+                <Pressable
+                  style={({ pressed }) => [styles.photoDeleteBtn, pressed && styles.pressed]}
+                  onPress={() => handleDeletePhoto(index)}
+                  accessibilityLabel="Delete photo"
+                >
+                  <Ionicons name="close" size={14} color={COLORS.white} />
+                </Pressable>
+              </View>
+            ))}
+
+            {canAddPhoto ? (
+              <Pressable
+                style={({ pressed }) => [
+                  styles.photoCell,
+                  styles.photoAddCell,
+                  pressed && styles.pressed,
+                ]}
+                onPress={handleAddPhoto}
+                disabled={uploadingPhoto}
+              >
+                {uploadingPhoto ? (
+                  <ActivityIndicator color="#D4A843" size="small" />
+                ) : (
+                  <>
+                    <Text style={styles.photoAddPlus}>+</Text>
+                  </>
+                )}
+              </Pressable>
+            ) : null}
+          </View>
+        </View>
+
+        {!data.genotypeVerified ? (
+          <View style={styles.infoCard}>
             <View style={styles.verifyBanner}>
               <Text style={styles.verifyBannerText}>
                 Verify your genotype to build trust with matches
               </Text>
               <Pressable
-                style={({ pressed }) => [styles.verifyBtn, pressed && styles.verifyBtnPressed]}
+                style={({ pressed }) => [styles.verifyBtn, pressed && styles.pressed]}
                 onPress={() => setShowVerifyModal(true)}
               >
                 <Text style={styles.verifyBtnText}>Verify</Text>
               </Pressable>
             </View>
-          ) : null}
-        </View>
+          </View>
+        ) : null}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>City</Text>
-          {editing ? (
-            <TextInput
-              style={styles.fieldInput}
-              value={draft?.city}
-              onChangeText={(text) => setDraft((p) => (p ? { ...p, city: text } : p))}
-            />
-          ) : (
-            <Text style={styles.sectionValue}>{data.city}</Text>
-          )}
-        </View>
-
-        <View style={styles.section}>
+        <View style={styles.infoCard}>
           <Text style={styles.sectionLabel}>Bio</Text>
           {editing ? (
             <TextInput
@@ -382,13 +544,13 @@ export default function Profile({ onSignOut }: ProfileProps) {
           )}
         </View>
 
-        <View style={styles.section}>
+        <View style={styles.infoCard}>
           <Text style={styles.sectionLabel}>Interests</Text>
           <View style={styles.chipRow}>
             {data.interests.length > 0 ? (
               data.interests.map((interest) => (
-                <View key={interest} style={styles.chip}>
-                  <Text style={styles.chipText}>{interest}</Text>
+                <View key={interest} style={styles.chipMint}>
+                  <Text style={styles.chipMintText}>{interest}</Text>
                 </View>
               ))
             ) : (
@@ -397,36 +559,35 @@ export default function Profile({ onSignOut }: ProfileProps) {
           </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Relationship goal</Text>
-          <View style={styles.goalCard}>
-            <Text style={styles.goalText}>{goalLabel}</Text>
-          </View>
+        <View style={styles.goalCard}>
+          <Text style={styles.sectionLabel}>Relationship Goal</Text>
+          <Text style={styles.goalValue}>{goalLabel}</Text>
         </View>
 
-        <Pressable
-          style={({ pressed }) => [styles.privacyLink, pressed && styles.privacyLinkPressed]}
-          onPress={() => setShowCommunityGuidelines(true)}
-        >
-          <Text style={styles.privacyLinkText}>Community Guidelines</Text>
-        </Pressable>
+        <View style={styles.footerCard}>
+          <Pressable
+            style={({ pressed }) => [styles.privacyLink, pressed && styles.pressed]}
+            onPress={() => setShowCommunityGuidelines(true)}
+          >
+            <Text style={styles.privacyLinkText}>Community Guidelines</Text>
+          </Pressable>
 
-        <Pressable
-          style={({ pressed }) => [styles.privacyLink, pressed && styles.privacyLinkPressed]}
-          onPress={() => setShowPrivacy(true)}
-        >
-          <Text style={styles.privacyLinkText}>Privacy Policy</Text>
-        </Pressable>
+          <Pressable
+            style={({ pressed }) => [styles.privacyLink, pressed && styles.pressed]}
+            onPress={() => setShowPrivacy(true)}
+          >
+            <Text style={styles.privacyLinkText}>Privacy Policy</Text>
+          </Pressable>
 
-        <Pressable
-          style={[styles.signOutBtn, signingOut && styles.signOutBtnDisabled]}
-          onPress={handleSignOut}
-          disabled={signingOut}
-        >
-          <Text style={styles.signOutText}>
-            {signingOut ? 'Signing out...' : 'Sign Out'}
-          </Text>
-        </Pressable>
+          <Pressable
+            style={[styles.signOutBtn, signingOut && styles.signOutBtnDisabled]}
+            onPress={handleSignOut}
+            disabled={signingOut}
+          >
+            <Text style={styles.signOutText}>
+              {signingOut ? 'Signing out...' : 'Sign Out'}
+            </Text>
+          </Pressable>
         </View>
       </ScrollView>
 
@@ -446,7 +607,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
             <Pressable
               style={({ pressed }) => [
                 styles.modalConfirmBtn,
-                pressed && styles.verifyBtnPressed,
+                pressed && styles.pressed,
                 verifying && styles.modalBtnDisabled,
               ]}
               onPress={handleConfirmVerification}
@@ -475,37 +636,344 @@ export default function Profile({ onSignOut }: ProfileProps) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.linen },
   centered: { alignItems: 'center', justifyContent: 'center' },
-  header: {
+  scroll: { paddingBottom: 36 },
+  hero: {
+    width: '100%',
+    height: HERO_HEIGHT,
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  heroImage: {
+    width: '100%',
+    height: HERO_HEIGHT,
+  },
+  heroPlaceholder: {
+    width: '100%',
+    height: HERO_HEIGHT,
+    backgroundColor: '#1A3D28',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  heroInitials: {
+    fontSize: 80,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    letterSpacing: 4,
+  },
+  heroGradient: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: HERO_HEIGHT * 0.5,
+  },
+  heroOverlayContent: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    paddingHorizontal: 20,
+    paddingBottom: 22,
+    zIndex: 2,
+  },
+  heroNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginBottom: 6,
+  },
+  heroName: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    letterSpacing: -0.3,
+    flexShrink: 1,
+  },
+  heroNameInput: {
+    fontSize: 26,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    borderBottomWidth: 2,
+    borderBottomColor: 'rgba(255,255,255,0.4)',
+    paddingVertical: 2,
+    minWidth: 140,
+    flexShrink: 1,
+  },
+  heroLocation: {
+    fontFamily: 'Satoshi-Medium',
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#8FAF95',
+  },
+  heroLocationInput: {
+    fontFamily: 'Satoshi-Medium',
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#8FAF95',
+    borderBottomWidth: 1.5,
+    borderBottomColor: 'rgba(143, 175, 149, 0.55)',
+    paddingVertical: 2,
+    minWidth: 120,
+  },
+  heroEditFloating: {
+    position: 'absolute',
+    top: 54,
+    right: 16,
+    zIndex: 10,
+  },
+  editPill: {
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 999,
+    backgroundColor: '#D4A843',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.22,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  editPillText: {
+    color: '#0D2818',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  editPillRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  cancelPill: {
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 999,
+    backgroundColor: 'rgba(255,255,255,0.92)',
+  },
+  cancelPillText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: 'rgba(13, 40, 24, 0.65)',
+  },
+  savePill: {
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 999,
+    backgroundColor: '#D4A843',
+  },
+  savePillText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#0D2818',
+  },
+  infoCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    marginHorizontal: 16,
+    marginTop: 12,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 3,
+  },
+  footerCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    marginHorizontal: 16,
+    marginTop: 12,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 3,
+  },
+  strengthHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: 58,
-    paddingHorizontal: 24,
-    paddingBottom: 12,
+    marginBottom: 10,
   },
-  title: {
-    ...TYPOGRAPHY.display,
-    fontFamily: 'ClashDisplay-Semibold',
+  strengthTitle: {
+    fontFamily: 'Satoshi-Medium',
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.forest,
   },
-  editBtn: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+  strengthPercent: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#D4A843',
+  },
+  strengthTrack: {
+    height: 8,
     borderRadius: 999,
-    backgroundColor: COLORS.forest,
-  },
-  editBtnText: { color: COLORS.linen, fontSize: 14, fontWeight: '700' },
-  editActions: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  cancelText: { fontSize: 14, fontWeight: '700', color: 'rgba(13, 40, 24, 0.6)' },
-  saveBtn: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 999,
-    backgroundColor: COLORS.gold,
-  },
-  saveBtnText: { fontSize: 14, fontWeight: '700', color: COLORS.forest },
-  errorBanner: {
-    marginHorizontal: 20,
+    backgroundColor: 'rgba(143, 175, 149, 0.25)',
+    overflow: 'hidden',
     marginBottom: 8,
+  },
+  strengthFill: {
+    height: 8,
+    borderRadius: 999,
+    backgroundColor: '#D4A843',
+  },
+  strengthHint: {
+    fontFamily: 'Satoshi-Medium',
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#8FAF95',
+  },
+  statsCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    marginHorizontal: 16,
+    marginTop: 12,
+    paddingVertical: 18,
+    paddingHorizontal: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 3,
+  },
+  statItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  statValue: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: '#D4A843',
+    marginBottom: 4,
+  },
+  statLabel: {
+    fontFamily: 'Satoshi-Medium',
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#8FAF95',
+    textAlign: 'center',
+  },
+  statDivider: {
+    width: 1,
+    height: 40,
+    backgroundColor: 'rgba(143, 175, 149, 0.35)',
+  },
+  sectionLabel: {
+    fontFamily: 'Satoshi-Medium',
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#8FAF95',
+    letterSpacing: 1.5,
+    textTransform: 'uppercase',
+    marginBottom: 10,
+  },
+  sectionValue: {
+    fontFamily: 'Satoshi-Medium',
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.forest,
+  },
+  photoGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: PHOTO_GAP,
+  },
+  photoCell: {
+    width: PHOTO_CELL_SIZE,
+    aspectRatio: 1,
+    borderRadius: 12,
+    overflow: 'hidden',
+    backgroundColor: COLORS.linen,
+  },
+  photoCellSpacer: {
+    width: PHOTO_CELL_SIZE,
+    aspectRatio: 1,
+  },
+  photoThumb: {
+    width: '100%',
+    height: '100%',
+  },
+  mainPhotoBadge: {
+    position: 'absolute',
+    left: 6,
+    bottom: 6,
+    backgroundColor: '#D4A843',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 999,
+  },
+  mainPhotoBadgeText: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: '#0D2818',
+  },
+  photoDeleteBtn: {
+    position: 'absolute',
+    top: 6,
+    right: 6,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: COLORS.error,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  photoAddCell: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(212, 168, 67, 0.08)',
+    borderWidth: 2,
+    borderStyle: 'dashed',
+    borderColor: '#D4A843',
+  },
+  photoAddPlus: {
+    fontSize: 34,
+    fontWeight: '300',
+    color: '#D4A843',
+    lineHeight: 36,
+  },
+  pressed: { opacity: 0.88 },
+  goalCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    marginHorizontal: 16,
+    marginTop: 12,
+    padding: 16,
+    borderWidth: 2,
+    borderColor: '#D4A843',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 3,
+  },
+  goalValue: {
+    fontFamily: 'Satoshi-Medium',
+    fontSize: 17,
+    fontWeight: '700',
+    color: COLORS.forest,
+  },
+  chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  chipMint: {
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 999,
+    backgroundColor: COLORS.mint,
+  },
+  chipMintText: {
+    fontFamily: 'Satoshi-Medium',
+    fontSize: 13,
+    fontWeight: '600',
+    color: COLORS.forest,
+  },
+  errorBanner: {
+    fontFamily: 'Satoshi-Medium',
+    marginHorizontal: 16,
+    marginTop: 8,
+    marginBottom: 4,
     padding: 10,
     borderRadius: 10,
     backgroundColor: COLORS.errorBg,
@@ -513,8 +981,15 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
     textAlign: 'center',
+    zIndex: 20,
   },
-  errorText: { color: 'rgba(13, 40, 24, 0.6)', fontSize: 15, fontWeight: '600', textAlign: 'center' },
+  errorText: {
+    fontFamily: 'Satoshi-Medium',
+    color: 'rgba(13, 40, 24, 0.6)',
+    fontSize: 15,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
   retryBtn: {
     marginTop: 16,
     backgroundColor: COLORS.forest,
@@ -523,63 +998,19 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   retryText: { color: COLORS.linen, fontWeight: '700' },
-  scroll: { paddingBottom: 24 },
-  scrollContent: { paddingHorizontal: 20 },
-  profileSummary: {
-    backgroundColor: COLORS.white,
-    borderRadius: 18,
-    padding: 16,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  summaryName: {
-    fontSize: 26,
-    fontWeight: '700',
-    color: COLORS.forest,
-    letterSpacing: -0.5,
-  },
-  summaryNameInput: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: COLORS.forest,
-    borderBottomWidth: 2,
-    borderBottomColor: COLORS.sage,
-    paddingVertical: 4,
-    marginBottom: 4,
-  },
-  summaryMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: 10,
-    marginTop: 8,
-  },
-  summaryMetaText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.textMuted,
-  },
-  genotypeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
   verifyBanner: {
-    marginTop: 14,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 12,
-    backgroundColor: 'rgba(212, 168, 67, 0.35)',
+    backgroundColor: 'rgba(212, 168, 67, 0.2)',
     borderRadius: 12,
     paddingVertical: 12,
-    paddingHorizontal: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(201, 135, 43, 0.2)',
+    paddingHorizontal: 12,
   },
   verifyBannerText: {
     flex: 1,
+    fontFamily: 'Satoshi-Medium',
     fontSize: 13,
     fontWeight: '600',
     color: COLORS.forest,
@@ -587,18 +1018,58 @@ const styles = StyleSheet.create({
   },
   verifyBtn: {
     backgroundColor: COLORS.gold,
-    paddingHorizontal: 16,
+    paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 10,
   },
-  verifyBtnPressed: {
-    opacity: 0.9,
-  },
   verifyBtnText: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '800',
     color: COLORS.forest,
   },
+  fieldInput: {
+    fontFamily: 'Satoshi-Medium',
+    fontSize: 16,
+    fontWeight: '500',
+    color: COLORS.forest,
+    borderWidth: 1.5,
+    borderColor: 'rgba(13, 40, 24, 0.12)',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    backgroundColor: COLORS.linen,
+  },
+  bioInput: { minHeight: 100 },
+  bio: {
+    fontFamily: 'Satoshi-Medium',
+    fontSize: 15,
+    lineHeight: 23,
+    color: 'rgba(13, 40, 24, 0.78)',
+    fontWeight: '500',
+  },
+  privacyLink: {
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  privacyLinkText: {
+    fontFamily: 'Satoshi-Medium',
+    fontSize: 15,
+    fontWeight: '600',
+    color: COLORS.forest,
+    textDecorationLine: 'underline',
+  },
+  signOutBtn: {
+    marginTop: 4,
+    height: 52,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: 'rgba(163, 45, 45, 0.35)',
+    backgroundColor: '#0D2818',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  signOutBtnDisabled: { opacity: 0.6 },
+  signOutText: { fontSize: 16, fontWeight: '600', color: '#FFFFFF' },
   modalBackdrop: {
     flex: 1,
     backgroundColor: 'rgba(13, 40, 24, 0.5)',
@@ -623,6 +1094,7 @@ const styles = StyleSheet.create({
     letterSpacing: -0.3,
   },
   modalBody: {
+    fontFamily: 'Satoshi-Medium',
     fontSize: 15,
     lineHeight: 22,
     color: COLORS.textMuted,
@@ -653,81 +1125,4 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: COLORS.forest,
   },
-  section: {
-    backgroundColor: COLORS.white,
-    borderRadius: 18,
-    padding: 16,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(13, 40, 24, 0.08)',
-  },
-  sectionLabel: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: COLORS.sage,
-    letterSpacing: 1.2,
-    textTransform: 'uppercase',
-    marginBottom: 8,
-  },
-  sectionValue: { fontSize: 16, fontWeight: '600', color: COLORS.forest },
-  fieldInput: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: COLORS.forest,
-    borderWidth: 1.5,
-    borderColor: 'rgba(13, 40, 24, 0.12)',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    backgroundColor: COLORS.linen,
-  },
-  bioInput: { minHeight: 100 },
-  bio: {
-    fontSize: 15,
-    lineHeight: 23,
-    color: 'rgba(13, 40, 24, 0.78)',
-    fontWeight: '500',
-  },
-  chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  chip: {
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 999,
-    backgroundColor: 'rgba(143, 175, 149, 0.35)',
-  },
-  chipText: { fontSize: 13, fontWeight: '600', color: COLORS.forest },
-  goalCard: {
-    backgroundColor: 'rgba(212, 168, 67, 0.35)',
-    borderRadius: 12,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(201, 135, 43, 0.25)',
-  },
-  goalText: { fontSize: 16, fontWeight: '600', color: COLORS.forest },
-  privacyLink: {
-    marginTop: 4,
-    paddingVertical: 14,
-    alignItems: 'center',
-  },
-  privacyLinkPressed: {
-    opacity: 0.75,
-  },
-  privacyLinkText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: COLORS.forest,
-    textDecorationLine: 'underline',
-  },
-  signOutBtn: {
-    marginTop: 8,
-    height: 54,
-    borderRadius: 16,
-    borderWidth: 1.5,
-    borderColor: 'rgba(163, 45, 45, 0.35)',
-    backgroundColor: COLORS.errorBg,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  signOutBtnDisabled: { opacity: 0.6 },
-  signOutText: { fontSize: 16, fontWeight: '600', color: COLORS.error },
 });

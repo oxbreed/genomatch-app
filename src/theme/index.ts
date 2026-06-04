@@ -2,7 +2,8 @@ export { COLORS, FOREST_DEEP, FOREST, GOLD, LINEN, SAGE, MINT, WHITE } from './c
 export { TYPOGRAPHY, FONT_FAMILY } from './typography';
 export { RADIUS, SHADOWS } from './shadows';
 
-/** Load with `useFonts(FONTS_TO_LOAD)` in App.tsx before rendering UI */
+/** Load with `useFonts(FONTS_TO_LOAD)` in App.tsx before rendering UI.
+ *  PostScript names must match `fontFamily` in styles (see FONT_FAMILY in typography.ts). */
 export const FONTS_TO_LOAD = {
   'ClashDisplay-Semibold': require('../../assets/fonts/ClashDisplay-Semibold.otf'),
   'ClashDisplay-Medium': require('../../assets/fonts/ClashDisplay-Medium.otf'),

@@ -1,6 +1,19 @@
 import { DimensionValue, Image, StyleSheet, Text, View } from 'react-native';
 import { COLORS, getInitials } from '../data/mockData';
 
+// Brand-safe gradient pairs — no purple, no off-brand colors
+const BRAND_GRADIENTS: [string, string][] = [
+  [COLORS.forest, COLORS.forestDeep],
+  [COLORS.forestDeep, '#0A1F12'],
+  ['#1A3D28', '#0D2818'],
+  ['#2A5438', '#1A3D28'],
+];
+
+function getBrandGradient(name: string): [string, string] {
+  const index = name.charCodeAt(0) % BRAND_GRADIENTS.length;
+  return BRAND_GRADIENTS[index];
+}
+
 type ProfileAvatarProps = {
   name: string;
   gradient: [string, string];
@@ -11,11 +24,12 @@ type ProfileAvatarProps = {
   borderRadius?: number;
   initialsPosition?: 'top' | 'center';
   initialsOpacity?: number;
+  noPhotoBackground?: string;
+  noPhotoInitialColor?: string;
 };
 
 export default function ProfileAvatar({
   name,
-  gradient,
   size = 56,
   avatarUrl,
   width,
@@ -23,7 +37,12 @@ export default function ProfileAvatar({
   borderRadius,
   initialsPosition = 'center',
   initialsOpacity = 1,
+  noPhotoBackground,
+  noPhotoInitialColor,
 }: ProfileAvatarProps) {
+  // Always use brand gradient — ignore whatever mockData passes
+  const gradient = getBrandGradient(name);
+
   const isCover = height != null;
   const outerWidth = isCover ? (width ?? size) : size;
   const outerHeight = isCover ? height : size;
@@ -34,15 +53,18 @@ export default function ProfileAvatar({
     ? isTopInitials
       ? outerHeight * 0.34
       : outerHeight * 0.28
-    : size * 0.32;
+    : size * 0.36;
   const hasPhoto = Boolean(avatarUrl?.trim());
   const initials = getInitials(name);
+  const fallbackBg = noPhotoBackground ?? gradient[0];
+  const fallbackInnerBg = noPhotoBackground ?? gradient[1];
+  const initialColor = noPhotoInitialColor ?? COLORS.linen;
 
   const initialsNode = (
     <Text
       style={[
         styles.initials,
-        { fontSize, opacity: initialsOpacity },
+        { fontSize, color: initialColor, opacity: initialsOpacity },
         isTopInitials && styles.initialsTop,
       ]}
     >
@@ -58,7 +80,7 @@ export default function ProfileAvatar({
           width: outerWidth,
           height: outerHeight,
           borderRadius: outerRadius,
-          backgroundColor: hasPhoto ? COLORS.white : gradient[0],
+          backgroundColor: hasPhoto ? COLORS.white : fallbackBg,
           borderWidth: hasPhoto && !isCover ? 2 : 0,
           borderColor: 'rgba(168, 213, 186, 0.5)',
         },
@@ -69,16 +91,8 @@ export default function ProfileAvatar({
           source={{ uri: avatarUrl! }}
           style={
             isCover
-              ? {
-                  width: '100%',
-                  height: '100%',
-                  borderRadius: outerRadius,
-                }
-              : {
-                  width: size - 4,
-                  height: size - 4,
-                  borderRadius: (size - 4) / 2,
-                }
+              ? { width: '100%', height: '100%', borderRadius: outerRadius }
+              : { width: size - 4, height: size - 4, borderRadius: (size - 4) / 2 }
           }
           resizeMode="cover"
         />
@@ -87,10 +101,7 @@ export default function ProfileAvatar({
           style={[
             styles.coverFallback,
             StyleSheet.absoluteFillObject,
-            {
-              borderRadius: outerRadius,
-              backgroundColor: gradient[1],
-            },
+            { borderRadius: outerRadius, backgroundColor: fallbackInnerBg },
           ]}
         >
           {!isTopInitials ? initialsNode : null}
@@ -103,7 +114,7 @@ export default function ProfileAvatar({
               width: innerSize,
               height: innerSize,
               borderRadius: innerSize / 2,
-              backgroundColor: gradient[1],
+              backgroundColor: fallbackInnerBg,
             },
           ]}
         >
@@ -144,7 +155,6 @@ const styles = StyleSheet.create({
   },
   initials: {
     fontWeight: '800',
-    color: COLORS.white,
     letterSpacing: 0.5,
   },
 });
