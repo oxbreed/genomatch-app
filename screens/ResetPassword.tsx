@@ -57,7 +57,7 @@ export default function ResetPassword({ email, onSuccess }: ResetPasswordProps) 
   const handleSubmit = async () => {
     if (requiresOtp) {
       const trimmedOtp = otpCode.trim();
-      if (!trimmedOtp || trimmedOtp.length < 6) {
+      if (!trimmedOtp || trimmedOtp.length !== 6) {
         setError('Please enter the 6-digit code from your email.');
         return;
       }
@@ -140,13 +140,13 @@ export default function ResetPassword({ email, onSuccess }: ResetPasswordProps) 
               <TextInput
                 style={styles.otpInput}
                 value={otpCode}
-                onChangeText={(text) => setOtpCode(text.replace(/\D/g, '').slice(0, 8))}
+                onChangeText={(text) => setOtpCode(text.replace(/\D/g, '').slice(0, 6))}
                 placeholder="000000"
                 placeholderTextColor="rgba(27, 122, 110, 0.35)"
                 keyboardType="number-pad"
                 autoComplete="one-time-code"
                 textContentType="oneTimeCode"
-                maxLength={8}
+                maxLength={6}
               />
             </>
           ) : null}
