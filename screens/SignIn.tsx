@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   Animated,
   Easing,
   KeyboardAvoidingView,
@@ -113,6 +114,24 @@ export default function SignIn({ onBack, onCreateAccount, onSignedIn }: SignInPr
     }).start();
   };
 
+  const handleForgotPassword = async () => {
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail) {
+      Alert.alert('Please enter your email address first.');
+      return;
+    }
+
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(trimmedEmail);
+    if (resetError) {
+      setError(resetError.message);
+      return;
+    }
+
+    Alert.alert(
+      'Password reset email sent! Check your inbox and follow the link to reset your password.'
+    );
+  };
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -187,6 +206,10 @@ export default function SignIn({ onBack, onCreateAccount, onSignedIn }: SignInPr
             autoComplete="password"
             textContentType="password"
           />
+
+          <Pressable style={styles.forgotPasswordRow} onPress={() => void handleForgotPassword()}>
+            <Text style={styles.forgotPasswordText}>Forgot password?</Text>
+          </Pressable>
 
           <View style={styles.trustBox}>
             <View style={styles.trustRow}>
@@ -340,6 +363,15 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginBottom: 8,
     opacity: 0.75,
+  },
+  forgotPasswordRow: {
+    alignSelf: 'flex-end',
+    marginTop: 8,
+  },
+  forgotPasswordText: {
+    color: COLORS.gold,
+    fontSize: 13,
+    fontWeight: '600',
   },
   trustBox: {
     marginTop: 16,
