@@ -32,6 +32,7 @@ export default function SignIn({
   onBack,
   onCreateAccount,
   onSignedIn,
+  onNavigateResetPassword,
 }: SignInProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -137,7 +138,7 @@ export default function SignIn({
     Alert.alert(
       'Check your email',
       'We sent a password reset link to ' + email.trim() + '. Open it on this phone to reset your password.',
-      [{ text: 'OK' }]
+      [{ text: 'OK', onPress: () => onNavigateResetPassword(email.trim()) }]
     );
   };
 
