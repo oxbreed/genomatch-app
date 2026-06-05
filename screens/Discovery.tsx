@@ -13,6 +13,7 @@ import {
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import EmptyState from '../src/components/EmptyState';
@@ -23,7 +24,7 @@ import FilterSheet, {
   hasActiveDiscoveryFilters,
   type DiscoveryFilters,
 } from '../src/components/FilterSheet';
-import { DiscoverMatchModal, DiscoverSeenAllState } from '../src/components/discover';
+import { DiscoverMatchModal } from '../src/components/discover';
 import { GenoInboxHeader, GenoInboxIconButton } from '../src/components/inbox';
 import { getDiscoveryCardHeight } from '../src/components/navigation/tabBarLayout';
 import { GenoPremiumChrome } from '../src/brand/graphics';
@@ -586,6 +587,14 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
     resetCardAnimation();
   }, [filters, resetCardAnimation]);
 
+
+  useEffect(() => {
+    if (!seenAll) return;
+    setProfileSheetVisible(false);
+    setShowModerationSheet(false);
+    resetCardAnimation();
+  }, [seenAll, resetCardAnimation]);
+
   const advanceProfile = useCallback(() => {
     setIndex((prev) => prev + 1);
   }, []);
@@ -897,11 +906,39 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
               />
             </View>
           ) : seenAll ? (
-            <DiscoverSeenAllState
-              reviewedCount={index}
-              onBrowseAgain={() => { setIndex(0); void loadProfiles(); }}
-              onAdjustFilters={() => setShowFilterSheet(true)}
-            />
+            <View style={styles.seenAllWrap}>
+              <LinearGradient
+                colors={['rgba(212, 168, 67, 0.42)', 'rgba(61, 122, 82, 0.22)', 'rgba(212, 168, 67, 0.38)']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.seenAllBorder}
+              >
+                <View style={styles.seenAllCard}>
+                  <View style={styles.seenAllIconWrap}>
+                    <Ionicons name="checkmark-done-outline" size={28} color={COLORS.forestDeep} />
+                  </View>
+                  <Text style={styles.seenAllTitle}>You've seen everyone for now</Text>
+                  <Text style={styles.seenAllSubtext}>Check back soon for new matches</Text>
+                  <Pressable
+                    style={({ pressed }) => [styles.refreshBtnWrap, pressed && styles.btnPressed]}
+                    onPress={() => {
+                      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      void loadProfiles();
+                    }}
+                  >
+                    <LinearGradient
+                      colors={[COLORS.gold, '#C49A38']}
+                      start={{ x: 0, y: 0.5 }}
+                      end={{ x: 1, y: 0.5 }}
+                      style={styles.refreshBtn}
+                    >
+                      <Ionicons name="refresh" size={18} color={COLORS.forestDeep} />
+                      <Text style={styles.refreshBtnText}>Refresh</Text>
+                    </LinearGradient>
+                  </Pressable>
+                </View>
+              </LinearGradient>
+            </View>
           ) : (
             <View style={styles.deckColumn}>
               <View style={styles.deckCardSlot}>
@@ -1736,6 +1773,77 @@ const styles = StyleSheet.create({
     color: COLORS.linen,
     fontWeight: '800',
     fontSize: 15,
+  },
+
+  seenAllWrap: {
+    flex: 1,
+    width: '100%',
+    justifyContent: 'center',
+    paddingHorizontal: 8,
+  },
+  seenAllBorder: {
+    borderRadius: RADIUS.xl,
+    padding: 1.5,
+    ...SHADOWS.cardElevated,
+    shadowColor: COLORS.gold,
+    shadowOpacity: 0.16,
+  },
+  seenAllCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: RADIUS.xl - 1.5,
+    paddingHorizontal: 28,
+    paddingVertical: 32,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(212, 168, 67, 0.2)',
+  },
+  seenAllIconWrap: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: COLORS.mint,
+    borderWidth: 1,
+    borderColor: 'rgba(212, 168, 67, 0.35)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 18,
+  },
+  seenAllTitle: {
+    fontFamily: 'ClashDisplay-Semibold',
+    fontSize: 24,
+    lineHeight: 30,
+    letterSpacing: -0.4,
+    color: COLORS.forestDeep,
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  seenAllSubtext: {
+    fontFamily: 'Satoshi-Medium',
+    fontSize: 15,
+    lineHeight: 22,
+    color: COLORS.sage,
+    textAlign: 'center',
+    marginBottom: 24,
+    maxWidth: 280,
+  },
+  refreshBtnWrap: {
+    width: '100%',
+    borderRadius: RADIUS.xl,
+    overflow: 'hidden',
+    ...SHADOWS.button,
+  },
+  refreshBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    height: 52,
+    paddingHorizontal: 24,
+  },
+  refreshBtnText: {
+    fontFamily: 'Satoshi-Bold',
+    fontSize: 16,
+    color: COLORS.forestDeep,
   },
   emptyState: {
     flex: 1,

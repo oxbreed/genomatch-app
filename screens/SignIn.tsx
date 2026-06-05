@@ -4,6 +4,7 @@ import {
   Animated,
   Easing,
   KeyboardAvoidingView,
+  Linking,
   Platform,
   Pressable,
   ScrollView,
@@ -222,6 +223,16 @@ export default function SignIn({ onBack, onCreateAccount, onSignedIn }: SignInPr
               New to GenoMatch? <Text style={styles.createBold}>Create account</Text>
             </Text>
           </Pressable>
+
+          <Text style={styles.legalText}>
+            By continuing you agree to our Terms of Service and{' '}
+            <Text
+              style={styles.legalLink}
+              onPress={() => void Linking.openURL('https://genomatch.app/privacy')}
+            >
+              Privacy Policy
+            </Text>
+          </Text>
         </Animated.View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -391,5 +402,18 @@ const styles = StyleSheet.create({
   createBold: {
     color: COLORS.forest,
     fontWeight: '700',
+  },
+  legalText: {
+    textAlign: 'center',
+    color: 'rgba(27, 122, 110, 0.55)',
+    fontSize: 12,
+    lineHeight: 18,
+    fontWeight: '500',
+    paddingBottom: 4,
+  },
+  legalLink: {
+    color: COLORS.forest,
+    fontWeight: '700',
+    textDecorationLine: 'underline',
   },
 });

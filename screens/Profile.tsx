@@ -15,11 +15,11 @@ import {
 import { StatusBar } from 'expo-status-bar';
 import CommunityGuidelines from './CommunityGuidelines';
 import PrivacyPolicy from './PrivacyPolicy';
-import { GenoPremiumChrome, GenoLogoCeremony } from '../src/brand/graphics';
+import { GenoCardFrame, GenoPremiumChrome, GenoLogoCeremony } from '../src/brand/graphics';
+import { Ionicons } from '@expo/vector-icons';
 import { GenoInboxHeader, GenoInboxIconButton } from '../src/components/inbox';
 import {
   ProfileEditFields,
-  ProfileFooterCard,
   ProfileGenotypeVerifyModal,
   ProfileHero,
   ProfilePhotosGrid,
@@ -43,7 +43,8 @@ import {
   type StudioStep,
 } from '../src/components/profileStudio';
 import { GENO_TAB_BAR_HEIGHT } from '../src/components/navigation/tabBarLayout';
-import { COLORS } from '../src/theme';
+import { PROFILE } from '../src/components/profile/profileTokens';
+import { COLORS, RADIUS } from '../src/theme';
 import { uploadAdditionalPhoto } from '../src/lib/photoUpload';
 import { mapProfileRow } from '../src/lib/profileMapper';
 import { logAuthState } from '../src/lib/auth';
@@ -311,6 +312,13 @@ export default function Profile({ onSignOut }: ProfileProps) {
     setProfile((p) => (p ? apply(p) : p));
   };
 
+  const requestDeleteAccount = () => {
+    Alert.alert(
+      'Delete Account',
+      'Are you sure you want to delete your account? This cannot be undone. Please email hello@genomatch.app to complete deletion.'
+    );
+  };
+
   const requestVerification = async () => {
     try {
       const row = await getCurrentProfile();
@@ -573,29 +581,64 @@ export default function Profile({ onSignOut }: ProfileProps) {
                 />
               </ProfileSectionCard>
 
-              <ProfileFooterCard
-                signingOut={signingOut}
-                onCommunity={() => setShowCommunityGuidelines(true)}
-                onPrivacy={() => setShowPrivacy(true)}
-                onSignOut={() => {
-                  Alert.alert('Sign Out', 'Are you sure?', [
-                    { text: 'Cancel', style: 'cancel' },
-                    {
-                      text: 'Sign Out',
-                      style: 'destructive',
-                      onPress: async () => {
-                        setSigningOut(true);
-                        try {
-                          await supabase.auth.signOut();
-                        } finally {
-                          setSigningOut(false);
-                          onSignOut?.();
-                        }
-                      },
-                    },
-                  ]);
-                }}
-              />
+              <GenoCardFrame showWatermark={false}>
+                <View style={styles.footerInner}>
+                  <Pressable
+                    style={({ pressed }) => [styles.footerLink, pressed && styles.footerLinkPressed]}
+                    onPress={() => setShowCommunityGuidelines(true)}
+                  >
+                    <Text style={styles.footerLinkText}>Community Guidelines</Text>
+                    <Ionicons name="chevron-forward" size={16} color={COLORS.sage} />
+                  </Pressable>
+                  <View style={styles.footerDivider} />
+                  <Pressable
+                    style={({ pressed }) => [styles.footerLink, pressed && styles.footerLinkPressed]}
+                    onPress={() => setShowPrivacy(true)}
+                  >
+                    <Text style={styles.footerLinkText}>Privacy Policy</Text>
+                    <Ionicons name="chevron-forward" size={16} color={COLORS.sage} />
+                  </Pressable>
+                  <View style={styles.footerDivider} />
+                  <Pressable
+                    style={({ pressed }) => [styles.footerLink, pressed && styles.footerLinkPressed]}
+                    onPress={requestDeleteAccount}
+                  >
+                    <Text style={styles.deleteAccountText}>Delete Account</Text>
+                  </Pressable>
+                  <View style={styles.footerDivider} />
+                  <Pressable
+                    style={({ pressed }) => [
+                      styles.signOutBtn,
+                      pressed && styles.footerLinkPressed,
+                      signingOut && styles.signOutDisabled,
+                    ]}
+                    onPress={() => {
+                      Alert.alert('Sign Out', 'Are you sure?', [
+                        { text: 'Cancel', style: 'cancel' },
+                        {
+                          text: 'Sign Out',
+                          style: 'destructive',
+                          onPress: async () => {
+                            setSigningOut(true);
+                            try {
+                              await supabase.auth.signOut();
+                            } finally {
+                              setSigningOut(false);
+                              onSignOut?.();
+                            }
+                          },
+                        },
+                      ]);
+                    }}
+                    disabled={signingOut}
+                  >
+                    <Ionicons name="log-out-outline" size={18} color={COLORS.forestDeep} />
+                    <Text style={styles.signOutText}>
+                      {signingOut ? 'Signing out…' : 'Sign out'}
+                    </Text>
+                  </Pressable>
+                </View>
+              </GenoCardFrame>
             </>
           )}
         </ScrollView>
@@ -670,5 +713,49 @@ const styles = StyleSheet.create({
     fontFamily: 'Satoshi-Medium',
     fontSize: 14,
     color: COLORS.sage,
+  },
+  footerInner: {
+    paddingVertical: 4,
+    paddingHorizontal: PROFILE.cardPadding,
+  },
+  footerLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 14,
+  },
+  footerLinkPressed: { opacity: 0.82 },
+  footerLinkText: {
+    fontFamily: 'Satoshi-Medium',
+    fontSize: 15,
+    color: COLORS.forestDeep,
+  },
+  footerDivider: {
+    height: 1,
+    backgroundColor: COLORS.border,
+  },
+  deleteAccountText: {
+    fontFamily: 'Satoshi-Medium',
+    fontSize: 15,
+    color: COLORS.error,
+  },
+  signOutBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    marginTop: 4,
+    marginBottom: 8,
+    paddingVertical: 14,
+    borderRadius: RADIUS.md,
+    backgroundColor: COLORS.mint,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  signOutDisabled: { opacity: 0.6 },
+  signOutText: {
+    fontFamily: 'Satoshi-Bold',
+    fontSize: 15,
+    color: COLORS.forestDeep,
   },
 });
