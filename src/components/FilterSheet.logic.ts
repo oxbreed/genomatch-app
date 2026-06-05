@@ -7,7 +7,7 @@ export type DiscoveryFilters = {
   city: string;
   minAge: string;
   maxAge: string;
-  relationshipGoal: 'any' | 'marriage' | 'serious' | 'casual';
+  relationshipGoal: 'any' | 'marriage' | 'serious' | 'casual' | 'friendship';
   verifiedOnly: boolean;
 };
 

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import Discovery from './Discovery';
@@ -19,6 +19,7 @@ export default function MainTabs({ onSignOut }: MainTabsProps) {
   const [openChatMatchId, setOpenChatMatchId] = useState<string | null>(null);
   const [matchCount, setMatchCount] = useState(0);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [immersiveOverlay, setImmersiveOverlay] = useState(false);
 
   const refreshBadges = useCallback(async () => {
     try {
@@ -37,32 +38,59 @@ export default function MainTabs({ onSignOut }: MainTabsProps) {
     refreshBadges();
   }, [refreshBadges, activeTab]);
 
+  useEffect(() => {
+    if (activeTab !== 'messages' && activeTab !== 'matches') {
+      setImmersiveOverlay(false);
+    }
+  }, [activeTab]);
+
   const handleStartChat = (matchId: string) => {
     setOpenChatMatchId(matchId);
     setActiveTab('messages');
+    void refreshBadges();
   };
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'discover':
-        return <Discovery />;
-      case 'matches':
-        return <Matches onStartChat={handleStartChat} />;
-      case 'messages':
-        return (
+  const tabPane = (tab: GenoTabId, child: ReactNode) => (
+    <View
+      key={tab}
+      style={[styles.tabPane, activeTab !== tab && styles.tabHidden]}
+      pointerEvents={activeTab === tab ? 'auto' : 'none'}
+    >
+      {child}
+    </View>
+  );
+
+  return (
+    <View style={styles.root}>
+      <StatusBar style="dark" />
+      <View style={styles.content}>
+        {tabPane(
+          'discover',
+          <Discovery onMatchCreated={refreshBadges} onStartChat={handleStartChat} />
+        )}
+        {tabPane(
+          'matches',
+          <Matches onStartChat={handleStartChat} onImmersiveChange={setImmersiveOverlay} />
+        )}
+        {tabPane(
+          'messages',
           <Messages
             initialChatMatchId={openChatMatchId}
             onChatOpened={() => setOpenChatMatchId(null)}
+            onImmersiveChange={setImmersiveOverlay}
           />
-        );
-      case 'profile':
-        return <Profile onSignOut={onSignOut} />;
-      default:
-        return <Discovery />;
-    }
-  };
+        )}
+        {tabPane('profile', <Profile onSignOut={onSignOut} />)}
+      </View>
+      {!immersiveOverlay ? (
+        <GenoTabBar tabs={tabsFromCounts(matchCount, unreadCount)} activeTab={activeTab} onSelect={setActiveTab} />
+      ) : null}
+    </View>
+  );
+}
 
-  const tabs = [
+function tabsFromCounts(matchCount: number, unreadCount: number) {
+  return [
     { id: 'discover' as const, label: 'Discover', icon: 'search-outline' as const, iconActive: 'search' as const },
     {
       id: 'matches' as const,
@@ -80,14 +108,6 @@ export default function MainTabs({ onSignOut }: MainTabsProps) {
     },
     { id: 'profile' as const, label: 'Profile', icon: 'person-outline' as const, iconActive: 'person' as const },
   ];
-
-  return (
-    <View style={styles.root}>
-      <StatusBar style="dark" />
-      <View style={styles.content}>{renderContent()}</View>
-      <GenoTabBar tabs={tabs} activeTab={activeTab} onSelect={setActiveTab} />
-    </View>
-  );
 }
 
 const styles = StyleSheet.create({
@@ -97,5 +117,13 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+    position: 'relative',
+  },
+  tabPane: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  tabHidden: {
+    opacity: 0,
+    zIndex: -1,
   },
 });

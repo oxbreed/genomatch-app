@@ -34,6 +34,7 @@ type Props = {
   showBio?: boolean;
   showInterests?: boolean;
   showGoals?: boolean;
+  hideHint?: boolean;
 };
 
 export default function ProfileEditFields({
@@ -46,6 +47,7 @@ export default function ProfileEditFields({
   showBio = true,
   showInterests = true,
   showGoals = true,
+  hideHint = false,
 }: Props) {
   return (
     <View style={styles.wrap}>
@@ -53,13 +55,18 @@ export default function ProfileEditFields({
         <GenoHelixField width={140} height={56} opacity={0.1} />
       </View>
 
-      {showBio || showInterests ? (
+      {!hideHint && (showBio || showInterests) ? (
         <Text style={styles.hint}>Refine how matches see your bond profile</Text>
       ) : null}
 
       {showBio ? (
         <>
-          <Text style={styles.label}>Bio</Text>
+          <View style={styles.labelRow}>
+            <Text style={styles.label}>Bio</Text>
+            <Text style={[styles.counter, bio.length >= 450 && styles.counterWarn]}>
+              {bio.length}/500
+            </Text>
+          </View>
           <TextInput
             style={styles.bioInput}
             value={bio}
@@ -145,9 +152,23 @@ const styles = StyleSheet.create({
     fontSize: PROFILE.sectionTitleSize,
     letterSpacing: -0.2,
     color: COLORS.forestDeep,
+  },
+  labelRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    justifyContent: 'space-between',
     marginBottom: 8,
   },
-  labelSpaced: { marginTop: 14 },
+  counter: {
+    fontFamily: 'Satoshi-Medium',
+    fontSize: 12,
+    color: COLORS.sage,
+  },
+  counterWarn: {
+    color: COLORS.gold,
+    fontFamily: 'Satoshi-Bold',
+  },
+  labelSpaced: { marginTop: 14, marginBottom: 8 },
   bioInput: {
     minHeight: 100,
     borderRadius: 14,

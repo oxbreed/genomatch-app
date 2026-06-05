@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { GenoCardFrame } from '../../brand/graphics';
-import { COLORS } from '../../theme';
+import { COLORS, RADIUS } from '../../theme';
 import { PROFILE } from './profileTokens';
 
 type Props = {
@@ -10,6 +11,21 @@ type Props = {
   onSignOut: () => void;
 };
 
+function FooterLink({
+  label,
+  onPress,
+}: {
+  label: string;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable style={({ pressed }) => [styles.link, pressed && styles.linkPressed]} onPress={onPress}>
+      <Text style={styles.linkText}>{label}</Text>
+      <Ionicons name="chevron-forward" size={16} color={COLORS.sage} />
+    </Pressable>
+  );
+}
+
 export default function ProfileFooterCard({
   signingOut,
   onCommunity,
@@ -17,21 +33,24 @@ export default function ProfileFooterCard({
   onSignOut,
 }: Props) {
   return (
-    <GenoCardFrame>
+    <GenoCardFrame showWatermark={false}>
       <View style={styles.inner}>
-        <Pressable style={styles.link} onPress={onCommunity}>
-          <Text style={styles.linkText}>Community Guidelines</Text>
-        </Pressable>
-        <Pressable style={styles.link} onPress={onPrivacy}>
-          <Text style={styles.linkText}>Privacy Policy</Text>
-        </Pressable>
+        <FooterLink label="Community Guidelines" onPress={onCommunity} />
+        <View style={styles.divider} />
+        <FooterLink label="Privacy Policy" onPress={onPrivacy} />
+        <View style={styles.divider} />
         <Pressable
-          style={[styles.signOut, signingOut && styles.signOutDisabled]}
+          style={({ pressed }) => [
+            styles.signOut,
+            pressed && styles.linkPressed,
+            signingOut && styles.signOutDisabled,
+          ]}
           onPress={onSignOut}
           disabled={signingOut}
         >
+          <Ionicons name="log-out-outline" size={18} color={COLORS.forestDeep} />
           <Text style={styles.signOutText}>
-            {signingOut ? 'Signing out...' : 'Sign Out'}
+            {signingOut ? 'Signing out…' : 'Sign out'}
           </Text>
         </Pressable>
       </View>
@@ -40,27 +59,43 @@ export default function ProfileFooterCard({
 }
 
 const styles = StyleSheet.create({
-  inner: { padding: 16, gap: 2 },
-  link: { paddingVertical: 12 },
+  inner: {
+    paddingVertical: 4,
+    paddingHorizontal: PROFILE.cardPadding,
+  },
+  link: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 14,
+  },
+  linkPressed: { opacity: 0.82 },
   linkText: {
-    fontFamily: 'ClashDisplay-Semibold',
-    fontSize: PROFILE.sectionTitleSize,
-    letterSpacing: -0.2,
+    fontFamily: 'Satoshi-Medium',
+    fontSize: 15,
     color: COLORS.forestDeep,
   },
+  divider: {
+    height: 1,
+    backgroundColor: COLORS.border,
+  },
   signOut: {
-    marginTop: 8,
-    paddingVertical: 14,
-    borderRadius: 14,
-    backgroundColor: 'rgba(192, 57, 43, 0.08)',
-    borderWidth: 1,
-    borderColor: 'rgba(192, 57, 43, 0.2)',
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    marginTop: 4,
+    marginBottom: 8,
+    paddingVertical: 14,
+    borderRadius: RADIUS.md,
+    backgroundColor: COLORS.mint,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
   signOutDisabled: { opacity: 0.6 },
   signOutText: {
     fontFamily: 'Satoshi-Bold',
     fontSize: 15,
-    color: COLORS.error,
+    color: COLORS.forestDeep,
   },
 });

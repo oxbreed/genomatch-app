@@ -15,6 +15,7 @@ import {
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps } from 'react';
+import { GenoLogoCeremony, GenoPremiumChrome } from '../src/brand/graphics';
 import { COLORS } from '../src/theme';
 import { supabase } from '../src/lib/supabase';
 import { validateEmail } from '../src/lib/validation';
@@ -175,6 +176,7 @@ export default function Register({
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
+      <GenoPremiumChrome variant="forest" />
       <StatusBar style="light" />
       <ScrollView
         contentContainerStyle={styles.scroll}
@@ -195,6 +197,9 @@ export default function Register({
           </Pressable>
           <View style={styles.brandChip}>
             <Text style={styles.brandChipText}>PREMIUM ACCESS</Text>
+          </View>
+          <View style={styles.logoWrap}>
+            <GenoLogoCeremony variant="auth" tone="light" />
           </View>
           <Text style={styles.title}>Create Your GenoMatch Account</Text>
           <Text style={styles.subtitle}>
@@ -376,6 +381,10 @@ const styles = StyleSheet.create({
     fontSize: 11,
     letterSpacing: 1.1,
     fontWeight: '800',
+  },
+  logoWrap: {
+    marginBottom: 14,
+    alignItems: 'flex-start',
   },
   title: {
     color: COLORS.ivory,

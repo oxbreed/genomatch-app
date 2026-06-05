@@ -1,6 +1,7 @@
 export { COLORS, FOREST_DEEP, FOREST, GOLD, LINEN, SAGE, MINT, WHITE } from './colors';
 export { TYPOGRAPHY, FONT_FAMILY } from './typography';
 export { RADIUS, SHADOWS } from './shadows';
+export { SCENE } from './sceneLayout';
 
 /** Load with `useFonts(FONTS_TO_LOAD)` in App.tsx before rendering UI.
  *  PostScript names must match `fontFamily` in styles (see FONT_FAMILY in typography.ts). */

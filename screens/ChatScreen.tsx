@@ -11,11 +11,13 @@ import {
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import ProfileAvatar from '../src/components/ProfileAvatar';
 import ReportBlockSheet from '../src/components/ReportBlockSheet';
-import { COLORS, TYPOGRAPHY, getInitials } from '../src/data/mockData';
+import { getInitials } from '../src/data/mockData';
+import { COLORS, RADIUS, SHADOWS } from '../src/theme';
 import type { DiscoveryProfile, MatchWithProfile } from '../src/types/database';
 import { sendLocalNotification } from '../src/lib/notifications';
 import { rateLimitAction } from '../src/lib/rateLimit';
@@ -207,7 +209,7 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
           </View>
           {showRead ? (
             <View style={styles.readReceipt}>
-              <Ionicons name="checkmark-done" size={14} color="rgba(13, 40, 24, 0.5)" />
+              <Ionicons name="checkmark-done" size={14} color={COLORS.textSubtle} />
               <Text style={styles.readReceiptText}>Read</Text>
             </View>
           ) : null}
@@ -236,11 +238,11 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
 
       <View style={styles.header}>
         <Pressable
-          style={({ pressed }) => [styles.headerIconBtn, pressed && styles.headerIconBtnPressed]}
+          style={({ pressed }) => [styles.backBtn, pressed && styles.headerIconBtnPressed]}
           onPress={onBack}
           accessibilityLabel="Go back"
         >
-          <Ionicons name="chevron-back" size={24} color="#FFFFFF" />
+          <Ionicons name="chevron-back" size={20} color={COLORS.forest} />
         </Pressable>
         {profile.avatarUrl?.trim() || profile.photos[0]?.trim() ? (
           <ProfileAvatar
@@ -248,8 +250,8 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
             gradient={profile.gradient}
             avatarUrl={profile.avatarUrl ?? profile.photos[0]}
             size={42}
-            noPhotoBackground="#1A3D28"
-            noPhotoInitialColor="#FFFFFF"
+            noPhotoBackground={COLORS.forest}
+            noPhotoInitialColor={COLORS.linen}
           />
         ) : (
           <View style={styles.chatHeaderAvatarFallback}>
@@ -267,18 +269,18 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
           )}
         </View>
         <Pressable
-          style={({ pressed }) => [styles.headerIconBtn, pressed && styles.headerIconBtnPressed]}
+          style={({ pressed }) => [styles.headerActionBtn, pressed && styles.headerIconBtnPressed]}
           onPress={() => setShowProfile(true)}
           accessibilityLabel="View profile"
         >
-          <Ionicons name="person-circle-outline" size={22} color="#FFFFFF" />
+          <Ionicons name="person-circle-outline" size={22} color={COLORS.forest} />
         </Pressable>
         <Pressable
-          style={({ pressed }) => [styles.headerIconBtn, pressed && styles.headerIconBtnPressed]}
+          style={({ pressed }) => [styles.headerActionBtn, pressed && styles.headerIconBtnPressed]}
           onPress={() => setShowModerationSheet(true)}
           accessibilityLabel="Report or block"
         >
-          <Ionicons name="ellipsis-vertical" size={22} color="#FFFFFF" />
+          <Ionicons name="ellipsis-vertical" size={20} color={COLORS.forest} />
         </Pressable>
       </View>
 
@@ -320,17 +322,32 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
           value={draft}
           onChangeText={handleDraftChange}
           placeholder="Type a message..."
-          placeholderTextColor="rgba(13, 40, 24, 0.35)"
+          placeholderTextColor={COLORS.textSubtle}
           multiline
           maxLength={1000}
           editable={!sending}
         />
-        <Pressable style={styles.sendBtn} onPress={handleSend}>
-          {sending ? (
-            <ActivityIndicator color="#0D2818" size="small" />
-          ) : (
-            <Text style={styles.sendBtnText}>Send</Text>
-          )}
+        <Pressable
+          style={({ pressed }) => [styles.sendBtnWrap, pressed && styles.sendBtnPressed]}
+          onPress={handleSend}
+          disabled={sending || !draft.trim()}
+        >
+          <LinearGradient
+            colors={
+              sending || !draft.trim()
+                ? ['rgba(143, 175, 149, 0.5)', 'rgba(143, 175, 149, 0.35)']
+                : [COLORS.gold, '#C49A38']
+            }
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.sendBtn}
+          >
+            {sending ? (
+              <ActivityIndicator color={COLORS.forestDeep} size="small" />
+            ) : (
+              <Text style={styles.sendBtnText}>Send</Text>
+            )}
+          </LinearGradient>
         </Pressable>
       </View>
     </KeyboardAvoidingView>
@@ -345,37 +362,51 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: 54,
+    paddingTop: 56,
     paddingHorizontal: 16,
-    paddingBottom: 12,
-    backgroundColor: COLORS.white,
+    paddingBottom: 14,
+    backgroundColor: COLORS.linen,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(13, 40, 24, 0.08)',
+    borderBottomColor: COLORS.border,
     gap: 10,
   },
-  headerIconBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 20,
-    backgroundColor: '#0D2818',
+  backBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 40,
+    height: 40,
+    borderRadius: RADIUS.pill,
+    backgroundColor: COLORS.mint,
+    borderWidth: 1,
+    borderColor: 'rgba(212, 168, 67, 0.28)',
+    flexShrink: 0,
+  },
+  headerActionBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: RADIUS.pill,
+    backgroundColor: COLORS.mint,
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
-    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(212, 168, 67, 0.2)',
   },
   headerIconBtnPressed: {
     opacity: 0.88,
   },
   headerText: {
     flex: 1,
+    minWidth: 0,
   },
   chatHeaderAvatarFallback: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(212,168,67,0.15)',
+    backgroundColor: 'rgba(212, 168, 67, 0.15)',
     borderWidth: 1.5,
-    borderColor: 'rgba(212,168,67,0.4)',
+    borderColor: 'rgba(212, 168, 67, 0.4)',
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
@@ -383,38 +414,35 @@ const styles = StyleSheet.create({
   chatHeaderAvatarInitials: {
     fontFamily: 'ClashDisplay-Semibold',
     fontSize: 16,
-    color: 'rgba(212,168,67,0.8)',
+    color: COLORS.gold,
     textAlign: 'center',
   },
   chatName: {
-    ...TYPOGRAPHY.name,
     fontFamily: 'ClashDisplay-Semibold',
     fontSize: 17,
-    fontWeight: '600',
+    letterSpacing: -0.2,
+    color: COLORS.forestDeep,
   },
   chatMeta: {
     fontFamily: 'Satoshi-Medium',
     fontSize: 12,
-    color: 'rgba(13, 40, 24, 0.55)',
-    fontWeight: '600',
+    color: COLORS.textSubtle,
     marginTop: 2,
   },
   typingMeta: {
     fontFamily: 'Satoshi-Medium',
     fontSize: 12,
     color: COLORS.sage,
-    fontWeight: '600',
     fontStyle: 'italic',
     marginTop: 2,
   },
   errorBanner: {
     fontFamily: 'Satoshi-Medium',
-    backgroundColor: '#FFEBEE',
-    color: '#A32D2D',
+    backgroundColor: COLORS.errorBg,
+    color: COLORS.error,
     textAlign: 'center',
     paddingVertical: 8,
     fontSize: 13,
-    fontWeight: '600',
   },
   loadingWrap: {
     flex: 1,
@@ -430,29 +458,30 @@ const styles = StyleSheet.create({
     fontFamily: 'Satoshi-Medium',
     alignSelf: 'center',
     fontSize: 11,
-    color: 'rgba(13, 40, 24, 0.45)',
-    fontWeight: '600',
+    letterSpacing: 0.3,
+    color: COLORS.textSubtle,
     marginVertical: 10,
   },
   emptyHint: {
     alignSelf: 'center',
     marginTop: 40,
-    backgroundColor: 'rgba(143, 175, 149, 0.3)',
+    backgroundColor: COLORS.chipFill,
     paddingHorizontal: 16,
     paddingVertical: 10,
-    borderRadius: 999,
+    borderRadius: RADIUS.pill,
     maxWidth: '90%',
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
   emptyHintText: {
     fontFamily: 'Satoshi-Medium',
     fontSize: 13,
     color: COLORS.forest,
-    fontWeight: '600',
     textAlign: 'center',
     lineHeight: 19,
   },
   bubbleRow: {
-    marginBottom: 6,
+    marginBottom: 8,
     maxWidth: '82%',
   },
   bubbleRowSent: {
@@ -466,24 +495,27 @@ const styles = StyleSheet.create({
   bubble: {
     paddingHorizontal: 14,
     paddingVertical: 10,
-    borderRadius: 18,
+    borderRadius: RADIUS.lg,
   },
   bubbleSent: {
     backgroundColor: COLORS.forestDeep,
-    borderBottomRightRadius: 4,
+    borderBottomRightRadius: 6,
   },
   bubbleReceived: {
     backgroundColor: COLORS.white,
     borderWidth: 1,
-    borderColor: 'rgba(13, 40, 24, 0.1)',
-    borderBottomLeftRadius: 4,
+    borderColor: COLORS.border,
+    borderBottomLeftRadius: 6,
+    ...SHADOWS.card,
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
   },
   bubbleText: {
     fontFamily: 'Satoshi-Medium',
     fontSize: 15,
     lineHeight: 21,
     color: COLORS.forest,
-    fontWeight: '500',
   },
   bubbleTextSent: {
     color: COLORS.linen,
@@ -498,8 +530,7 @@ const styles = StyleSheet.create({
   readReceiptText: {
     fontFamily: 'Satoshi-Medium',
     fontSize: 11,
-    fontWeight: '600',
-    color: 'rgba(13, 40, 24, 0.5)',
+    color: COLORS.textSubtle,
   },
   composer: {
     flexDirection: 'row',
@@ -507,39 +538,44 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    paddingBottom: 8,
+    paddingBottom: 10,
     backgroundColor: COLORS.white,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(13, 40, 24, 0.08)',
+    borderTopColor: COLORS.border,
   },
   composerInput: {
     flex: 1,
     minHeight: 44,
     maxHeight: 120,
-    borderRadius: 14,
+    borderRadius: RADIUS.md,
     borderWidth: 1.5,
-    borderColor: 'rgba(13, 40, 24, 0.12)',
+    borderColor: 'rgba(13, 40, 24, 0.1)',
     backgroundColor: COLORS.linen,
     paddingHorizontal: 14,
     paddingVertical: 10,
     fontFamily: 'Satoshi-Medium',
     fontSize: 16,
     color: COLORS.forest,
-    fontWeight: '500',
+  },
+  sendBtnWrap: {
+    borderRadius: RADIUS.md,
+    overflow: 'hidden',
+    ...SHADOWS.button,
+  },
+  sendBtnPressed: {
+    opacity: 0.9,
   },
   sendBtn: {
-    minWidth: 80,
+    minWidth: 76,
     minHeight: 44,
-    borderRadius: 14,
-    backgroundColor: '#D4A843',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: 18,
     paddingVertical: 10,
   },
   sendBtnText: {
+    fontFamily: 'Satoshi-Bold',
     fontSize: 15,
-    fontWeight: '700',
-    color: '#0D2818',
+    color: COLORS.forestDeep,
   },
 });

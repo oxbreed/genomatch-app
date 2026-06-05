@@ -1,10 +1,11 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useRef } from 'react';
+import { Animated, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps } from 'react';
 import * as Haptics from 'expo-haptics';
-import { GenoBondMark } from '../../brand';
 import { COLORS, TYPOGRAPHY } from '../../theme';
+import { GENO_TAB_BAR_HEIGHT } from './tabBarLayout';
 
 type IonName = ComponentProps<typeof Ionicons>['name'];
 
@@ -24,6 +25,47 @@ type Props = {
   onSelect: (id: GenoTabId) => void;
 };
 
+function TabItem({
+  tab,
+  active,
+  onPress,
+}: {
+  tab: GenoTabConfig;
+  active: boolean;
+  onPress: () => void;
+}) {
+  const scale = useRef(new Animated.Value(active ? 1 : 1)).current;
+
+  useEffect(() => {
+    Animated.spring(scale, {
+      toValue: active ? 1.06 : 1,
+      friction: 8,
+      tension: 160,
+      useNativeDriver: true,
+    }).start();
+  }, [active, scale]);
+
+  return (
+    <Pressable style={styles.tabItem} onPress={onPress} accessibilityRole="tab" accessibilityState={{ selected: active }}>
+      <Animated.View style={[styles.iconWrap, active && styles.iconWrapActive, { transform: [{ scale }] }]}>
+        <Ionicons
+          name={active ? tab.iconActive : tab.icon}
+          size={22}
+          color={active ? COLORS.gold : 'rgba(245, 239, 230, 0.48)'}
+        />
+        {tab.badge != null && tab.badge > 0 ? (
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>{tab.badge > 99 ? '99+' : tab.badge}</Text>
+          </View>
+        ) : null}
+      </Animated.View>
+      <Text style={[styles.tabLabel, active && styles.tabLabelActive]} numberOfLines={1}>
+        {tab.label}
+      </Text>
+    </Pressable>
+  );
+}
+
 export default function GenoTabBar({ tabs, activeTab, onSelect }: Props) {
   return (
     <View style={styles.wrap}>
@@ -31,50 +73,28 @@ export default function GenoTabBar({ tabs, activeTab, onSelect }: Props) {
         colors={['rgba(13, 40, 24, 0.98)', COLORS.tabBar]}
         style={StyleSheet.absoluteFill}
       />
-      <View style={styles.topRule} pointerEvents="none">
-        <LinearGradient
-          colors={['transparent', COLORS.gold, 'rgba(61, 122, 82, 0.5)', 'transparent']}
-          start={{ x: 0, y: 0.5 }}
-          end={{ x: 1, y: 0.5 }}
-          style={styles.ruleGradient}
-        />
-      </View>
-
-      <View style={styles.markRow} pointerEvents="none">
-        <GenoBondMark size={20} opacity={0.35} />
-      </View>
-
+      <LinearGradient
+        colors={['transparent', 'rgba(212, 168, 67, 0.55)', 'transparent']}
+        start={{ x: 0, y: 0.5 }}
+        end={{ x: 1, y: 0.5 }}
+        style={styles.topRule}
+        pointerEvents="none"
+      />
       <View style={styles.tabsRow}>
         {tabs.map((tab) => {
           const active = tab.id === activeTab;
           return (
-            <Pressable
+            <TabItem
               key={tab.id}
-              style={styles.tabItem}
+              tab={tab}
+              active={active}
               onPress={() => {
                 if (tab.id !== activeTab) {
                   void Haptics.selectionAsync();
                 }
                 onSelect(tab.id);
               }}
-            >
-              <View style={styles.iconWrap}>
-                <Ionicons
-                  name={active ? tab.iconActive : tab.icon}
-                  size={22}
-                  color={active ? COLORS.gold : 'rgba(245, 239, 230, 0.5)'}
-                />
-                {tab.badge != null && tab.badge > 0 ? (
-                  <View style={styles.badge}>
-                    <Text style={styles.badgeText}>
-                      {tab.badge > 99 ? '99+' : tab.badge}
-                    </Text>
-                  </View>
-                ) : null}
-              </View>
-              <Text style={[styles.tabLabel, active && styles.tabLabelActive]}>{tab.label}</Text>
-              {active ? <View style={styles.dot} /> : null}
-            </Pressable>
+            />
           );
         })}
       </View>
@@ -82,48 +102,52 @@ export default function GenoTabBar({ tabs, activeTab, onSelect }: Props) {
   );
 }
 
+export { GENO_TAB_BAR_HEIGHT };
+
 const styles = StyleSheet.create({
   wrap: {
-    paddingTop: 8,
-    paddingBottom: 26,
-    paddingHorizontal: 6,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.06)',
+    height: GENO_TAB_BAR_HEIGHT,
+    paddingTop: 6,
+    paddingBottom: Platform.OS === 'ios' ? 22 : 10,
+    paddingHorizontal: 4,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: 'rgba(255, 255, 255, 0.08)',
     overflow: 'hidden',
   },
   topRule: {
     position: 'absolute',
     top: 0,
-    left: 0,
-    right: 0,
+    left: 24,
+    right: 24,
     height: 1,
   },
-  ruleGradient: { flex: 1, height: 1 },
-  markRow: {
-    position: 'absolute',
-    top: 10,
-    alignSelf: 'center',
-    opacity: 0.5,
-  },
   tabsRow: {
+    flex: 1,
     flexDirection: 'row',
-    zIndex: 2,
+    alignItems: 'center',
   },
   tabItem: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 4,
-    minHeight: 52,
-    paddingTop: 6,
+    gap: 3,
+    paddingTop: 2,
   },
   iconWrap: {
     position: 'relative',
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 18,
+  },
+  iconWrapActive: {
+    backgroundColor: 'rgba(212, 168, 67, 0.14)',
   },
   badge: {
     position: 'absolute',
-    top: -6,
-    right: -10,
+    top: -2,
+    right: -6,
     minWidth: 16,
     height: 16,
     borderRadius: 8,
@@ -141,18 +165,11 @@ const styles = StyleSheet.create({
   },
   tabLabel: {
     ...TYPOGRAPHY.caption,
-    fontSize: 11,
-    color: 'rgba(245, 239, 230, 0.5)',
+    fontSize: 10,
+    color: 'rgba(245, 239, 230, 0.48)',
   },
   tabLabelActive: {
     color: COLORS.gold,
     fontFamily: TYPOGRAPHY.label.fontFamily,
-  },
-  dot: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: COLORS.gold,
-    marginTop: 2,
   },
 });

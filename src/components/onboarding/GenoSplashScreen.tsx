@@ -4,12 +4,10 @@ import {
   Animated,
   Easing,
   StyleSheet,
-  Text,
   View,
 } from 'react-native';
-import { GenoPremiumChrome, GenoBondHalo } from '../../brand/graphics';
-import GenoMatchLogo from '../GenoMatchLogo';
-import { COLORS, TYPOGRAPHY } from '../../theme';
+import { GenoPremiumChrome, GenoLogoCeremony } from '../../brand/graphics';
+import { COLORS } from '../../theme';
 
 type Props = {
   bootstrapping?: boolean;
@@ -19,56 +17,15 @@ type Props = {
 export default function GenoSplashScreen({ bootstrapping, onFinish }: Props) {
   const splashOpacity = useRef(new Animated.Value(1)).current;
   const splashScale = useRef(new Animated.Value(0.88)).current;
-  const logoFloat = useRef(new Animated.Value(0)).current;
-  const logoPulse = useRef(new Animated.Value(0.94)).current;
 
   useEffect(() => {
-    const splashIn = Animated.parallel([
-      Animated.timing(splashScale, {
-        toValue: 1,
-        duration: 900,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
-      }),
-    ]);
-
-    const floatingLoop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(logoFloat, {
-          toValue: -8,
-          duration: 1400,
-          easing: Easing.inOut(Easing.sin),
-          useNativeDriver: true,
-        }),
-        Animated.timing(logoFloat, {
-          toValue: 8,
-          duration: 1400,
-          easing: Easing.inOut(Easing.sin),
-          useNativeDriver: true,
-        }),
-      ])
-    );
-
-    const pulseLoop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(logoPulse, {
-          toValue: 1,
-          duration: 1400,
-          easing: Easing.inOut(Easing.sin),
-          useNativeDriver: true,
-        }),
-        Animated.timing(logoPulse, {
-          toValue: 0.94,
-          duration: 1400,
-          easing: Easing.inOut(Easing.sin),
-          useNativeDriver: true,
-        }),
-      ])
-    );
-
+    const splashIn = Animated.timing(splashScale, {
+      toValue: 1,
+      duration: 900,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    });
     splashIn.start();
-    floatingLoop.start();
-    pulseLoop.start();
 
     const timeout = setTimeout(() => {
       Animated.parallel([
@@ -89,12 +46,8 @@ export default function GenoSplashScreen({ bootstrapping, onFinish }: Props) {
       });
     }, 2600);
 
-    return () => {
-      clearTimeout(timeout);
-      floatingLoop.stop();
-      pulseLoop.stop();
-    };
-  }, [logoFloat, logoPulse, onFinish, splashOpacity, splashScale]);
+    return () => clearTimeout(timeout);
+  }, [onFinish, splashOpacity, splashScale]);
 
   return (
     <View style={styles.root}>
@@ -105,20 +58,13 @@ export default function GenoSplashScreen({ bootstrapping, onFinish }: Props) {
           { opacity: splashOpacity, transform: [{ scale: splashScale }] },
         ]}
       >
-        <View style={styles.haloWrap}>
-          <GenoBondHalo size={200} opacity={0.45} animated />
-          <Animated.View
-            style={[
-              styles.logoOrb,
-              { transform: [{ translateY: logoFloat }, { scale: logoPulse }] },
-            ]}
-          >
-            <GenoMatchLogo size={140} />
-          </Animated.View>
-        </View>
-
-        <Text style={styles.wordmark}>GenoMatch</Text>
-        <Text style={styles.tagline}>Connecting hearts. Aligning genes.</Text>
+        <GenoLogoCeremony
+          variant="splash"
+          showWordmark
+          tagline="Connecting hearts. Aligning genes."
+          tone="light"
+          style={styles.ceremony}
+        />
 
         {bootstrapping ? (
           <ActivityIndicator style={styles.spinner} size="small" color={COLORS.gold} />
@@ -139,30 +85,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     zIndex: 2,
   },
-  haloWrap: {
-    width: 200,
-    height: 200,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 28,
+  ceremony: {
+    marginBottom: 72,
   },
-  logoOrb: {
-    position: 'absolute',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  wordmark: {
-    fontFamily: 'ClashDisplay-Semibold',
-    fontSize: 40,
-    color: COLORS.linen,
-    letterSpacing: -1,
-  },
-  tagline: {
-    ...TYPOGRAPHY.body,
-    marginTop: 10,
-    color: COLORS.sage,
-    fontSize: 16,
-    textAlign: 'center',
-  },
-  spinner: { marginTop: 24 },
+  spinner: { marginTop: -48 },
 });

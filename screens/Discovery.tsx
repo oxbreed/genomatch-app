@@ -18,18 +18,30 @@ import { Ionicons } from '@expo/vector-icons';
 import EmptyState from '../src/components/EmptyState';
 import FilterSheet, {
   DEFAULT_DISCOVERY_FILTERS,
+  applyDiscoveryFilters,
+  countActiveDiscoveryFilters,
   hasActiveDiscoveryFilters,
   type DiscoveryFilters,
 } from '../src/components/FilterSheet';
+import { DiscoverMatchModal, DiscoverSeenAllState } from '../src/components/discover';
+import { GenoInboxHeader, GenoInboxIconButton } from '../src/components/inbox';
+import { getDiscoveryCardHeight } from '../src/components/navigation/tabBarLayout';
+import { GenoPremiumChrome } from '../src/brand/graphics';
 import GenotypeBadge from '../src/components/GenotypeBadge';
+import ReportBlockSheet from '../src/components/ReportBlockSheet';
 import { COLORS, RADIUS, SHADOWS, TYPOGRAPHY, getInitials, getMockDiscoveryProfiles } from '../src/data/mockData';
-import { fetchDiscoveryProfiles } from '../src/lib/profiles';
+import {
+  fetchDiscoveryProfiles,
+  getViewerProfileSnapshot,
+  type ViewerProfileSnapshot,
+} from '../src/lib/profiles';
 import { recordLike, recordPass } from '../src/lib/likes';
+import { getMatchIdForProfile } from '../src/lib/matches';
 import type { DiscoveryProfile, Genotype } from '../src/types/database';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const SWIPE_THRESHOLD = SCREEN_WIDTH * 0.22;
-const CARD_HEIGHT = SCREEN_HEIGHT * 0.55;
+const CARD_HEIGHT = getDiscoveryCardHeight(SCREEN_HEIGHT);
 const BACK_CARD_PEEK = 12;
 const BACK_CARD_VISIBLE = 60;
 const HIGH_COMPATIBILITY_MIN = 75;
@@ -50,36 +62,6 @@ function triggerMatchCelebrationHaptic() {
   setTimeout(() => {
     void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   }, 300);
-}
-
-function applyDiscoveryFilters(
-  profiles: DiscoveryProfile[],
-  filters: DiscoveryFilters
-): DiscoveryProfile[] {
-  return profiles.filter((p) => {
-    if (filters.compatibilityMode === 'high' && p.compatibility < HIGH_COMPATIBILITY_MIN) {
-      return false;
-    }
-
-    const cityQuery = filters.city.trim().toLowerCase();
-    if (cityQuery && !p.city.toLowerCase().includes(cityQuery)) {
-      return false;
-    }
-
-    if (filters.minAge.trim() || filters.maxAge.trim()) {
-      if (p.age == null) return false;
-      const min = filters.minAge.trim() ? parseInt(filters.minAge, 10) : 18;
-      const max = filters.maxAge.trim() ? parseInt(filters.maxAge, 10) : 65;
-      if (p.age < min || p.age > max) return false;
-    }
-
-    if (filters.relationshipGoal !== 'any') {
-      const goal = (p.relationshipGoal ?? '').toLowerCase();
-      if (goal !== filters.relationshipGoal) return false;
-    }
-
-    return true;
-  });
 }
 
 function getMatchLabel(percent: number): string {
@@ -369,7 +351,12 @@ function ProfileCard({ profile, swipeIndex, totalProfiles, viewerGenotype, progr
   );
 }
 
-export default function Discovery() {
+type DiscoveryProps = {
+  onMatchCreated?: () => void;
+  onStartChat?: (matchId: string) => void;
+};
+
+export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProps = {}) {
   const [allProfiles, setAllProfiles] = useState<DiscoveryProfile[]>([]);
   const [filters, setFilters] = useState<DiscoveryFilters>(DEFAULT_DISCOVERY_FILTERS);
   const [showFilterSheet, setShowFilterSheet] = useState(false);
@@ -378,11 +365,15 @@ export default function Discovery() {
   const [index, setIndex] = useState(0);
   const [showMatch, setShowMatch] = useState(false);
   const [matchedName, setMatchedName] = useState('');
+  const [matchedProfile, setMatchedProfile] = useState<DiscoveryProfile | null>(null);
+  const [matchedMatchId, setMatchedMatchId] = useState<string | null>(null);
+  const [viewerSnapshot, setViewerSnapshot] = useState<ViewerProfileSnapshot | null>(null);
   const [actionError, setActionError] = useState('');
   const [usingMockFallback, setUsingMockFallback] = useState(false);
   const [viewerGenotype, setViewerGenotype] = useState<Genotype | null>(null);
   const [superLikeToast, setSuperLikeToast] = useState(false);
   const [profileSheetVisible, setProfileSheetVisible] = useState(false);
+  const [showModerationSheet, setShowModerationSheet] = useState(false);
 
   const profiles = useMemo(
     () => applyDiscoveryFilters(allProfiles, filters),
@@ -395,21 +386,27 @@ export default function Discovery() {
     setLoadError('');
     setLoading(true);
     try {
-      const { profiles: rows, viewerGenotype: loadedViewerGenotype } = await fetchDiscoveryProfiles();
+      const [{ profiles: rows, viewerGenotype: loadedViewerGenotype }, viewer] = await Promise.all([
+        fetchDiscoveryProfiles(),
+        getViewerProfileSnapshot(),
+      ]);
       setViewerGenotype(loadedViewerGenotype);
+      setViewerSnapshot(viewer);
       if (rows.length > 0) {
         setAllProfiles(rows);
         setUsingMockFallback(false);
       } else {
         setAllProfiles(getMockDiscoveryProfiles());
         setUsingMockFallback(true);
-        setViewerGenotype('AA');
+        if (!loadedViewerGenotype) setViewerGenotype('AA');
       }
       setIndex(0);
-    } catch {
-      setAllProfiles(getMockDiscoveryProfiles());
-      setUsingMockFallback(true);
-      setViewerGenotype('AA');
+    } catch (err) {
+      const viewer = await getViewerProfileSnapshot().catch(() => null);
+      setViewerSnapshot(viewer);
+      setAllProfiles([]);
+      setUsingMockFallback(false);
+      setLoadError(err instanceof Error ? err.message : 'Could not load profiles');
       setIndex(0);
     } finally {
       setLoading(false);
@@ -561,6 +558,15 @@ export default function Discovery() {
     });
   }, [sheetBackdropOpacity, sheetTranslateY]);
 
+  const handleBlockedFromDiscover = useCallback(() => {
+    if (!profile) return;
+    const blockedId = profile.id;
+    setAllProfiles((prev) => prev.filter((p) => p.id !== blockedId));
+    setShowModerationSheet(false);
+    closeProfileSheet();
+    setIndex((i) => Math.min(i, Math.max(0, profiles.length - 2)));
+  }, [closeProfileSheet, profile, profiles.length]);
+
   const openProfileSheetRef = useRef(openProfileSheet);
   openProfileSheetRef.current = openProfileSheet;
 
@@ -591,13 +597,33 @@ export default function Discovery() {
 
   const dismissMatchOverlay = useCallback(() => {
     setShowMatch(false);
+    setMatchedProfile(null);
+    setMatchedMatchId(null);
   }, []);
 
-  const showMatchOverlay = useCallback((name: string) => {
-    triggerMatchCelebrationHaptic();
-    setMatchedName(name);
-    setShowMatch(true);
-  }, []);
+  const handleSendMessageFromMatch = useCallback(async () => {
+    const profileId = matchedProfile?.id;
+    let matchId = matchedMatchId;
+    dismissMatchOverlay();
+    if (!matchId && profileId && !matchedProfile?.isMock) {
+      matchId = await getMatchIdForProfile(profileId);
+    }
+    if (matchId) {
+      onStartChat?.(matchId);
+    }
+  }, [dismissMatchOverlay, matchedMatchId, matchedProfile, onStartChat]);
+
+  const showMatchOverlay = useCallback(
+    (name: string, matched: DiscoveryProfile, matchId: string | null = null) => {
+      triggerMatchCelebrationHaptic();
+      setMatchedName(name);
+      setMatchedProfile(matched);
+      setMatchedMatchId(matchId);
+      setShowMatch(true);
+      onMatchCreated?.();
+    },
+    [onMatchCreated]
+  );
 
   const animateSwipe = useCallback(
     (direction: 'left' | 'right', onDone: () => void) => {
@@ -645,16 +671,16 @@ export default function Discovery() {
       const afterSwipe = async () => {
         if (profile.isMock) {
           if (direction === 'like') {
-            showMatchOverlay(firstName);
+            showMatchOverlay(firstName, profile);
           }
           return;
         }
 
         if (direction === 'like') {
           try {
-            const { isMutualMatch } = await recordLike(profile.id);
+            const { isMutualMatch, matchId } = await recordLike(profile.id);
             if (isMutualMatch) {
-              showMatchOverlay(firstName);
+              showMatchOverlay(firstName, profile, matchId);
             }
           } catch (err) {
             setActionError(
@@ -782,8 +808,13 @@ export default function Discovery() {
     extrapolate: 'clamp',
   });
 
+  const discoverSubtitle = usingMockFallback
+    ? 'Preview profiles — real matches appear as members join'
+    : 'Genotype-aware matches near you';
+
   return (
     <View style={styles.container}>
+      <GenoPremiumChrome variant="discover" />
       <StatusBar style="dark" />
 
       <View style={styles.screenRoot}>
@@ -801,28 +832,32 @@ export default function Discovery() {
             <Text style={styles.superLikeToastText}>⭐ Super Liked!</Text>
           </Animated.View>
         ) : null}
-        <View style={styles.header}>
-          <View style={styles.headerRow}>
-            <Text style={styles.headerTitle}>Discover</Text>
-            <Pressable
-              style={({ pressed }) => [styles.filterBtn, pressed && styles.filterBtnPressed]}
-              onPress={() => setShowFilterSheet(true)}
-              accessibilityLabel="Filter discovery profiles"
-            >
-              <Ionicons name="options-outline" size={24} color={COLORS.forest} />
-              {filtersActive ? <View style={styles.filterDot} /> : null}
-            </Pressable>
-          </View>
-          <Text style={styles.headerSubtitle}>
-            {usingMockFallback
-              ? 'Preview profiles — real matches appear as members join'
-              : 'Genotype-aware matches near you'}
-          </Text>
-        </View>
+        <GenoInboxHeader
+          title="Discover"
+          subtitle={discoverSubtitle}
+          ceremonyMark
+          right={
+            <View style={styles.filterBtnWrap}>
+              <GenoInboxIconButton
+                icon="options-outline"
+                onPress={() => setShowFilterSheet(true)}
+                accessibilityLabel="Filter discovery profiles"
+              />
+              {filtersActive ? (
+                <View style={styles.filterBadge}>
+                  <Text style={styles.filterBadgeText}>
+                    {countActiveDiscoveryFilters(filters)}
+                  </Text>
+                </View>
+              ) : null}
+            </View>
+          }
+        />
 
         <FilterSheet
           visible={showFilterSheet}
           filters={filters}
+          previewProfiles={allProfiles}
           onClose={() => setShowFilterSheet(false)}
           onApply={setFilters}
         />
@@ -862,13 +897,11 @@ export default function Discovery() {
               />
             </View>
           ) : seenAll ? (
-            <View style={styles.emptyState}>
-              <EmptyState
-                type="seen-all"
-                title="You've seen everyone nearby"
-                subtitle="Check back tomorrow for new matches."
-              />
-            </View>
+            <DiscoverSeenAllState
+              reviewedCount={index}
+              onBrowseAgain={() => { setIndex(0); void loadProfiles(); }}
+              onAdjustFilters={() => setShowFilterSheet(true)}
+            />
           ) : (
             <View style={styles.deckColumn}>
               <View style={styles.deckCardSlot}>
@@ -970,8 +1003,9 @@ export default function Discovery() {
                 </View>
               </View>
 
-              <View style={styles.actions}>
+              <View style={styles.actionBar}>
                 {actionError ? <Text style={styles.actionError}>{actionError}</Text> : null}
+                <View style={styles.actions}>
                 <Pressable
                   style={({ pressed }) => [styles.passBtn, pressed && styles.btnPressed]}
                   onPress={handlePass}
@@ -989,6 +1023,7 @@ export default function Discovery() {
                     <Ionicons name="heart" size={28} color="#FFFFFF" />
                   </Pressable>
                 </Animated.View>
+                </View>
               </View>
             </View>
           )}
@@ -1029,6 +1064,16 @@ export default function Discovery() {
             </Text>
             <Pressable
               style={({ pressed }) => [
+                styles.profileSheetSafetyBtn,
+                pressed && styles.profileSheetChatBtnPressed,
+              ]}
+              onPress={() => setShowModerationSheet(true)}
+            >
+              <Ionicons name="shield-outline" size={18} color={COLORS.sage} />
+              <Text style={styles.profileSheetSafetyText}>Report or block</Text>
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => [
                 styles.profileSheetChatBtn,
                 pressed && styles.profileSheetChatBtnPressed,
               ]}
@@ -1043,36 +1088,24 @@ export default function Discovery() {
         </View>
       </Modal>
 
-      <Modal
+      {profile ? (
+        <ReportBlockSheet
+          visible={showModerationSheet}
+          onClose={() => setShowModerationSheet(false)}
+          targetUserId={profile.id}
+          targetName={profile.name}
+          onBlocked={handleBlockedFromDiscover}
+        />
+      ) : null}
+
+      <DiscoverMatchModal
         visible={showMatch}
-        transparent
-        animationType="fade"
-        statusBarTranslucent
-        onRequestClose={dismissMatchOverlay}
-      >
-        <View style={styles.matchModalBackdrop}>
-          <View style={styles.matchCard}>
-            <Text style={styles.matchTitle} numberOfLines={1}>
-              It's a Match!
-            </Text>
-            <Text style={styles.matchSubtitle} numberOfLines={1}>
-              You matched with {matchedName}!
-            </Text>
-            <View style={styles.matchIconWrap}>
-              <Ionicons name="heart" size={44} color="#D4A843" />
-            </View>
-            <Pressable
-              style={({ pressed }) => [
-                styles.matchContinueBtn,
-                pressed && styles.matchContinueBtnPressed,
-              ]}
-              onPress={dismissMatchOverlay}
-            >
-              <Text style={styles.matchContinueText}>Continue</Text>
-            </Pressable>
-          </View>
-        </View>
-      </Modal>
+        matchName={matchedName}
+        profile={matchedProfile}
+        viewer={viewerSnapshot}
+        onContinue={dismissMatchOverlay}
+        onSendMessage={() => { void handleSendMessageFromMatch(); }}
+      />
     </View>
   );
 }
@@ -1087,7 +1120,7 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingTop: 58,
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     paddingBottom: 0,
   },
   headerRow: {
@@ -1113,6 +1146,26 @@ const styles = StyleSheet.create({
   filterBtnPressed: {
     opacity: 0.88,
   },
+  filterBtnWrap: {
+    position: 'relative',
+  },
+  filterBadge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: COLORS.gold,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+  },
+  filterBadgeText: {
+    fontFamily: 'Satoshi-Bold',
+    fontSize: 10,
+    color: COLORS.forestDeep,
+  },
   filterDot: {
     position: 'absolute',
     top: 8,
@@ -1134,15 +1187,19 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
     paddingTop: 12,
+    paddingBottom: 6,
   },
   deckColumn: {
     flex: 1,
     width: '100%',
     alignItems: 'center',
+    justifyContent: 'space-between',
   },
   deckCardSlot: {
     width: '100%',
-    height: CARD_HEIGHT + BACK_CARD_PEEK,
+    flex: 1,
+    minHeight: 0,
+    maxHeight: CARD_HEIGHT + BACK_CARD_PEEK,
     overflow: 'hidden',
   },
   cardStackContainer: {
@@ -1183,12 +1240,12 @@ const styles = StyleSheet.create({
     height: CARD_HEIGHT,
     borderRadius: 24,
     overflow: 'hidden',
-    backgroundColor: '#1A3D28',
-    shadowColor: '#000',
+    backgroundColor: COLORS.forest,
+    shadowColor: COLORS.forestDeep,
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.22,
-    shadowRadius: 20,
-    elevation: 12,
+    shadowOpacity: 0.14,
+    shadowRadius: 16,
+    elevation: 6,
   },
   cardBody: {
     width: '100%',
@@ -1210,7 +1267,7 @@ const styles = StyleSheet.create({
   },
   swipeProgressFill: {
     height: 3,
-    backgroundColor: '#D4A843',
+    backgroundColor: COLORS.gold,
     borderRadius: 2,
   },
   genotypeCompatRow: {
@@ -1239,7 +1296,7 @@ const styles = StyleSheet.create({
     left: 24,
     right: 24,
     zIndex: 100,
-    backgroundColor: '#D4A843',
+    backgroundColor: COLORS.gold,
     borderRadius: 999,
     paddingVertical: 10,
     paddingHorizontal: 18,
@@ -1274,7 +1331,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(13, 40, 24, 0.72)',
   },
   profileSheet: {
-    backgroundColor: '#1A3D28',
+    backgroundColor: COLORS.forest,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 24,
@@ -1327,8 +1384,24 @@ const styles = StyleSheet.create({
     color: '#8FAF95',
     marginBottom: 20,
   },
+  profileSheetSafetyBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    marginTop: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+  },
+  profileSheetSafetyText: {
+    fontFamily: 'Satoshi-Medium',
+    fontSize: 14,
+    color: COLORS.sage,
+  },
   profileSheetChatBtn: {
-    backgroundColor: '#D4A843',
+    backgroundColor: COLORS.gold,
     borderRadius: 999,
     paddingVertical: 16,
     alignItems: 'center',
@@ -1350,7 +1423,7 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   cardMediaImage: {
-    borderRadius: 24,
+    borderRadius: 20,
   },
   cardNoPhoto: {
     backgroundColor: '#0F2F1A',
@@ -1533,7 +1606,7 @@ const styles = StyleSheet.create({
   },
   cardDragTint: {
     ...StyleSheet.absoluteFillObject,
-    borderRadius: 24,
+    borderRadius: 20,
     zIndex: 8,
   },
   cardDragTintLike: {
@@ -1577,7 +1650,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
+    shadowColor: COLORS.forestDeep,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 8,
@@ -1587,13 +1660,17 @@ const styles = StyleSheet.create({
     fontSize: 22,
     color: '#D4A843',
   },
+  actionBar: {
+    width: '100%',
+    paddingTop: 12,
+    paddingBottom: 6,
+    alignItems: 'center',
+  },
   actions: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     gap: 24,
-    marginTop: 20,
-    zIndex: 20,
   },
   passBtn: {
     width: 60,
@@ -1602,7 +1679,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
+    shadowColor: COLORS.forestDeep,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 8,
@@ -1612,10 +1689,10 @@ const styles = StyleSheet.create({
     width: 72,
     height: 72,
     borderRadius: 36,
-    backgroundColor: '#D4A843',
+    backgroundColor: COLORS.gold,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
+    shadowColor: COLORS.forestDeep,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 8,
@@ -1691,57 +1768,5 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.body,
     fontFamily: 'Satoshi-Medium',
     textAlign: 'center',
-  },
-  matchModalBackdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(13,40,24,0.97)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 32,
-  },
-  matchCard: {
-    backgroundColor: '#1A3D28',
-    borderRadius: 24,
-    padding: 40,
-    width: '100%',
-    alignItems: 'center',
-  },
-  matchTitle: {
-    fontSize: 34,
-    fontWeight: '700',
-    color: '#D4A843',
-    width: '100%',
-    textAlign: 'center',
-    marginBottom: 12,
-  },
-  matchSubtitle: {
-    fontFamily: 'Satoshi-Medium',
-    fontSize: 18,
-    fontWeight: '400',
-    color: '#FFFFFF',
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  matchIconWrap: {
-    marginTop: 20,
-    marginBottom: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  matchContinueBtn: {
-    width: '100%',
-    backgroundColor: COLORS.gold,
-    borderRadius: 999,
-    paddingVertical: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  matchContinueBtnPressed: {
-    opacity: 0.88,
-  },
-  matchContinueText: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: COLORS.forest,
   },
 });

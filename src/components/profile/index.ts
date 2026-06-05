@@ -10,3 +10,4 @@ export { default as ProfileGenotypeVerifyModal } from './ProfileGenotypeVerifyMo
 export { default as ProfileViewSections } from './ProfileViewSections';
 export { default as ProfileFooterCard } from './ProfileFooterCard';
 export { default as ProfileSectionHeader } from './ProfileSectionHeader';
+export { default as ProfileStudioCTA } from './ProfileStudioCTA';

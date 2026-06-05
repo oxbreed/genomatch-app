@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { GenoCardFrame } from '../../brand/graphics';
 import ProfileSectionHeader from './ProfileSectionHeader';
+import { PROFILE } from './profileTokens';
 
 type Props = {
   label?: string;
@@ -21,7 +22,7 @@ export default function ProfileSectionCard({
   style,
 }: Props) {
   return (
-    <GenoCardFrame style={[styles.wrap, style]}>
+    <GenoCardFrame style={[styles.wrap, style]} showWatermark={false}>
       <View style={[styles.inner, editing && styles.innerEditing]}>
         {label ? (
           <ProfileSectionHeader kicker={kicker} title={label} hint={hint} />
@@ -35,9 +36,9 @@ export default function ProfileSectionCard({
 const styles = StyleSheet.create({
   wrap: {},
   inner: {
-    padding: 16,
+    padding: PROFILE.cardPadding,
   },
   innerEditing: {
-    backgroundColor: 'rgba(237, 243, 238, 0.5)',
+    backgroundColor: 'rgba(237, 243, 238, 0.45)',
   },
 });

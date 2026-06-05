@@ -1,7 +1,7 @@
 import type { Genotype, MatchWithProfile, ProfileRow } from '../types/database';
 import { logSupabaseResult } from './auth';
 import { mapProfileRow } from './profileMapper';
-import { getBlockedUserIds } from './moderation';
+import { getBlockedUserIds, severConnection } from './moderation';
 import { getCurrentUserId } from './profiles';
 import { supabase } from './supabase';
 
@@ -96,9 +96,10 @@ export async function unmatchByMatchId(matchId: string): Promise<void> {
   const isParticipant = match.user_a_id === userId || match.user_b_id === userId;
   if (!isParticipant) throw new Error('Not allowed to unmatch');
 
-  const { error: deleteError } = await supabase.from('matches').delete().eq('id', matchId);
-  logSupabaseResult('matches.unmatch', null, deleteError);
-  if (deleteError) throw deleteError;
+  const otherId =
+    match.user_a_id === userId ? match.user_b_id : match.user_a_id;
+
+  await severConnection(userId, otherId);
 }
 
 export async function getMatchIdForProfile(profileId: string): Promise<string | null> {

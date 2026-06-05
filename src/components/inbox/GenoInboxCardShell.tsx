@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
   bodyCol: {
     flex: 1,
     minWidth: 0,
-    gap: 3,
+    gap: 4,
   },
   actionsCol: {
     alignItems: 'center',

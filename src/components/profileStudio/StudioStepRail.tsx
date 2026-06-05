@@ -25,17 +25,20 @@ type Props = {
   steps: StudioStep[];
   activeIndex: number;
   onSelect: (index: number) => void;
+  completedSteps?: boolean[];
 };
 
 function StepPill({
   step,
   index,
   active,
+  complete,
   onPress,
 }: {
   step: StudioStep;
   index: number;
   active: boolean;
+  complete?: boolean;
   onPress: () => void;
 }) {
   const scale = useRef(new Animated.Value(active ? 1 : 0.96)).current;
@@ -60,11 +63,15 @@ function StepPill({
             style={styles.pillGlow}
           />
         ) : null}
-        <View style={[styles.pill, active && styles.pillActive]}>
-          <View style={[styles.stepBadge, active && styles.stepBadgeActive]}>
-            <Text style={[styles.stepBadgeText, active && styles.stepBadgeTextActive]}>
-              {index + 1}
-            </Text>
+        <View style={[styles.pill, active && styles.pillActive, complete && !active && styles.pillComplete]}>
+          <View style={[styles.stepBadge, active && styles.stepBadgeActive, complete && styles.stepBadgeComplete]}>
+            {complete ? (
+              <Ionicons name="checkmark" size={11} color={COLORS.forestDeep} />
+            ) : (
+              <Text style={[styles.stepBadgeText, active && styles.stepBadgeTextActive]}>
+                {index + 1}
+              </Text>
+            )}
           </View>
           <Ionicons
             name={step.icon}
@@ -78,7 +85,7 @@ function StepPill({
   );
 }
 
-export default function StudioStepRail({ steps, activeIndex, onSelect }: Props) {
+export default function StudioStepRail({ steps, activeIndex, onSelect, completedSteps }: Props) {
   const [trackWidth, setTrackWidth] = useState(0);
   const progress = useRef(new Animated.Value(0)).current;
 
@@ -129,6 +136,7 @@ export default function StudioStepRail({ steps, activeIndex, onSelect }: Props) 
             step={step}
             index={index}
             active={activeIndex === index}
+            complete={completedSteps?.[index]}
             onPress={() => onSelect(index)}
           />
         ))}
@@ -197,6 +205,10 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.mint,
     borderColor: 'rgba(212, 168, 67, 0.55)',
   },
+  pillComplete: {
+    borderColor: 'rgba(61, 122, 82, 0.35)',
+    backgroundColor: 'rgba(237, 243, 238, 0.85)',
+  },
   stepBadge: {
     width: 20,
     height: 20,
@@ -207,6 +219,9 @@ const styles = StyleSheet.create({
   },
   stepBadgeActive: {
     backgroundColor: COLORS.gold,
+  },
+  stepBadgeComplete: {
+    backgroundColor: 'rgba(61, 122, 82, 0.25)',
   },
   stepBadgeText: {
     fontFamily: 'Satoshi-Bold',

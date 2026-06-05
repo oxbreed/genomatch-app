@@ -20,11 +20,8 @@ function SuperLikeButton({ onPress, disabled }: SuperLikeProps) {
       disabled={disabled}
       accessibilityLabel="Super like"
     >
-      <LinearGradient
-        colors={[COLORS.white, COLORS.mint]}
-        style={styles.superLikeGradient}
-      >
-        <Ionicons name="star" size={26} color={COLORS.gold} />
+      <LinearGradient colors={[COLORS.white, COLORS.mint]} style={styles.superLikeGradient}>
+        <Ionicons name="star" size={22} color={COLORS.gold} />
       </LinearGradient>
     </Pressable>
   );
@@ -49,39 +46,29 @@ export default function DiscoverActionDock({
 }: Props) {
   return (
     <View style={styles.dock}>
-      <LinearGradient
-        colors={['transparent', 'rgba(237, 243, 238, 0.95)', COLORS.linen]}
-        style={styles.dockFade}
-        pointerEvents="none"
-      />
-      <View style={styles.dockInner}>
-        {errorText ? <Animated.Text style={styles.error}>{errorText}</Animated.Text> : null}
-        <View style={styles.actions}>
+      {errorText ? <Animated.Text style={styles.error}>{errorText}</Animated.Text> : null}
+      <View style={styles.actions}>
+        <Pressable
+          style={({ pressed }) => [styles.passBtn, pressed && styles.btnPressed]}
+          onPress={onPass}
+          disabled={disabled}
+        >
+          <Ionicons name="close" size={24} color={COLORS.sage} />
+        </Pressable>
+
+        <SuperLikeButton onPress={onSuperLike} disabled={disabled} />
+
+        <Animated.View style={{ transform: [{ scale: likePulseScale }] }}>
           <Pressable
-            style={({ pressed }) => [styles.passBtn, pressed && styles.btnPressed]}
-            onPress={onPass}
+            style={({ pressed }) => [styles.likeBtnOuter, pressed && styles.btnPressed]}
+            onPress={onLike}
             disabled={disabled}
           >
-            <Ionicons name="close" size={26} color={COLORS.sage} />
+            <LinearGradient colors={[COLORS.gold, '#C49A3A']} style={styles.likeBtnGradient}>
+              <Ionicons name="heart" size={26} color={COLORS.forestDeep} />
+            </LinearGradient>
           </Pressable>
-
-          <SuperLikeButton onPress={onSuperLike} disabled={disabled} />
-
-          <Animated.View style={{ transform: [{ scale: likePulseScale }] }}>
-            <Pressable
-              style={({ pressed }) => [styles.likeBtnOuter, pressed && styles.btnPressed]}
-              onPress={onLike}
-              disabled={disabled}
-            >
-              <LinearGradient
-                colors={[COLORS.gold, '#C49A3A']}
-                style={styles.likeBtnGradient}
-              >
-                <Ionicons name="heart" size={30} color={COLORS.forestDeep} />
-              </LinearGradient>
-            </Pressable>
-          </Animated.View>
-        </View>
+        </Animated.View>
       </View>
     </View>
   );
@@ -90,17 +77,7 @@ export default function DiscoverActionDock({
 const styles = StyleSheet.create({
   dock: {
     width: '100%',
-    marginTop: 8,
-  },
-  dockFade: {
-    position: 'absolute',
-    top: -40,
-    left: 0,
-    right: 0,
-    height: 48,
-  },
-  dockInner: {
-    paddingTop: 12,
+    paddingTop: 8,
     paddingBottom: 4,
     alignItems: 'center',
   },
@@ -116,35 +93,35 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 22,
+    gap: 20,
   },
   passBtn: {
-    width: 58,
-    height: 58,
-    borderRadius: 29,
-    backgroundColor: COLORS.white,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: 'rgba(143, 175, 149, 0.5)',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 4,
-  },
-  superLikeBtn: {
     width: 54,
     height: 54,
     borderRadius: 27,
-    overflow: 'hidden',
-    borderWidth: 2,
-    borderColor: COLORS.gold,
-    shadowColor: COLORS.gold,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
+    backgroundColor: COLORS.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: 'rgba(143, 175, 149, 0.45)',
+    shadowColor: COLORS.forestDeep,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.08,
     shadowRadius: 8,
-    elevation: 5,
+    elevation: 3,
+  },
+  superLikeBtn: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    overflow: 'hidden',
+    borderWidth: 1.5,
+    borderColor: 'rgba(212, 168, 67, 0.55)',
+    shadowColor: COLORS.gold,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.18,
+    shadowRadius: 6,
+    elevation: 4,
   },
   superLikeGradient: {
     flex: 1,
@@ -152,17 +129,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   likeBtnOuter: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
     overflow: 'hidden',
-    borderWidth: 3,
-    borderColor: 'rgba(212, 168, 67, 0.5)',
+    borderWidth: 2,
+    borderColor: 'rgba(212, 168, 67, 0.45)',
     shadowColor: COLORS.gold,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.35,
-    shadowRadius: 14,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.22,
+    shadowRadius: 10,
+    elevation: 6,
   },
   likeBtnGradient: {
     flex: 1,

@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react';
-import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import { StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GenoBondMark } from '../GenoSignaturePattern';
 import { GENO_VISUAL } from './genoVisualTokens';
-import { COLORS } from '../../theme';
+import { COLORS, RADIUS, SHADOWS } from '../../theme';
 
 type Props = {
   children: ReactNode;
@@ -12,7 +12,7 @@ type Props = {
 };
 
 /** Signature gradient card frame — lists, panels, modals */
-export default function GenoCardFrame({ children, style, showWatermark = true }: Props) {
+export default function GenoCardFrame({ children, style, showWatermark = false }: Props) {
   return (
     <View style={[styles.outer, style]}>
       <LinearGradient
@@ -24,7 +24,7 @@ export default function GenoCardFrame({ children, style, showWatermark = true }:
         <View style={styles.inner}>
           {showWatermark ? (
             <View style={styles.watermark} pointerEvents="none">
-              <GenoBondMark size={40} opacity={0.05} />
+              <GenoBondMark size={36} opacity={0.04} />
             </View>
           ) : null}
           {children}
@@ -37,26 +37,24 @@ export default function GenoCardFrame({ children, style, showWatermark = true }:
 const styles = StyleSheet.create({
   outer: {
     marginHorizontal: 16,
-    marginBottom: 10,
+    marginBottom: 12,
   },
   border: {
-    borderRadius: 16,
-    padding: 1.5,
-    shadowColor: COLORS.forest,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 4,
+    borderRadius: RADIUS.lg,
+    padding: 1,
+    ...SHADOWS.card,
+    shadowOpacity: 0.08,
+    shadowRadius: 14,
   },
   inner: {
     backgroundColor: COLORS.white,
-    borderRadius: 14.5,
+    borderRadius: RADIUS.lg - 1,
     overflow: 'hidden',
   },
   watermark: {
     position: 'absolute',
-    right: 8,
-    bottom: 2,
+    right: 10,
+    bottom: 4,
     zIndex: 0,
   },
 });

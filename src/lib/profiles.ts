@@ -3,6 +3,7 @@ import { getBlockedUserIds } from './moderation';
 import type { DiscoveryProfile, Genotype, ProfileRow } from '../types/database';
 import { getAuthenticatedUserId, logSupabaseResult } from './auth';
 import { mapProfileRow, resolveProfilePhotos } from './profileMapper';
+import { getVerificationEligibility } from './verification';
 import { supabase } from './supabase';
 import { sanitizeText } from './validation';
 
@@ -241,18 +242,46 @@ export async function updateProfileFields(
   if (error) throw error;
 }
 
-/** Self-declare genotype accuracy (builds trust with matches). */
+/** Self-declare genotype accuracy (builds trust with matches). Requires photo + profile basics. */
 export async function verifyGenotype(): Promise<void> {
   const userId = await getCurrentUserId();
   if (!userId) throw new Error('Not signed in');
 
-  const { error } = await supabase
-    .from('profiles')
-    .update({
-      verification_status: 'verified',
-      genotype_verified: true,
-    })
-    .eq('id', userId);
+  const row = await getCurrentProfile();
+  const eligibility = getVerificationEligibility(row);
+  if (!eligibility.ok) {
+    throw new Error(eligibility.message);
+  }
+
+  const payload: Record<string, unknown> = {
+    verification_status: 'verified',
+    genotype_verified: true,
+  };
+
+  const { error } = await supabase.from('profiles').update(payload).eq('id', userId);
 
   if (error) throw error;
+}
+
+export type ViewerProfileSnapshot = {
+  name: string;
+  avatarUrl: string | null;
+  photos: string[];
+  gradient: [string, string];
+  genotypeVerified: boolean;
+};
+
+/** Current member snapshot for match modals and headers. */
+export async function getViewerProfileSnapshot(): Promise<ViewerProfileSnapshot | null> {
+  const row = await getCurrentProfile();
+  if (!row) return null;
+
+  const mapped = mapProfileRow(row, row.genotype ?? null);
+  return {
+    name: mapped.name,
+    avatarUrl: mapped.avatarUrl ?? null,
+    photos: mapped.photos,
+    gradient: mapped.gradient,
+    genotypeVerified: mapped.genotypeVerified,
+  };
 }

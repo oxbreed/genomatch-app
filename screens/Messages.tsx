@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
-  ActivityIndicator,
   FlatList,
+  Pressable,
   RefreshControl,
   StyleSheet,
   Text,
@@ -10,10 +10,11 @@ import {
 import { StatusBar } from 'expo-status-bar';
 import * as Haptics from 'expo-haptics';
 import EmptyState from '../src/components/EmptyState';
-import { GenoPremiumChrome } from '../src/brand/graphics';
+import { GenoPremiumChrome, GenoLogoCeremony } from '../src/brand/graphics';
 import { GenoInboxCountBadge, GenoInboxHeader } from '../src/components/inbox';
 import ConversationListCard from '../src/components/messages/ConversationListCard';
 import { logAuthState } from '../src/lib/auth';
+import { TAB_SCENE_BOTTOM_PADDING } from '../src/components/navigation/tabBarLayout';
 import { COLORS } from '../src/theme';
 import { fetchConversations } from '../src/lib/messages';
 import { fetchMatches } from '../src/lib/matches';
@@ -24,6 +25,7 @@ import MatchProfile from './MatchProfile';
 type MessagesProps = {
   initialChatMatchId?: string | null;
   onChatOpened?: () => void;
+  onImmersiveChange?: (immersive: boolean) => void;
 };
 
 function conversationToMatch(item: ConversationPreview): MatchWithProfile {
@@ -34,7 +36,7 @@ function conversationToMatch(item: ConversationPreview): MatchWithProfile {
   };
 }
 
-export default function Messages({ initialChatMatchId, onChatOpened }: MessagesProps) {
+export default function Messages({ initialChatMatchId, onChatOpened, onImmersiveChange }: MessagesProps) {
   const [conversations, setConversations] = useState<ConversationPreview[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -70,6 +72,10 @@ export default function Messages({ initialChatMatchId, onChatOpened }: MessagesP
   useEffect(() => {
     loadConversations();
   }, [loadConversations]);
+
+  useEffect(() => {
+    onImmersiveChange?.(!!activeChat || !!selectedMatch);
+  }, [activeChat, onImmersiveChange, selectedMatch]);
 
   useEffect(() => {
     if (!initialChatMatchId) return;
@@ -117,7 +123,10 @@ export default function Messages({ initialChatMatchId, onChatOpened }: MessagesP
     return (
       <MatchProfile
         match={selectedMatch}
-        onBack={() => setSelectedMatch(null)}
+        onBack={() => {
+          setSelectedMatch(null);
+          loadConversations();
+        }}
         onSendMessage={() => openChat(selectedMatch.matchId, selectedMatch.profile)}
       />
     );
@@ -142,11 +151,15 @@ export default function Messages({ initialChatMatchId, onChatOpened }: MessagesP
 
       {loading ? (
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color={COLORS.forest} />
+          <GenoLogoCeremony variant="compact" tone="dark" />
+          <Text style={styles.loadingText}>Loading conversations…</Text>
         </View>
       ) : error ? (
         <View style={styles.centered}>
           <Text style={styles.error}>{error}</Text>
+          <Pressable style={styles.retryBtn} onPress={() => loadConversations()}>
+            <Text style={styles.retryText}>Try again</Text>
+          </Pressable>
         </View>
       ) : (
         <FlatList
@@ -188,13 +201,30 @@ export default function Messages({ initialChatMatchId, onChatOpened }: MessagesP
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.linen },
-  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
-  list: { paddingBottom: 24 },
+  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, gap: 12 },
+  loadingText: {
+    fontFamily: 'Satoshi-Medium',
+    fontSize: 14,
+    color: COLORS.sage,
+  },
+  list: { paddingBottom: TAB_SCENE_BOTTOM_PADDING },
   emptyList: { flexGrow: 1 },
   error: {
     fontFamily: 'Satoshi-Medium',
     fontSize: 15,
     color: COLORS.error,
     textAlign: 'center',
+    marginBottom: 12,
+  },
+  retryBtn: {
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 12,
+    backgroundColor: COLORS.gold,
+  },
+  retryText: {
+    fontFamily: 'Satoshi-Bold',
+    fontSize: 15,
+    color: COLORS.forestDeep,
   },
 });

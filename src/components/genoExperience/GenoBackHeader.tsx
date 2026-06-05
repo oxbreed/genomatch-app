@@ -58,6 +58,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontFamily: 'ClashDisplay-Semibold',
     fontSize: 17,
+    letterSpacing: -0.3,
     color: COLORS.forestDeep,
     textAlign: 'center',
   },

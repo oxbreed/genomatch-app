@@ -11,7 +11,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { GenoBondMark, GenoSignaturePattern } from '../../brand';
-import { COLORS } from '../../theme';
+import { COLORS, RADIUS, SHADOWS } from '../../theme';
 
 type Props = {
   reviewedCount: number;
@@ -200,16 +200,12 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   cardBorder: {
-    borderRadius: 26,
+    borderRadius: RADIUS.xl,
     padding: 2,
-    shadowColor: COLORS.forest,
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.12,
-    shadowRadius: 24,
-    elevation: 10,
+    ...SHADOWS.cardElevated,
   },
   card: {
-    borderRadius: 24,
+    borderRadius: RADIUS.xl - 2,
     overflow: 'hidden',
   },
   cardGradient: {
@@ -310,7 +306,7 @@ const styles = StyleSheet.create({
     gap: 12,
     width: '100%',
     padding: 14,
-    borderRadius: 16,
+    borderRadius: RADIUS.md,
     backgroundColor: COLORS.white,
     borderWidth: 1,
     borderColor: COLORS.border,
@@ -342,9 +338,10 @@ const styles = StyleSheet.create({
   },
   primaryBtn: {
     width: '100%',
-    borderRadius: 16,
+    borderRadius: RADIUS.md,
     overflow: 'hidden',
     marginBottom: 10,
+    ...SHADOWS.button,
   },
   primaryGradient: {
     flexDirection: 'row',

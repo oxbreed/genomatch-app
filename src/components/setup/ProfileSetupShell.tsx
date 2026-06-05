@@ -35,7 +35,7 @@ export default function ProfileSetupShell({ stepLabel, title, subtitle, children
 
 const styles = StyleSheet.create({
   wrap: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingTop: 8,
     paddingBottom: 12,
     gap: 6,

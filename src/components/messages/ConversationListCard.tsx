@@ -80,6 +80,7 @@ const styles = StyleSheet.create({
     letterSpacing: -0.2,
   },
   nameUnread: {
+    fontFamily: 'ClashDisplay-Semibold',
     color: COLORS.forestDeep,
   },
   time: {

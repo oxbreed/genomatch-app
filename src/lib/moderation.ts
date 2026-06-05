@@ -12,6 +12,17 @@ export const REPORT_REASONS = [
 
 export type ReportReason = (typeof REPORT_REASONS)[number];
 
+/** Remove match row and bilateral likes so blocked/unmatched users can be managed cleanly. */
+export async function severConnection(userId: string, otherId: string): Promise<void> {
+  const [userAId, userBId] = userId < otherId ? [userId, otherId] : [otherId, userId];
+
+  await Promise.all([
+    supabase.from('matches').delete().eq('user_a_id', userAId).eq('user_b_id', userBId),
+    supabase.from('likes').delete().eq('liker_id', userId).eq('liked_id', otherId),
+    supabase.from('likes').delete().eq('liker_id', otherId).eq('liked_id', userId),
+  ]);
+}
+
 /** Submit a report against another user. */
 export async function reportUser(
   reportedId: string,
@@ -41,12 +52,17 @@ export async function blockUser(blockedId: string): Promise<void> {
   if (!blockerId) throw new Error('Not signed in');
   if (blockerId === blockedId) throw new Error('Cannot block yourself');
 
-  const { error } = await supabase.from('blocks').upsert(
-    { blocker_id: blockerId, blocked_id: blockedId },
-    { onConflict: 'blocker_id,blocked_id' }
-  );
+  const { error: insertError } = await supabase.from('blocks').insert({
+    blocker_id: blockerId,
+    blocked_id: blockedId,
+  });
 
-  if (error) throw error;
+  // Unique violation = already blocked
+  if (insertError && insertError.code !== '23505') {
+    throw insertError;
+  }
+
+  await severConnection(blockerId, blockedId);
 }
 
 /** Profile ids the current user has blocked. */

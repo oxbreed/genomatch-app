@@ -1,5 +1,4 @@
 import {
-  ActivityIndicator,
   Image,
   Pressable,
   StyleSheet,
@@ -9,13 +8,11 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { GenoBondHalo, GenoSparkCeremony } from '../../brand/graphics';
+import { GenoLogoCeremony } from '../../brand/graphics';
 import { GenoBondMark } from '../../brand';
 import GenotypeBadge from '../GenotypeBadge';
 import VerifiedBadge from '../VerifiedBadge';
-import { INBOX } from '../inbox/inboxTokens';
 import { COLORS } from '../../theme';
-import { getInitials } from '../../data/mockData';
 import type { Genotype } from '../../types/database';
 
 type Props = {
@@ -26,20 +23,16 @@ type Props = {
   genotypeVerified: boolean;
   heroPhotoUri: string | null;
   editing: boolean;
-  saving: boolean;
+  saving?: boolean;
   draftName?: string;
   draftCity?: string;
   onChangeName?: (text: string) => void;
   onChangeCity?: (text: string) => void;
   onEdit: () => void;
-  onCancel: () => void;
-  onSave: () => void;
-  completionPercent: number;
-  /** Studio edit: hero chrome + bottom dock handle actions */
+  onCancel?: () => void;
+  onSave?: () => void;
   studioMode?: boolean;
 };
-
-const HERO_HEIGHT = 300;
 
 export default function ProfileHero({
   displayName,
@@ -49,20 +42,17 @@ export default function ProfileHero({
   genotypeVerified,
   heroPhotoUri,
   editing,
-  saving,
   draftName,
   draftCity,
   onChangeName,
   onChangeCity,
   onEdit,
-  onCancel,
-  onSave,
-  completionPercent,
   studioMode = false,
 }: Props) {
+  const showInlineEdit = studioMode && editing;
+
   return (
-    <View style={[styles.hero, editing && styles.heroEditing]}>
-      <GenoSparkCeremony variant="forest" />
+    <View style={styles.hero}>
       {heroPhotoUri ? (
         <Image source={{ uri: heroPhotoUri }} style={styles.heroImage} resizeMode="cover" />
       ) : (
@@ -70,58 +60,46 @@ export default function ProfileHero({
           colors={[COLORS.forest, COLORS.forestDeep]}
           style={styles.heroPlaceholder}
         >
-          <View style={styles.haloWrap}>
-            <GenoBondHalo size={140} opacity={0.5} animated />
-            <Text style={styles.initials}>{getInitials(displayName)}</Text>
-          </View>
+          <GenoLogoCeremony variant="hero" tone="light" />
+          {!studioMode ? (
+            <Text style={styles.placeholderHint}>Add a photo in Profile Studio</Text>
+          ) : null}
         </LinearGradient>
       )}
 
+      {heroPhotoUri && studioMode ? (
+        <View style={styles.photoSeal} pointerEvents="none">
+          <GenoLogoCeremony variant="mark" tone="light" subtle style={styles.sealMark} />
+        </View>
+      ) : null}
+
       <LinearGradient
-        colors={['transparent', 'rgba(13,40,24,0.5)', 'rgba(13,40,24,0.96)']}
+        colors={['transparent', 'rgba(13,40,24,0.42)', 'rgba(13,40,24,0.94)']}
         style={styles.heroGradient}
         pointerEvents="none"
       />
 
       <View style={styles.topBar}>
-        <View style={styles.brandPill}>
-          <GenoBondMark size={22} opacity={0.95} />
-          <Text style={styles.brandText}>Your bond</Text>
+        <View style={[styles.brandPill, studioMode && styles.studioPill]}>
+          <GenoBondMark size={18} opacity={0.95} />
+          <Text style={[styles.brandText, studioMode && styles.studioPillText]}>
+            {studioMode ? 'Studio' : 'GenoMatch'}
+          </Text>
         </View>
-        <View style={styles.topRight}>
-          {!studioMode && !editing ? (
-            <Pressable
-              style={({ pressed }) => [styles.editBtn, pressed && styles.pressed]}
-              onPress={onEdit}
-            >
-              <LinearGradient colors={INBOX.colors.goldBtn} style={styles.editGradient}>
-                <Ionicons name="color-wand-outline" size={16} color={COLORS.forestDeep} />
-                <Text style={styles.editText}>Open studio</Text>
-              </LinearGradient>
-            </Pressable>
-          ) : null}
-          {!studioMode && editing ? (
-            <View style={styles.editRow}>
-              <Pressable style={styles.cancelBtn} onPress={onCancel}>
-                <Text style={styles.cancelText}>Cancel</Text>
-              </Pressable>
-              <Pressable style={styles.saveBtn} onPress={onSave} disabled={saving}>
-                <LinearGradient colors={[COLORS.gold, '#C49A3A']} style={styles.saveGradient}>
-                  {saving ? (
-                    <ActivityIndicator color={COLORS.forestDeep} size="small" />
-                  ) : (
-                    <Text style={styles.saveText}>Save</Text>
-                  )}
-                </LinearGradient>
-              </Pressable>
-            </View>
-          ) : null}
-        </View>
+        {!studioMode && !editing ? (
+          <Pressable
+            style={({ pressed }) => [styles.editBtn, pressed && styles.pressed]}
+            onPress={onEdit}
+          >
+            <Ionicons name="color-wand-outline" size={15} color={COLORS.linen} />
+            <Text style={styles.editText}>Studio</Text>
+          </Pressable>
+        ) : null}
       </View>
 
       <View style={styles.overlay}>
         <View style={styles.nameRow}>
-          {editing ? (
+          {showInlineEdit ? (
             <TextInput
               style={styles.nameInput}
               value={draftName}
@@ -130,14 +108,17 @@ export default function ProfileHero({
               placeholderTextColor="rgba(255,255,255,0.45)"
             />
           ) : (
-            <Text style={styles.name} numberOfLines={1}>
-              {displayName}
-            </Text>
+            <View style={styles.nameBlock}>
+              <Text style={styles.name} numberOfLines={1}>
+                {displayName}
+              </Text>
+              <View style={styles.nameAccent} />
+            </View>
           )}
           <GenotypeBadge genotype={genotype} />
           {genotypeVerified ? <VerifiedBadge compact /> : null}
         </View>
-        {editing ? (
+        {showInlineEdit ? (
           <TextInput
             style={styles.locationInput}
             value={draftCity}
@@ -148,99 +129,97 @@ export default function ProfileHero({
         ) : (
           <Text style={styles.location}>
             {age ? `${age} · ` : ''}
-            {city}
+            {city || 'Add your city'}
           </Text>
         )}
       </View>
-
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   hero: {
+    flex: 1,
     width: '100%',
-    height: HERO_HEIGHT,
     position: 'relative',
     overflow: 'hidden',
   },
-  heroEditing: {
-    borderBottomWidth: 3,
-    borderBottomColor: COLORS.gold,
+  heroImage: {
+    ...StyleSheet.absoluteFillObject,
   },
-  heroImage: { width: '100%', height: HERO_HEIGHT },
   heroPlaceholder: {
-    width: '100%',
-    height: HERO_HEIGHT,
+    ...StyleSheet.absoluteFillObject,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  haloWrap: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  initials: {
+  placeholderHint: {
     position: 'absolute',
-    fontFamily: 'ClashDisplay-Semibold',
-    fontSize: 72,
-    color: COLORS.linen,
-    letterSpacing: 2,
+    bottom: 72,
+    fontFamily: 'Satoshi-Medium',
+    fontSize: 12,
+    color: 'rgba(143, 175, 149, 0.85)',
+  },
+  photoSeal: {
+    position: 'absolute',
+    top: 52,
+    alignSelf: 'center',
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    zIndex: 2,
+    opacity: 0.85,
+  },
+  sealMark: {
+    width: 44,
+    height: 44,
   },
   heroGradient: {
     position: 'absolute',
     left: 0,
     right: 0,
     bottom: 0,
-    height: HERO_HEIGHT * 0.65,
+    height: '70%',
   },
   topBar: {
     position: 'absolute',
-    top: 52,
-    left: 16,
-    right: 16,
+    top: 40,
+    left: 14,
+    right: 14,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     zIndex: 3,
   },
-  topRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    flexShrink: 0,
-  },
   brandPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    paddingHorizontal: 12,
+    gap: 7,
+    paddingHorizontal: 11,
     paddingVertical: 6,
     borderRadius: 999,
-    backgroundColor: 'rgba(13, 40, 24, 0.55)',
+    backgroundColor: 'rgba(13, 40, 24, 0.52)',
     borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.35)',
+    borderColor: 'rgba(245, 239, 230, 0.12)',
+  },
+  studioPill: {
+    borderColor: 'rgba(212, 168, 67, 0.55)',
+    backgroundColor: 'rgba(13, 40, 24, 0.78)',
   },
   brandText: {
     fontFamily: 'Satoshi-Bold',
-    fontSize: 12,
+    fontSize: 11,
     color: COLORS.linen,
+    letterSpacing: 0.3,
   },
-  completionPill: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 999,
-    backgroundColor: COLORS.gold,
-  },
-  completionText: {
-    fontFamily: 'Satoshi-Bold',
-    fontSize: 12,
-    color: COLORS.forestDeep,
+  studioPillText: {
+    color: COLORS.gold,
+    letterSpacing: 0.8,
   },
   overlay: {
     position: 'absolute',
     left: 16,
     right: 16,
-    bottom: 56,
+    bottom: 22,
     zIndex: 2,
   },
   nameRow: {
@@ -250,16 +229,27 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 6,
   },
+  nameBlock: {
+    flexShrink: 1,
+    gap: 4,
+  },
   name: {
     fontFamily: 'ClashDisplay-Semibold',
     fontSize: 28,
     color: COLORS.linen,
-    letterSpacing: -0.4,
+    letterSpacing: -0.5,
     flexShrink: 1,
+  },
+  nameAccent: {
+    width: 32,
+    height: 2,
+    borderRadius: 1,
+    backgroundColor: COLORS.gold,
+    opacity: 0.7,
   },
   nameInput: {
     fontFamily: 'ClashDisplay-Semibold',
-    fontSize: 26,
+    fontSize: 24,
     color: COLORS.linen,
     borderBottomWidth: 2,
     borderBottomColor: 'rgba(212, 168, 67, 0.6)',
@@ -270,7 +260,8 @@ const styles = StyleSheet.create({
   location: {
     fontFamily: 'Satoshi-Medium',
     fontSize: 14,
-    color: 'rgba(143, 175, 149, 0.95)',
+    letterSpacing: 0.1,
+    color: 'rgba(245, 239, 230, 0.78)',
   },
   locationInput: {
     fontFamily: 'Satoshi-Medium',
@@ -280,45 +271,22 @@ const styles = StyleSheet.create({
     borderBottomColor: 'rgba(212, 168, 67, 0.5)',
     paddingVertical: 2,
   },
-  editBtn: { borderRadius: 999, overflow: 'hidden' },
-  editGradient: {
+  editBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    gap: 5,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 999,
+    backgroundColor: 'rgba(245, 239, 230, 0.14)',
+    borderWidth: 1,
+    borderColor: 'rgba(245, 239, 230, 0.28)',
   },
   editText: {
     fontFamily: 'Satoshi-Bold',
-    fontSize: 13,
-    color: COLORS.forestDeep,
+    fontSize: 12,
+    color: COLORS.linen,
+    letterSpacing: 0.2,
   },
-  editRow: { flexDirection: 'row', gap: 8 },
-  cancelBtn: {
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 999,
-    backgroundColor: 'rgba(255,255,255,0.92)',
-  },
-  cancelText: {
-    fontFamily: 'Satoshi-Bold',
-    fontSize: 13,
-    color: COLORS.textSubtle,
-  },
-  saveBtn: { borderRadius: 999, overflow: 'hidden' },
-  saveGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    minWidth: 88,
-    justifyContent: 'center',
-  },
-  saveText: {
-    fontFamily: 'Satoshi-Bold',
-    fontSize: 13,
-    color: COLORS.forestDeep,
-  },
-  pressed: { opacity: 0.9 },
+  pressed: { opacity: 0.88 },
 });

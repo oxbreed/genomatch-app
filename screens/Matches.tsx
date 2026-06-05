@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
-  ActivityIndicator,
   Alert,
   FlatList,
+  Pressable,
   RefreshControl,
   StyleSheet,
   Text,
@@ -11,10 +11,11 @@ import {
 import { StatusBar } from 'expo-status-bar';
 import * as Haptics from 'expo-haptics';
 import EmptyState from '../src/components/EmptyState';
-import { GenoPremiumChrome } from '../src/brand/graphics';
+import { GenoPremiumChrome, GenoLogoCeremony } from '../src/brand/graphics';
 import { GenoInboxCountBadge, GenoInboxHeader } from '../src/components/inbox';
 import MatchListCard from '../src/components/matches/MatchListCard';
 import { logAuthState } from '../src/lib/auth';
+import { TAB_SCENE_BOTTOM_PADDING } from '../src/components/navigation/tabBarLayout';
 import { COLORS } from '../src/theme';
 import type { Genotype, MatchWithProfile } from '../src/types/database';
 import { fetchMatches, unmatchByMatchId } from '../src/lib/matches';
@@ -22,9 +23,10 @@ import MatchProfile from './MatchProfile';
 
 type MatchesProps = {
   onStartChat?: (matchId: string) => void;
+  onImmersiveChange?: (immersive: boolean) => void;
 };
 
-export default function Matches({ onStartChat }: MatchesProps) {
+export default function Matches({ onStartChat, onImmersiveChange }: MatchesProps) {
   const [matches, setMatches] = useState<MatchWithProfile[]>([]);
   const [viewerGenotype, setViewerGenotype] = useState<Genotype | null>(null);
   const [loading, setLoading] = useState(true);
@@ -51,6 +53,10 @@ export default function Matches({ onStartChat }: MatchesProps) {
   useEffect(() => {
     loadMatches();
   }, [loadMatches]);
+
+  useEffect(() => {
+    onImmersiveChange?.(!!selectedMatch);
+  }, [onImmersiveChange, selectedMatch]);
 
   const handleUnmatch = (item: MatchWithProfile) => {
     Alert.alert(
@@ -82,7 +88,10 @@ export default function Matches({ onStartChat }: MatchesProps) {
     return (
       <MatchProfile
         match={selectedMatch}
-        onBack={() => setSelectedMatch(null)}
+        onBack={() => {
+          setSelectedMatch(null);
+          loadMatches();
+        }}
         onSendMessage={() => {
           onStartChat?.(selectedMatch.matchId);
           setSelectedMatch(null);
@@ -104,11 +113,15 @@ export default function Matches({ onStartChat }: MatchesProps) {
 
       {loading ? (
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color={COLORS.forest} />
+          <GenoLogoCeremony variant="compact" tone="dark" />
+          <Text style={styles.loadingText}>Loading matches…</Text>
         </View>
       ) : error ? (
         <View style={styles.centered}>
           <Text style={styles.error}>{error}</Text>
+          <Pressable style={styles.retryBtn} onPress={() => loadMatches()}>
+            <Text style={styles.retryText}>Try again</Text>
+          </Pressable>
         </View>
       ) : (
         <FlatList
@@ -152,13 +165,30 @@ export default function Matches({ onStartChat }: MatchesProps) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.linen },
-  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
-  list: { paddingBottom: 24 },
+  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, gap: 12 },
+  loadingText: {
+    fontFamily: 'Satoshi-Medium',
+    fontSize: 14,
+    color: COLORS.sage,
+  },
+  list: { paddingBottom: TAB_SCENE_BOTTOM_PADDING },
   emptyList: { flexGrow: 1 },
   error: {
     fontFamily: 'Satoshi-Medium',
     fontSize: 15,
     color: COLORS.error,
     textAlign: 'center',
+    marginBottom: 12,
+  },
+  retryBtn: {
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 12,
+    backgroundColor: COLORS.gold,
+  },
+  retryText: {
+    fontFamily: 'Satoshi-Bold',
+    fontSize: 15,
+    color: COLORS.forestDeep,
   },
 });

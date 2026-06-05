@@ -1,9 +1,9 @@
 /** Legal entity — shown in privacy, auth footers, and support copy */
 export const GENOMATCH_COMPANY = {
-  legalName: 'GenoMatch Ltd',
+  legalName: 'Genomatch Ltd Nigeria',
   registration: 'RC No. 9236521',
   jurisdiction: 'Nigeria',
-  locationLine: 'GenoMatch Ltd, Nigeria',
+  locationLine: 'Genomatch Ltd Nigeria',
   contactEmail: 'hello@genomatch.app',
   website: 'genomatch.app',
 } as const;

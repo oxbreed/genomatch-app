@@ -113,12 +113,17 @@ export async function fetchConversations(): Promise<ConversationPreview[]> {
       if (!row) return null;
 
       const last = lastByMatch.get(match.id);
+      const unread =
+        !!last &&
+        last.sender_id !== userId &&
+        (last.read_at == null || last.read_at === '');
+
       return {
         matchId: match.id,
         profile: mapProfileRow(row, viewerGenotype),
         lastMessage: last?.body ?? null,
         lastMessageAt: last?.created_at ?? match.created_at,
-        unread: false,
+        unread,
       };
     })
     .filter((item): item is ConversationPreview => item !== null);

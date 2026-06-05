@@ -1,6 +1,8 @@
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
+import { GenoLogoCeremony } from '../../brand/graphics';
 import { COLORS } from '../../theme';
 
 type Props = {
@@ -18,6 +20,12 @@ export default function StudioSaveDock({
   onDiscard,
   onSave,
 }: Props) {
+  const handleSave = () => {
+    if (saveDisabled || saving) return;
+    void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    onSave();
+  };
+
   return (
     <View style={styles.dock}>
       <LinearGradient
@@ -27,22 +35,20 @@ export default function StudioSaveDock({
       />
       <View style={styles.panel}>
         <View style={styles.meta}>
-          <View style={[styles.statusDot, hasChanges && styles.statusDotLive]} />
+          <GenoLogoCeremony variant="mark" tone="dark" subtle style={styles.mark} />
           <View style={styles.metaCopy}>
-            <Text style={styles.metaTitle}>
-              {hasChanges ? 'Ready to publish' : 'Studio draft'}
-            </Text>
+            <View style={styles.metaTitleRow}>
+              <View style={[styles.statusDot, hasChanges && styles.statusDotLive]} />
+              <Text style={styles.metaTitle}>
+                {hasChanges ? 'Ready to publish' : 'Studio draft'}
+              </Text>
+            </View>
             <Text style={styles.metaSub}>
               {hasChanges
-                ? 'Matches will see updates on Discover after save'
-                : 'Tweak your gallery, story, or intent above'}
+                ? 'Matches will see updates on Discover after you publish'
+                : 'Make changes above, then publish when ready'}
             </Text>
           </View>
-          <Ionicons
-            name={hasChanges ? 'rocket-outline' : 'color-wand-outline'}
-            size={22}
-            color={hasChanges ? COLORS.gold : COLORS.sage}
-          />
         </View>
         <View style={styles.actions}>
           <Pressable
@@ -58,7 +64,7 @@ export default function StudioSaveDock({
               pressed && styles.pressed,
               saveDisabled && styles.saveDisabled,
             ]}
-            onPress={onSave}
+            onPress={handleSave}
             disabled={saveDisabled}
           >
             <LinearGradient
@@ -104,10 +110,10 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 22,
     borderTopRightRadius: 22,
     paddingHorizontal: 16,
-    paddingTop: 14,
+    paddingTop: 16,
     paddingBottom: 24,
-    borderTopWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.25)',
+    borderTopWidth: 2,
+    borderColor: COLORS.gold,
     shadowColor: COLORS.forestDeep,
     shadowOffset: { width: 0, height: -6 },
     shadowOpacity: 0.12,
@@ -120,10 +126,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
   },
+  mark: {
+    width: 44,
+    height: 44,
+  },
+  metaCopy: {
+    flex: 1,
+    gap: 3,
+  },
+  metaTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
   statusDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
     backgroundColor: 'rgba(143, 175, 149, 0.45)',
   },
   statusDotLive: {
@@ -132,10 +151,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.9,
     shadowRadius: 6,
-  },
-  metaCopy: {
-    flex: 1,
-    gap: 2,
   },
   metaTitle: {
     fontFamily: 'ClashDisplay-Semibold',

@@ -31,6 +31,7 @@ export type MockProfile = {
   bio: string;
   interests: string[];
   gradient: [string, string];
+  photoUrl?: string;
   lastMessageAt?: string;
 };
 
@@ -45,6 +46,7 @@ export const MOCK_MATCHES: MockProfile[] = [
     bio: 'Architect who loves live music and long walks. Looking for someone intentional, kind, and ready for something real.',
     interests: ['Music', 'Travel', 'Art', 'Food'],
     gradient: ['#2A5C40', '#1A3D28'],
+    photoUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80',
     lastMessageAt: '2h ago',
   },
   {
@@ -57,6 +59,7 @@ export const MOCK_MATCHES: MockProfile[] = [
     bio: 'Fitness coach and foodie. I value honesty, good conversation, and building a future with the right person.',
     interests: ['Fitness', 'Food', 'Sports', 'Movies'],
     gradient: ['#2E7D32', '#1B5E20'],
+    photoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80',
     lastMessageAt: 'Yesterday',
   },
   {
@@ -69,6 +72,7 @@ export const MOCK_MATCHES: MockProfile[] = [
     bio: 'Medical student and book lover. Building a life filled with purpose, laughter, and deep connection.',
     interests: ['Reading', 'Movies', 'Nature', 'Food'],
     gradient: ['#A32D2D', '#7B1F1F'],
+    photoUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=600&q=80',
     lastMessageAt: 'Mon',
   },
 ];
@@ -116,20 +120,23 @@ export function getFirstName(name: string) {
 
 /** Mock cards shown in Discovery when no real profiles exist yet. */
 export function getMockDiscoveryProfiles(): DiscoveryProfile[] {
-  return MOCK_MATCHES.map((p) => ({
-    id: `mock-${p.id}`,
-    name: p.name,
-    age: p.age,
-    city: p.city,
-    genotype: p.genotype,
-    compatibility: p.compatibility,
-    bio: p.bio,
-    interests: p.interests,
-    gradient: p.gradient,
-    avatarUrl: null,
-    photos: [],
-    genotypeVerified: false,
-    verificationStatus: 'unverified',
-    isMock: true,
-  }));
+  return MOCK_MATCHES.map((p) => {
+    const photos = p.photoUrl ? [p.photoUrl] : [];
+    return {
+      id: `mock-${p.id}`,
+      name: p.name,
+      age: p.age,
+      city: p.city,
+      genotype: p.genotype,
+      compatibility: p.compatibility,
+      bio: p.bio,
+      interests: p.interests,
+      gradient: p.gradient,
+      avatarUrl: photos[0] ?? null,
+      photos,
+      genotypeVerified: true,
+      verificationStatus: 'verified',
+      isMock: true,
+    };
+  });
 }

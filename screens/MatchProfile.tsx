@@ -9,11 +9,17 @@ import {
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
+import { GenoPremiumChrome, GenoCardFrame } from '../src/brand/graphics';
+import { GenoBackHeader } from '../src/components/genoExperience';
 import GenotypeBadge from '../src/components/GenotypeBadge';
 import ProfileAvatar from '../src/components/ProfileAvatar';
+import { ProfileViewSections } from '../src/components/profile';
+import { ProfileVitalityRing } from '../src/components/profileStudio';
 import ReportBlockSheet from '../src/components/ReportBlockSheet';
-import { COLORS, RELATIONSHIP_GOAL_LABELS } from '../src/data/mockData';
+import { COLORS, RADIUS, SHADOWS } from '../src/theme';
 import type { MatchWithProfile } from '../src/types/database';
 
 type MatchProfileProps = {
@@ -22,37 +28,9 @@ type MatchProfileProps = {
   onSendMessage: () => void;
 };
 
-function CompatibilityRing({ percent }: { percent: number }) {
-  const ringColor = percent >= 90 ? COLORS.gold : COLORS.sage;
-
-  return (
-    <View style={styles.ringWrap}>
-      <View style={styles.ringOuter} />
-      <View
-        style={[
-          styles.ringAccent,
-          {
-            borderTopColor: ringColor,
-            borderRightColor: percent > 50 ? ringColor : 'transparent',
-            borderBottomColor: percent > 75 ? ringColor : 'transparent',
-            borderLeftColor: percent > 25 ? 'rgba(168, 213, 186, 0.7)' : 'transparent',
-          },
-        ]}
-      />
-      <View style={styles.ringInner}>
-        <Text style={styles.ringPercent}>{percent}%</Text>
-        <Text style={styles.ringLabel}>Compatible</Text>
-      </View>
-    </View>
-  );
-}
-
 export default function MatchProfile({ match, onBack, onSendMessage }: MatchProfileProps) {
   const { profile } = match;
   const [showModerationSheet, setShowModerationSheet] = useState(false);
-  const goalKey = profile.relationshipGoal ?? '';
-  const goalLabel =
-    RELATIONSHIP_GOAL_LABELS[goalKey] ?? (goalKey || 'Not specified');
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(24)).current;
@@ -93,23 +71,27 @@ export default function MatchProfile({ match, onBack, onSendMessage }: MatchProf
     }).start();
   };
 
+  const handleSend = () => {
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    onSendMessage();
+  };
+
+  const menuBtn = (
+    <Pressable
+      style={({ pressed }) => [styles.menuBtn, pressed && styles.menuBtnPressed]}
+      onPress={() => setShowModerationSheet(true)}
+      accessibilityLabel="Report or block"
+    >
+      <Ionicons name="ellipsis-vertical" size={20} color={COLORS.forest} />
+    </Pressable>
+  );
+
   return (
     <View style={styles.container}>
+      <GenoPremiumChrome variant="linen" />
       <StatusBar style="dark" />
 
-      <View style={styles.header}>
-        <Pressable style={styles.backBtn} onPress={onBack}>
-          <Text style={styles.backText}>← Back</Text>
-        </Pressable>
-        <Text style={styles.headerTitle}>Match Profile</Text>
-        <Pressable
-          style={({ pressed }) => [styles.menuBtn, pressed && styles.menuBtnPressed]}
-          onPress={() => setShowModerationSheet(true)}
-          accessibilityLabel="Report or block"
-        >
-          <Ionicons name="ellipsis-vertical" size={22} color={COLORS.forest} />
-        </Pressable>
-      </View>
+      <GenoBackHeader title="Match profile" onBack={onBack} right={menuBtn} />
 
       <ReportBlockSheet
         visible={showModerationSheet}
@@ -124,75 +106,74 @@ export default function MatchProfile({ match, onBack, onSendMessage }: MatchProf
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.heroCard}>
-          <View style={styles.heroTop}>
-            <ProfileAvatar
-              name={profile.name}
-              gradient={profile.gradient}
-              avatarUrl={profile.avatarUrl}
-              size={112}
+        <GenoCardFrame style={styles.heroFrame}>
+          <View style={styles.heroInner}>
+            <View style={styles.heroTop}>
+              <ProfileAvatar
+                name={profile.name}
+                gradient={profile.gradient}
+                avatarUrl={profile.avatarUrl}
+                size={108}
+              />
+              <View style={styles.ringCol}>
+                <ProfileVitalityRing percent={profile.compatibility} size={88} />
+                <Text style={styles.ringLabel}>Compatible</Text>
+              </View>
+            </View>
+
+            <Text style={styles.displayName}>
+              {profile.name}
+              {profile.age != null ? `, ${profile.age}` : ''}
+            </Text>
+
+            <View style={styles.heroMeta}>
+              <GenotypeBadge genotype={profile.genotype} />
+              <View style={styles.cityRow}>
+                <Ionicons name="location-outline" size={14} color={COLORS.sage} />
+                <Text style={styles.city}>{profile.city}</Text>
+              </View>
+            </View>
+
+            <View style={styles.matchBadge}>
+              <Ionicons name="heart" size={12} color={COLORS.forestDeep} />
+              <Text style={styles.matchBadgeText}>Mutual match</Text>
+            </View>
+          </View>
+        </GenoCardFrame>
+
+        <GenoCardFrame style={styles.sectionsFrame}>
+          <View style={styles.sectionsInner}>
+            <ProfileViewSections
+              bio={profile.bio}
+              interests={profile.interests}
+              relationshipGoal={profile.relationshipGoal ?? ''}
             />
-            <CompatibilityRing percent={profile.compatibility} />
           </View>
-
-          <Text style={styles.displayName}>
-            {profile.name}
-            {profile.age != null ? `, ${profile.age}` : ''}
-          </Text>
-
-          <View style={styles.heroMeta}>
-            <GenotypeBadge genotype={profile.genotype} />
-            <View style={styles.cityRow}>
-              <Ionicons name="location-outline" size={14} color={COLORS.sage} />
-              <Text style={styles.city}>{profile.city}</Text>
-            </View>
-          </View>
-
-          <View style={styles.matchBadge}>
-            <Ionicons name="heart" size={12} color={COLORS.forest} />
-            <Text style={styles.matchBadgeText}>Mutual Match</Text>
-          </View>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>About</Text>
-          <Text style={styles.bio}>
-            {profile.bio || 'No bio yet — say hello and start a conversation!'}
-          </Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Interests</Text>
-          {profile.interests.length > 0 ? (
-            <View style={styles.chipRow}>
-              {profile.interests.map((interest) => (
-                <View key={interest} style={styles.chip}>
-                  <Text style={styles.chipText}>{interest}</Text>
-                </View>
-              ))}
-            </View>
-          ) : (
-            <Text style={styles.emptyHint}>No interests listed yet</Text>
-          )}
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Relationship goal</Text>
-          <View style={styles.goalCard}>
-            <Text style={styles.goalText}>{goalLabel}</Text>
-          </View>
-        </View>
+        </GenoCardFrame>
       </Animated.ScrollView>
 
       <View style={styles.footer}>
+        <LinearGradient
+          colors={['rgba(245, 239, 230, 0)', 'rgba(245, 239, 230, 0.96)', COLORS.linen]}
+          style={styles.footerFade}
+          pointerEvents="none"
+        />
         <Animated.View style={[styles.footerInner, { transform: [{ scale: ctaScale }] }]}>
           <Pressable
-            style={styles.messageBtn}
+            style={({ pressed }) => [styles.messageBtnWrap, pressed && styles.messageBtnPressed]}
             onPressIn={onCtaPressIn}
             onPressOut={onCtaPressOut}
-            onPress={onSendMessage}
+            onPress={handleSend}
           >
-            <Text style={styles.messageBtnText}>Send Message</Text>
+            <LinearGradient
+              colors={[COLORS.forest, COLORS.forestDeep]}
+              start={{ x: 0, y: 0.5 }}
+              end={{ x: 1, y: 0.5 }}
+              style={styles.messageBtn}
+            >
+              <Ionicons name="chatbubble-ellipses-outline" size={18} color={COLORS.linen} />
+              <Text style={styles.messageBtnText}>Send message</Text>
+            </LinearGradient>
           </Pressable>
         </Animated.View>
       </View>
@@ -203,114 +184,54 @@ export default function MatchProfile({ match, onBack, onSendMessage }: MatchProf
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.ivory,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingTop: 58,
-    paddingHorizontal: 20,
-    paddingBottom: 12,
-  },
-  backBtn: {
-    minHeight: 40,
-    justifyContent: 'center',
-    paddingHorizontal: 12,
-    borderRadius: 20,
-    backgroundColor: 'rgba(168, 213, 186, 0.35)',
-  },
-  backText: {
-    fontSize: 14,
-    fontWeight: '800',
-    color: COLORS.forest,
-  },
-  headerTitle: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: COLORS.forest,
-    letterSpacing: 0.2,
+    backgroundColor: COLORS.linen,
   },
   menuBtn: {
     width: 40,
     height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(168, 213, 186, 0.35)',
+    borderRadius: RADIUS.pill,
+    backgroundColor: COLORS.mint,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(7, 77, 46, 0.08)',
+    borderColor: 'rgba(212, 168, 67, 0.28)',
   },
   menuBtnPressed: {
-    opacity: 0.85,
+    opacity: 0.88,
   },
   scroll: {
-    paddingHorizontal: 20,
     paddingBottom: 120,
   },
-  heroCard: {
-    backgroundColor: COLORS.white,
-    borderRadius: 24,
-    paddingVertical: 28,
-    paddingHorizontal: 20,
+  heroFrame: {
+    marginTop: 4,
+  },
+  heroInner: {
+    paddingVertical: 24,
+    paddingHorizontal: 18,
     alignItems: 'center',
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(7, 77, 46, 0.08)',
-    shadowColor: COLORS.forest,
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 3,
   },
   heroTop: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 20,
-    marginBottom: 16,
+    gap: 18,
+    marginBottom: 14,
   },
-  ringWrap: {
-    width: 88,
-    height: 88,
+  ringCol: {
     alignItems: 'center',
-    justifyContent: 'center',
-  },
-  ringOuter: {
-    position: 'absolute',
-    width: 88,
-    height: 88,
-    borderRadius: 44,
-    borderWidth: 3,
-    borderColor: 'rgba(168, 213, 186, 0.35)',
-  },
-  ringAccent: {
-    position: 'absolute',
-    width: 88,
-    height: 88,
-    borderRadius: 44,
-    borderWidth: 3,
-  },
-  ringInner: {
-    alignItems: 'center',
-  },
-  ringPercent: {
-    fontSize: 22,
-    fontWeight: '800',
-    color: COLORS.forest,
-    letterSpacing: -0.5,
+    gap: 4,
   },
   ringLabel: {
+    fontFamily: 'Satoshi-Bold',
     fontSize: 10,
-    fontWeight: '700',
-    color: 'rgba(7, 77, 46, 0.55)',
-    letterSpacing: 0.3,
-    marginTop: 2,
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
+    color: COLORS.sage,
   },
   displayName: {
+    fontFamily: 'ClashDisplay-Semibold',
     fontSize: 26,
-    fontWeight: '800',
-    color: COLORS.forest,
+    color: COLORS.forestDeep,
     textAlign: 'center',
     letterSpacing: -0.5,
   },
@@ -328,115 +249,74 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   city: {
+    fontFamily: 'Satoshi-Medium',
     fontSize: 14,
-    fontWeight: '400',
-    lineHeight: 21,
+    lineHeight: 20,
     color: COLORS.textMuted,
   },
   matchBadge: {
-    marginTop: 16,
+    marginTop: 14,
     paddingHorizontal: 14,
     paddingVertical: 7,
-    borderRadius: 999,
-    backgroundColor: 'rgba(255, 224, 130, 0.45)',
+    borderRadius: RADIUS.pill,
+    backgroundColor: 'rgba(212, 168, 67, 0.22)',
     borderWidth: 1,
-    borderColor: 'rgba(201, 135, 43, 0.25)',
+    borderColor: 'rgba(212, 168, 67, 0.35)',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
   },
   matchBadgeText: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: COLORS.forest,
-    letterSpacing: 0.2,
-  },
-  section: {
-    backgroundColor: COLORS.white,
-    borderRadius: 18,
-    padding: 16,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(7, 77, 46, 0.08)',
-  },
-  sectionLabel: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: COLORS.sage,
-    letterSpacing: 1.2,
+    fontFamily: 'Satoshi-Bold',
+    fontSize: 11,
+    letterSpacing: 1,
     textTransform: 'uppercase',
-    marginBottom: 10,
+    color: COLORS.forestDeep,
   },
-  bio: {
-    fontSize: 15,
-    lineHeight: 23,
-    color: 'rgba(7, 77, 46, 0.78)',
-    fontWeight: '500',
+  sectionsFrame: {
+    marginTop: 2,
   },
-  chipRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  chip: {
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 999,
-    backgroundColor: 'rgba(168, 213, 186, 0.35)',
-  },
-  chipText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: COLORS.forest,
-  },
-  emptyHint: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: 'rgba(7, 77, 46, 0.5)',
-  },
-  goalCard: {
-    backgroundColor: 'rgba(255, 224, 130, 0.35)',
-    borderRadius: 12,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(201, 135, 43, 0.25)',
-  },
-  goalText: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: COLORS.forest,
+  sectionsInner: {
+    padding: 16,
   },
   footer: {
     position: 'absolute',
     left: 0,
     right: 0,
     bottom: 0,
-    paddingHorizontal: 20,
-    paddingTop: 12,
+    paddingHorizontal: 16,
     paddingBottom: 28,
-    backgroundColor: COLORS.ivory,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(7, 77, 46, 0.08)',
+  },
+  footerFade: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: -28,
+    height: 28,
   },
   footerInner: {
     width: '100%',
   },
+  messageBtnWrap: {
+    borderRadius: RADIUS.md,
+    overflow: 'hidden',
+    ...SHADOWS.button,
+  },
+  messageBtnPressed: {
+    opacity: 0.92,
+  },
   messageBtn: {
-    height: 56,
-    borderRadius: 16,
-    backgroundColor: COLORS.forest,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: COLORS.forest,
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 4,
+    gap: 8,
+    height: 54,
+    paddingHorizontal: 20,
   },
   messageBtnText: {
-    fontSize: 17,
-    fontWeight: '800',
-    color: COLORS.ivory,
-    letterSpacing: 0.2,
+    fontFamily: 'Satoshi-Bold',
+    fontSize: 16,
+    color: COLORS.linen,
+    letterSpacing: 0.1,
   },
 });

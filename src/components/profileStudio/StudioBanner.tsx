@@ -1,126 +1,58 @@
-import { useEffect, useRef } from 'react';
-import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import Svg, { Path } from 'react-native-svg';
+import { GenoLogoCeremony } from '../../brand/graphics';
 import { COLORS } from '../../theme';
 
 type Props = {
   doneCount: number;
   totalCount: number;
-  opacity?: Animated.Value;
 };
 
-function SparkGlyph() {
+export default function StudioBanner({ doneCount, totalCount }: Props) {
   return (
-    <Svg width={28} height={28} viewBox="0 0 28 28">
-      <Path
-        d="M14 2 L16 12 L26 14 L16 16 L14 26 L12 16 L2 14 L12 12 Z"
-        fill={COLORS.gold}
-        fillOpacity={0.85}
-      />
-    </Svg>
-  );
-}
-
-export default function StudioBanner({ doneCount, totalCount, opacity }: Props) {
-  const shimmer = useRef(new Animated.Value(0)).current;
-  const spin = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    const shimmerLoop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(shimmer, {
-          toValue: 1,
-          duration: 2200,
-          easing: Easing.inOut(Easing.quad),
-          useNativeDriver: true,
-        }),
-        Animated.timing(shimmer, {
-          toValue: 0,
-          duration: 2200,
-          easing: Easing.inOut(Easing.quad),
-          useNativeDriver: true,
-        }),
-      ])
-    );
-    const spinLoop = Animated.loop(
-      Animated.timing(spin, {
-        toValue: 1,
-        duration: 12000,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      })
-    );
-    shimmerLoop.start();
-    spinLoop.start();
-    return () => {
-      shimmerLoop.stop();
-      spinLoop.stop();
-    };
-  }, [shimmer, spin]);
-
-  const shimmerOpacity = shimmer.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.35, 1],
-  });
-  const rotate = spin.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
-  });
-
-  const content = (
-    <LinearGradient
-      colors={['#1A3D28', '#0D2818', '#142E22']}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      style={styles.card}
-    >
-      <View style={styles.pattern} pointerEvents="none">
-        {[0, 1, 2, 3].map((i) => (
-          <View
-            key={i}
-            style={[styles.patternDot, { left: 24 + i * 52, top: 12 + (i % 2) * 28 }]}
-          />
-        ))}
-      </View>
-      <Animated.View style={[styles.iconOrbit, { transform: [{ rotate }] }]}>
-        <View style={styles.iconRing} />
-      </Animated.View>
-      <View style={styles.iconCore}>
-        <Animated.View style={{ opacity: shimmerOpacity }}>
-          <SparkGlyph />
-        </Animated.View>
-      </View>
-      <View style={styles.copy}>
-        <Text style={styles.kicker}>GENOMATCH STUDIO</Text>
-        <Text style={styles.title}>Craft your presence</Text>
-        <Text style={styles.sub}>
-          Private until you publish · {doneCount}/{totalCount} essentials glowing
-        </Text>
-        <View style={styles.dots}>
-          {Array.from({ length: totalCount }).map((_, i) => (
+    <View style={styles.wrap}>
+      <LinearGradient
+        colors={['#1A3D28', '#0D2818', '#142E22']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.card}
+      >
+        <View style={styles.pattern} pointerEvents="none">
+          {[0, 1, 2, 3].map((i) => (
             <View
               key={i}
-              style={[styles.dot, i < doneCount && styles.dotLit]}
+              style={[styles.patternDot, { left: 24 + i * 52, top: 12 + (i % 2) * 28 }]}
             />
           ))}
         </View>
-      </View>
-      <Ionicons
-        name="chevron-down-outline"
-        size={18}
-        color="rgba(245, 239, 230, 0.45)"
-        style={styles.chevron}
-      />
-    </LinearGradient>
+
+        <View style={styles.logoSlot}>
+          <GenoLogoCeremony variant="studio" tone="light" />
+        </View>
+
+        <View style={styles.copy}>
+          <Text style={styles.kicker}>GENOMATCH STUDIO</Text>
+          <Text style={styles.title}>Craft your presence</Text>
+          <Text style={styles.sub}>
+            Draft only you see · {doneCount} of {totalCount} essentials complete
+          </Text>
+          <View style={styles.dots}>
+            {Array.from({ length: totalCount }).map((_, i) => (
+              <View key={i} style={[styles.dot, i < doneCount && styles.dotLit]} />
+            ))}
+          </View>
+        </View>
+
+        <Ionicons
+          name="chevron-down-outline"
+          size={18}
+          color="rgba(245, 239, 230, 0.45)"
+          style={styles.chevron}
+        />
+      </LinearGradient>
+    </View>
   );
-
-  if (opacity) {
-    return <Animated.View style={{ opacity, marginHorizontal: 16, marginTop: 12 }}>{content}</Animated.View>;
-  }
-
-  return <View style={styles.wrap}>{content}</View>;
 }
 
 const styles = StyleSheet.create({
@@ -153,32 +85,14 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     backgroundColor: 'rgba(212, 168, 67, 0.2)',
   },
-  iconOrbit: {
-    position: 'absolute',
-    left: 14,
-    top: 14,
-    width: 52,
-    height: 52,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconRing: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.4)',
-    borderStyle: 'dashed',
-  },
-  iconCore: {
-    width: 52,
-    height: 52,
+  logoSlot: {
+    width: 64,
+    height: 64,
     alignItems: 'center',
     justifyContent: 'center',
   },
   copy: {
     flex: 1,
-    marginLeft: 48,
     gap: 4,
   },
   kicker: {

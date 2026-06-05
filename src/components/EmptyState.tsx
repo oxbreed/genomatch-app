@@ -1,9 +1,11 @@
 import type { ReactElement } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Line, Path, Rect } from 'react-native-svg';
-import { COLORS, FOREST, FOREST_DEEP, GOLD, LINEN, SAGE } from '../theme';
+import { LinearGradient } from 'expo-linear-gradient';
+import { COLORS, FOREST, FOREST_DEEP, GOLD, LINEN, RADIUS, SAGE, SHADOWS } from '../theme';
+import { INBOX } from './inbox/inboxTokens';
 
-const ILLUS_SIZE = 136;
+const ILLUS_SIZE = 128;
 
 export type EmptyStateType =
   | 'no-profiles'
@@ -164,10 +166,17 @@ export default function EmptyState({
       <Text style={styles.subtitle}>{subtitle}</Text>
       {actionLabel && onAction ? (
         <Pressable
-          style={({ pressed }) => [styles.cta, pressed && styles.ctaPressed]}
+          style={({ pressed }) => [styles.ctaWrap, pressed && styles.ctaPressed]}
           onPress={onAction}
         >
-          <Text style={styles.ctaText}>{actionLabel}</Text>
+          <LinearGradient
+            colors={[COLORS.gold, '#C49A38']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.cta}
+          >
+            <Text style={styles.ctaText}>{actionLabel}</Text>
+          </LinearGradient>
         </Pressable>
       ) : null}
     </View>
@@ -177,46 +186,50 @@ export default function EmptyState({
 const styles = StyleSheet.create({
   wrap: {
     alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 48,
+    paddingHorizontal: INBOX.cardMarginH + 8,
+    paddingTop: 44,
     paddingBottom: 24,
   },
   illusWrap: {
-    marginBottom: 20,
+    marginBottom: 18,
     alignItems: 'center',
     justifyContent: 'center',
   },
   title: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: COLORS.forest,
+    fontFamily: 'ClashDisplay-Semibold',
+    fontSize: INBOX.headerTitleSize,
+    color: COLORS.forestDeep,
     textAlign: 'center',
-    letterSpacing: -0.3,
+    letterSpacing: -0.4,
     marginBottom: 8,
   },
   subtitle: {
-    fontSize: 15,
+    fontFamily: 'Satoshi-Medium',
+    fontSize: INBOX.headerSubtitleSize + 1,
     lineHeight: 22,
-    fontWeight: '500',
     color: COLORS.sage,
     textAlign: 'center',
     maxWidth: 280,
   },
-  cta: {
+  ctaWrap: {
     marginTop: 20,
-    backgroundColor: COLORS.gold,
-    paddingHorizontal: 22,
-    paddingVertical: 12,
-    borderRadius: 14,
-    minWidth: 160,
+    borderRadius: RADIUS.md,
+    overflow: 'hidden',
+    minWidth: 168,
+    ...SHADOWS.button,
+  },
+  cta: {
+    paddingHorizontal: 24,
+    paddingVertical: 13,
     alignItems: 'center',
   },
   ctaPressed: {
     opacity: 0.9,
   },
   ctaText: {
+    fontFamily: 'Satoshi-Bold',
     fontSize: 15,
-    fontWeight: '800',
-    color: COLORS.forest,
+    color: COLORS.forestDeep,
+    letterSpacing: 0.1,
   },
 });

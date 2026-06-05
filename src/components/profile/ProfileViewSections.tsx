@@ -1,5 +1,5 @@
+import type { ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, RELATIONSHIP_GOAL_LABELS } from '../../data/mockData';
 import { PROFILE } from './profileTokens';
 
@@ -9,49 +9,83 @@ type Props = {
   relationshipGoal: string;
 };
 
+function SectionBlock({
+  label,
+  children,
+  showDivider,
+}: {
+  label: string;
+  children: ReactNode;
+  showDivider?: boolean;
+}) {
+  return (
+    <View style={styles.block}>
+      <Text style={styles.blockLabel}>{label}</Text>
+      {children}
+      {showDivider ? <View style={styles.divider} /> : null}
+    </View>
+  );
+}
+
 export default function ProfileViewSections({ bio, interests, relationshipGoal }: Props) {
   const goalLabel =
     RELATIONSHIP_GOAL_LABELS[relationshipGoal] ?? (relationshipGoal || 'Not set');
 
   return (
     <View style={styles.wrap}>
-      <Text style={styles.bioText}>
-        {bio || 'Add a bio in Edit to tell matches your story.'}
-      </Text>
+      <SectionBlock label="Bio" showDivider>
+        <Text style={[styles.bioText, !bio && styles.placeholder]}>
+          {bio || 'Add a bio in Profile Studio to tell matches your story.'}
+        </Text>
+      </SectionBlock>
 
-      {interests.length > 0 ? (
-        <View style={styles.chipRow}>
-          {interests.map((interest) => (
-            <LinearGradient
-              key={interest}
-              colors={['rgba(237, 243, 238, 0.95)', 'rgba(212, 168, 67, 0.12)']}
-              style={styles.chip}
-            >
-              <Text style={styles.chipText}>{interest}</Text>
-            </LinearGradient>
-          ))}
+      <SectionBlock label="Interests" showDivider>
+        {interests.length > 0 ? (
+          <View style={styles.chipRow}>
+            {interests.map((interest) => (
+              <View key={interest} style={styles.chip}>
+                <Text style={styles.chipText}>{interest}</Text>
+              </View>
+            ))}
+          </View>
+        ) : (
+          <Text style={styles.emptyHint}>No interests yet</Text>
+        )}
+      </SectionBlock>
+
+      <SectionBlock label="Looking for">
+        <View style={styles.goalPill}>
+          <Text style={styles.goalText}>{goalLabel}</Text>
         </View>
-      ) : (
-        <Text style={styles.emptyHint}>No interests yet — add them in Edit</Text>
-      )}
-
-      <LinearGradient
-        colors={['rgba(212, 168, 67, 0.28)', 'rgba(61, 122, 82, 0.15)']}
-        style={styles.goalPill}
-      >
-        <Text style={styles.goalText}>{goalLabel}</Text>
-      </LinearGradient>
+      </SectionBlock>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  wrap: { gap: 14 },
+  wrap: { gap: PROFILE.sectionGap },
+  block: { gap: 8 },
+  divider: {
+    marginTop: 16,
+    height: 1,
+    backgroundColor: COLORS.border,
+  },
+  blockLabel: {
+    fontFamily: 'Satoshi-Bold',
+    fontSize: PROFILE.sectionLabelSize,
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
+    color: COLORS.sage,
+  },
   bioText: {
     fontFamily: 'Satoshi-Medium',
     fontSize: PROFILE.bodySize,
-    lineHeight: 23,
+    lineHeight: 24,
     color: COLORS.forestDeep,
+  },
+  placeholder: {
+    color: COLORS.textMuted,
+    fontStyle: 'italic',
   },
   chipRow: {
     flexDirection: 'row',
@@ -59,16 +93,17 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   chip: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 999,
+    backgroundColor: COLORS.white,
     borderWidth: 1,
-    borderColor: 'rgba(61, 122, 82, 0.15)',
+    borderColor: 'rgba(143, 175, 149, 0.45)',
   },
   chipText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: 'Satoshi-Medium',
     fontSize: 13,
-    color: COLORS.forest,
+    color: COLORS.forestDeep,
   },
   emptyHint: {
     fontFamily: 'Satoshi-Medium',
@@ -78,14 +113,16 @@ const styles = StyleSheet.create({
   goalPill: {
     alignSelf: 'flex-start',
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 14,
+    paddingVertical: 11,
+    borderRadius: 12,
+    backgroundColor: COLORS.mint,
     borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.35)',
+    borderColor: 'rgba(212, 168, 67, 0.22)',
   },
   goalText: {
     fontFamily: 'ClashDisplay-Semibold',
-    fontSize: 18,
+    fontSize: 16,
     color: COLORS.forestDeep,
+    letterSpacing: -0.2,
   },
 });

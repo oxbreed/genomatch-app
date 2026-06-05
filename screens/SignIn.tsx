@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
-import GenoMatchLogo from '../src/components/GenoMatchLogo';
+import { GenoLogoCeremony, GenoPremiumChrome } from '../src/brand/graphics';
 import { COLORS } from '../src/theme';
 import { resolvePostSignInScreen } from '../src/lib/profiles';
 import { supabase } from '../src/lib/supabase';
@@ -35,7 +35,6 @@ export default function SignIn({ onBack, onCreateAccount, onSignedIn }: SignInPr
   const introOpacity = useRef(new Animated.Value(0)).current;
   const introTranslateY = useRef(new Animated.Value(18)).current;
   const ctaScale = useRef(new Animated.Value(1)).current;
-  const logoPulse = useRef(new Animated.Value(0.92)).current;
 
   useEffect(() => {
     Animated.parallel([
@@ -51,14 +50,8 @@ export default function SignIn({ onBack, onCreateAccount, onSignedIn }: SignInPr
         easing: Easing.out(Easing.cubic),
         useNativeDriver: true,
       }),
-      Animated.timing(logoPulse, {
-        toValue: 1,
-        duration: 700,
-        easing: Easing.out(Easing.quad),
-        useNativeDriver: true,
-      }),
     ]).start();
-  }, [introOpacity, introTranslateY, logoPulse]);
+  }, [introOpacity, introTranslateY]);
 
   const handleSignIn = async () => {
     const trimmedEmail = email.trim();
@@ -124,6 +117,7 @@ export default function SignIn({ onBack, onCreateAccount, onSignedIn }: SignInPr
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
+      <GenoPremiumChrome variant="forest" />
       <StatusBar style="light" />
       <ScrollView
         contentContainerStyle={styles.scroll}
@@ -145,9 +139,9 @@ export default function SignIn({ onBack, onCreateAccount, onSignedIn }: SignInPr
           <View style={styles.brandChip}>
             <Text style={styles.brandChipText}>WELCOME BACK</Text>
           </View>
-          <Animated.View style={[styles.logoOrb, { transform: [{ scale: logoPulse }] }]}>
-            <GenoMatchLogo size={56} />
-          </Animated.View>
+          <View style={styles.logoWrap}>
+            <GenoLogoCeremony variant="auth" tone="light" />
+          </View>
           <Text style={styles.title}>Sign In to GenoMatch</Text>
           <Text style={styles.subtitle}>
             Pick up where you left off — your matches and conversations are waiting.
@@ -278,19 +272,9 @@ const styles = StyleSheet.create({
     letterSpacing: 1.1,
     fontWeight: '800',
   },
-  logoOrb: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: 'rgba(250, 250, 247, 0.12)',
-    borderWidth: 1,
-    borderColor: 'rgba(250, 250, 247, 0.22)',
-    alignItems: 'center',
-    justifyContent: 'center',
+  logoWrap: {
     marginBottom: 16,
-  },
-  logoEmoji: {
-    fontSize: 34,
+    alignItems: 'flex-start',
   },
   title: {
     color: COLORS.ivory,
