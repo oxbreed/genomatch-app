@@ -10,6 +10,10 @@ import { sanitizeText } from './validation';
 const PROFILE_FIELDS =
   'id, email, genotype, display_name, avatar_url, photos, bio, date_of_birth, city, country, gender, interests, relationship_goal, onboarding_completed, verification_status, genotype_verified, created_at, updated_at';
 
+/** Public profile fields for discovery — excludes email and other private columns. */
+const DISCOVERY_PROFILE_FIELDS =
+  'id, display_name, date_of_birth, city, country, genotype, genotype_verified, photos, bio, interests, relationship_goal, verification_status';
+
 export { resolveProfilePhotos };
 
 export async function getCurrentUserId(): Promise<string | null> {
@@ -145,7 +149,7 @@ export async function fetchDiscoveryProfiles(): Promise<{
 
   const { data: me, error: meError } = await supabase
     .from('profiles')
-    .select('*')
+    .select('genotype')
     .eq('id', userId)
     .maybeSingle();
 
@@ -163,7 +167,7 @@ export async function fetchDiscoveryProfiles(): Promise<{
 
   const { data, error } = await supabase
     .from('profiles')
-    .select('*')
+    .select(DISCOVERY_PROFILE_FIELDS)
     .neq('id', userId)
     .order('created_at', { ascending: false })
     .limit(50);
