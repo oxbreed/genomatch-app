@@ -8,11 +8,13 @@ export async function getAuthenticatedUserId(): Promise<string | null> {
     error: sessionError,
   } = await supabase.auth.getSession();
 
-  console.log('[auth] getSession', {
-    userId: session?.user?.id ?? null,
-    expiresAt: session?.expires_at ?? null,
-    error: sessionError?.message ?? null,
-  });
+  if (__DEV__) {
+    console.log('[auth] getSession', {
+      userId: session?.user?.id ?? null,
+      expiresAt: session?.expires_at ?? null,
+      error: sessionError?.message ?? null,
+    });
+  }
 
   if (session?.user?.id) return session.user.id;
 
@@ -21,10 +23,12 @@ export async function getAuthenticatedUserId(): Promise<string | null> {
     error: userError,
   } = await supabase.auth.getUser();
 
-  console.log('[auth] getUser fallback', {
-    userId: user?.id ?? null,
-    error: userError?.message ?? null,
-  });
+  if (__DEV__) {
+    console.log('[auth] getUser fallback', {
+      userId: user?.id ?? null,
+      error: userError?.message ?? null,
+    });
+  }
 
   return user?.id ?? null;
 }
@@ -33,11 +37,14 @@ export async function logAuthState(context: string): Promise<void> {
   const {
     data: { session },
   } = await supabase.auth.getSession();
-  console.log(`[auth] ${context}`, {
-    hasSession: !!session,
-    userId: session?.user?.id ?? null,
-    email: session?.user?.email ?? null,
-  });
+
+  if (__DEV__) {
+    console.log(`[auth] ${context}`, {
+      hasSession: !!session,
+      userId: session?.user?.id ?? null,
+      email: session?.user?.email ?? null,
+    });
+  }
 }
 
 export function logSupabaseResult(
@@ -45,25 +52,27 @@ export function logSupabaseResult(
   data: unknown,
   error: PostgrestError | null
 ): void {
-  console.log(`[supabase] ${label}`, {
-    rowCount: Array.isArray(data) ? data.length : data ? 1 : 0,
-    data,
-    error: error
-      ? {
-          message: error.message,
-          code: error.code,
-          hint: error.hint,
-          details: error.details,
-        }
-      : null,
-  });
+  if (__DEV__) {
+    console.log(`[supabase] ${label}`, {
+      rowCount: Array.isArray(data) ? data.length : data ? 1 : 0,
+      data,
+      error: error
+        ? {
+            message: error.message,
+            code: error.code,
+            hint: error.hint,
+            details: error.details,
+          }
+        : null,
+    });
 
-  if (error?.code === '42501') {
-    console.warn(`[supabase] ${label} — possible RLS policy block (code 42501)`);
-  }
-  if (error?.message?.includes('does not exist')) {
-    console.warn(
-      `[supabase] ${label} — table may be missing; run Supabase migrations`
-    );
+    if (error?.code === '42501') {
+      console.warn(`[supabase] ${label} — possible RLS policy block (code 42501)`);
+    }
+    if (error?.message?.includes('does not exist')) {
+      console.warn(
+        `[supabase] ${label} — table may be missing; run Supabase migrations`
+      );
+    }
   }
 }
