@@ -81,7 +81,7 @@ export default function ResetPassword({ email, onSuccess }: ResetPasswordProps) 
         const { error: verifyError } = await supabase.auth.verifyOtp({
           email,
           token: otpCode.trim(),
-          type: 'email',
+          type: 'recovery',
         });
 
         if (verifyError) {

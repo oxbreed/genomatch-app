@@ -127,12 +127,11 @@ export default function SignIn({
       return;
     }
 
-    const { error: otpError } = await supabase.auth.signInWithOtp({
-      email: trimmedEmail,
-      options: { shouldCreateUser: false },
+    const { error } = await supabase.auth.resetPasswordForEmail(trimmedEmail, {
+      redirectTo: 'genomatch://reset-password',
     });
-    if (otpError) {
-      setError(otpError.message);
+    if (error) {
+      setError(error.message);
       return;
     }
 
