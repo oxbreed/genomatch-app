@@ -18,10 +18,12 @@ import { COLORS } from '../src/theme';
 import { supabase } from '../src/lib/supabase';
 
 type ResetPasswordProps = {
+  email?: string;
   onSuccess: () => void;
 };
 
-export default function ResetPassword({ onSuccess }: ResetPasswordProps) {
+export default function ResetPassword({ email, onSuccess }: ResetPasswordProps) {
+  const [otpCode, setOtpCode] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPass, setShowPass] = useState(false);
@@ -31,6 +33,8 @@ export default function ResetPassword({ onSuccess }: ResetPasswordProps) {
 
   const introOpacity = useRef(new Animated.Value(1)).current;
   const ctaScale = useRef(new Animated.Value(1)).current;
+
+  const requiresOtp = Boolean(email?.trim());
 
   const onCtaPressIn = () => {
     Animated.spring(ctaScale, {
@@ -51,6 +55,14 @@ export default function ResetPassword({ onSuccess }: ResetPasswordProps) {
   };
 
   const handleSubmit = async () => {
+    if (requiresOtp) {
+      const trimmedOtp = otpCode.trim();
+      if (!trimmedOtp || trimmedOtp.length !== 6) {
+        setError('Please enter the 6-digit code from your email.');
+        return;
+      }
+    }
+
     if (password.length < 8) {
       setError('Password must be at least 8 characters.');
       return;
@@ -65,6 +77,19 @@ export default function ResetPassword({ onSuccess }: ResetPasswordProps) {
     setLoading(true);
 
     try {
+      if (requiresOtp && email) {
+        const { error: verifyError } = await supabase.auth.verifyOtp({
+          email,
+          token: otpCode.trim(),
+          type: 'email',
+        });
+
+        if (verifyError) {
+          setError(verifyError.message);
+          return;
+        }
+      }
+
       const { error: updateError } = await supabase.auth.updateUser({ password });
 
       if (updateError) {
@@ -74,7 +99,7 @@ export default function ResetPassword({ onSuccess }: ResetPasswordProps) {
 
       await supabase.auth.signOut();
 
-      Alert.alert('Password updated! Please sign in.', '', [
+      Alert.alert('Password updated successfully! Please sign in.', '', [
         { text: 'OK', onPress: onSuccess },
       ]);
     } catch (err) {
@@ -101,10 +126,31 @@ export default function ResetPassword({ onSuccess }: ResetPasswordProps) {
             <GenoLogoCeremony variant="auth" tone="dark" />
           </View>
           <Text style={styles.title}>Reset Password</Text>
-          <Text style={styles.subtitle}>Choose a new password for your GenoMatch account.</Text>
+          <Text style={styles.subtitle}>
+            {requiresOtp
+              ? `Enter the 6-digit code we sent to ${email}, then choose a new password.`
+              : 'Choose a new password for your GenoMatch account.'}
+          </Text>
         </Animated.View>
 
         <Animated.View style={[styles.formCard, { opacity: introOpacity }]}>
+          {requiresOtp ? (
+            <>
+              <Text style={styles.label}>6-Digit Code</Text>
+              <TextInput
+                style={styles.otpInput}
+                value={otpCode}
+                onChangeText={(text) => setOtpCode(text.replace(/\D/g, '').slice(0, 6))}
+                placeholder="000000"
+                placeholderTextColor="rgba(27, 122, 110, 0.35)"
+                keyboardType="number-pad"
+                autoComplete="one-time-code"
+                textContentType="oneTimeCode"
+                maxLength={6}
+              />
+            </>
+          ) : null}
+
           <Text style={styles.hint}>Password must be at least 8 characters</Text>
 
           <Text style={styles.label}>New Password</Text>
@@ -214,6 +260,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     fontWeight: '500',
     marginBottom: 4,
+    marginTop: 4,
   },
   label: {
     color: COLORS.forest,
@@ -222,6 +269,19 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     marginTop: 14,
     letterSpacing: 0.2,
+  },
+  otpInput: {
+    height: 54,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: 'rgba(27, 122, 110, 0.18)',
+    backgroundColor: COLORS.white,
+    paddingHorizontal: 14,
+    color: '#1D2B23',
+    fontSize: 22,
+    fontWeight: '600',
+    letterSpacing: 8,
+    textAlign: 'center',
   },
   input: {
     height: 54,

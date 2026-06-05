@@ -50,6 +50,7 @@ export default function App() {
     'onboarding' | 'register' | 'signIn' | 'resetPassword' | 'profileSetup' | 'main'
   >('onboarding');
   const [splashDone, setSplashDone] = useState(false);
+  const [resetPasswordEmail, setResetPasswordEmail] = useState<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -168,12 +169,24 @@ export default function App() {
         onBack={() => setScreen('register')}
         onCreateAccount={() => setScreen('register')}
         onSignedIn={(destination) => setScreen(destination)}
+        onNavigateResetPassword={(resetEmail) => {
+          setResetPasswordEmail(resetEmail);
+          setScreen('resetPassword');
+        }}
       />
     );
   }
 
   if (screen === 'resetPassword') {
-    return <ResetPassword onSuccess={() => setScreen('signIn')} />;
+    return (
+      <ResetPassword
+        email={resetPasswordEmail ?? undefined}
+        onSuccess={() => {
+          setResetPasswordEmail(null);
+          setScreen('signIn');
+        }}
+      />
+    );
   }
 
   if (screen === 'profileSetup') {

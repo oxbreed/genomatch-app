@@ -25,9 +25,15 @@ type SignInProps = {
   onBack: () => void;
   onCreateAccount: () => void;
   onSignedIn: (destination: 'main' | 'profileSetup') => void;
+  onNavigateResetPassword: (email: string) => void;
 };
 
-export default function SignIn({ onBack, onCreateAccount, onSignedIn }: SignInProps) {
+export default function SignIn({
+  onBack,
+  onCreateAccount,
+  onSignedIn,
+  onNavigateResetPassword,
+}: SignInProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPass, setShowPass] = useState(false);
@@ -121,14 +127,19 @@ export default function SignIn({ onBack, onCreateAccount, onSignedIn }: SignInPr
       return;
     }
 
-    const { error: resetError } = await supabase.auth.resetPasswordForEmail(trimmedEmail);
-    if (resetError) {
-      setError(resetError.message);
+    const { error: otpError } = await supabase.auth.signInWithOtp({
+      email: trimmedEmail,
+      options: { shouldCreateUser: false },
+    });
+    if (otpError) {
+      setError(otpError.message);
       return;
     }
 
     Alert.alert(
-      'Password reset email sent! Check your inbox and follow the link to reset your password.'
+      'A 6-digit code has been sent to your email. Enter it in the app to reset your password.',
+      '',
+      [{ text: 'OK', onPress: () => onNavigateResetPassword(trimmedEmail) }]
     );
   };
 
