@@ -15,9 +15,10 @@ import {
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { GenoLogoCeremony, GenoPremiumChrome } from '../src/brand/graphics';
-import { COLORS } from '../src/theme';
+import { GenoLogoCeremony, GenoPremiumChrome, GENO_VISUAL } from '../src/brand/graphics';
+import { COLORS, RADIUS, SHADOWS } from '../src/theme';
 import { resolvePostSignInScreen } from '../src/lib/profiles';
 import { supabase } from '../src/lib/supabase';
 
@@ -39,6 +40,7 @@ export default function SignIn({
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [focusedField, setFocusedField] = useState<'email' | 'password' | null>(null);
 
   const introOpacity = useRef(new Animated.Value(0)).current;
   const introTranslateY = useRef(new Animated.Value(18)).current;
@@ -147,8 +149,8 @@ export default function SignIn({
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <GenoPremiumChrome variant="forest" />
-      <StatusBar style="light" />
+      <GenoPremiumChrome variant="linen" />
+      <StatusBar style="dark" />
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
@@ -163,15 +165,25 @@ export default function SignIn({
             },
           ]}
         >
-          <Pressable style={styles.back} onPress={onBack}>
+          <Pressable
+            style={({ pressed }) => [styles.back, pressed && styles.backPressed]}
+            onPress={onBack}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
+          >
+            <Ionicons name="chevron-back" size={18} color={COLORS.forestDeep} />
             <Text style={styles.backText}>Back</Text>
           </Pressable>
+
           <View style={styles.brandChip}>
+            <Ionicons name="sparkles-outline" size={11} color={COLORS.gold} />
             <Text style={styles.brandChipText}>WELCOME BACK</Text>
           </View>
+
           <View style={styles.logoWrap}>
-            <GenoLogoCeremony variant="auth" tone="light" />
+            <GenoLogoCeremony variant="auth" tone="dark" />
           </View>
+
           <Text style={styles.title}>Sign In to GenoMatch</Text>
           <Text style={styles.subtitle}>
             Pick up where you left off — your matches and conversations are waiting.
@@ -180,99 +192,123 @@ export default function SignIn({
 
         <Animated.View
           style={[
-            styles.formCard,
+            styles.formCardOuter,
             {
               opacity: introOpacity,
               transform: [{ translateY: introTranslateY }],
             },
           ]}
         >
-          <Text style={styles.label}>Email Address</Text>
-          <TextInput
-            style={styles.input}
-            value={email}
-            onChangeText={setEmail}
-            placeholder="you@example.com"
-            placeholderTextColor="rgba(27, 122, 110, 0.35)"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoComplete="email"
-            textContentType="emailAddress"
-          />
+          <LinearGradient
+            colors={GENO_VISUAL.chrome.cardBorder}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.formCardBorder}
+          >
+            <View style={styles.formCard}>
+              <Text style={[styles.label, styles.labelFirst]}>Email Address</Text>
+              <TextInput
+                style={[styles.input, focusedField === 'email' && styles.inputFocused]}
+                value={email}
+                onChangeText={setEmail}
+                placeholder="you@example.com"
+                placeholderTextColor="rgba(27, 122, 110, 0.35)"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoComplete="email"
+                textContentType="emailAddress"
+                onFocus={() => setFocusedField('email')}
+                onBlur={() => setFocusedField(null)}
+              />
 
-          <View style={styles.passwordRow}>
-            <Text style={styles.label}>Password</Text>
-            <Pressable onPress={() => setShowPass((prev) => !prev)}>
-              <Text style={styles.togglePassText}>{showPass ? 'Hide' : 'Show'}</Text>
-            </Pressable>
-          </View>
-          <TextInput
-            style={styles.input}
-            value={password}
-            onChangeText={setPassword}
-            placeholder="Your password"
-            placeholderTextColor="rgba(27, 122, 110, 0.35)"
-            secureTextEntry={!showPass}
-            autoComplete="password"
-            textContentType="password"
-          />
+              <View style={styles.passwordRow}>
+                <Text style={styles.label}>Password</Text>
+                <Pressable onPress={() => setShowPass((prev) => !prev)} hitSlop={8}>
+                  <Text style={styles.togglePassText}>{showPass ? 'Hide' : 'Show'}</Text>
+                </Pressable>
+              </View>
+              <TextInput
+                style={[styles.input, focusedField === 'password' && styles.inputFocused]}
+                value={password}
+                onChangeText={setPassword}
+                placeholder="Your password"
+                placeholderTextColor="rgba(27, 122, 110, 0.35)"
+                secureTextEntry={!showPass}
+                autoComplete="password"
+                textContentType="password"
+                onFocus={() => setFocusedField('password')}
+                onBlur={() => setFocusedField(null)}
+              />
 
-          <Pressable style={styles.forgotPasswordRow} onPress={() => void handleForgotPassword()}>
-            <Text style={styles.forgotPasswordText}>Forgot password?</Text>
-          </Pressable>
+              <Pressable
+                style={styles.forgotPasswordRow}
+                onPress={() => void handleForgotPassword()}
+                hitSlop={8}
+              >
+                <Text style={styles.forgotPasswordText}>Forgot password?</Text>
+              </Pressable>
 
-          <View style={styles.trustBox}>
-            <View style={styles.trustRow}>
-              <Ionicons name="lock-closed" size={16} color={COLORS.forest} />
-              <Text style={styles.trustText}>
-                Secure sign-in with encrypted genotype-aware matching.
+              <View style={styles.trustBox}>
+                <View style={styles.trustIcon}>
+                  <Ionicons name="lock-closed" size={16} color={COLORS.verified} />
+                </View>
+                <Text style={styles.trustText}>
+                  Secure sign-in with encrypted genotype-aware matching.
+                </Text>
+              </View>
+
+              {error ? <Text style={styles.error}>{error}</Text> : null}
+
+              <Animated.View style={{ transform: [{ scale: ctaScale }] }}>
+                <Pressable
+                  style={[styles.submitBtn, loading && styles.submitBtnDisabled]}
+                  onPressIn={onCtaPressIn}
+                  onPressOut={onCtaPressOut}
+                  onPress={handleSignIn}
+                  disabled={loading}
+                >
+                  <LinearGradient
+                    colors={[COLORS.gold, '#E8C56A', '#C49A3A']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.submitGradient}
+                  >
+                    {loading ? (
+                      <View style={styles.submitContent}>
+                        <ActivityIndicator color={COLORS.forestDeep} size="small" />
+                        <Text style={styles.submitText}>Signing in…</Text>
+                      </View>
+                    ) : (
+                      <Text style={styles.submitText}>Sign In</Text>
+                    )}
+                  </LinearGradient>
+                </Pressable>
+              </Animated.View>
+
+              <Pressable style={styles.createRow} onPress={onCreateAccount}>
+                <Text style={styles.createText}>
+                  New to GenoMatch? <Text style={styles.createBold}>Create account</Text>
+                </Text>
+              </Pressable>
+
+              <Text style={styles.legalText}>
+                By continuing you agree to our{' '}
+                <Text
+                  style={styles.legalLink}
+                  onPress={() => void Linking.openURL('https://genomatch.app/terms')}
+                >
+                  Terms of Service
+                </Text>
+                {' '}and{' '}
+                <Text
+                  style={styles.legalLink}
+                  onPress={() => void Linking.openURL('https://genomatch.app/privacy')}
+                >
+                  Privacy Policy
+                </Text>
               </Text>
             </View>
-          </View>
-
-          {error ? <Text style={styles.error}>{error}</Text> : null}
-
-          <Animated.View style={{ transform: [{ scale: ctaScale }] }}>
-            <Pressable
-              style={[styles.submitBtn, loading && styles.submitBtnDisabled]}
-              onPressIn={onCtaPressIn}
-              onPressOut={onCtaPressOut}
-              onPress={handleSignIn}
-              disabled={loading}
-            >
-              {loading ? (
-                <View style={styles.submitContent}>
-                  <ActivityIndicator color={COLORS.forest} size="small" />
-                  <Text style={styles.submitText}>Signing in...</Text>
-                </View>
-              ) : (
-                <Text style={styles.submitText}>Sign In</Text>
-              )}
-            </Pressable>
-          </Animated.View>
-
-          <Pressable style={styles.createRow} onPress={onCreateAccount}>
-            <Text style={styles.createText}>
-              New to GenoMatch? <Text style={styles.createBold}>Create account</Text>
-            </Text>
-          </Pressable>
-
-          <Text style={styles.legalText}>
-            By continuing you agree to our{' '}
-            <Text
-              style={styles.legalLink}
-              onPress={() => void Linking.openURL('https://genomatch.app/terms')}
-            >
-              Terms of Service
-            </Text>
-            {' '}and{' '}
-            <Text
-              style={styles.legalLink}
-              onPress={() => void Linking.openURL('https://genomatch.app/privacy')}
-            >
-              Privacy Policy
-            </Text>
-          </Text>
+          </LinearGradient>
         </Animated.View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -282,91 +318,127 @@ export default function SignIn({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.forest,
+    backgroundColor: COLORS.linen,
   },
   scroll: {
     paddingHorizontal: 20,
-    paddingTop: 58,
-    paddingBottom: 40,
+    paddingTop: 56,
+    paddingBottom: 44,
   },
   hero: {
-    marginBottom: 20,
+    marginBottom: 22,
   },
   back: {
     alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
     minHeight: 44,
     justifyContent: 'center',
     paddingHorizontal: 14,
-    borderRadius: 22,
+    paddingVertical: 10,
+    borderRadius: RADIUS.pill,
     borderWidth: 1,
-    borderColor: 'rgba(250, 250, 247, 0.26)',
-    backgroundColor: 'rgba(250, 250, 247, 0.07)',
+    borderColor: 'rgba(13, 40, 24, 0.1)',
+    backgroundColor: COLORS.white,
     marginBottom: 18,
+    ...SHADOWS.card,
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+  },
+  backPressed: {
+    opacity: 0.88,
+    transform: [{ scale: 0.98 }],
   },
   backText: {
-    color: COLORS.ivory,
+    color: COLORS.forestDeep,
+    fontFamily: 'Satoshi-Bold',
     fontSize: 14,
-    fontWeight: '700',
-    letterSpacing: 0.2,
+    letterSpacing: 0.1,
   },
   brandChip: {
     alignSelf: 'flex-start',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 999,
-    backgroundColor: 'rgba(201, 135, 43, 0.22)',
-    marginBottom: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: RADIUS.pill,
+    backgroundColor: 'rgba(212, 168, 67, 0.14)',
+    borderWidth: 1,
+    borderColor: 'rgba(212, 168, 67, 0.35)',
+    marginBottom: 14,
   },
   brandChipText: {
-    color: COLORS.gold,
-    fontSize: 11,
-    letterSpacing: 1.1,
-    fontWeight: '800',
+    color: '#8C6A00',
+    fontFamily: 'Satoshi-Bold',
+    fontSize: 10,
+    letterSpacing: 1.6,
   },
   logoWrap: {
     marginBottom: 16,
     alignItems: 'flex-start',
   },
   title: {
-    color: COLORS.ivory,
-    fontSize: 34,
-    lineHeight: 39,
-    letterSpacing: -0.7,
-    fontWeight: '700',
+    fontFamily: 'ClashDisplay-Semibold',
+    color: COLORS.forestDeep,
+    fontSize: 32,
+    lineHeight: 38,
+    letterSpacing: -0.8,
     marginBottom: 10,
-    maxWidth: '95%',
+    maxWidth: '96%',
   },
   subtitle: {
-    color: 'rgba(250, 250, 247, 0.76)',
+    fontFamily: 'Satoshi-Medium',
+    color: 'rgba(13, 40, 24, 0.62)',
     fontSize: 15,
     lineHeight: 24,
-    fontWeight: '500',
     maxWidth: '96%',
+  },
+  formCardOuter: {
+    width: '100%',
+  },
+  formCardBorder: {
+    borderRadius: RADIUS.xl,
+    padding: 1.5,
+    ...SHADOWS.cardElevated,
+    shadowColor: COLORS.gold,
+    shadowOpacity: 0.12,
   },
   formCard: {
     backgroundColor: COLORS.ivory,
-    borderRadius: 24,
-    paddingHorizontal: 18,
-    paddingVertical: 20,
+    borderRadius: RADIUS.xl - 1.5,
+    paddingHorizontal: 20,
+    paddingTop: 8,
+    paddingBottom: 22,
   },
   label: {
+    fontFamily: 'Satoshi-Bold',
     color: COLORS.forest,
     fontSize: 14,
-    fontWeight: '700',
     marginBottom: 8,
     marginTop: 14,
-    letterSpacing: 0.2,
+    letterSpacing: 0.15,
+  },
+  labelFirst: {
+    marginTop: 8,
   },
   input: {
     height: 54,
-    borderRadius: 14,
+    borderRadius: RADIUS.md,
     borderWidth: 1.5,
-    borderColor: 'rgba(27, 122, 110, 0.18)',
+    borderColor: 'rgba(27, 122, 110, 0.16)',
     backgroundColor: COLORS.white,
     paddingHorizontal: 14,
-    color: '#1D2B23',
+    color: COLORS.forestDeep,
+    fontFamily: 'Satoshi-Medium',
     fontSize: 16,
-    fontWeight: '500',
+  },
+  inputFocused: {
+    borderColor: 'rgba(212, 168, 67, 0.65)',
+    ...SHADOWS.card,
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
   },
   passwordRow: {
     marginTop: 2,
@@ -375,58 +447,72 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   togglePassText: {
+    fontFamily: 'Satoshi-Bold',
     color: COLORS.forest,
     fontSize: 13,
-    fontWeight: '700',
     marginBottom: 8,
-    opacity: 0.75,
+    opacity: 0.8,
   },
   forgotPasswordRow: {
     alignSelf: 'flex-end',
-    marginTop: 8,
+    marginTop: 10,
+    paddingVertical: 2,
   },
   forgotPasswordText: {
-    color: COLORS.gold,
+    fontFamily: 'Satoshi-Bold',
+    color: '#8C6A00',
     fontSize: 13,
-    fontWeight: '600',
+    letterSpacing: 0.1,
   },
   trustBox: {
     marginTop: 16,
-    borderRadius: 14,
-    backgroundColor: 'rgba(27, 122, 110, 0.1)',
+    borderRadius: RADIUS.md,
+    backgroundColor: 'rgba(61, 122, 82, 0.08)',
     borderWidth: 1,
-    borderColor: 'rgba(27, 122, 110, 0.14)',
+    borderColor: 'rgba(61, 122, 82, 0.14)',
     paddingVertical: 12,
     paddingHorizontal: 12,
-  },
-  trustRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: 8,
+    gap: 10,
   },
-  trustText: {
-    flex: 1,
-    color: COLORS.forest,
-    fontSize: 12,
-    lineHeight: 18,
-    fontWeight: '400',
-  },
-  error: {
-    marginTop: 12,
-    color: '#A32D2D',
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  submitBtn: {
-    marginTop: 18,
-    height: 56,
-    borderRadius: 15,
-    backgroundColor: COLORS.gold,
+  trustIcon: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: 'rgba(61, 122, 82, 0.12)',
     alignItems: 'center',
     justifyContent: 'center',
   },
+  trustText: {
+    flex: 1,
+    fontFamily: 'Satoshi-Medium',
+    color: COLORS.forest,
+    fontSize: 12,
+    lineHeight: 18,
+  },
+  error: {
+    marginTop: 12,
+    fontFamily: 'Satoshi-Bold',
+    color: COLORS.error,
+    fontSize: 13,
+  },
+  submitBtn: {
+    marginTop: 20,
+    borderRadius: RADIUS.pill,
+    overflow: 'hidden',
+    ...SHADOWS.button,
+    shadowColor: COLORS.gold,
+    shadowOpacity: 0.28,
+  },
   submitBtnDisabled: {
     opacity: 0.72,
+  },
+  submitGradient: {
+    height: 56,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 24,
   },
   submitContent: {
     flexDirection: 'row',
@@ -434,35 +520,35 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   submitText: {
-    color: COLORS.forest,
+    fontFamily: 'Satoshi-Bold',
+    color: COLORS.forestDeep,
     fontSize: 17,
-    fontWeight: '700',
     letterSpacing: 0.1,
   },
   createRow: {
     alignItems: 'center',
-    paddingVertical: 16,
+    paddingVertical: 18,
   },
   createText: {
+    fontFamily: 'Satoshi-Medium',
     color: 'rgba(27, 122, 110, 0.65)',
     fontSize: 14,
-    fontWeight: '500',
   },
   createBold: {
+    fontFamily: 'Satoshi-Bold',
     color: COLORS.forest,
-    fontWeight: '700',
   },
   legalText: {
     textAlign: 'center',
+    fontFamily: 'Satoshi-Medium',
     color: 'rgba(27, 122, 110, 0.55)',
     fontSize: 12,
     lineHeight: 18,
-    fontWeight: '500',
     paddingBottom: 4,
   },
   legalLink: {
+    fontFamily: 'Satoshi-Bold',
     color: COLORS.forest,
-    fontWeight: '700',
     textDecorationLine: 'underline',
   },
 });
