@@ -452,7 +452,7 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
   const superLikeToastOpacity = useRef(new Animated.Value(0)).current;
   const superLikeToastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const profile = profiles[index];
+  const profile = index < profiles.length ? profiles[index] : undefined;
 
   const progressFillWidth = progressAnim.interpolate({
     inputRange: [0, 1],
@@ -917,8 +917,8 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
                   <View style={styles.seenAllIconWrap}>
                     <Ionicons name="checkmark-done-outline" size={28} color={COLORS.forestDeep} />
                   </View>
-                  <Text style={styles.seenAllTitle}>You've seen everyone for now</Text>
-                  <Text style={styles.seenAllSubtext}>Check back soon for new matches</Text>
+                  <Text style={styles.seenAllTitle}>You're all caught up!</Text>
+                  <Text style={styles.seenAllSubtext}>New matches appear as more members join</Text>
                   <Pressable
                     style={({ pressed }) => [styles.refreshBtnWrap, pressed && styles.btnPressed]}
                     onPress={() => {
