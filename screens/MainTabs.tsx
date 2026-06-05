@@ -1,31 +1,41 @@
-import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import type { ComponentProps } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import Discovery from './Discovery';
 import Matches from './Matches';
 import Messages from './Messages';
 import Profile from './Profile';
-import { COLORS, TYPOGRAPHY } from '../src/theme';
-
-type TabId = 'discover' | 'matches' | 'messages' | 'profile';
-type IonName = ComponentProps<typeof Ionicons>['name'];
-
-const TABS: { id: TabId; label: string; icon: IonName; iconActive: IonName }[] = [
-  { id: 'discover', label: 'Discover', icon: 'search-outline', iconActive: 'search' },
-  { id: 'matches', label: 'Matches', icon: 'heart-outline', iconActive: 'heart' },
-  { id: 'messages', label: 'Messages', icon: 'chatbubble-outline', iconActive: 'chatbubble' },
-  { id: 'profile', label: 'Profile', icon: 'person-outline', iconActive: 'person' },
-];
+import GenoTabBar, { type GenoTabId } from '../src/components/navigation/GenoTabBar';
+import { COLORS } from '../src/theme';
+import { fetchConversations } from '../src/lib/messages';
+import { fetchMatches } from '../src/lib/matches';
 
 type MainTabsProps = {
   onSignOut?: () => void;
 };
 
 export default function MainTabs({ onSignOut }: MainTabsProps) {
-  const [activeTab, setActiveTab] = useState<TabId>('discover');
+  const [activeTab, setActiveTab] = useState<GenoTabId>('discover');
   const [openChatMatchId, setOpenChatMatchId] = useState<string | null>(null);
+  const [matchCount, setMatchCount] = useState(0);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  const refreshBadges = useCallback(async () => {
+    try {
+      const [{ matches }, conversations] = await Promise.all([
+        fetchMatches(),
+        fetchConversations(),
+      ]);
+      setMatchCount(matches.length);
+      setUnreadCount(conversations.filter((c) => c.unread).length);
+    } catch {
+      // badges are non-critical
+    }
+  }, []);
+
+  useEffect(() => {
+    refreshBadges();
+  }, [refreshBadges, activeTab]);
 
   const handleStartChat = (matchId: string) => {
     setOpenChatMatchId(matchId);
@@ -52,31 +62,30 @@ export default function MainTabs({ onSignOut }: MainTabsProps) {
     }
   };
 
+  const tabs = [
+    { id: 'discover' as const, label: 'Discover', icon: 'search-outline' as const, iconActive: 'search' as const },
+    {
+      id: 'matches' as const,
+      label: 'Matches',
+      icon: 'heart-outline' as const,
+      iconActive: 'heart' as const,
+      badge: matchCount,
+    },
+    {
+      id: 'messages' as const,
+      label: 'Messages',
+      icon: 'chatbubble-outline' as const,
+      iconActive: 'chatbubble' as const,
+      badge: unreadCount,
+    },
+    { id: 'profile' as const, label: 'Profile', icon: 'person-outline' as const, iconActive: 'person' as const },
+  ];
+
   return (
     <View style={styles.root}>
       <StatusBar style="dark" />
       <View style={styles.content}>{renderContent()}</View>
-
-      <View style={styles.tabBar}>
-        {TABS.map((tab) => {
-          const active = activeTab === tab.id;
-          return (
-            <Pressable
-              key={tab.id}
-              style={styles.tabItem}
-              onPress={() => setActiveTab(tab.id)}
-            >
-              <Ionicons
-                name={active ? tab.iconActive : tab.icon}
-                size={22}
-                color={active ? COLORS.gold : 'rgba(245, 239, 230, 0.55)'}
-              />
-              <Text style={[styles.tabLabel, active && styles.tabLabelActive]}>{tab.label}</Text>
-              {active && <View style={styles.tabIndicator} />}
-            </Pressable>
-          );
-        })}
-      </View>
+      <GenoTabBar tabs={tabs} activeTab={activeTab} onSelect={setActiveTab} />
     </View>
   );
 }
@@ -88,39 +97,5 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-  },
-  tabBar: {
-    flexDirection: 'row',
-    backgroundColor: COLORS.tabBar,
-    paddingTop: 10,
-    paddingBottom: 28,
-    paddingHorizontal: 8,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.08)',
-  },
-  tabItem: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 4,
-    minHeight: 52,
-  },
-  tabLabel: {
-    ...TYPOGRAPHY.caption,
-    fontSize: 11,
-    color: 'rgba(245, 239, 230, 0.55)',
-    letterSpacing: 0.2,
-  },
-  tabLabelActive: {
-    color: COLORS.gold,
-    fontFamily: TYPOGRAPHY.label.fontFamily,
-  },
-  tabIndicator: {
-    position: 'absolute',
-    bottom: 4,
-    width: 20,
-    height: 3,
-    borderRadius: 2,
-    backgroundColor: COLORS.gold,
   },
 });

@@ -1,13 +1,11 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
-import { Ionicons } from '@expo/vector-icons';
-import { COLORS } from '../src/theme';
+import { GenoLegalScreen } from '../src/components/shell';
+import { GENOMATCH_COMPANY, GENOMATCH_CONTACT_LINE } from '../src/constants/company';
 
 type CommunityGuidelinesProps = {
   onBack: () => void;
 };
 
-const SECTIONS: { title: string; body: string }[] = [
+const SECTIONS = [
   {
     title: 'Our Community',
     body:
@@ -45,98 +43,17 @@ const SECTIONS: { title: string; body: string }[] = [
   },
   {
     title: 'Contact',
-    body: 'Questions about these guidelines? Email hello@genomatch.app',
+    body: `Questions about these guidelines? ${GENOMATCH_CONTACT_LINE}`,
   },
 ];
 
 export default function CommunityGuidelines({ onBack }: CommunityGuidelinesProps) {
   return (
-    <View style={styles.container}>
-      <StatusBar style="dark" />
-
-      <View style={styles.header}>
-        <Pressable
-          style={({ pressed }) => [styles.backBtn, pressed && styles.backBtnPressed]}
-          onPress={onBack}
-          accessibilityLabel="Go back"
-        >
-          <Ionicons name="arrow-back" size={22} color={COLORS.forest} />
-        </Pressable>
-        <Text style={styles.headerTitle}>Community Guidelines</Text>
-        <View style={styles.headerSpacer} />
-      </View>
-
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {SECTIONS.map((section) => (
-          <View key={section.title} style={styles.section}>
-            <Text style={styles.sectionTitle}>{section.title}</Text>
-            <Text style={styles.sectionBody}>{section.body}</Text>
-          </View>
-        ))}
-      </ScrollView>
-    </View>
+    <GenoLegalScreen
+      title="Community Guidelines"
+      subtitle={`Standards for every ${GENOMATCH_COMPANY.legalName} member`}
+      sections={SECTIONS}
+      onBack={onBack}
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.ivory,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingTop: 58,
-    paddingHorizontal: 20,
-    paddingBottom: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-    backgroundColor: COLORS.white,
-  },
-  backBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(168, 213, 186, 0.35)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  backBtnPressed: {
-    opacity: 0.85,
-  },
-  headerTitle: {
-    flex: 1,
-    textAlign: 'center',
-    fontSize: 18,
-    fontWeight: '700',
-    color: COLORS.forest,
-    letterSpacing: -0.3,
-  },
-  headerSpacer: {
-    width: 40,
-  },
-  scrollContent: {
-    paddingHorizontal: 24,
-    paddingTop: 20,
-    paddingBottom: 40,
-  },
-  section: {
-    marginBottom: 22,
-  },
-  sectionTitle: {
-    fontSize: 17,
-    fontWeight: '600',
-    color: COLORS.forest,
-    letterSpacing: -0.2,
-    marginBottom: 8,
-  },
-  sectionBody: {
-    fontSize: 15,
-    fontWeight: '400',
-    lineHeight: 22.5,
-    color: COLORS.textMuted,
-  },
-});

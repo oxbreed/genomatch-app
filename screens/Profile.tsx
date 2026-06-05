@@ -148,7 +148,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
 
       if (userId) {
         try {
-          const [matchRows, likesResult] = await Promise.all([
+          const [matchResult, likesResult] = await Promise.all([
             fetchMatches(),
             supabase
               .from('likes')
@@ -160,7 +160,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
             likesResult.error || likesResult.count == null ? 0 : likesResult.count;
 
           setStats({
-            matches: matchRows.length,
+            matches: matchResult.matches.length,
             likesReceived,
             profileViews: 0,
           });

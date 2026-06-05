@@ -1,15 +1,20 @@
-import type { MatchWithProfile, ProfileRow } from '../types/database';
+import type { Genotype, MatchWithProfile, ProfileRow } from '../types/database';
 import { logSupabaseResult } from './auth';
 import { mapProfileRow } from './profileMapper';
 import { getBlockedUserIds } from './moderation';
 import { getCurrentUserId } from './profiles';
 import { supabase } from './supabase';
 
-export async function fetchMatches(): Promise<MatchWithProfile[]> {
+export type FetchMatchesResult = {
+  matches: MatchWithProfile[];
+  viewerGenotype: Genotype | null;
+};
+
+export async function fetchMatches(): Promise<FetchMatchesResult> {
   const userId = await getCurrentUserId();
   if (!userId) {
     console.log('[matches] fetchMatches — no authenticated user');
-    return [];
+    return { matches: [], viewerGenotype: null };
   }
 
   const { data: matchRows, error: matchError } = await supabase
@@ -20,14 +25,6 @@ export async function fetchMatches(): Promise<MatchWithProfile[]> {
 
   logSupabaseResult('matches.fetchMatches', matchRows, matchError);
   if (matchError) throw matchError;
-  if (!matchRows?.length) return [];
-
-  const blockedSet = await getBlockedUserIds(userId);
-  const visibleMatches = matchRows.filter((match) => {
-    const otherId = match.user_a_id === userId ? match.user_b_id : match.user_a_id;
-    return !blockedSet.has(otherId);
-  });
-  if (!visibleMatches.length) return [];
 
   const { data: me, error: meError } = await supabase
     .from('profiles')
@@ -38,6 +35,15 @@ export async function fetchMatches(): Promise<MatchWithProfile[]> {
   logSupabaseResult('matches.viewerGenotype', me, meError);
   if (meError) throw meError;
   const viewerGenotype = (me as { genotype: ProfileRow['genotype'] } | null)?.genotype ?? null;
+
+  if (!matchRows?.length) return { matches: [], viewerGenotype };
+
+  const blockedSet = await getBlockedUserIds(userId);
+  const visibleMatches = matchRows.filter((match) => {
+    const otherId = match.user_a_id === userId ? match.user_b_id : match.user_a_id;
+    return !blockedSet.has(otherId);
+  });
+  if (!visibleMatches.length) return { matches: [], viewerGenotype };
 
   const otherIds = visibleMatches.map((m) =>
     m.user_a_id === userId ? m.user_b_id : m.user_a_id
@@ -57,18 +63,42 @@ export async function fetchMatches(): Promise<MatchWithProfile[]> {
     ((profiles ?? []) as ProfileRow[]).map((p) => [p.id, p])
   );
 
-  return visibleMatches
-    .map((match) => {
-      const otherId = match.user_a_id === userId ? match.user_b_id : match.user_a_id;
-      const row = profileMap.get(otherId);
-      if (!row) return null;
-      return {
-        matchId: match.id,
-        profile: mapProfileRow(row, viewerGenotype),
-        matchedAt: match.created_at,
-      };
-    })
-    .filter((item): item is MatchWithProfile => item !== null);
+  return {
+    matches: visibleMatches
+      .map((match) => {
+        const otherId = match.user_a_id === userId ? match.user_b_id : match.user_a_id;
+        const row = profileMap.get(otherId);
+        if (!row) return null;
+        return {
+          matchId: match.id,
+          profile: mapProfileRow(row, viewerGenotype),
+          matchedAt: match.created_at,
+        };
+      })
+      .filter((item): item is MatchWithProfile => item !== null),
+    viewerGenotype,
+  };
+}
+
+export async function unmatchByMatchId(matchId: string): Promise<void> {
+  const userId = await getCurrentUserId();
+  if (!userId) throw new Error('Not signed in');
+
+  const { data: match, error: fetchError } = await supabase
+    .from('matches')
+    .select('id, user_a_id, user_b_id')
+    .eq('id', matchId)
+    .maybeSingle();
+
+  if (fetchError) throw fetchError;
+  if (!match) throw new Error('Match not found');
+
+  const isParticipant = match.user_a_id === userId || match.user_b_id === userId;
+  if (!isParticipant) throw new Error('Not allowed to unmatch');
+
+  const { error: deleteError } = await supabase.from('matches').delete().eq('id', matchId);
+  logSupabaseResult('matches.unmatch', null, deleteError);
+  if (deleteError) throw deleteError;
 }
 
 export async function getMatchIdForProfile(profileId: string): Promise<string | null> {

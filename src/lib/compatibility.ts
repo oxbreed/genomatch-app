@@ -47,3 +47,25 @@ export function getGenotypeCompatibilityLine(
   const risk = riskByPair[pairKey] ?? 'Genotype-compatible match';
   return `${pairLabel} — ${risk}`;
 }
+
+/** Short risk label for swipe cards and match rows */
+export function getGenotypeRiskShort(
+  viewerGenotype: Genotype | null,
+  candidateGenotype: Genotype
+): string {
+  const viewer = viewerGenotype ?? 'AA';
+  const pairKey = [viewer, candidateGenotype].sort().join('');
+  const riskByPair: Record<string, string> = {
+    AAAA: 'Very low risk',
+    AAAS: 'Low risk',
+    AAAC: 'Low risk',
+    AASS: 'Elevated risk',
+    ASAS: 'Moderate risk',
+    ASAC: 'Moderate risk',
+    ASSS: 'Higher risk',
+    ACAC: 'Moderate risk',
+    ACCC: 'Moderate risk',
+    SSSS: 'Higher risk',
+  };
+  return riskByPair[pairKey] ?? 'Compatible';
+}
