@@ -24,6 +24,7 @@ import MatchProfile from './MatchProfile';
 
 type MessagesProps = {
   initialChatMatchId?: string | null;
+  initialChatProfile?: DiscoveryProfile | null;
   onChatOpened?: () => void;
   onImmersiveChange?: (immersive: boolean) => void;
 };
@@ -36,7 +37,12 @@ function conversationToMatch(item: ConversationPreview): MatchWithProfile {
   };
 }
 
-export default function Messages({ initialChatMatchId, onChatOpened, onImmersiveChange }: MessagesProps) {
+export default function Messages({
+  initialChatMatchId,
+  initialChatProfile,
+  onChatOpened,
+  onImmersiveChange,
+}: MessagesProps) {
   const [conversations, setConversations] = useState<ConversationPreview[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -80,6 +86,12 @@ export default function Messages({ initialChatMatchId, onChatOpened, onImmersive
   useEffect(() => {
     if (!initialChatMatchId) return;
 
+    if (initialChatProfile) {
+      openChat(initialChatMatchId, initialChatProfile);
+      onChatOpened?.();
+      return;
+    }
+
     const openFromDeepLink = async () => {
       const existing = conversations.find((c) => c.matchId === initialChatMatchId);
       if (existing) {
@@ -102,9 +114,9 @@ export default function Messages({ initialChatMatchId, onChatOpened, onImmersive
     };
 
     if (!loading) {
-      openFromDeepLink();
+      void openFromDeepLink();
     }
-  }, [conversations, initialChatMatchId, loading, onChatOpened]);
+  }, [conversations, initialChatMatchId, initialChatProfile, loading, onChatOpened]);
 
   if (activeChat) {
     return (

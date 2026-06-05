@@ -17,12 +17,12 @@ import MatchListCard from '../src/components/matches/MatchListCard';
 import { logAuthState } from '../src/lib/auth';
 import { TAB_SCENE_BOTTOM_PADDING } from '../src/components/navigation/tabBarLayout';
 import { COLORS } from '../src/theme';
-import type { Genotype, MatchWithProfile } from '../src/types/database';
+import type { DiscoveryProfile, Genotype, MatchWithProfile } from '../src/types/database';
 import { fetchMatches, unmatchByMatchId } from '../src/lib/matches';
 import MatchProfile from './MatchProfile';
 
 type MatchesProps = {
-  onStartChat?: (matchId: string) => void;
+  onStartChat?: (matchId: string, profile?: DiscoveryProfile) => void;
   onImmersiveChange?: (immersive: boolean) => void;
 };
 
@@ -93,7 +93,7 @@ export default function Matches({ onStartChat, onImmersiveChange }: MatchesProps
           loadMatches();
         }}
         onSendMessage={() => {
-          onStartChat?.(selectedMatch.matchId);
+          onStartChat?.(selectedMatch.matchId, selectedMatch.profile);
           setSelectedMatch(null);
         }}
       />
@@ -145,7 +145,7 @@ export default function Matches({ onStartChat, onImmersiveChange }: MatchesProps
               onOpenProfile={() => setSelectedMatch(item)}
               onStartChat={() => {
                 void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                onStartChat?.(item.matchId);
+                onStartChat?.(item.matchId, item.profile);
               }}
               onUnmatch={() => handleUnmatch(item)}
             />

@@ -354,7 +354,7 @@ function ProfileCard({ profile, swipeIndex, totalProfiles, viewerGenotype, progr
 
 type DiscoveryProps = {
   onMatchCreated?: () => void;
-  onStartChat?: (matchId: string) => void;
+  onStartChat?: (matchId: string, profile?: DiscoveryProfile) => void;
 };
 
 export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProps = {}) {
@@ -611,14 +611,15 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
   }, []);
 
   const handleSendMessageFromMatch = useCallback(async () => {
-    const profileId = matchedProfile?.id;
+    const profile = matchedProfile;
+    const profileId = profile?.id;
     let matchId = matchedMatchId;
     dismissMatchOverlay();
-    if (!matchId && profileId && !matchedProfile?.isMock) {
+    if (!matchId && profileId && !profile?.isMock) {
       matchId = await getMatchIdForProfile(profileId);
     }
     if (matchId) {
-      onStartChat?.(matchId);
+      onStartChat?.(matchId, profile ?? undefined);
     }
   }, [dismissMatchOverlay, matchedMatchId, matchedProfile, onStartChat]);
 

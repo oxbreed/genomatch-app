@@ -9,6 +9,7 @@ import GenoTabBar, { type GenoTabId } from '../src/components/navigation/GenoTab
 import { COLORS } from '../src/theme';
 import { fetchConversations } from '../src/lib/messages';
 import { fetchMatches } from '../src/lib/matches';
+import type { DiscoveryProfile } from '../src/types/database';
 
 type MainTabsProps = {
   onSignOut?: () => void;
@@ -17,6 +18,7 @@ type MainTabsProps = {
 export default function MainTabs({ onSignOut }: MainTabsProps) {
   const [activeTab, setActiveTab] = useState<GenoTabId>('discover');
   const [openChatMatchId, setOpenChatMatchId] = useState<string | null>(null);
+  const [openChatProfile, setOpenChatProfile] = useState<DiscoveryProfile | null>(null);
   const [matchCount, setMatchCount] = useState(0);
   const [unreadCount, setUnreadCount] = useState(0);
   const [immersiveOverlay, setImmersiveOverlay] = useState(false);
@@ -44,8 +46,9 @@ export default function MainTabs({ onSignOut }: MainTabsProps) {
     }
   }, [activeTab]);
 
-  const handleStartChat = (matchId: string) => {
+  const handleStartChat = (matchId: string, profile?: DiscoveryProfile) => {
     setOpenChatMatchId(matchId);
+    setOpenChatProfile(profile ?? null);
     setActiveTab('messages');
     void refreshBadges();
   };
@@ -76,7 +79,11 @@ export default function MainTabs({ onSignOut }: MainTabsProps) {
           'messages',
           <Messages
             initialChatMatchId={openChatMatchId}
-            onChatOpened={() => setOpenChatMatchId(null)}
+            initialChatProfile={openChatProfile}
+            onChatOpened={() => {
+              setOpenChatMatchId(null);
+              setOpenChatProfile(null);
+            }}
             onImmersiveChange={setImmersiveOverlay}
           />
         )}
