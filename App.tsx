@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { Linking, View, StyleSheet } from 'react-native';
 import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
 import type { ComponentProps } from 'react';
@@ -9,6 +9,7 @@ import { GenoOnboardingFlow, GenoSplashScreen } from './src/components/onboardin
 import type { GenoOnboardingSlide } from './src/components/onboarding';
 import Register from './screens/Register';
 import SignIn from './screens/SignIn';
+import ResetPassword from './screens/ResetPassword';
 import ProfileSetup from './screens/ProfileSetup';
 import MainTabs from './screens/MainTabs';
 import { resolveInitialScreen } from './src/lib/profiles';
@@ -46,15 +47,57 @@ export default function App() {
   const [fontsLoaded] = useFonts(FONTS_TO_LOAD);
   const [bootstrapping, setBootstrapping] = useState(true);
   const [screen, setScreen] = useState<
-    'onboarding' | 'register' | 'signIn' | 'profileSetup' | 'main'
+    'onboarding' | 'register' | 'signIn' | 'resetPassword' | 'profileSetup' | 'main'
   >('onboarding');
   const [splashDone, setSplashDone] = useState(false);
 
   useEffect(() => {
     let mounted = true;
 
+    const isResetPasswordDeepLink = (url: string) =>
+      url.includes('genomatch://reset-password') || url.includes('genomatch.app/reset-password');
+
+    const extractResetTokens = (url: string) => {
+      const hashStart = url.indexOf('#');
+      const hash = hashStart >= 0 ? url.slice(hashStart + 1) : '';
+      const params = new URLSearchParams(hash);
+      const access_token = params.get('access_token');
+      if (!access_token) return null;
+      return {
+        access_token,
+        refresh_token: params.get('refresh_token') ?? '',
+      };
+    };
+
+    const handleResetPasswordUrl = async (url: string | null): Promise<boolean> => {
+      if (!url || !isResetPasswordDeepLink(url)) return false;
+
+      const tokens = extractResetTokens(url);
+      if (!tokens) return false;
+
+      const { error } = await supabase.auth.setSession({
+        access_token: tokens.access_token,
+        refresh_token: tokens.refresh_token,
+      });
+
+      if (error) {
+        console.error('[App] reset password deep link failed', error.message);
+        return false;
+      }
+
+      if (mounted) {
+        setScreen('resetPassword');
+      }
+      return true;
+    };
+
     (async () => {
       try {
+        const initialUrl = await Linking.getInitialURL();
+        if (await handleResetPasswordUrl(initialUrl)) {
+          return;
+        }
+
         const {
           data: { session },
           error: sessionError,
@@ -80,6 +123,10 @@ export default function App() {
       }
     })();
 
+    const linkSubscription = Linking.addEventListener('url', (event) => {
+      void handleResetPasswordUrl(event.url);
+    });
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
@@ -91,6 +138,7 @@ export default function App() {
 
     return () => {
       mounted = false;
+      linkSubscription.remove();
       subscription.unsubscribe();
     };
   }, []);
@@ -122,6 +170,10 @@ export default function App() {
         onSignedIn={(destination) => setScreen(destination)}
       />
     );
+  }
+
+  if (screen === 'resetPassword') {
+    return <ResetPassword onSuccess={() => setScreen('signIn')} />;
   }
 
   if (screen === 'profileSetup') {
