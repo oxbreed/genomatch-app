@@ -335,7 +335,14 @@ export default function Register({
           </Pressable>
 
           <Text style={styles.legalText}>
-            By continuing you agree to our Terms of Service and{' '}
+            By continuing you agree to our{' '}
+            <Text
+              style={styles.legalLink}
+              onPress={() => void Linking.openURL('https://genomatch.app/terms')}
+            >
+              Terms of Service
+            </Text>
+            {' '}and{' '}
             <Text
               style={styles.legalLink}
               onPress={() => void Linking.openURL('https://genomatch.app/privacy')}
