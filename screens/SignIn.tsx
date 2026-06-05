@@ -32,7 +32,6 @@ export default function SignIn({
   onBack,
   onCreateAccount,
   onSignedIn,
-  onNavigateResetPassword,
 }: SignInProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -127,9 +126,8 @@ export default function SignIn({
       return;
     }
 
-    const { error } = await supabase.auth.signInWithOtp({
-      email: trimmedEmail,
-      options: { shouldCreateUser: false },
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: 'https://www.genomatch.app/reset-password',
     });
     if (error) {
       setError(error.message);
@@ -137,9 +135,9 @@ export default function SignIn({
     }
 
     Alert.alert(
-      'A 6-digit code has been sent to your email. Enter it in the app to reset your password.',
-      '',
-      [{ text: 'OK', onPress: () => onNavigateResetPassword(trimmedEmail) }]
+      'Check your email',
+      'We sent a password reset link to ' + email.trim() + '. Open it on this phone to reset your password.',
+      [{ text: 'OK' }]
     );
   };
 
