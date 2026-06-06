@@ -190,11 +190,20 @@ function SuperLikeButton({ onPress, disabled }: SuperLikeButtonProps) {
 }
 
 function MatchPill({ percent }: { percent: number }) {
+  const high = percent >= HIGH_COMPATIBILITY_MIN;
+
   return (
     <View style={styles.matchPillWrap} pointerEvents="none">
-      <View style={styles.matchPill}>
+      <LinearGradient
+        colors={
+          high
+            ? ['rgba(212, 168, 67, 0.95)', 'rgba(196, 154, 58, 0.9)']
+            : ['rgba(61, 122, 82, 0.9)', 'rgba(45, 95, 65, 0.9)']
+        }
+        style={styles.matchPill}
+      >
         <Text style={styles.matchPillText}>{percent}%</Text>
-      </View>
+      </LinearGradient>
       <Text style={styles.matchPillLabel}>{getMatchLabel(percent)}</Text>
     </View>
   );
@@ -259,43 +268,56 @@ function ProfileCard({ profile, swipeIndex, totalProfiles, viewerGenotype, progr
           resizeMode="cover"
         />
       ) : (
-        <View style={[styles.cardMedia, styles.cardNoPhoto]}>
+        <LinearGradient
+          colors={[COLORS.forestDeep, COLORS.forest]}
+          style={[styles.cardMedia, styles.cardNoPhoto]}
+        >
           <View style={styles.noPhotoPlaceholderWrap} pointerEvents="none">
             <View style={styles.noPhotoCircle}>
               <Text style={styles.noPhotoInitials}>{getInitials(profile.name)}</Text>
             </View>
             <Text style={styles.noPhotoCaption}>No photo yet</Text>
           </View>
-        </View>
+        </LinearGradient>
       )}
 
-      {currentUri ? (
-        <Text style={styles.initialsWatermark} pointerEvents="none">
-          {getInitials(profile.name)}
-        </Text>
-      ) : null}
+      <LinearGradient
+        colors={['rgba(13, 40, 24, 0.28)', 'transparent']}
+        style={styles.cardTopShade}
+        pointerEvents="none"
+      />
 
-      <View style={styles.cardBottomShade} pointerEvents="none" />
+      <LinearGradient
+        colors={['transparent', 'rgba(13, 40, 24, 0.55)', 'rgba(13, 40, 24, 0.92)']}
+        locations={[0, 0.42, 1]}
+        style={styles.cardBottomShade}
+        pointerEvents="none"
+      />
 
       <View style={styles.cardInfoFooter} pointerEvents="box-none">
-        <View style={styles.nameBadgeRow}>
-          <Text style={styles.cardName} numberOfLines={1}>
-            {profile.name}
-            {profile.age != null ? `, ${profile.age}` : ''}
-          </Text>
-          <GenotypeBadge genotype={profile.genotype} />
-          {profile.genotypeVerified ? (
-            <Ionicons
-              name="shield-checkmark"
-              size={18}
-              color={COLORS.verified}
-              accessibilityLabel="Genotype verified"
-            />
-          ) : null}
+        <View style={styles.nameSection}>
+          <View style={styles.cardInfoAccent} pointerEvents="none" />
+          <View style={styles.nameBadgeRow}>
+            <Text style={styles.cardName} numberOfLines={1}>
+              {profile.name}
+              {profile.age != null ? `, ${profile.age}` : ''}
+            </Text>
+            <View style={styles.nameBadgeCluster}>
+              <GenotypeBadge genotype={profile.genotype} />
+              {profile.genotypeVerified ? (
+                <Ionicons
+                  name="shield-checkmark"
+                  size={18}
+                  color={COLORS.verified}
+                  accessibilityLabel="Genotype verified"
+                />
+              ) : null}
+            </View>
+          </View>
         </View>
 
         <View style={styles.cityRow}>
-          <Ionicons name="location-outline" size={14} color="#8FAF95" />
+          <Ionicons name="location-outline" size={14} color={COLORS.sage} />
           <Text style={styles.cityText}>{profile.city}</Text>
         </View>
 
@@ -1278,12 +1300,14 @@ const styles = StyleSheet.create({
     height: CARD_HEIGHT,
     borderRadius: 24,
     overflow: 'hidden',
-    backgroundColor: COLORS.forest,
-    shadowColor: COLORS.forestDeep,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.14,
-    shadowRadius: 16,
-    elevation: 6,
+    backgroundColor: COLORS.forestDeep,
+    borderWidth: 1.5,
+    borderColor: 'rgba(212, 168, 67, 0.35)',
+    shadowColor: COLORS.gold,
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.22,
+    shadowRadius: 22,
+    elevation: 10,
   },
   cardBody: {
     width: '100%',
@@ -1297,20 +1321,18 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    height: 3,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    borderRadius: 2,
+    height: 4,
+    backgroundColor: 'rgba(255,255,255,0.15)',
     zIndex: 7,
     overflow: 'hidden',
   },
   swipeProgressFill: {
-    height: 3,
+    height: 4,
     backgroundColor: COLORS.gold,
-    borderRadius: 2,
   },
   genotypeCompatRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     gap: 8,
     marginBottom: 8,
   },
@@ -1318,14 +1340,14 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
+    marginTop: 5,
   },
   genotypeCompatText: {
     flex: 1,
     fontFamily: 'Satoshi-Medium',
     fontSize: 12,
-    color: '#FFFFFF',
-    opacity: 0.9,
-    lineHeight: 16,
+    color: 'rgba(245, 239, 230, 0.9)',
+    lineHeight: 17,
   },
   superLikeToast: {
     position: 'absolute',
@@ -1461,65 +1483,55 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   cardMediaImage: {
-    borderRadius: 20,
+    borderRadius: 24,
   },
   cardNoPhoto: {
-    backgroundColor: '#0F2F1A',
     alignItems: 'center',
     justifyContent: 'center',
   },
   noPhotoPlaceholderWrap: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: '45%',
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 1,
   },
   noPhotoCircle: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: 'rgba(212,168,67,0.15)',
+    width: 108,
+    height: 108,
+    borderRadius: 54,
+    backgroundColor: 'rgba(212, 168, 67, 0.14)',
     borderWidth: 1.5,
-    borderColor: 'rgba(212,168,67,0.4)',
+    borderColor: 'rgba(212, 168, 67, 0.45)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   noPhotoInitials: {
     fontFamily: 'ClashDisplay-Semibold',
-    fontSize: 36,
-    color: 'rgba(212,168,67,0.6)',
+    fontSize: 40,
+    color: 'rgba(212, 168, 67, 0.75)',
     textAlign: 'center',
+    letterSpacing: 1,
   },
   noPhotoCaption: {
-    fontFamily: 'Satoshi-Regular',
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.3)',
-    marginTop: 8,
+    fontFamily: 'Satoshi-Medium',
+    fontSize: 13,
+    color: COLORS.sage,
+    marginTop: 10,
     textAlign: 'center',
   },
-  initialsWatermark: {
+  cardTopShade: {
     position: 'absolute',
-    top: '22%',
+    top: 0,
     left: 0,
     right: 0,
-    textAlign: 'center',
-    fontSize: 80,
-    fontWeight: '800',
-    color: 'rgba(255,255,255,0.15)',
-    letterSpacing: 4,
-    zIndex: 1,
+    height: '22%',
+    zIndex: 2,
   },
   cardBottomShade: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    height: '45%',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    height: '58%',
     zIndex: 2,
   },
   cardInfoFooter: {
@@ -1527,60 +1539,85 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingBottom: 22,
     zIndex: 3,
+  },
+  nameSection: {
+    marginBottom: 6,
+  },
+  cardInfoAccent: {
+    width: 36,
+    height: 3,
+    borderRadius: 2,
+    backgroundColor: COLORS.gold,
+    marginBottom: 8,
+    opacity: 0.9,
   },
   nameBadgeRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    flexWrap: 'wrap',
+    flexWrap: 'nowrap',
     gap: 8,
-    marginBottom: 8,
+  },
+  nameBadgeCluster: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    flexShrink: 0,
   },
   cardName: {
-    fontSize: 24,
+    fontFamily: 'ClashDisplay-Semibold',
+    fontSize: 22,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: COLORS.linen,
+    letterSpacing: -0.4,
     flexShrink: 1,
+    minWidth: 0,
+    textShadowColor: 'rgba(13, 40, 24, 0.45)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
   },
   cityRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 4,
     marginBottom: 8,
   },
   cityText: {
     fontFamily: 'Satoshi-Medium',
     fontSize: 14,
     fontWeight: '500',
-    color: '#8FAF95',
+    color: COLORS.sage,
   },
   cardBio: {
     fontFamily: 'Satoshi-Medium',
-    fontSize: 13,
-    lineHeight: 18,
-    color: '#FFFFFF',
+    fontSize: 14,
+    lineHeight: 20,
+    color: 'rgba(245, 239, 230, 0.88)',
     marginBottom: 10,
   },
   tagsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: 6,
   },
   tagChip: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
     borderRadius: 999,
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    backgroundColor: 'rgba(212, 168, 67, 0.22)',
+    borderWidth: 1,
+    borderColor: 'rgba(212, 168, 67, 0.42)',
   },
   tagText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#FFFFFF',
+    fontFamily: 'Satoshi-Bold',
+    fontSize: 11,
+    color: COLORS.linen,
   },
   photoDots: {
     position: 'absolute',
-    top: 14,
+    top: 12,
     left: 0,
     right: 0,
     flexDirection: 'row',
@@ -1589,16 +1626,14 @@ const styles = StyleSheet.create({
     zIndex: 5,
   },
   photoDot: {
-    width: 7,
-    height: 7,
-    borderRadius: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.45)',
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: 'rgba(255, 255, 255, 0.35)',
   },
   photoDotActive: {
-    backgroundColor: COLORS.white,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: 18,
+    backgroundColor: COLORS.gold,
   },
   photoTapLeft: {
     position: 'absolute',
@@ -1622,29 +1657,40 @@ const styles = StyleSheet.create({
     right: 14,
     alignItems: 'center',
     zIndex: 6,
+    gap: 4,
   },
   matchPill: {
-    backgroundColor: COLORS.gold,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     borderRadius: 999,
+    borderWidth: 2,
+    borderColor: 'rgba(255, 255, 255, 0.45)',
+    shadowColor: COLORS.gold,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.35,
+    shadowRadius: 6,
+    elevation: 4,
   },
   matchPillText: {
-    fontSize: 13,
+    fontFamily: 'ClashDisplay-Semibold',
+    fontSize: 15,
     fontWeight: '700',
-    color: COLORS.forest,
+    color: COLORS.forestDeep,
+    letterSpacing: -0.2,
   },
   matchPillLabel: {
-    marginTop: 4,
-    fontSize: 11,
-    fontWeight: '600',
-    color: '#FFFFFF',
-    opacity: 0.9,
+    fontFamily: 'Satoshi-Bold',
+    fontSize: 10,
+    letterSpacing: 0.6,
+    color: COLORS.linen,
     textAlign: 'center',
+    textShadowColor: 'rgba(0, 0, 0, 0.4)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
   },
   cardDragTint: {
     ...StyleSheet.absoluteFillObject,
-    borderRadius: 20,
+    borderRadius: 24,
     zIndex: 8,
   },
   cardDragTintLike: {

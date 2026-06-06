@@ -1,5 +1,5 @@
 /** GenoMatch brand palette */
-export const FOREST_DEEP = '#0D2818';
+export const FOREST_DEEP = '#163522';
 export const FOREST = '#1A3D28';
 export const GOLD = '#D4A843';
 export const LINEN = '#F5EFE6';

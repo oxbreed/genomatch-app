@@ -11,7 +11,6 @@ import {
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import ProfileAvatar from '../src/components/ProfileAvatar';
@@ -332,22 +331,13 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
           onPress={handleSend}
           disabled={sending || !draft.trim()}
         >
-          <LinearGradient
-            colors={
-              sending || !draft.trim()
-                ? ['rgba(143, 175, 149, 0.5)', 'rgba(143, 175, 149, 0.35)']
-                : [COLORS.gold, '#C49A38']
-            }
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.sendBtn}
-          >
+          <View style={styles.sendBtn}>
             {sending ? (
-              <ActivityIndicator color={COLORS.forestDeep} size="small" />
+              <ActivityIndicator color="#0D2818" size="small" />
             ) : (
               <Text style={styles.sendBtnText}>Send</Text>
             )}
-          </LinearGradient>
+          </View>
         </Pressable>
       </View>
     </KeyboardAvoidingView>
@@ -495,21 +485,17 @@ const styles = StyleSheet.create({
   bubble: {
     paddingHorizontal: 14,
     paddingVertical: 10,
-    borderRadius: RADIUS.lg,
+    borderRadius: 20,
   },
   bubbleSent: {
-    backgroundColor: COLORS.forestDeep,
-    borderBottomRightRadius: 6,
+    backgroundColor: '#1A3D28',
+    borderBottomRightRadius: 4,
   },
   bubbleReceived: {
-    backgroundColor: COLORS.white,
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: COLORS.border,
-    borderBottomLeftRadius: 6,
-    ...SHADOWS.card,
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
+    borderColor: '#E8E0D5',
+    borderBottomLeftRadius: 4,
   },
   bubbleText: {
     fontFamily: 'Satoshi-Medium',
@@ -541,16 +527,16 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     backgroundColor: COLORS.white,
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
+    borderTopColor: '#D4A843',
   },
   composerInput: {
     flex: 1,
     minHeight: 44,
     maxHeight: 120,
-    borderRadius: RADIUS.md,
-    borderWidth: 1.5,
-    borderColor: 'rgba(13, 40, 24, 0.1)',
-    backgroundColor: COLORS.linen,
+    borderRadius: 25,
+    borderWidth: 1,
+    borderColor: '#D4A843',
+    backgroundColor: '#FFFFFF',
     paddingHorizontal: 14,
     paddingVertical: 10,
     fontFamily: 'Satoshi-Medium',
@@ -572,10 +558,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 18,
     paddingVertical: 10,
+    backgroundColor: '#D4A843',
   },
   sendBtnText: {
     fontFamily: 'Satoshi-Bold',
     fontSize: 15,
-    color: COLORS.forestDeep,
+    color: '#0D2818',
   },
 });
