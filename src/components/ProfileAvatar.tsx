@@ -56,9 +56,9 @@ export default function ProfileAvatar({
     : size * 0.36;
   const hasPhoto = Boolean(avatarUrl?.trim());
   const initials = getInitials(name);
-  const fallbackBg = noPhotoBackground ?? gradient[0];
-  const fallbackInnerBg = noPhotoBackground ?? gradient[1];
-  const initialColor = noPhotoInitialColor ?? COLORS.linen;
+  const fallbackBg = noPhotoBackground ?? '#1A3D28';
+  const fallbackInnerBg = noPhotoBackground ?? '#1A3D28';
+  const initialColor = noPhotoInitialColor ?? '#FFFFFF';
 
   const initialsNode = (
     <Text
