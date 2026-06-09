@@ -202,17 +202,22 @@ export default function DiscoverMatchModal({
                 </View>
 
                 {profile ? (
-                  <View style={styles.compatPill}>
-                    <Ionicons name="sparkles" size={14} color={COLORS.gold} />
-                    <Text style={styles.compatText}>{profile.compatibility}% genotype match</Text>
-                    {profile.genotypeVerified ? (
-                      <>
-                        <View style={styles.compatDivider} />
-                        <Ionicons name="shield-checkmark" size={13} color={COLORS.verified} />
-                        <Text style={styles.verifiedText}>Verified</Text>
-                      </>
-                    ) : null}
-                  </View>
+                  <>
+                    <View style={styles.compatPill}>
+                      <Ionicons name="sparkles" size={14} color={COLORS.gold} />
+                      <Text style={styles.compatText}>{profile.compatibility}% genotype match</Text>
+                      {profile.genotypeVerified ? (
+                        <>
+                          <View style={styles.compatDivider} />
+                          <Ionicons name="shield-checkmark" size={13} color={COLORS.verified} />
+                          <Text style={styles.verifiedText}>Verified</Text>
+                        </>
+                      ) : null}
+                    </View>
+                    <Text style={styles.compatDisclaimer} numberOfLines={2}>
+                      Informational only — not medical advice.
+                    </Text>
+                  </>
                 ) : null}
 
                 <Pressable
@@ -407,6 +412,15 @@ const styles = StyleSheet.create({
     fontFamily: 'Satoshi-Bold',
     fontSize: 11,
     color: COLORS.verified,
+  },
+  compatDisclaimer: {
+    fontSize: 10,
+    lineHeight: 13,
+    color: COLORS.sage,
+    textAlign: 'center',
+    marginTop: 6,
+    opacity: 0.8,
+    paddingHorizontal: 16,
   },
   ctaWrap: {
     width: '100%',
