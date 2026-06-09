@@ -46,7 +46,7 @@ export const MOCK_MATCHES: MockProfile[] = [
     bio: 'Architect who loves live music and long walks. Looking for someone intentional, kind, and ready for something real.',
     interests: ['Music', 'Travel', 'Art', 'Food'],
     gradient: ['#2A5C40', '#1A3D28'],
-    photoUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80',
+    photoUrl: 'https://genomatch.app/demo/demo-amara.png',
     lastMessageAt: '2h ago',
   },
   {
@@ -59,7 +59,7 @@ export const MOCK_MATCHES: MockProfile[] = [
     bio: 'Fitness coach and foodie. I value honesty, good conversation, and building a future with the right person.',
     interests: ['Fitness', 'Food', 'Sports', 'Movies'],
     gradient: ['#2E7D32', '#1B5E20'],
-    photoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80',
+    photoUrl: 'https://genomatch.app/demo/demo-kwame.png',
     lastMessageAt: 'Yesterday',
   },
   {
@@ -72,8 +72,21 @@ export const MOCK_MATCHES: MockProfile[] = [
     bio: 'Medical student and book lover. Building a life filled with purpose, laughter, and deep connection.',
     interests: ['Reading', 'Movies', 'Nature', 'Food'],
     gradient: ['#A32D2D', '#7B1F1F'],
-    photoUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=600&q=80',
+    photoUrl: 'https://genomatch.app/demo/demo-zainab.png',
     lastMessageAt: 'Mon',
+  },
+  {
+    id: '4',
+    name: 'Amani Mwangi',
+    age: 30,
+    city: 'Nairobi',
+    genotype: 'AC',
+    compatibility: 82,
+    bio: 'Software engineer who enjoys hiking and photography. Looking for an honest connection built on shared values and laughter.',
+    interests: ['Hiking', 'Photography', 'Tech', 'Music'],
+    gradient: ['#1B5E20', '#0D2818'],
+    photoUrl: 'https://genomatch.app/demo/demo-amani.png',
+    lastMessageAt: '3d ago',
   },
 ];
 
