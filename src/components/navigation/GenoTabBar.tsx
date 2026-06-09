@@ -70,10 +70,6 @@ export default function GenoTabBar({ tabs, activeTab, onSelect }: Props) {
   return (
     <View style={styles.wrap}>
       <LinearGradient
-        colors={['rgba(13, 40, 24, 0.98)', COLORS.tabBar]}
-        style={StyleSheet.absoluteFill}
-      />
-      <LinearGradient
         colors={['transparent', 'rgba(212, 168, 67, 0.55)', 'transparent']}
         start={{ x: 0, y: 0.5 }}
         end={{ x: 1, y: 0.5 }}
@@ -107,12 +103,19 @@ export { GENO_TAB_BAR_HEIGHT };
 const styles = StyleSheet.create({
   wrap: {
     height: GENO_TAB_BAR_HEIGHT,
-    paddingTop: 6,
-    paddingBottom: Platform.OS === 'ios' ? 22 : 10,
+    paddingTop: 8,
+    paddingBottom: 8,
     paddingHorizontal: 4,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: 'rgba(255, 255, 255, 0.08)',
+    marginHorizontal: 16,
+    marginBottom: Platform.OS === 'ios' ? 24 : 16,
+    borderRadius: 28,
+    backgroundColor: 'rgba(22, 53, 34, 0.82)',
     overflow: 'hidden',
+    shadowColor: '#0B1F13',
+    shadowOpacity: 0.28,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 12,
   },
   topRule: {
     position: 'absolute',
