@@ -333,7 +333,7 @@ export default function Register({
                   <Ionicons name="shield-checkmark" size={16} color={COLORS.verified} />
                 </View>
                 <Text style={styles.privacyText}>
-                  Your genotype is encrypted, protected, and only used for compatibility intelligence.
+                  Your genotype is kept private, secured, and only used for compatibility intelligence.
                 </Text>
               </View>
 
