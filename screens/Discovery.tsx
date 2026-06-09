@@ -1027,20 +1027,16 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
                           key={stackProfile.id}
                           pointerEvents="none"
                           style={[
-                            styles.cardBehindPeek,
+                            styles.card,
                             styles.cardInStack,
                             {
                               zIndex: depthFromTop,
-                              opacity: 0.7,
+                              opacity: 0.92,
                               transform: [{ scale: 0.96 }],
                             },
                           ]}
                         >
-                          <View style={styles.cardBehindClip}>
-                            <View style={styles.cardBehindClipInner}>
-                              <ProfileCard profile={stackProfile} />
-                            </View>
-                          </View>
+                          <ProfileCard profile={stackProfile} />
                         </Animated.View>
                       );
                     }
