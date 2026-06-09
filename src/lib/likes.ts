@@ -75,7 +75,7 @@ export async function recordLike(likedId: string): Promise<LikeResult> {
   }
 
   const { data: profile } = await supabase
-    .from('profiles')
+    .from('public_profiles')
     .select('display_name')
     .eq('id', likedId)
     .maybeSingle();

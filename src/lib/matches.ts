@@ -50,7 +50,7 @@ export async function fetchMatches(): Promise<FetchMatchesResult> {
   );
 
   const { data: profiles, error: profilesError } = await supabase
-    .from('profiles')
+    .from('public_profiles')
     .select(
       'id, display_name, genotype, city, bio, interests, relationship_goal, avatar_url, photos, date_of_birth'
     )

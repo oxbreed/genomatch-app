@@ -166,7 +166,7 @@ export async function fetchDiscoveryProfiles(): Promise<{
   const blockedSet = await getBlockedUserIds(userId);
 
   const { data, error } = await supabase
-    .from('profiles')
+    .from('public_profiles')
     .select(DISCOVERY_PROFILE_FIELDS)
     .neq('id', userId)
     .order('created_at', { ascending: false })
