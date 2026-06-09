@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     overflow: 'hidden',
     borderRadius: RADIUS.xl,
-    backgroundColor: COLORS.forestDeep,
+    backgroundColor: 'rgba(22, 53, 34, 0.82)',
   },
   viewVignette: {
     position: 'absolute',
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     overflow: 'hidden',
     borderRadius: RADIUS.xl - 1.5,
-    backgroundColor: COLORS.forestDeep,
+    backgroundColor: 'rgba(22, 53, 34, 0.82)',
   },
   topAccent: {
     position: 'absolute',

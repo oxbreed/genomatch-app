@@ -13,7 +13,7 @@ export default function StudioBanner({ doneCount, totalCount }: Props) {
   return (
     <View style={styles.wrap}>
       <LinearGradient
-        colors={['#1A3D28', '#0D2818', '#142E22']}
+        colors={['rgba(22, 53, 34, 0.82)', 'rgba(22, 53, 34, 0.82)', 'rgba(22, 53, 34, 0.82)']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.card}

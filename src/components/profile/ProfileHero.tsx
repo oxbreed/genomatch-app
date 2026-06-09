@@ -57,7 +57,7 @@ export default function ProfileHero({
         <Image source={{ uri: heroPhotoUri }} style={styles.heroImage} resizeMode="cover" />
       ) : (
         <LinearGradient
-          colors={[COLORS.forest, COLORS.forestDeep]}
+          colors={['rgba(22, 53, 34, 0.82)', 'rgba(22, 53, 34, 0.82)']}
           style={styles.heroPlaceholder}
         >
           <GenoLogoCeremony variant="hero" tone="light" />
