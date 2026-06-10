@@ -1,12 +1,22 @@
 import type { ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import LifestyleBadges from '../LifestyleBadges';
+import PresenceBadge from '../PresenceBadge';
 import { COLORS, RELATIONSHIP_GOAL_LABELS } from '../../data/mockData';
+import type { PresenceState } from '../../types/database';
 import { PROFILE } from './profileTokens';
 
 type Props = {
   bio: string;
   interests: string[];
   relationshipGoal: string;
+  presenceState?: PresenceState;
+  isNewMember?: boolean;
+  drinkingStatus?: string | null;
+  smokingStatus?: string | null;
+  educationStatus?: string | null;
+  heightCm?: number | null;
+  religion?: string | null;
 };
 
 function SectionBlock({
@@ -27,12 +37,47 @@ function SectionBlock({
   );
 }
 
-export default function ProfileViewSections({ bio, interests, relationshipGoal }: Props) {
+export default function ProfileViewSections({
+  bio,
+  interests,
+  relationshipGoal,
+  presenceState,
+  isNewMember,
+  drinkingStatus,
+  smokingStatus,
+  educationStatus,
+  heightCm,
+  religion,
+}: Props) {
   const goalLabel =
     RELATIONSHIP_GOAL_LABELS[relationshipGoal] ?? (relationshipGoal || 'Not set');
+  const hasLifestyle = !!(drinkingStatus || smokingStatus || educationStatus || heightCm || religion);
+  const showPresence =
+    (presenceState && presenceState !== 'offline') || isNewMember;
 
   return (
     <View style={styles.wrap}>
+      {showPresence ? (
+        <SectionBlock label="Status" showDivider>
+          <PresenceBadge
+            presenceState={presenceState ?? 'offline'}
+            isNewMember={isNewMember}
+          />
+        </SectionBlock>
+      ) : null}
+
+      {hasLifestyle ? (
+        <SectionBlock label="Lifestyle" showDivider>
+          <LifestyleBadges
+            drinkingStatus={drinkingStatus}
+            smokingStatus={smokingStatus}
+            educationStatus={educationStatus}
+            heightCm={heightCm}
+            religion={religion}
+          />
+        </SectionBlock>
+      ) : null}
+
       <SectionBlock label="Bio" showDivider>
         <Text style={[styles.bioText, !bio && styles.placeholder]}>
           {bio || 'Add a bio in Profile Studio to tell matches your story.'}

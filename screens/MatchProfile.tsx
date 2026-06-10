@@ -16,6 +16,8 @@ import { GenoPremiumChrome, GenoCardFrame } from '../src/brand/graphics';
 import { GenoBackHeader } from '../src/components/genoExperience';
 import GenotypeBadge from '../src/components/GenotypeBadge';
 import ProfileAvatar from '../src/components/ProfileAvatar';
+import LifestyleBadges from '../src/components/LifestyleBadges';
+import PresenceBadge from '../src/components/PresenceBadge';
 import { ProfileViewSections } from '../src/components/profile';
 import { ProfileVitalityRing } from '../src/components/profileStudio';
 import ReportBlockSheet from '../src/components/ReportBlockSheet';
@@ -134,6 +136,25 @@ export default function MatchProfile({ match, onBack, onSendMessage }: MatchProf
               </View>
             </View>
 
+            {(profile.presenceState !== 'offline' || profile.isNewMember) ? (
+              <View style={styles.presenceRow}>
+                <PresenceBadge
+                  presenceState={profile.presenceState}
+                  isNewMember={profile.isNewMember}
+                />
+              </View>
+            ) : null}
+
+            <View style={styles.lifestyleRow}>
+              <LifestyleBadges
+                drinkingStatus={profile.drinkingStatus}
+                smokingStatus={profile.smokingStatus}
+                educationStatus={profile.educationStatus}
+                heightCm={profile.heightCm}
+                religion={profile.religion}
+              />
+            </View>
+
             <View style={styles.matchBadge}>
               <Ionicons name="heart" size={12} color={COLORS.forestDeep} />
               <Text style={styles.matchBadgeText}>Mutual match</Text>
@@ -242,6 +263,13 @@ const styles = StyleSheet.create({
     marginTop: 12,
     flexWrap: 'wrap',
     justifyContent: 'center',
+  },
+  presenceRow: {
+    marginTop: 10,
+  },
+  lifestyleRow: {
+    marginTop: 10,
+    paddingHorizontal: 8,
   },
   cityRow: {
     flexDirection: 'row',

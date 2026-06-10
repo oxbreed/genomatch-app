@@ -19,6 +19,7 @@ import { GenoCardFrame, GenoPremiumChrome, GenoLogoCeremony } from '../src/brand
 import { Ionicons } from '@expo/vector-icons';
 import { GenoInboxHeader, GenoInboxIconButton } from '../src/components/inbox';
 import {
+  ProfileDetailsFields,
   ProfileEditFields,
   ProfileGenotypeVerifyModal,
   ProfileHero,
@@ -65,6 +66,7 @@ const STUDIO_STEPS: StudioStep[] = [
   { id: 'photos', label: 'Photos', icon: 'images-outline' },
   { id: 'story', label: 'Story', icon: 'document-text-outline' },
   { id: 'intent', label: 'Intent', icon: 'heart-outline' },
+  { id: 'details', label: 'Details', icon: 'options-outline' },
 ];
 
 type ProfileProps = { onSignOut?: () => void };
@@ -81,6 +83,11 @@ type EditableProfile = {
   photos: string[];
   gradient: [string, string];
   genotypeVerified: boolean;
+  heightCm: number | null;
+  religion: string;
+  drinkingStatus: string;
+  smokingStatus: string;
+  educationStatus: string;
 };
 
 function calculateProfileCompletion(data: EditableProfile): number {
@@ -104,6 +111,7 @@ function countStudioEssentials(data: EditableProfile): number {
   if (data.interests.length > 0) n += 1;
   if (data.city.trim()) n += 1;
   if (data.relationshipGoal.trim()) n += 1;
+  if (data.drinkingStatus || data.smokingStatus || data.educationStatus) n += 1;
   return n;
 }
 
@@ -113,6 +121,11 @@ function profilesEqual(a: EditableProfile, b: EditableProfile): boolean {
     a.city === b.city &&
     a.bio === b.bio &&
     a.relationshipGoal === b.relationshipGoal &&
+    a.heightCm === b.heightCm &&
+    a.religion === b.religion &&
+    a.drinkingStatus === b.drinkingStatus &&
+    a.smokingStatus === b.smokingStatus &&
+    a.educationStatus === b.educationStatus &&
     JSON.stringify(a.interests) === JSON.stringify(b.interests) &&
     JSON.stringify(a.photos) === JSON.stringify(b.photos)
   );
@@ -168,6 +181,11 @@ export default function Profile({ onSignOut }: ProfileProps) {
         photos: mapped.photos,
         gradient: mapped.gradient,
         genotypeVerified: mapped.genotypeVerified,
+        heightCm: row.height_cm ?? null,
+        religion: row.religion ?? '',
+        drinkingStatus: row.drinking_status ?? '',
+        smokingStatus: row.smoking_status ?? '',
+        educationStatus: row.education_status ?? '',
       };
       setProfile(loaded);
       setDraft(loaded);
@@ -217,11 +235,12 @@ export default function Profile({ onSignOut }: ProfileProps) {
   );
 
   const stepComplete = useMemo((): boolean[] => {
-    if (!draft) return [false, false, false];
+    if (!draft) return [false, false, false, false];
     return [
       draft.photos.length > 0 || !!draft.avatarUrl,
       !!draft.bio.trim() && draft.interests.length > 0,
       !!draft.relationshipGoal.trim(),
+      !!(draft.drinkingStatus || draft.smokingStatus || draft.educationStatus || draft.heightCm || draft.religion),
     ];
   }, [draft]);
 
@@ -282,6 +301,11 @@ export default function Profile({ onSignOut }: ProfileProps) {
         date_of_birth: year ? `${year}-01-01` : undefined,
         interests: draft.interests,
         relationship_goal: draft.relationshipGoal,
+        height_cm: draft.heightCm,
+        religion: draft.religion || null,
+        drinking_status: draft.drinkingStatus || null,
+        smoking_status: draft.smokingStatus || null,
+        education_status: draft.educationStatus || null,
       });
       setProfile({ ...draft });
       setEditing(false);
@@ -449,7 +473,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
 
           {editing ? (
             <Animated.View style={{ opacity: studioFade }}>
-              <StudioBanner doneCount={essentialsDone} totalCount={5} />
+              <StudioBanner doneCount={essentialsDone} totalCount={6} />
               <StudioStepRail
                 steps={STUDIO_STEPS}
                 activeIndex={activeStep}
@@ -533,7 +557,6 @@ export default function Profile({ onSignOut }: ProfileProps) {
               <StudioSectionShell
                 active={activeStep === 2}
                 onLayout={onSectionLayout('intent')}
-                style={{ marginBottom: 8 }}
               >
                 <ProfileSectionHeader
                   kicker="03 · INTENT"
@@ -550,6 +573,30 @@ export default function Profile({ onSignOut }: ProfileProps) {
                   showBio={false}
                   showInterests={false}
                   showGoals
+                />
+              </StudioSectionShell>
+
+              <StudioSectionShell
+                active={activeStep === 3}
+                onLayout={onSectionLayout('details')}
+                style={{ marginBottom: 8 }}
+              >
+                <ProfileSectionHeader
+                  kicker="04 · DETAILS"
+                  title="Lifestyle & background"
+                  hint="Drinking, smoking, education & more — shown on your profile"
+                />
+                <ProfileDetailsFields
+                  heightCm={draft?.heightCm ?? null}
+                  religion={draft?.religion ?? ''}
+                  drinkingStatus={draft?.drinkingStatus ?? ''}
+                  smokingStatus={draft?.smokingStatus ?? ''}
+                  educationStatus={draft?.educationStatus ?? ''}
+                  onSelectHeight={(cm) => setDraft((p) => (p ? { ...p, heightCm: cm } : p))}
+                  onSelectReligion={(id) => setDraft((p) => (p ? { ...p, religion: id } : p))}
+                  onSelectDrinking={(id) => setDraft((p) => (p ? { ...p, drinkingStatus: id } : p))}
+                  onSelectSmoking={(id) => setDraft((p) => (p ? { ...p, smokingStatus: id } : p))}
+                  onSelectEducation={(id) => setDraft((p) => (p ? { ...p, educationStatus: id } : p))}
                 />
               </StudioSectionShell>
             </>
@@ -578,6 +625,11 @@ export default function Profile({ onSignOut }: ProfileProps) {
                   bio={data.bio}
                   interests={data.interests}
                   relationshipGoal={data.relationshipGoal}
+                  drinkingStatus={data.drinkingStatus}
+                  smokingStatus={data.smokingStatus}
+                  educationStatus={data.educationStatus}
+                  heightCm={data.heightCm}
+                  religion={data.religion}
                 />
               </ProfileSectionCard>
 

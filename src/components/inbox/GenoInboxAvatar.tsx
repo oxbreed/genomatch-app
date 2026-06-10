@@ -1,8 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import ProfileAvatar from '../ProfileAvatar';
+import { PresenceDot } from '../PresenceBadge';
 import { COLORS } from '../../theme';
 import { getInitials } from '../../data/mockData';
+import type { PresenceState } from '../../types/database';
 import { INBOX } from './inboxTokens';
 
 function brandGradient(name: string): [string, string] {
@@ -19,6 +21,7 @@ type Props = {
   photoUrl?: string | null;
   gradient?: [string, string];
   showUnread?: boolean;
+  presenceState?: PresenceState;
 };
 
 export default function GenoInboxAvatar({
@@ -27,6 +30,7 @@ export default function GenoInboxAvatar({
   photoUrl,
   gradient,
   showUnread,
+  presenceState,
 }: Props) {
   const url = avatarUrl?.trim() || photoUrl?.trim();
   const size = INBOX.avatarSize;
@@ -54,6 +58,11 @@ export default function GenoInboxAvatar({
           )}
         </View>
       </LinearGradient>
+      {presenceState && presenceState !== 'offline' ? (
+        <View style={styles.presence}>
+          <PresenceDot presenceState={presenceState} size={14} />
+        </View>
+      ) : null}
       {showUnread ? (
         <LinearGradient colors={INBOX.colors.goldBtn} style={styles.unread}>
           <View style={styles.unreadDot} />
@@ -85,6 +94,11 @@ const styles = StyleSheet.create({
     fontFamily: 'ClashDisplay-Semibold',
     fontSize: 17,
     color: COLORS.gold,
+  },
+  presence: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
   },
   unread: {
     position: 'absolute',

@@ -12,6 +12,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { GenoBondHalo } from '../../brand/graphics';
 import GenotypeBadge from '../GenotypeBadge';
+import LifestyleBadges from '../LifestyleBadges';
+import PresenceBadge from '../PresenceBadge';
 import VerifiedBadge from '../VerifiedBadge';
 import { COLORS, getInitials } from '../../data/mockData';
 import { getGenotypeRiskShort } from '../../lib/compatibility';
@@ -115,6 +117,16 @@ export default function DiscoverSwipeCard({
             {profile.genotypeVerified ? <VerifiedBadge compact /> : null}
           </View>
 
+          {(profile.presenceState !== 'offline' || profile.isNewMember) ? (
+            <View style={styles.presenceRow}>
+              <PresenceBadge
+                presenceState={profile.presenceState}
+                isNewMember={profile.isNewMember}
+                dark
+              />
+            </View>
+          ) : null}
+
           <View style={styles.cityRow}>
             <Ionicons name="location-outline" size={14} color={COLORS.sage} />
             <Text style={styles.cityText}>{profile.city}</Text>
@@ -135,6 +147,14 @@ export default function DiscoverSwipeCard({
           <Text style={styles.cardBio} numberOfLines={3} ellipsizeMode="tail">
             {profile.bio || 'Tap to view full profile'}
           </Text>
+
+          <LifestyleBadges
+            drinkingStatus={profile.drinkingStatus}
+            smokingStatus={profile.smokingStatus}
+            educationStatus={profile.educationStatus}
+            compact
+            dark
+          />
 
           <View style={styles.tagsRow}>
             {profile.interests.slice(0, 4).map((interest) => (
@@ -252,6 +272,9 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 6,
   },
+  presenceRow: {
+    marginBottom: 6,
+  },
   cardName: {
     fontFamily: 'ClashDisplay-Semibold',
     fontSize: 26,
@@ -300,6 +323,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 6,
+    marginTop: 6,
   },
   tagChip: {
     paddingHorizontal: 10,

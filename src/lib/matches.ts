@@ -2,7 +2,7 @@ import type { Genotype, MatchWithProfile, ProfileRow } from '../types/database';
 import { logSupabaseResult } from './auth';
 import { mapProfileRow } from './profileMapper';
 import { getBlockedUserIds, severConnection } from './moderation';
-import { getCurrentUserId } from './profiles';
+import { fetchPublicProfilesByIds, getCurrentUserId } from './profiles';
 import { supabase } from './supabase';
 
 export type FetchMatchesResult = {
@@ -49,19 +49,11 @@ export async function fetchMatches(): Promise<FetchMatchesResult> {
     m.user_a_id === userId ? m.user_b_id : m.user_a_id
   );
 
-  const { data: profiles, error: profilesError } = await supabase
-    .from('public_profiles')
-    .select(
-      'id, display_name, genotype, city, bio, interests, relationship_goal, avatar_url, photos, date_of_birth'
-    )
-    .in('id', otherIds);
+  const profiles = await fetchPublicProfilesByIds(otherIds);
 
-  logSupabaseResult('matches.matchedProfiles', profiles, profilesError);
-  if (profilesError) throw profilesError;
+  logSupabaseResult('matches.matchedProfiles', profiles, null);
 
-  const profileMap = new Map(
-    ((profiles ?? []) as ProfileRow[]).map((p) => [p.id, p])
-  );
+  const profileMap = new Map(profiles.map((p) => [p.id, p]));
 
   return {
     matches: visibleMatches

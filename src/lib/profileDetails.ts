@@ -35,3 +35,32 @@ export function parseHeightInput(raw: string): number | null {
   if (Number.isNaN(n)) return null;
   return clampHeightCm(n);
 }
+
+export const HABIT_OPTIONS = [
+  { id: 'never', label: 'Never' },
+  { id: 'socially', label: 'Socially' },
+  { id: 'regularly', label: 'Regularly' },
+  { id: 'prefer_not', label: 'Prefer not to say' },
+] as const;
+
+export type HabitId = (typeof HABIT_OPTIONS)[number]['id'];
+
+export const HABIT_LABELS: Record<string, string> = Object.fromEntries(
+  HABIT_OPTIONS.map((o) => [o.id, o.label])
+);
+
+export const EDUCATION_OPTIONS = [
+  { id: 'high_school', label: 'High school' },
+  { id: 'diploma', label: 'Diploma / Certificate' },
+  { id: 'bachelors', label: "Bachelor's degree" },
+  { id: 'masters', label: "Master's degree" },
+  { id: 'doctorate', label: 'Doctorate' },
+  { id: 'other', label: 'Other' },
+  { id: 'prefer_not', label: 'Prefer not to say' },
+] as const;
+
+export type EducationId = (typeof EDUCATION_OPTIONS)[number]['id'];
+
+export const EDUCATION_LABELS: Record<string, string> = Object.fromEntries(
+  EDUCATION_OPTIONS.map((o) => [o.id, o.label])
+);

@@ -14,6 +14,8 @@ import GenoCompatRing from '../genomatch/GenoCompatRing';
 import ProfileAvatar from '../ProfileAvatar';
 import VerifiedBadge from '../VerifiedBadge';
 import GenotypeBadge from '../GenotypeBadge';
+import LifestyleBadges from '../LifestyleBadges';
+import PresenceBadge from '../PresenceBadge';
 import { COLORS, RELATIONSHIP_GOAL_LABELS } from '../../data/mockData';
 import { getGenotypeCompatibilityLine } from '../../lib/compatibility';
 import type { DiscoveryProfile, Genotype } from '../../types/database';
@@ -82,6 +84,12 @@ export default function DiscoverProfileSheet({
               {profile.genotypeVerified ? <VerifiedBadge compact /> : null}
               <Text style={styles.city}>{profile.city}</Text>
             </View>
+            {(profile.presenceState !== 'offline' || profile.isNewMember) ? (
+              <PresenceBadge
+                presenceState={profile.presenceState}
+                isNewMember={profile.isNewMember}
+              />
+            ) : null}
             <Text style={styles.compatLine} numberOfLines={2}>
               {compatLine}
             </Text>
@@ -90,6 +98,14 @@ export default function DiscoverProfileSheet({
           <Text style={styles.bio}>
             {profile.bio || 'No bio yet — tap Like to start a bond.'}
           </Text>
+
+          <LifestyleBadges
+            drinkingStatus={profile.drinkingStatus}
+            smokingStatus={profile.smokingStatus}
+            educationStatus={profile.educationStatus}
+            heightCm={profile.heightCm}
+            religion={profile.religion}
+          />
 
           {profile.interests.length > 0 ? (
             <View style={styles.chipRow}>

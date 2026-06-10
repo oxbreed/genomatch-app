@@ -2,22 +2,90 @@ import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { GenoHelixField } from '../../brand/graphics';
-import { HEIGHT_PRESETS_CM, RELIGION_OPTIONS, formatHeightCm } from '../../lib/profileDetails';
+import {
+  EDUCATION_OPTIONS,
+  HABIT_OPTIONS,
+  HEIGHT_PRESETS_CM,
+  RELIGION_OPTIONS,
+  formatHeightCm,
+} from '../../lib/profileDetails';
 import { COLORS } from '../../theme';
 import { PROFILE } from './profileTokens';
 
 type Props = {
   heightCm: number | null;
   religion: string;
+  drinkingStatus: string;
+  smokingStatus: string;
+  educationStatus: string;
   onSelectHeight: (cm: number | null) => void;
   onSelectReligion: (id: string) => void;
+  onSelectDrinking: (id: string) => void;
+  onSelectSmoking: (id: string) => void;
+  onSelectEducation: (id: string) => void;
 };
+
+function HabitSection({
+  icon,
+  label,
+  hint,
+  value,
+  onSelect,
+}: {
+  icon: keyof typeof Ionicons.glyphMap;
+  label: string;
+  hint: string;
+  value: string;
+  onSelect: (id: string) => void;
+}) {
+  return (
+    <>
+      <View style={[styles.fieldHeader, styles.fieldHeaderSpaced]}>
+        <View style={styles.iconRing}>
+          <Ionicons name={icon} size={16} color={COLORS.gold} />
+        </View>
+        <View style={styles.fieldCopy}>
+          <Text style={styles.label}>{label}</Text>
+          <Text style={styles.hint}>{hint}</Text>
+        </View>
+      </View>
+      <View style={styles.religionGrid}>
+        {HABIT_OPTIONS.map((opt) => {
+          const active = value === opt.id;
+          return (
+            <Pressable
+              key={opt.id}
+              style={styles.religionCell}
+              onPress={() => onSelect(active ? '' : opt.id)}
+            >
+              {active ? (
+                <LinearGradient colors={[COLORS.gold, '#C49A3A']} style={styles.religionChipActive}>
+                  <Text style={styles.religionTextActive}>{opt.label}</Text>
+                </LinearGradient>
+              ) : (
+                <View style={styles.religionChip}>
+                  <Text style={styles.religionText}>{opt.label}</Text>
+                </View>
+              )}
+            </Pressable>
+          );
+        })}
+      </View>
+    </>
+  );
+}
 
 export default function ProfileDetailsFields({
   heightCm,
   religion,
+  drinkingStatus,
+  smokingStatus,
+  educationStatus,
   onSelectHeight,
   onSelectReligion,
+  onSelectDrinking,
+  onSelectSmoking,
+  onSelectEducation,
 }: Props) {
   const heightLabel = formatHeightCm(heightCm);
 
@@ -105,6 +173,55 @@ export default function ProfileDetailsFields({
               key={opt.id}
               style={styles.religionCell}
               onPress={() => onSelectReligion(active ? '' : opt.id)}
+            >
+              {active ? (
+                <LinearGradient colors={[COLORS.gold, '#C49A3A']} style={styles.religionChipActive}>
+                  <Text style={styles.religionTextActive}>{opt.label}</Text>
+                </LinearGradient>
+              ) : (
+                <View style={styles.religionChip}>
+                  <Text style={styles.religionText}>{opt.label}</Text>
+                </View>
+              )}
+            </Pressable>
+          );
+        })}
+      </View>
+
+      <HabitSection
+        icon="wine-outline"
+        label="Drinking"
+        hint="Optional — shown on your profile"
+        value={drinkingStatus}
+        onSelect={onSelectDrinking}
+      />
+
+      <HabitSection
+        icon="cloud-outline"
+        label="Smoking"
+        hint="Optional — shown on your profile"
+        value={smokingStatus}
+        onSelect={onSelectSmoking}
+      />
+
+      <View style={[styles.fieldHeader, styles.fieldHeaderSpaced]}>
+        <View style={styles.iconRing}>
+          <Ionicons name="school-outline" size={16} color={COLORS.gold} />
+        </View>
+        <View style={styles.fieldCopy}>
+          <Text style={styles.label}>Education</Text>
+          <Text style={styles.hint}>Optional — helps matches know your background</Text>
+        </View>
+      </View>
+
+      <View style={styles.religionGrid}>
+        {EDUCATION_OPTIONS.map((opt) => {
+          const active = educationStatus === opt.id;
+          return (
+            <Pressable
+              key={opt.id}
+              style={styles.religionCell}
+              onPress={() => onSelectEducation(active ? '' : opt.id)}
             >
               {active ? (
                 <LinearGradient colors={[COLORS.gold, '#C49A3A']} style={styles.religionChipActive}>

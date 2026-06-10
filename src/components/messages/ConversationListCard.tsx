@@ -31,6 +31,7 @@ export default function ConversationListCard({ item, onOpenProfile, onOpenChat }
           photoUrl={profile.photos[0]}
           gradient={profile.gradient}
           showUnread={item.unread}
+          presenceState={profile.presenceState}
         />
       }
       body={

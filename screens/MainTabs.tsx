@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { AppState, StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import Discovery from './Discovery';
 import Matches from './Matches';
@@ -9,6 +9,7 @@ import GenoTabBar, { type GenoTabId } from '../src/components/navigation/GenoTab
 import { COLORS } from '../src/theme';
 import { fetchConversations } from '../src/lib/messages';
 import { fetchMatches } from '../src/lib/matches';
+import { touchLastActive } from '../src/lib/presence';
 import type { DiscoveryProfile } from '../src/types/database';
 
 type MainTabsProps = {
@@ -39,6 +40,18 @@ export default function MainTabs({ onSignOut }: MainTabsProps) {
   useEffect(() => {
     refreshBadges();
   }, [refreshBadges, activeTab]);
+
+  useEffect(() => {
+    void touchLastActive();
+    const interval = setInterval(() => void touchLastActive(), 2 * 60 * 1000);
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') void touchLastActive();
+    });
+    return () => {
+      clearInterval(interval);
+      subscription.remove();
+    };
+  }, []);
 
   useEffect(() => {
     if (activeTab !== 'messages' && activeTab !== 'matches') {

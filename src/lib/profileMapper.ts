@@ -1,5 +1,6 @@
 import type { DiscoveryProfile, Genotype, ProfileRow } from '../types/database';
 import { computeCompatibility } from './compatibility';
+import { isNewMember, resolvePresenceState } from './presence';
 
 const GRADIENTS: [string, string][] = [
   ['#2A5C40', '#0D2818'],
@@ -74,5 +75,13 @@ export function mapProfileRow(
     relationshipGoal: row.relationship_goal,
     genotypeVerified: isGenotypeVerified(row),
     verificationStatus: row.verification_status ?? 'unverified',
+    heightCm: row.height_cm ?? null,
+    religion: row.religion ?? null,
+    drinkingStatus: row.drinking_status ?? null,
+    smokingStatus: row.smoking_status ?? null,
+    educationStatus: row.education_status ?? null,
+    presenceState: resolvePresenceState(row.last_active_at),
+    isNewMember: isNewMember(row.created_at),
+    createdAt: row.created_at ?? null,
   };
 }

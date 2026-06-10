@@ -1,5 +1,7 @@
 export type Genotype = 'AA' | 'AS' | 'SS' | 'AC';
 
+export type PresenceState = 'online' | 'recently_online' | 'offline';
+
 export type ProfileRow = {
   id: string;
   email: string | null;
@@ -17,6 +19,12 @@ export type ProfileRow = {
   onboarding_completed: boolean;
   verification_status: string;
   genotype_verified: boolean;
+  height_cm: number | null;
+  religion: string | null;
+  drinking_status: string | null;
+  smoking_status: string | null;
+  education_status: string | null;
+  last_active_at: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -52,6 +60,14 @@ export type DiscoveryProfile = {
   relationshipGoal?: string | null;
   genotypeVerified: boolean;
   verificationStatus?: string | null;
+  heightCm?: number | null;
+  religion?: string | null;
+  drinkingStatus?: string | null;
+  smokingStatus?: string | null;
+  educationStatus?: string | null;
+  presenceState: PresenceState;
+  isNewMember: boolean;
+  createdAt?: string | null;
   isMock?: boolean;
 };
 

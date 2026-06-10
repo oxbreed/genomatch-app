@@ -133,7 +133,7 @@ export function getFirstName(name: string) {
 
 /** Mock cards shown in Discovery when no real profiles exist yet. */
 export function getMockDiscoveryProfiles(): DiscoveryProfile[] {
-  return MOCK_MATCHES.map((p) => {
+  return MOCK_MATCHES.map((p, index) => {
     const photos = p.photoUrl ? [p.photoUrl] : [];
     return {
       id: `mock-${p.id}`,
@@ -149,6 +149,11 @@ export function getMockDiscoveryProfiles(): DiscoveryProfile[] {
       photos,
       genotypeVerified: false,
       verificationStatus: 'unverified',
+      drinkingStatus: index % 2 === 0 ? 'socially' : 'never',
+      smokingStatus: 'never',
+      educationStatus: index % 3 === 0 ? 'bachelors' : 'masters',
+      presenceState: index % 3 === 0 ? 'online' : index % 3 === 1 ? 'recently_online' : 'offline',
+      isNewMember: index < 2,
       isMock: true,
     };
   });

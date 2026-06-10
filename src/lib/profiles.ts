@@ -1,3 +1,4 @@
+import type { PostgrestError } from '@supabase/supabase-js';
 import { getSeenProfileIds } from './likes';
 import { getBlockedUserIds } from './moderation';
 import type { DiscoveryProfile, Genotype, ProfileRow } from '../types/database';
@@ -7,14 +8,125 @@ import { getVerificationEligibility } from './verification';
 import { supabase } from './supabase';
 import { sanitizeText } from './validation';
 
-const PROFILE_FIELDS =
+const CORE_PROFILE_FIELDS =
   'id, email, genotype, display_name, avatar_url, photos, bio, date_of_birth, city, country, gender, interests, relationship_goal, onboarding_completed, verification_status, genotype_verified, created_at, updated_at';
 
+const EXTENDED_PROFILE_FIELDS =
+  'height_cm, religion, drinking_status, smoking_status, education_status, last_active_at';
+
+const PROFILE_FIELDS = `${CORE_PROFILE_FIELDS}, ${EXTENDED_PROFILE_FIELDS}`;
+
 /** Public profile fields for discovery — excludes email and other private columns. */
-const DISCOVERY_PROFILE_FIELDS =
-  'id, display_name, date_of_birth, city, country, genotype, genotype_verified, photos, bio, interests, relationship_goal, verification_status';
+const CORE_PUBLIC_PROFILE_FIELDS =
+  'id, display_name, date_of_birth, city, country, gender, genotype, genotype_verified, photos, bio, interests, relationship_goal, verification_status, created_at';
+
+const EXTENDED_PUBLIC_PROFILE_FIELDS =
+  'height_cm, religion, drinking_status, smoking_status, education_status, last_active_at';
+
+export const PUBLIC_PROFILE_FIELDS = `${CORE_PUBLIC_PROFILE_FIELDS}, ${EXTENDED_PUBLIC_PROFILE_FIELDS}`;
 
 export { resolveProfilePhotos };
+
+function isMissingColumnError(error: PostgrestError | null): boolean {
+  if (!error) return false;
+  const msg = error.message.toLowerCase();
+  return (
+    error.code === '42703' ||
+    error.code === 'PGRST204' ||
+    msg.includes('does not exist') ||
+    msg.includes('could not find') ||
+    msg.includes('column')
+  );
+}
+
+function normalizeProfileRow(row: Record<string, unknown>): ProfileRow {
+  return {
+    height_cm: null,
+    religion: null,
+    drinking_status: null,
+    smoking_status: null,
+    education_status: null,
+    last_active_at: null,
+    ...row,
+  } as ProfileRow;
+}
+
+async function selectOwnProfile(
+  userId: string,
+  options?: { single?: boolean }
+): Promise<{ data: ProfileRow | null; error: PostgrestError | null }> {
+  const builder = supabase.from('profiles').select(PROFILE_FIELDS).eq('id', userId);
+  const result = options?.single
+    ? await builder.single()
+    : await builder.maybeSingle();
+
+  if (!result.error) {
+    return {
+      data: result.data ? normalizeProfileRow(result.data as Record<string, unknown>) : null,
+      error: null,
+    };
+  }
+
+  if (!isMissingColumnError(result.error)) {
+    return { data: null, error: result.error };
+  }
+
+  console.warn('[profiles] extended columns missing — falling back to core profile fields');
+  const fallbackBuilder = supabase.from('profiles').select(CORE_PROFILE_FIELDS).eq('id', userId);
+  const fallback = options?.single
+    ? await fallbackBuilder.single()
+    : await fallbackBuilder.maybeSingle();
+
+  if (fallback.error) {
+    return { data: null, error: fallback.error };
+  }
+
+  return {
+    data: fallback.data ? normalizeProfileRow(fallback.data as Record<string, unknown>) : null,
+    error: null,
+  };
+}
+
+async function fetchPublicProfilesWithFallback(
+  build: (fields: string) => PromiseLike<{ data: unknown; error: PostgrestError | null }>
+): Promise<{ data: ProfileRow[]; error: PostgrestError | null }> {
+  const primary = await build(PUBLIC_PROFILE_FIELDS);
+
+  if (!primary.error) {
+    return {
+      data: ((primary.data ?? []) as Record<string, unknown>[]).map(normalizeProfileRow),
+      error: null,
+    };
+  }
+
+  if (!isMissingColumnError(primary.error)) {
+    return { data: [], error: primary.error };
+  }
+
+  console.warn('[profiles] extended public columns missing — falling back to core public fields');
+  const fallback = await build(CORE_PUBLIC_PROFILE_FIELDS);
+
+  if (fallback.error) {
+    return { data: [], error: fallback.error };
+  }
+
+  return {
+    data: ((fallback.data ?? []) as Record<string, unknown>[]).map(normalizeProfileRow),
+    error: null,
+  };
+}
+
+/** Fetch public profile rows by user id (matches, messages). */
+export async function fetchPublicProfilesByIds(ids: string[]): Promise<ProfileRow[]> {
+  if (!ids.length) return [];
+
+  const { data, error } = await fetchPublicProfilesWithFallback((fields) =>
+    supabase.from('public_profiles').select(fields).in('id', ids)
+  );
+
+  if (error) throw error;
+  return data;
+}
 
 export async function getCurrentUserId(): Promise<string | null> {
   return getAuthenticatedUserId();
@@ -27,18 +139,14 @@ export async function getCurrentProfile(): Promise<ProfileRow | null> {
     return null;
   }
 
-  const { data, error } = await supabase
-    .from('profiles')
-    .select(PROFILE_FIELDS)
-    .eq('id', userId)
-    .maybeSingle();
+  const { data, error } = await selectOwnProfile(userId);
 
   logSupabaseResult('profiles.getCurrentProfile', data, error);
   if (error) throw error;
 
   if (!data) return null;
 
-  const row = data as ProfileRow;
+  const row = data;
 
   if (!row.genotype) {
     const {
@@ -76,11 +184,14 @@ export async function ensureUserProfile(): Promise<ProfileRow | null> {
         : null,
   };
 
-  const { data, error } = await supabase.from('profiles').insert(payload).select(PROFILE_FIELDS).single();
+  const { error: insertError } = await supabase.from('profiles').insert(payload);
+  logSupabaseResult('profiles.ensureUserProfile.insert', null, insertError);
+  if (insertError) throw insertError;
 
+  const { data, error } = await selectOwnProfile(user.id, { single: true });
   logSupabaseResult('profiles.ensureUserProfile', data, error);
   if (error) throw error;
-  return data as ProfileRow;
+  return data;
 }
 
 export function isProfileComplete(profile: ProfileRow | null): boolean {
@@ -98,16 +209,18 @@ export async function syncOnboardingIfNeeded(
     return profile;
   }
 
-  const { data, error } = await supabase
+  const { error: updateError } = await supabase
     .from('profiles')
     .update({ onboarding_completed: true })
-    .eq('id', profile.id)
-    .select(PROFILE_FIELDS)
-    .single();
+    .eq('id', profile.id);
 
+  logSupabaseResult('profiles.syncOnboardingIfNeeded.update', null, updateError);
+  if (updateError) throw updateError;
+
+  const { data, error } = await selectOwnProfile(profile.id, { single: true });
   logSupabaseResult('profiles.syncOnboardingIfNeeded', data, error);
   if (error) throw error;
-  return data as ProfileRow;
+  return data;
 }
 
 /** Route after sign-in based on profile completion. */
@@ -165,16 +278,18 @@ export async function fetchDiscoveryProfiles(): Promise<{
 
   const blockedSet = await getBlockedUserIds(userId);
 
-  const { data, error } = await supabase
-    .from('public_profiles')
-    .select(DISCOVERY_PROFILE_FIELDS)
-    .neq('id', userId)
-    .order('created_at', { ascending: false })
-    .limit(50);
+  const { data, error } = await fetchPublicProfilesWithFallback((fields) =>
+    supabase
+      .from('public_profiles')
+      .select(fields)
+      .neq('id', userId)
+      .order('created_at', { ascending: false })
+      .limit(50)
+  );
 
   if (error) throw error;
 
-  const profiles = ((data ?? []) as ProfileRow[])
+  const profiles = data
     .filter((row) => !seenSet.has(row.id) && !blockedSet.has(row.id))
     .map((row) => mapProfileRow(row, viewerGenotype));
 
@@ -225,6 +340,11 @@ export async function updateProfileFields(
       | 'relationship_goal'
       | 'date_of_birth'
       | 'avatar_url'
+      | 'height_cm'
+      | 'religion'
+      | 'drinking_status'
+      | 'smoking_status'
+      | 'education_status'
     >
   >
 ): Promise<void> {
@@ -243,7 +363,27 @@ export async function updateProfileFields(
   }
 
   const { error } = await supabase.from('profiles').update(payload).eq('id', userId);
-  if (error) throw error;
+  if (!error) return;
+
+  if (!isMissingColumnError(error)) throw error;
+
+  const corePayload = { ...payload };
+  for (const key of [
+    'height_cm',
+    'religion',
+    'drinking_status',
+    'smoking_status',
+    'education_status',
+  ] as const) {
+    delete corePayload[key];
+  }
+
+  const { error: retryError } = await supabase
+    .from('profiles')
+    .update(corePayload)
+    .eq('id', userId);
+
+  if (retryError) throw retryError;
 }
 
 /** Self-declare genotype accuracy (builds trust with matches). Requires photo + profile basics. */

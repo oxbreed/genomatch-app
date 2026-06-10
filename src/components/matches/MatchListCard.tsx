@@ -9,6 +9,7 @@ import { COLORS } from '../../theme';
 import type { MatchWithProfile } from '../../types/database';
 import type { Genotype } from '../../types/database';
 import VerifiedBadge from '../VerifiedBadge';
+import PresenceBadge from '../PresenceBadge';
 import { getGenotypeRiskShort } from '../../lib/compatibility';
 
 type Props = {
@@ -39,6 +40,7 @@ export default function MatchListCard({
           avatarUrl={profile.avatarUrl}
           photoUrl={profile.photos[0]}
           gradient={profile.gradient}
+          presenceState={profile.presenceState}
         />
       }
       body={
@@ -51,6 +53,11 @@ export default function MatchListCard({
                   <Text style={styles.genotypeText}>{profile.genotype}</Text>
                 </View>
                 {profile.genotypeVerified ? <VerifiedBadge compact /> : null}
+                <PresenceBadge
+                  presenceState={profile.presenceState}
+                  isNewMember={profile.isNewMember}
+                  compact
+                />
             <Text style={[styles.pct, compatHigh && styles.pctHigh]}>
               {profile.compatibility}%
             </Text>
