@@ -16,13 +16,15 @@ import { GenoPremiumChrome, GenoCardFrame } from '../src/brand/graphics';
 import { GenoBackHeader } from '../src/components/genoExperience';
 import GenotypeBadge from '../src/components/GenotypeBadge';
 import ProfileAvatar from '../src/components/ProfileAvatar';
+import FamilyPlanningCard from '../src/components/FamilyPlanningCard';
 import LifestyleBadges from '../src/components/LifestyleBadges';
 import PresenceBadge from '../src/components/PresenceBadge';
 import { ProfileViewSections } from '../src/components/profile';
 import { ProfileVitalityRing } from '../src/components/profileStudio';
 import ReportBlockSheet from '../src/components/ReportBlockSheet';
 import { COLORS, RADIUS, SHADOWS } from '../src/theme';
-import type { MatchWithProfile } from '../src/types/database';
+import { getCurrentProfile } from '../src/lib/profiles';
+import type { Genotype, MatchWithProfile } from '../src/types/database';
 
 type MatchProfileProps = {
   match: MatchWithProfile;
@@ -33,10 +35,15 @@ type MatchProfileProps = {
 export default function MatchProfile({ match, onBack, onSendMessage }: MatchProfileProps) {
   const { profile } = match;
   const [showModerationSheet, setShowModerationSheet] = useState(false);
+  const [viewerGenotype, setViewerGenotype] = useState<Genotype | null>(null);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(24)).current;
   const ctaScale = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    void getCurrentProfile().then((row) => setViewerGenotype(row?.genotype ?? null));
+  }, []);
 
   useEffect(() => {
     Animated.parallel([
@@ -159,6 +166,15 @@ export default function MatchProfile({ match, onBack, onSendMessage }: MatchProf
               <Ionicons name="heart" size={12} color={COLORS.forestDeep} />
               <Text style={styles.matchBadgeText}>Mutual match</Text>
             </View>
+          </View>
+        </GenoCardFrame>
+
+        <GenoCardFrame style={styles.familyFrame}>
+          <View style={styles.familyInner}>
+            <FamilyPlanningCard
+              viewerGenotype={viewerGenotype}
+              candidateGenotype={profile.genotype}
+            />
           </View>
         </GenoCardFrame>
 
@@ -300,6 +316,12 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     textTransform: 'uppercase',
     color: COLORS.forestDeep,
+  },
+  familyFrame: {
+    marginTop: 2,
+  },
+  familyInner: {
+    padding: 16,
   },
   sectionsFrame: {
     marginTop: 2,

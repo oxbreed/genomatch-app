@@ -13,11 +13,13 @@ import {
 import { StatusBar } from 'expo-status-bar';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
+import FamilyPlanningCard from '../src/components/FamilyPlanningCard';
 import ProfileAvatar from '../src/components/ProfileAvatar';
 import ReportBlockSheet from '../src/components/ReportBlockSheet';
 import { getInitials } from '../src/data/mockData';
 import { COLORS, RADIUS, SHADOWS } from '../src/theme';
-import type { DiscoveryProfile, MatchWithProfile } from '../src/types/database';
+import { getCurrentProfile } from '../src/lib/profiles';
+import type { DiscoveryProfile, Genotype, MatchWithProfile } from '../src/types/database';
 import { sendLocalNotification } from '../src/lib/notifications';
 import { rateLimitAction } from '../src/lib/rateLimit';
 import {
@@ -57,6 +59,7 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
   const [showProfile, setShowProfile] = useState(false);
   const [showModerationSheet, setShowModerationSheet] = useState(false);
   const [otherTyping, setOtherTyping] = useState(false);
+  const [viewerGenotype, setViewerGenotype] = useState<Genotype | null>(null);
   const listRef = useRef<FlatList<ChatMessage>>(null);
   const realtimeRef = useRef<ReturnType<typeof subscribeToChatRealtime> | null>(null);
   const typingStopRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -92,6 +95,10 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
   useEffect(() => {
     loadMessages();
   }, [loadMessages]);
+
+  useEffect(() => {
+    void getCurrentProfile().then((row) => setViewerGenotype(row?.genotype ?? null));
+  }, []);
 
   useEffect(() => {
     const handle = subscribeToChatRealtime(matchId, profile.id, {
@@ -307,6 +314,10 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
           onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: false })}
           ListEmptyComponent={
             <View style={styles.emptyHint}>
+              <FamilyPlanningCard
+                viewerGenotype={viewerGenotype}
+                candidateGenotype={profile.genotype}
+              />
               <Text style={styles.emptyHintText}>
                 You matched! Say hello and start your compatibility journey.
               </Text>
@@ -453,8 +464,19 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   emptyHint: {
+    alignSelf: 'stretch',
+    marginTop: 24,
+    paddingHorizontal: 16,
+    gap: 14,
+    maxWidth: '100%',
+  },
+  emptyHintText: {
     alignSelf: 'center',
-    marginTop: 40,
+    fontFamily: 'Satoshi-Medium',
+    fontSize: 13,
+    color: COLORS.forest,
+    textAlign: 'center',
+    lineHeight: 19,
     backgroundColor: COLORS.chipFill,
     paddingHorizontal: 16,
     paddingVertical: 10,
@@ -462,13 +484,7 @@ const styles = StyleSheet.create({
     maxWidth: '90%',
     borderWidth: 1,
     borderColor: COLORS.border,
-  },
-  emptyHintText: {
-    fontFamily: 'Satoshi-Medium',
-    fontSize: 13,
-    color: COLORS.forest,
-    textAlign: 'center',
-    lineHeight: 19,
+    overflow: 'hidden',
   },
   bubbleRow: {
     marginBottom: 8,

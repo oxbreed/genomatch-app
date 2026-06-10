@@ -2,6 +2,7 @@ import {
   Animated,
   Modal,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -14,10 +15,10 @@ import GenoCompatRing from '../genomatch/GenoCompatRing';
 import ProfileAvatar from '../ProfileAvatar';
 import VerifiedBadge from '../VerifiedBadge';
 import GenotypeBadge from '../GenotypeBadge';
+import FamilyPlanningCard from '../FamilyPlanningCard';
 import LifestyleBadges from '../LifestyleBadges';
 import PresenceBadge from '../PresenceBadge';
 import { COLORS, RELATIONSHIP_GOAL_LABELS } from '../../data/mockData';
-import { getGenotypeCompatibilityLine } from '../../lib/compatibility';
 import type { DiscoveryProfile, Genotype } from '../../types/database';
 
 type Props = {
@@ -46,8 +47,6 @@ export default function DiscoverProfileSheet({
 }: Props) {
   if (!profile) return null;
 
-  const compatLine = getGenotypeCompatibilityLine(viewerGenotype, profile.genotype);
-
   return (
     <Modal
       visible={visible}
@@ -65,6 +64,12 @@ export default function DiscoverProfileSheet({
           <View style={styles.handle} />
           <GenoBondMark size={22} opacity={0.45} />
 
+          <ScrollView
+            style={styles.sheetScroll}
+            contentContainerStyle={styles.sheetScrollContent}
+            showsVerticalScrollIndicator={false}
+            bounces={false}
+          >
           <GenoCardFrame style={styles.heroFrame}>
             <View style={styles.heroInner}>
               <ProfileAvatar
@@ -90,10 +95,12 @@ export default function DiscoverProfileSheet({
                 isNewMember={profile.isNewMember}
               />
             ) : null}
-            <Text style={styles.compatLine} numberOfLines={2}>
-              {compatLine}
-            </Text>
           </GenoCardFrame>
+
+          <FamilyPlanningCard
+            viewerGenotype={viewerGenotype}
+            candidateGenotype={profile.genotype}
+          />
 
           <Text style={styles.bio}>
             {profile.bio || 'No bio yet — tap Like to start a bond.'}
@@ -139,6 +146,7 @@ export default function DiscoverProfileSheet({
           <Pressable style={styles.dismissBtn} onPress={onClose}>
             <Text style={styles.dismissText}>Keep browsing</Text>
           </Pressable>
+          </ScrollView>
         </Animated.View>
       </View>
     </Modal>
@@ -161,12 +169,17 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.linen,
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
-    paddingHorizontal: 20,
     paddingTop: 12,
+    maxHeight: '88%',
+  },
+  sheetScroll: {
+    width: '100%',
+  },
+  sheetScrollContent: {
+    paddingHorizontal: 20,
     paddingBottom: 36,
     alignItems: 'center',
     gap: 12,
-    maxHeight: '88%',
   },
   handle: {
     width: 44,
@@ -205,15 +218,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Satoshi-Medium',
     fontSize: 14,
     color: COLORS.sage,
-  },
-  compatLine: {
-    fontFamily: 'Satoshi-Medium',
-    fontSize: 13,
-    lineHeight: 18,
-    color: COLORS.textSubtle,
-    textAlign: 'center',
-    paddingHorizontal: 16,
-    paddingBottom: 14,
   },
   bio: {
     fontFamily: 'Satoshi-Medium',

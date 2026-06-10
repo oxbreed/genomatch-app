@@ -12,6 +12,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { GenoBondHalo } from '../../brand/graphics';
 import GenotypeBadge from '../GenotypeBadge';
+import FamilyPlanningCard from '../FamilyPlanningCard';
 import LifestyleBadges from '../LifestyleBadges';
 import PresenceBadge from '../PresenceBadge';
 import VerifiedBadge from '../VerifiedBadge';
@@ -142,6 +143,15 @@ export default function DiscoverSwipeCard({
             <Text style={styles.compatText} numberOfLines={2}>
               {profile.compatibility}% bond · {riskShort}
             </Text>
+          </View>
+
+          <View style={styles.familyRow}>
+            <FamilyPlanningCard
+              viewerGenotype={viewerGenotype ?? null}
+              candidateGenotype={profile.genotype}
+              compact
+              dark
+            />
           </View>
 
           <Text style={styles.cardBio} numberOfLines={3} ellipsizeMode="tail">
@@ -297,6 +307,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 8,
+    marginBottom: 6,
+  },
+  familyRow: {
     marginBottom: 8,
   },
   compatDot: {
