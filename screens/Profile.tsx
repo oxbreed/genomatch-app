@@ -44,7 +44,7 @@ import {
   type StudioStep,
 } from '../src/components/profileStudio';
 import { GENO_TAB_BAR_HEIGHT } from '../src/components/navigation/tabBarLayout';
-import { PROFILE } from '../src/components/profile/profileTokens';
+import { PROFILE, PROFILE_TYPE } from '../src/components/profile/profileTokens';
 import { COLORS, RADIUS } from '../src/theme';
 import { uploadAdditionalPhoto } from '../src/lib/photoUpload';
 import { mapProfileRow } from '../src/lib/profileMapper';
@@ -489,7 +489,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
               ) : null}
             </Animated.View>
           ) : (
-            <>
+            <View style={styles.viewStack}>
               <ProfileStrengthPanel
                 percent={completionPercent}
                 hint={getStrengthLabel(completionPercent)}
@@ -501,7 +501,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
                 genotype={data.genotype}
                 onVerify={requestVerification}
               />
-            </>
+            </View>
           )}
 
           {editing ? (
@@ -601,8 +601,9 @@ export default function Profile({ onSignOut }: ProfileProps) {
               </StudioSectionShell>
             </>
           ) : (
-            <>
+            <View style={styles.viewStack}>
               <ProfileSectionCard
+                kicker="YOUR PHOTOS"
                 label="Gallery"
                 hint={
                   data.photos.length > 0
@@ -620,7 +621,11 @@ export default function Profile({ onSignOut }: ProfileProps) {
                 />
               </ProfileSectionCard>
 
-              <ProfileSectionCard label="About you" hint="How matches see your bond on Discover">
+              <ProfileSectionCard
+                kicker="YOUR STORY"
+                label="About you"
+                hint="How matches see your bond on Discover"
+              >
                 <ProfileViewSections
                   bio={data.bio}
                   interests={data.interests}
@@ -633,7 +638,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
                 />
               </ProfileSectionCard>
 
-              <GenoCardFrame showWatermark={false}>
+              <GenoCardFrame showWatermark={false} style={styles.footerCard}>
                 <View style={styles.footerInner}>
                   <Pressable
                     style={({ pressed }) => [styles.footerLink, pressed && styles.footerLinkPressed]}
@@ -691,7 +696,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
                   </Pressable>
                 </View>
               </GenoCardFrame>
-            </>
+            </View>
           )}
         </ScrollView>
 
@@ -736,6 +741,12 @@ const styles = StyleSheet.create({
   centered: { alignItems: 'center', justifyContent: 'center', padding: 24 },
   scroll: { paddingBottom: GENO_TAB_BAR_HEIGHT + 20, paddingTop: 2 },
   scrollStudio: { paddingBottom: 148 },
+  viewStack: {
+    gap: 2,
+  },
+  footerCard: {
+    marginBottom: 4,
+  },
   errorBanner: {
     marginHorizontal: 16,
     marginBottom: 8,
@@ -806,8 +817,7 @@ const styles = StyleSheet.create({
   },
   signOutDisabled: { opacity: 0.6 },
   signOutText: {
-    fontFamily: 'Satoshi-Bold',
-    fontSize: 15,
+    ...PROFILE_TYPE.footerAction,
     color: COLORS.forestDeep,
   },
 });

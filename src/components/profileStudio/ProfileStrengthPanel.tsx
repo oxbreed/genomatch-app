@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GenoCardFrame } from '../../brand/graphics';
 import { COLORS } from '../../theme';
-import { PROFILE } from '../profile/profileTokens';
+import { PROFILE, PROFILE_TYPE } from '../profile/profileTokens';
 import ProfileVitalityRing from './ProfileVitalityRing';
 
 type Props = {
@@ -12,7 +12,7 @@ type Props = {
 
 export default function ProfileStrengthPanel({ percent, hint }: Props) {
   return (
-    <GenoCardFrame showWatermark={false}>
+    <GenoCardFrame showWatermark={false} style={styles.frame}>
       <View style={styles.inner}>
         <ProfileVitalityRing percent={percent} size={68} />
         <View style={styles.copy}>
@@ -33,29 +33,27 @@ export default function ProfileStrengthPanel({ percent, hint }: Props) {
 }
 
 const styles = StyleSheet.create({
+  frame: {
+    marginBottom: PROFILE.cardGap,
+  },
   inner: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 16,
-    paddingVertical: 16,
+    paddingVertical: 18,
     paddingHorizontal: PROFILE.cardPadding,
   },
   copy: {
     flex: 1,
-    gap: 5,
+    gap: 6,
   },
   kicker: {
-    fontFamily: 'Satoshi-Bold',
-    fontSize: PROFILE.sectionLabelSize,
-    letterSpacing: 1.2,
-    textTransform: 'uppercase',
+    ...PROFILE_TYPE.sectionKicker,
     color: COLORS.sage,
   },
   title: {
-    fontFamily: 'ClashDisplay-Semibold',
-    fontSize: PROFILE.sectionTitleSize,
+    ...PROFILE_TYPE.sectionTitle,
     color: COLORS.forestDeep,
-    letterSpacing: -0.3,
   },
   barTrack: {
     height: 3,

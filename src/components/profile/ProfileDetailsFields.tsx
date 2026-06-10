@@ -10,7 +10,7 @@ import {
   formatHeightCm,
 } from '../../lib/profileDetails';
 import { COLORS } from '../../theme';
-import { PROFILE } from './profileTokens';
+import { PROFILE, PROFILE_TYPE } from './profileTokens';
 
 type Props = {
   heightCm: number | null;
@@ -268,14 +268,11 @@ const styles = StyleSheet.create({
   },
   fieldCopy: { flex: 1, gap: 2 },
   label: {
-    fontFamily: 'ClashDisplay-Semibold',
-    fontSize: PROFILE.sectionTitleSize,
-    letterSpacing: -0.2,
+    ...PROFILE_TYPE.sectionTitle,
     color: COLORS.forestDeep,
   },
   hint: {
-    fontFamily: 'Satoshi-Medium',
-    fontSize: 12,
+    ...PROFILE_TYPE.sectionHint,
     color: COLORS.sage,
   },
   valuePill: {

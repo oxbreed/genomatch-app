@@ -13,6 +13,7 @@ import { GenoBondMark } from '../../brand';
 import GenotypeBadge from '../GenotypeBadge';
 import VerifiedBadge from '../VerifiedBadge';
 import { COLORS } from '../../theme';
+import { PROFILE_TYPE } from './profileTokens';
 import type { Genotype } from '../../types/database';
 
 type Props = {
@@ -234,10 +235,8 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   name: {
-    fontFamily: 'ClashDisplay-Semibold',
-    fontSize: 28,
+    ...PROFILE_TYPE.heroName,
     color: COLORS.linen,
-    letterSpacing: -0.5,
     flexShrink: 1,
   },
   nameAccent: {
@@ -258,10 +257,8 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
   },
   location: {
-    fontFamily: 'Satoshi-Medium',
-    fontSize: 14,
-    letterSpacing: 0.1,
-    color: 'rgba(245, 239, 230, 0.78)',
+    ...PROFILE_TYPE.heroMeta,
+    color: 'rgba(245, 239, 230, 0.82)',
   },
   locationInput: {
     fontFamily: 'Satoshi-Medium',

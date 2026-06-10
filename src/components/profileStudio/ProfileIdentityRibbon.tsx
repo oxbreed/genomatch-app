@@ -3,7 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { GenoCardFrame } from '../../brand/graphics';
 import { COLORS } from '../../theme';
-import { PROFILE } from '../profile/profileTokens';
+import { PROFILE, PROFILE_TYPE } from '../profile/profileTokens';
 
 type Props = {
   verified: boolean;
@@ -15,7 +15,7 @@ type Props = {
 export default function ProfileIdentityRibbon({ verified, genotype, onVerify }: Props) {
   if (verified) {
     return (
-      <GenoCardFrame showWatermark={false}>
+      <GenoCardFrame showWatermark={false} style={styles.frame}>
         <View style={styles.verifiedInner}>
           <View style={styles.iconVerified}>
             <Ionicons name="shield-checkmark" size={20} color={COLORS.verified} />
@@ -32,7 +32,7 @@ export default function ProfileIdentityRibbon({ verified, genotype, onVerify }: 
   }
 
   return (
-    <GenoCardFrame showWatermark={false}>
+    <GenoCardFrame showWatermark={false} style={styles.frame}>
       <View style={[styles.accentBar, styles.accentPending]} />
       <View style={styles.unverifiedInner}>
         <View style={styles.iconPending}>
@@ -61,6 +61,9 @@ export default function ProfileIdentityRibbon({ verified, genotype, onVerify }: 
 }
 
 const styles = StyleSheet.create({
+  frame: {
+    marginBottom: PROFILE.cardGap,
+  },
   accentBar: {
     position: 'absolute',
     left: 0,
@@ -107,21 +110,16 @@ const styles = StyleSheet.create({
   },
   copy: { flex: 1, gap: 4 },
   kicker: {
-    fontFamily: 'Satoshi-Bold',
-    fontSize: 10,
-    letterSpacing: 2,
+    ...PROFILE_TYPE.sectionKicker,
+    letterSpacing: 1.6,
     color: COLORS.gold,
   },
   title: {
-    fontFamily: 'ClashDisplay-Semibold',
-    fontSize: 15,
+    ...PROFILE_TYPE.ribbonTitle,
     color: COLORS.forestDeep,
-    letterSpacing: -0.2,
   },
   sub: {
-    fontFamily: 'Satoshi-Medium',
-    fontSize: 12,
-    lineHeight: 17,
+    ...PROFILE_TYPE.ribbonSub,
     color: COLORS.sage,
     marginTop: 2,
   },

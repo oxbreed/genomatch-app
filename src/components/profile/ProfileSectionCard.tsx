@@ -34,9 +34,12 @@ export default function ProfileSectionCard({
 }
 
 const styles = StyleSheet.create({
-  wrap: {},
+  wrap: {
+    marginBottom: PROFILE.cardGap,
+  },
   inner: {
     padding: PROFILE.cardPadding,
+    paddingTop: PROFILE.cardPadding + 2,
   },
   innerEditing: {
     backgroundColor: 'rgba(237, 243, 238, 0.45)',

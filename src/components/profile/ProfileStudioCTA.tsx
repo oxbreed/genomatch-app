@@ -2,7 +2,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { GenoCardFrame } from '../../brand/graphics';
 import { COLORS, RADIUS } from '../../theme';
-import { PROFILE } from './profileTokens';
+import { PROFILE, PROFILE_TYPE } from './profileTokens';
 
 type Props = {
   percent: number;
@@ -19,7 +19,7 @@ export default function ProfileStudioCTA({ percent, onPress }: Props) {
       accessibilityRole="button"
       accessibilityLabel="Open profile studio"
     >
-      <GenoCardFrame showWatermark={false}>
+      <GenoCardFrame showWatermark={false} style={styles.frame}>
         <View style={styles.inner}>
           <View style={styles.icon}>
             <Ionicons name="color-wand-outline" size={18} color={COLORS.forestDeep} />
@@ -44,11 +44,14 @@ export default function ProfileStudioCTA({ percent, onPress }: Props) {
 }
 
 const styles = StyleSheet.create({
+  frame: {
+    marginBottom: PROFILE.cardGap,
+  },
   inner: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 14,
-    paddingVertical: 16,
+    paddingVertical: 18,
     paddingHorizontal: PROFILE.cardPadding,
   },
   icon: {
@@ -66,15 +69,11 @@ const styles = StyleSheet.create({
     gap: 3,
   },
   title: {
-    fontFamily: 'ClashDisplay-Semibold',
-    fontSize: 16,
+    ...PROFILE_TYPE.ctaTitle,
     color: COLORS.forestDeep,
-    letterSpacing: -0.25,
   },
   sub: {
-    fontFamily: 'Satoshi-Medium',
-    fontSize: 12,
-    lineHeight: 17,
+    ...PROFILE_TYPE.ctaSub,
     color: COLORS.textSubtle,
   },
   chevron: {

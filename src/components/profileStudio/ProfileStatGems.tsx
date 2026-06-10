@@ -3,7 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps } from 'react';
 import { GenoCardFrame } from '../../brand/graphics';
 import { COLORS } from '../../theme';
-import { PROFILE } from '../profile/profileTokens';
+import { PROFILE, PROFILE_TYPE } from '../profile/profileTokens';
 
 type IonName = ComponentProps<typeof Ionicons>['name'];
 
@@ -45,9 +45,12 @@ export default function ProfileStatGems({ matches, likesReceived, profileViews }
 }
 
 const styles = StyleSheet.create({
+  frame: {
+    marginBottom: PROFILE.cardGap,
+  },
   row: {
     flexDirection: 'row',
-    paddingVertical: 18,
+    paddingVertical: 20,
     paddingHorizontal: PROFILE.cardPadding,
   },
   gemWrap: {
@@ -66,15 +69,11 @@ const styles = StyleSheet.create({
     gap: 5,
   },
   value: {
-    fontFamily: 'ClashDisplay-Semibold',
-    fontSize: 24,
+    ...PROFILE_TYPE.statValue,
     color: COLORS.forestDeep,
-    letterSpacing: -0.5,
   },
   label: {
-    fontFamily: 'Satoshi-Medium',
-    fontSize: 11,
-    letterSpacing: 0.2,
+    ...PROFILE_TYPE.statLabel,
     color: COLORS.sage,
     textAlign: 'center',
   },

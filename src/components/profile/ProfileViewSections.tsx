@@ -4,7 +4,7 @@ import LifestyleBadges from '../LifestyleBadges';
 import PresenceBadge from '../PresenceBadge';
 import { COLORS, RELATIONSHIP_GOAL_LABELS } from '../../data/mockData';
 import type { PresenceState } from '../../types/database';
-import { PROFILE } from './profileTokens';
+import { PROFILE, PROFILE_TYPE } from './profileTokens';
 
 type Props = {
   bio: string;
@@ -116,21 +116,17 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.border,
   },
   blockLabel: {
-    fontFamily: 'Satoshi-Bold',
-    fontSize: PROFILE.sectionLabelSize,
-    letterSpacing: 1.2,
-    textTransform: 'uppercase',
+    ...PROFILE_TYPE.blockLabel,
     color: COLORS.sage,
   },
   bioText: {
-    fontFamily: 'Satoshi-Medium',
-    fontSize: PROFILE.bodySize,
-    lineHeight: 24,
+    ...PROFILE_TYPE.body,
     color: COLORS.forestDeep,
   },
   placeholder: {
     color: COLORS.textMuted,
     fontStyle: 'italic',
+    fontFamily: PROFILE_TYPE.body.fontFamily,
   },
   chipRow: {
     flexDirection: 'row',
@@ -146,13 +142,11 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(143, 175, 149, 0.45)',
   },
   chipText: {
-    fontFamily: 'Satoshi-Medium',
-    fontSize: 13,
+    ...PROFILE_TYPE.chip,
     color: COLORS.forestDeep,
   },
   emptyHint: {
-    fontFamily: 'Satoshi-Medium',
-    fontSize: 14,
+    ...PROFILE_TYPE.bodyMedium,
     color: COLORS.textMuted,
   },
   goalPill: {
@@ -165,9 +159,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(212, 168, 67, 0.22)',
   },
   goalText: {
-    fontFamily: 'ClashDisplay-Semibold',
-    fontSize: 16,
+    ...PROFILE_TYPE.goal,
     color: COLORS.forestDeep,
-    letterSpacing: -0.2,
   },
 });

@@ -83,8 +83,8 @@ function FrameCorner({ flip }: { flip?: 'tr' }) {
 const styles = StyleSheet.create({
   viewWrap: {
     marginHorizontal: 16,
-    marginTop: 2,
-    marginBottom: 10,
+    marginTop: 4,
+    marginBottom: 12,
   },
   viewHero: {
     width: '100%',

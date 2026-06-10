@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { COLORS } from '../../theme';
-import { PROFILE } from './profileTokens';
+import { PROFILE_TYPE } from './profileTokens';
 
 type Props = {
   kicker?: string;
@@ -21,33 +21,26 @@ export default function ProfileSectionHeader({ kicker, title, hint }: Props) {
 
 const styles = StyleSheet.create({
   wrap: {
-    marginBottom: 14,
-    gap: 3,
+    marginBottom: 16,
+    gap: 4,
   },
   kicker: {
-    fontFamily: 'Satoshi-Bold',
-    fontSize: PROFILE.sectionLabelSize,
-    letterSpacing: 1.4,
-    textTransform: 'uppercase',
-    color: COLORS.sage,
+    ...PROFILE_TYPE.sectionKicker,
+    color: COLORS.gold,
   },
   title: {
-    fontFamily: 'ClashDisplay-Semibold',
-    fontSize: PROFILE.sectionTitleSize,
-    letterSpacing: -0.3,
+    ...PROFILE_TYPE.sectionTitle,
     color: COLORS.forestDeep,
   },
   hint: {
-    fontFamily: 'Satoshi-Medium',
-    fontSize: PROFILE.metaSize,
-    lineHeight: 18,
+    ...PROFILE_TYPE.sectionHint,
     color: COLORS.textSubtle,
-    marginTop: 1,
+    marginTop: 2,
   },
   rule: {
-    marginTop: 10,
+    marginTop: 12,
     height: 1,
-    backgroundColor: COLORS.border,
+    backgroundColor: 'rgba(143, 175, 149, 0.35)',
     borderRadius: 1,
   },
 });
