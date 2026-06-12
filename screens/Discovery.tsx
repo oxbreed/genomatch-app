@@ -40,6 +40,7 @@ import {
   DISCOVERY_HEADER_GAP,
   DISCOVERY_STACK_PEEK,
   getDiscoveryCardHeight,
+  getDiscoveryCardHeightFromDeck,
 } from '../src/components/navigation/tabBarLayout';
 import { GenoPremiumChrome } from '../src/brand/graphics';
 import GenotypeBadge from '../src/components/GenotypeBadge';
@@ -57,7 +58,7 @@ import type { DiscoveryProfile, Genotype } from '../src/types/database';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const SWIPE_THRESHOLD = SCREEN_WIDTH * 0.22;
-const CARD_HEIGHT = getDiscoveryCardHeight(SCREEN_HEIGHT);
+const FALLBACK_CARD_HEIGHT = getDiscoveryCardHeight(SCREEN_HEIGHT);
 const BACK_CARD_PEEK = DISCOVERY_STACK_PEEK;
 const HIGH_COMPATIBILITY_MIN = 75;
 const SWIPE_UP_THRESHOLD = 48;
@@ -98,6 +99,7 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
   const [matchedMatchId, setMatchedMatchId] = useState<string | null>(null);
   const [viewerSnapshot, setViewerSnapshot] = useState<ViewerProfileSnapshot | null>(null);
   const [actionError, setActionError] = useState('');
+  const [deckColumnHeight, setDeckColumnHeight] = useState(0);
   const [usingMockFallback, setUsingMockFallback] = useState(false);
   const [viewerGenotype, setViewerGenotype] = useState<Genotype | null>(null);
   const [superLikeToast, setSuperLikeToast] = useState(false);
@@ -650,6 +652,50 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
     ? 'Preview profiles · real matches\nas members join'
     : 'Genotype-aware matches near you';
 
+
+  const cardHeight = useMemo(() => {
+    if (deckColumnHeight > 0) {
+      return getDiscoveryCardHeightFromDeck(deckColumnHeight);
+    }
+    return FALLBACK_CARD_HEIGHT;
+  }, [deckColumnHeight]);
+
+  const deckSlotHeight =
+    deckColumnHeight > 0 ? deckColumnHeight : cardHeight + BACK_CARD_PEEK;
+
+  const cardLayoutStyles = useMemo(
+    () => ({
+      deckCardSlot: { height: deckSlotHeight },
+      cardStackContainer: { height: deckSlotHeight },
+      card: { height: cardHeight },
+      cardBody: { height: cardHeight },
+      cardActionsOverlay: {
+        top:
+          cardHeight -
+          DISCOVERY_CARD_ACTIONS_OVERLAY -
+          DISCOVERY_CARD_ACTIONS_LIFT,
+      },
+      actionError: {
+        top:
+          cardHeight -
+          DISCOVERY_CARD_ACTIONS_OVERLAY -
+          DISCOVERY_CARD_ACTIONS_LIFT -
+          28,
+      },
+    }),
+    [cardHeight, deckSlotHeight]
+  );
+
+  const onDeckColumnLayout = useCallback(
+    (height: number) => {
+      const next = Math.round(height);
+      if (next > 0) {
+        setDeckColumnHeight((prev) => (Math.abs(prev - next) > 1 ? next : prev));
+      }
+    },
+    []
+  );
+
   return (
     <View style={styles.container}>
       <GenoPremiumChrome variant="discover" />
@@ -767,9 +813,12 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
               </LinearGradient>
             </View>
           ) : (
-            <View style={styles.deckColumn}>
-              <View style={styles.deckCardSlot}>
-                <View style={styles.cardStackContainer}>
+            <View
+              style={styles.deckColumn}
+              onLayout={(event) => onDeckColumnLayout(event.nativeEvent.layout.height)}
+            >
+              <View style={[styles.deckCardSlot, cardLayoutStyles.deckCardSlot]}>
+                <View style={[styles.cardStackContainer, cardLayoutStyles.cardStackContainer]}>
                   {[...profiles.slice(index)].reverse().map((stackProfile, renderIdx) => {
                     const stackSize = profiles.length - index;
                     const depthFromTop = stackSize - 1 - renderIdx;
@@ -784,6 +833,7 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
                           style={[
                             styles.card,
                             styles.cardInStack,
+                            cardLayoutStyles.card,
                             {
                               zIndex: 3,
                               opacity: cardOpacity,
@@ -812,7 +862,7 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
                             totalProfiles={profiles.length}
                             viewerGenotype={viewerGenotype}
                             progressFillWidth={progressFillWidth}
-                            height={CARD_HEIGHT}
+                            height={cardHeight}
                             onExpand={openProfileSheet}
                           />
                         </Animated.View>
@@ -827,6 +877,7 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
                           style={[
                             styles.card,
                             styles.cardInStack,
+                            cardLayoutStyles.card,
                             styles.cardBehind,
                             {
                               zIndex: 2,
@@ -838,7 +889,7 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
                             },
                           ]}
                         >
-                          <DiscoverSwipeCard profile={stackProfile} height={CARD_HEIGHT} />
+                          <DiscoverSwipeCard profile={stackProfile} height={cardHeight} />
                         </Animated.View>
                       );
                     }
@@ -850,20 +901,27 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
                         style={[
                           styles.card,
                           styles.cardInStack,
+                          cardLayoutStyles.card,
                           styles.cardStackBack,
                           { zIndex: depthFromTop, opacity: 0 },
                         ]}
                       >
-                        <DiscoverSwipeCard profile={stackProfile} height={CARD_HEIGHT} />
+                        <DiscoverSwipeCard profile={stackProfile} height={cardHeight} />
                       </Animated.View>
                     );
                   })}
                 </View>
 
                 {actionError ? (
-                  <Text style={styles.actionError}>{actionError}</Text>
+                  <Text style={[styles.actionError, cardLayoutStyles.actionError]}>{actionError}</Text>
                 ) : null}
-                <View style={styles.cardActionsOverlay} pointerEvents="box-none">
+                <View style={[styles.cardActionsOverlay, cardLayoutStyles.cardActionsOverlay]} pointerEvents="box-none">
+                  <LinearGradient
+                    colors={['transparent', 'rgba(13, 40, 24, 0.22)', 'rgba(13, 40, 24, 0.48)']}
+                    locations={[0, 0.55, 1]}
+                    style={styles.cardActionsFade}
+                    pointerEvents="none"
+                  />
                   <DiscoverActionDock
                     variant="glass"
                     onPass={handlePass}
@@ -1001,10 +1059,10 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'flex-start',
+    overflow: 'hidden',
   },
   deckCardSlot: {
     width: '100%',
-    height: CARD_HEIGHT + BACK_CARD_PEEK,
     position: 'relative',
     overflow: 'visible',
   },
@@ -1012,13 +1070,16 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     right: 0,
-    top:
-      CARD_HEIGHT -
-      DISCOVERY_CARD_ACTIONS_OVERLAY -
-      DISCOVERY_CARD_ACTIONS_LIFT,
     height: DISCOVERY_CARD_ACTIONS_OVERLAY,
     justifyContent: 'center',
     zIndex: 40,
+  },
+  cardActionsFade: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: -6,
+    height: DISCOVERY_CARD_ACTIONS_OVERLAY + 20,
   },
   cardActionsRow: {
     zIndex: 2,
@@ -1026,7 +1087,6 @@ const styles = StyleSheet.create({
   cardStackContainer: {
     position: 'relative',
     width: '100%',
-    height: CARD_HEIGHT + BACK_CARD_PEEK,
     overflow: 'visible',
   },
   cardInStack: {
@@ -1043,14 +1103,12 @@ const styles = StyleSheet.create({
   },
   card: {
     width: '100%',
-    height: CARD_HEIGHT,
     borderRadius: DISCOVERY_CARD_RADIUS,
     overflow: 'hidden',
     backgroundColor: 'transparent',
   },
   cardBody: {
     width: '100%',
-    height: CARD_HEIGHT,
     borderRadius: 24,
     overflow: 'hidden',
     position: 'relative',
@@ -1421,11 +1479,6 @@ const styles = StyleSheet.create({
   actionError: {
     fontFamily: 'Satoshi-Medium',
     position: 'absolute',
-    top:
-      CARD_HEIGHT -
-      DISCOVERY_CARD_ACTIONS_OVERLAY -
-      DISCOVERY_CARD_ACTIONS_LIFT -
-      28,
     left: 16,
     right: 16,
     zIndex: 41,

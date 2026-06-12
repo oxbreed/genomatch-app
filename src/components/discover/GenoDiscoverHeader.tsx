@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
   wrap: {
     paddingTop: 46,
     paddingHorizontal: 12,
-    paddingBottom: 4,
+    paddingBottom: 0,
     zIndex: 4,
   },
   glass: {
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
   glassInner: {
     paddingHorizontal: 12,
     paddingTop: 8,
-    paddingBottom: 6,
+    paddingBottom: 5,
     gap: 4,
   },
   row: {
@@ -107,7 +107,8 @@ const styles = StyleSheet.create({
   subtitle: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 10,
-    lineHeight: 13,
+    lineHeight: 12,
+    letterSpacing: 0.05,
     color: COLORS.sage,
     minWidth: 0,
     flexShrink: 1,
