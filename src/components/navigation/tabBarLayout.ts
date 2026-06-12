@@ -19,13 +19,16 @@ export const GENO_TAB_BAR_HEIGHT =
   GENO_TAB_BAR_PILL_HEIGHT + GENO_TAB_BAR_BOTTOM_MARGIN;
 
 /**
- * GenoInboxHeader block on Discover — keep in sync with `GenoInboxHeader` wrap styles.
- * Inlined to avoid importing inbox tokens (circular dependency with theme).
+ * GenoDiscoverHeader footprint — keep in sync with `GenoDiscoverHeader` styles.
+ * Inlined to avoid circular dependency with theme/inbox tokens.
  */
-const DISCOVERY_HEADER_ROW_HEIGHT = Math.max(36 + 6, 10 + 2 + 26 + 1 + 18);
+const DISCOVERY_HEADER_ROW_HEIGHT = 10 + 19 + 2 + 13 * 2;
 
 export const DISCOVERY_HEADER_HEIGHT =
-  56 + DISCOVERY_HEADER_ROW_HEIGHT + 14 + 1 + 14;
+  46 + 8 + DISCOVERY_HEADER_ROW_HEIGHT + 4 + 1 + 6 + 4;
+
+/** Visible gap between header rule and card top. */
+export const DISCOVERY_HEADER_GAP = 8;
 
 /** Visible gap between card bottom edge and tab bar top. */
 export const DISCOVERY_CARD_TAB_GAP = 10;
@@ -38,11 +41,14 @@ export const DISCOVERY_DECK_BOTTOM_INSET =
 export const DISCOVERY_CARD_ACTIONS_OVERLAY = 72;
 
 /** Action dock inset from the card bottom edge. */
-export const DISCOVERY_CARD_ACTIONS_LIFT = 14;
+export const DISCOVERY_CARD_ACTIONS_LIFT = 28;
+
+/** Space between swipe-up hint and action dock. */
+const DISCOVERY_CARD_HINT_ACTION_GAP = 20;
 
 /** Glass swipe-up hint sits above the action dock. */
 export const DISCOVERY_CARD_HINT_BOTTOM =
-  DISCOVERY_CARD_ACTIONS_LIFT + DISCOVERY_CARD_ACTIONS_OVERLAY + 8;
+  DISCOVERY_CARD_ACTIONS_LIFT + DISCOVERY_CARD_ACTIONS_OVERLAY + DISCOVERY_CARD_HINT_ACTION_GAP;
 
 /** Name / meta block above hint + actions. */
 export const DISCOVERY_CARD_FOOTER_BOTTOM = DISCOVERY_CARD_HINT_BOTTOM + 36;
@@ -54,13 +60,13 @@ export const DISCOVERY_STACK_PEEK = 6;
 export const DISCOVERY_CARD_RADIUS = 26;
 
 /** Minimal gap under header before card starts. */
-const DISCOVERY_HEADER_GAP = 4;
+const DISCOVERY_HEADER_CARD_GAP = DISCOVERY_HEADER_GAP;
 
 /** Card fills from Discover header down to just above the tab bar. */
 export function getDiscoveryCardHeight(screenHeight: number): number {
   const reserved =
     DISCOVERY_HEADER_HEIGHT +
-    DISCOVERY_HEADER_GAP +
+    DISCOVERY_HEADER_CARD_GAP +
     DISCOVERY_DECK_BOTTOM_INSET;
   return Math.max(380, screenHeight - reserved);
 }

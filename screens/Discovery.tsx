@@ -29,13 +29,15 @@ import {
   DiscoverProfileSheet,
   DiscoverSwipeCard,
   DiscoverSwipeStamp,
+  GenoDiscoverHeader,
 } from '../src/components/discover';
-import { GenoInboxHeader, GenoInboxIconButton } from '../src/components/inbox';
+import { GenoInboxIconButton } from '../src/components/inbox';
 import {
   DISCOVERY_CARD_ACTIONS_LIFT,
   DISCOVERY_CARD_ACTIONS_OVERLAY,
   DISCOVERY_CARD_RADIUS,
   DISCOVERY_DECK_BOTTOM_INSET,
+  DISCOVERY_HEADER_GAP,
   DISCOVERY_STACK_PEEK,
   getDiscoveryCardHeight,
 } from '../src/components/navigation/tabBarLayout';
@@ -645,7 +647,7 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
   });
 
   const discoverSubtitle = usingMockFallback
-    ? 'Preview profiles — real matches appear as members join'
+    ? 'Preview profiles · real matches\nas members join'
     : 'Genotype-aware matches near you';
 
   return (
@@ -668,11 +670,8 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
             <Text style={styles.superLikeToastText}>⭐ Super Liked!</Text>
           </Animated.View>
         ) : null}
-        <GenoInboxHeader
-          title="Discover"
+        <GenoDiscoverHeader
           subtitle={discoverSubtitle}
-          subtitleStyle={styles.discoverHeaderSubtitle}
-          ceremonyMark
           right={
             <View style={styles.filterBtnWrap}>
               <GenoInboxIconButton
@@ -865,12 +864,6 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
                   <Text style={styles.actionError}>{actionError}</Text>
                 ) : null}
                 <View style={styles.cardActionsOverlay} pointerEvents="box-none">
-                  <LinearGradient
-                    colors={['transparent', 'rgba(13, 40, 24, 0.22)', 'rgba(13, 40, 24, 0.48)']}
-                    locations={[0, 0.55, 1]}
-                    style={styles.cardActionsFade}
-                    pointerEvents="none"
-                  />
                   <DiscoverActionDock
                     variant="glass"
                     onPass={handlePass}
@@ -928,11 +921,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.linen,
-  },
-  discoverHeaderSubtitle: {
-    fontSize: 11,
-    lineHeight: 15,
-    letterSpacing: 0.1,
   },
   screenRoot: {
     flex: 1,
@@ -1005,14 +993,14 @@ const styles = StyleSheet.create({
   deckArea: {
     flex: 1,
     paddingHorizontal: 10,
-    paddingTop: 0,
+    paddingTop: DISCOVERY_HEADER_GAP,
     paddingBottom: DISCOVERY_DECK_BOTTOM_INSET,
   },
   deckColumn: {
     flex: 1,
     width: '100%',
     alignItems: 'center',
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-start',
   },
   deckCardSlot: {
     width: '100%',
@@ -1031,13 +1019,6 @@ const styles = StyleSheet.create({
     height: DISCOVERY_CARD_ACTIONS_OVERLAY,
     justifyContent: 'center',
     zIndex: 40,
-  },
-  cardActionsFade: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: -6,
-    height: DISCOVERY_CARD_ACTIONS_OVERLAY + 20,
   },
   cardActionsRow: {
     zIndex: 2,
