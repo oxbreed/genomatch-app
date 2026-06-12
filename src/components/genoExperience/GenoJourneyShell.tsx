@@ -2,10 +2,10 @@ import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
-import { GenoPremiumChrome } from '../../brand/graphics';
+import { GenoPremiumChrome, GenoGlassSurface } from '../../brand/graphics';
 import GenoMatchLogo from '../GenoMatchLogo';
 import { GenoBondMark } from '../../brand';
-import { COLORS, RADIUS, SHADOWS } from '../../theme';
+import { FONT_FAMILY, COLORS, RADIUS, SHADOWS } from '../../theme';
 
 type Props = {
   children: ReactNode;
@@ -40,13 +40,22 @@ export default function GenoJourneyShell({
       <View style={styles.topBar}>
         <View style={styles.topLeft}>
           {onBack ? (
-            <Pressable
-              style={({ pressed }) => [styles.backBtn, pressed && styles.pressed]}
-              onPress={onBack}
-              hitSlop={8}
+            <GenoGlassSurface
+              variant="light"
+              borderRadius={RADIUS.pill}
+              shadow="glass"
+              intensity={40}
+              style={styles.backBtn}
+              contentStyle={styles.backBtnInner}
             >
-              <Text style={styles.backText}>{backLabel}</Text>
-            </Pressable>
+              <Pressable
+                style={({ pressed }) => [styles.backPress, pressed && styles.pressed]}
+                onPress={onBack}
+                hitSlop={8}
+              >
+                <Text style={styles.backText}>{backLabel}</Text>
+              </Pressable>
+            </GenoGlassSurface>
           ) : showBrand ? (
             <View style={styles.brandRow}>
               <GenoMatchLogo size={34} />
@@ -80,7 +89,17 @@ export function GenoJourneyCard({ children, style }: JourneyCardProps) {
         end={{ x: 1, y: 1 }}
         style={styles.cardBorder}
       >
-        <View style={styles.cardInner}>{children}</View>
+        <GenoGlassSurface
+          variant="dark"
+          borderRadius={RADIUS.xl - 1.5}
+          shadow="glassElevated"
+          showTopRule
+          showBorder={false}
+          style={styles.cardGlass}
+          contentStyle={styles.cardInner}
+        >
+          {children}
+        </GenoGlassSurface>
       </LinearGradient>
     </View>
   );
@@ -183,17 +202,16 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   backBtn: {
+    overflow: 'hidden',
+    borderRadius: RADIUS.pill,
+  },
+  backBtnInner: {
     paddingHorizontal: 14,
     paddingVertical: 8,
-    borderRadius: RADIUS.pill,
-    backgroundColor: COLORS.white,
-    borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.32)',
-    ...SHADOWS.card,
-    shadowOpacity: 0.06,
   },
+  backPress: {},
   backText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 14,
     color: COLORS.forestDeep,
   },
@@ -236,12 +254,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   ctaText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 17,
     color: COLORS.forestDeep,
   },
   helper: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 13,
     lineHeight: 19,
     color: COLORS.sage,
@@ -256,12 +274,11 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.xl,
     padding: 1.5,
   },
+  cardGlass: {
+    overflow: 'hidden',
+  },
   cardInner: {
-    backgroundColor: COLORS.forestDeep,
-    borderRadius: RADIUS.xl - 1.5,
     padding: 24,
-    borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.22)',
   },
   hero: {
     paddingBottom: 12,
@@ -277,20 +294,20 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(212, 168, 67, 0.35)',
   },
   kickerText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 10,
     letterSpacing: 1.6,
     color: COLORS.gold,
   },
   heroTitle: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 30,
     lineHeight: 36,
     letterSpacing: -0.6,
     color: COLORS.forestDeep,
   },
   heroSubtitle: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 15,
     lineHeight: 23,
     color: COLORS.sage,

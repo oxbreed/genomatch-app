@@ -1,0 +1,26 @@
+{
+  "fontFamilies": {
+    "heading": {
+      "value": "Gotham Rounded",
+      "type": "fontFamilies",
+      "description": "Primary UI — profile names, ages, headings, user-facing copy (~70% of app)"
+    },
+    "marketing": {
+      "value": "Proxima Nova",
+      "type": "fontFamilies",
+      "description": "Logos, kickers, onboarding, splash, promo banners"
+    },
+    "system": {
+      "value": "Helvetica / Roboto",
+      "type": "fontFamilies",
+      "description": "Tab labels, nested settings, technical nav copy"
+    }
+  },
+  "implementation": {
+    "headingLoadName": "Montserrat_700Bold",
+    "marketingLoadName": "Montserrat_800ExtraBold",
+    "systemIos": "Helvetica",
+    "systemAndroid": "Roboto",
+    "standInNote": "Replace Montserrat files with licensed Gotham Rounded / Proxima Nova in assets/fonts when available."
+  }
+}

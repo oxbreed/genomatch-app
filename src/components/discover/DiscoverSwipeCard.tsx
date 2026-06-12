@@ -10,19 +10,23 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { GenoBondHalo } from '../../brand/graphics';
+import {
+  DISCOVERY_CARD_FOOTER_BOTTOM,
+  DISCOVERY_CARD_HINT_BOTTOM,
+  DISCOVERY_CARD_RADIUS,
+  getDiscoveryCardHeight,
+} from '../../components/navigation/tabBarLayout';
 import GenotypeBadge from '../GenotypeBadge';
-import FamilyPlanningCard from '../FamilyPlanningCard';
-import LifestyleBadges from '../LifestyleBadges';
-import PresenceBadge from '../PresenceBadge';
-import VerifiedBadge from '../VerifiedBadge';
+import LocationLine from '../LocationLine';
 import { COLORS, getInitials } from '../../data/mockData';
+import { FONT_FAMILY, SHADOWS } from '../../theme';
 import { getGenotypeRiskShort } from '../../lib/compatibility';
 import type { DiscoveryProfile, Genotype } from '../../types/database';
 import DiscoverMatchPill from './DiscoverMatchPill';
+import { DISCOVER_GLASS_ICON, discoverGlassType } from './discoverGlassType';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
-export const DISCOVER_CARD_HEIGHT = SCREEN_HEIGHT * 0.55;
+export const DISCOVER_CARD_HEIGHT = getDiscoveryCardHeight(SCREEN_HEIGHT);
 
 function getCompatDotColor(percent: number): string {
   if (percent >= 80) return COLORS.gold;
@@ -36,14 +40,19 @@ type Props = {
   totalProfiles?: number;
   viewerGenotype?: Genotype | null;
   progressFillWidth?: Animated.AnimatedInterpolation<string | number>;
+  height?: number;
+  onExpand?: () => void;
 };
 
+/** Full-bleed bond card — seamless photo, no frame seam */
 export default function DiscoverSwipeCard({
   profile,
   swipeIndex,
   totalProfiles,
   viewerGenotype,
   progressFillWidth,
+  height = DISCOVER_CARD_HEIGHT,
+  onExpand,
 }: Props) {
   const gallery = useMemo(() => {
     if (profile.photos.length > 0) return profile.photos;
@@ -66,323 +75,307 @@ export default function DiscoverSwipeCard({
       : 0;
 
   return (
-    <LinearGradient
-      colors={['rgba(212, 168, 67, 0.55)', 'rgba(61, 122, 82, 0.35)', 'rgba(212, 168, 67, 0.45)']}
-      style={styles.cardFrame}
-    >
-      <View style={styles.cardBody}>
-        {totalProfiles != null && totalProfiles > 0 && swipeIndex != null ? (
-          <View style={styles.swipeProgressTrack} pointerEvents="none">
-            <Animated.View
-              style={[
-                styles.swipeProgressFill,
-                progressFillWidth
-                  ? { width: progressFillWidth }
-                  : { width: `${progressRatio * 100}%` },
-              ]}
-            />
-          </View>
-        ) : null}
-
-        {currentUri ? (
-          <ImageBackground
-            source={{ uri: currentUri }}
-            style={styles.cardMedia}
-            imageStyle={styles.cardMediaImage}
-            resizeMode="cover"
+    <View style={[styles.cardShell, { height }]}>
+      {totalProfiles != null && totalProfiles > 0 && swipeIndex != null ? (
+        <View style={styles.swipeProgressTrack} pointerEvents="none">
+          <Animated.View
+            style={[
+              styles.swipeProgressFill,
+              progressFillWidth
+                ? { width: progressFillWidth }
+                : { width: `${progressRatio * 100}%` },
+            ]}
           />
-        ) : (
-          <LinearGradient
-            colors={[COLORS.forestDeep, COLORS.forest]}
-            style={[styles.cardMedia, styles.cardNoPhoto]}
-          >
-            <GenoBondHalo size={120} opacity={0.4} animated />
-            <Text style={styles.noPhotoInitials}>{getInitials(profile.name)}</Text>
-            <Text style={styles.noPhotoCaption}>No photo yet</Text>
-          </LinearGradient>
-        )}
+        </View>
+      ) : null}
 
-        <LinearGradient
-          colors={['transparent', 'rgba(13, 40, 24, 0.55)', 'rgba(13, 40, 24, 0.92)']}
-          style={styles.cardBottomShade}
-          pointerEvents="none"
+      {currentUri ? (
+        <ImageBackground
+          source={{ uri: currentUri }}
+          style={styles.cardMedia}
+          imageStyle={styles.cardMediaImage}
+          resizeMode="cover"
         />
-
-        <View style={styles.cardInfoFooter} pointerEvents="box-none">
-          <View style={styles.nameBadgeRow}>
-            <Text style={styles.cardName} numberOfLines={1}>
-              {profile.name}
-              {profile.age != null ? `, ${profile.age}` : ''}
-            </Text>
-            <GenotypeBadge genotype={profile.genotype} />
-            {profile.genotypeVerified ? <VerifiedBadge compact /> : null}
+      ) : (
+        <LinearGradient
+          colors={[COLORS.forestDeep, COLORS.forest]}
+          style={[styles.cardMedia, styles.cardNoPhoto]}
+        >
+          <View style={styles.noPhotoCircle}>
+            <Text style={styles.noPhotoInitials}>{getInitials(profile.name)}</Text>
           </View>
+          <Text style={styles.noPhotoCaption}>No photo yet</Text>
+        </LinearGradient>
+      )}
 
-          {(profile.presenceState !== 'offline' || profile.isNewMember) ? (
-            <View style={styles.presenceRow}>
-              <PresenceBadge
-                presenceState={profile.presenceState}
-                isNewMember={profile.isNewMember}
-                dark
-              />
-            </View>
-          ) : null}
+      <LinearGradient
+        colors={['rgba(255, 255, 255, 0.14)', 'transparent', 'transparent']}
+        locations={[0, 0.25, 1]}
+        style={styles.cardGloss}
+        pointerEvents="none"
+      />
 
-          <View style={styles.cityRow}>
-            <Ionicons name="location-outline" size={14} color={COLORS.sage} />
-            <Text style={styles.cityText}>{profile.city}</Text>
-          </View>
+      <LinearGradient
+        colors={['rgba(13, 40, 24, 0.22)', 'transparent']}
+        style={styles.cardTopShade}
+        pointerEvents="none"
+      />
 
-          <View style={styles.compatRow}>
-            <View
-              style={[
-                styles.compatDot,
-                { backgroundColor: getCompatDotColor(profile.compatibility) },
-              ]}
-            />
-            <Text style={styles.compatText} numberOfLines={2}>
-              {profile.compatibility}% bond · {riskShort}
-            </Text>
-          </View>
+      <LinearGradient
+        colors={['transparent', 'rgba(13, 40, 24, 0.5)', 'rgba(13, 40, 24, 0.88)']}
+        locations={[0, 0.45, 1]}
+        style={styles.cardBottomShade}
+        pointerEvents="none"
+      />
 
-          <View style={styles.familyRow}>
-            <FamilyPlanningCard
-              viewerGenotype={viewerGenotype ?? null}
-              candidateGenotype={profile.genotype}
-              compact
-              dark
-            />
-          </View>
-
-          <Text style={styles.cardBio} numberOfLines={3} ellipsizeMode="tail">
-            {profile.bio || 'Tap to view full profile'}
+      <Pressable
+        style={styles.cardInfoFooter}
+        onPress={onExpand}
+        disabled={!onExpand}
+        accessibilityLabel="View full profile"
+      >
+        <View style={styles.nameBadgeRow}>
+          <Text style={styles.cardName} numberOfLines={1}>
+            {profile.name}
+            {profile.age != null ? `, ${profile.age}` : ''}
           </Text>
-
-          <LifestyleBadges
-            drinkingStatus={profile.drinkingStatus}
-            smokingStatus={profile.smokingStatus}
-            educationStatus={profile.educationStatus}
-            compact
-            dark
-          />
-
-          <View style={styles.tagsRow}>
-            {profile.interests.slice(0, 4).map((interest) => (
-              <View key={interest} style={styles.tagChip}>
-                <Text style={styles.tagText}>{interest}</Text>
-              </View>
-            ))}
+          <View style={styles.nameBadgeCluster}>
+            <GenotypeBadge genotype={profile.genotype} />
+            {profile.genotypeVerified ? (
+              <Ionicons
+                name="shield-checkmark"
+                size={17}
+                color={COLORS.verified}
+                accessibilityLabel="Genotype verified"
+              />
+            ) : null}
           </View>
         </View>
 
-        {hasMultiple ? (
-          <>
-            <View style={styles.photoDots} pointerEvents="none">
-              {gallery.map((_, i) => (
-                <View
-                  key={i}
-                  style={[styles.photoDot, i === photoIndex && styles.photoDotActive]}
-                />
-              ))}
-            </View>
-            <Pressable
-              style={styles.photoTapLeft}
-              onPress={() => setPhotoIndex((i) => (i <= 0 ? gallery.length - 1 : i - 1))}
-            />
-            <Pressable
-              style={styles.photoTapRight}
-              onPress={() =>
-                setPhotoIndex((i) => (i >= gallery.length - 1 ? 0 : i + 1))
-              }
-            />
-          </>
-        ) : null}
+        <LocationLine city={profile.city} distanceBand={profile.distanceBand} dark />
 
-        <DiscoverMatchPill percent={profile.compatibility} />
-      </View>
-    </LinearGradient>
+        <View style={styles.compatRow}>
+          <View
+            style={[
+              styles.compatDot,
+              { backgroundColor: getCompatDotColor(profile.compatibility) },
+            ]}
+          />
+          <Text style={styles.compatText} numberOfLines={1}>
+            {profile.compatibility}% · {riskShort}
+          </Text>
+        </View>
+      </Pressable>
+
+      {onExpand ? (
+        <Pressable
+          style={styles.expandHintWrap}
+          onPress={onExpand}
+          accessibilityLabel="Swipe up for more profile details"
+          hitSlop={10}
+        >
+          <Ionicons name="chevron-up" size={12} color={DISCOVER_GLASS_ICON} />
+          <Text style={discoverGlassType.hint}>Swipe up for more</Text>
+        </Pressable>
+      ) : null}
+
+      {hasMultiple ? (
+        <>
+          <View style={styles.photoBars} pointerEvents="none">
+            {gallery.map((_, i) => (
+              <View
+                key={i}
+                style={[styles.photoBar, i === photoIndex && styles.photoBarActive]}
+              />
+            ))}
+          </View>
+          <Pressable
+            style={styles.photoTapLeft}
+            onPress={() => setPhotoIndex((i) => (i <= 0 ? gallery.length - 1 : i - 1))}
+            accessibilityLabel="Previous photo"
+          />
+          <Pressable
+            style={styles.photoTapRight}
+            onPress={() => setPhotoIndex((i) => (i >= gallery.length - 1 ? 0 : i + 1))}
+            accessibilityLabel="Next photo"
+          />
+        </>
+      ) : null}
+
+      <DiscoverMatchPill percent={profile.compatibility} />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  cardFrame: {
-    flex: 1,
-    borderRadius: 26,
-    padding: 2,
-    shadowColor: COLORS.forest,
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.2,
-    shadowRadius: 20,
-    elevation: 12,
-  },
-  cardBody: {
+  cardShell: {
     width: '100%',
-    height: DISCOVER_CARD_HEIGHT,
-    borderRadius: 24,
+    borderRadius: DISCOVERY_CARD_RADIUS,
     overflow: 'hidden',
     backgroundColor: COLORS.forestDeep,
+    ...SHADOWS.glassElevated,
+    shadowColor: COLORS.forest,
+    shadowOpacity: 0.16,
   },
   swipeProgressTrack: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    height: 4,
-    backgroundColor: 'rgba(255,255,255,0.15)',
+    height: 2,
+    backgroundColor: 'rgba(255,255,255,0.12)',
     zIndex: 7,
     overflow: 'hidden',
   },
   swipeProgressFill: {
-    height: 4,
+    height: 2,
     backgroundColor: COLORS.gold,
   },
   cardMedia: {
     ...StyleSheet.absoluteFillObject,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   cardMediaImage: {
-    borderRadius: 24,
+    borderRadius: DISCOVERY_CARD_RADIUS,
   },
   cardNoPhoto: {
+    alignItems: 'center',
+    justifyContent: 'center',
     gap: 8,
   },
+  noPhotoCircle: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: 'rgba(245, 239, 230, 0.12)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: 'rgba(212, 168, 67, 0.35)',
+  },
   noPhotoInitials: {
-    fontFamily: 'ClashDisplay-Semibold',
-    fontSize: 56,
+    fontFamily: FONT_FAMILY.gothamBold,
+    fontSize: 44,
     color: COLORS.linen,
     letterSpacing: 2,
   },
   noPhotoCaption: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 13,
     color: COLORS.sage,
+  },
+  cardGloss: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 3,
+  },
+  cardTopShade: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '20%',
+    zIndex: 2,
   },
   cardBottomShade: {
     position: 'absolute',
     left: 0,
     right: 0,
     bottom: 0,
-    height: '55%',
+    height: '40%',
+    zIndex: 2,
   },
   cardInfoFooter: {
     position: 'absolute',
     left: 0,
     right: 0,
-    bottom: 0,
+    bottom: DISCOVERY_CARD_FOOTER_BOTTOM,
     paddingHorizontal: 18,
-    paddingBottom: 18,
-    paddingTop: 12,
     zIndex: 6,
   },
   nameBadgeRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    flexWrap: 'wrap',
+    flexWrap: 'nowrap',
     gap: 8,
     marginBottom: 6,
   },
-  presenceRow: {
-    marginBottom: 6,
+  nameBadgeCluster: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    flexShrink: 0,
   },
   cardName: {
-    fontFamily: 'ClashDisplay-Semibold',
-    fontSize: 26,
+    fontFamily: FONT_FAMILY.gothamBold,
+    fontSize: 25,
     color: COLORS.linen,
     letterSpacing: -0.4,
     flexShrink: 1,
-  },
-  cityRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    marginBottom: 8,
-  },
-  cityText: {
-    fontFamily: 'Satoshi-Medium',
-    fontSize: 14,
-    color: COLORS.sage,
+    minWidth: 0,
+    textShadowColor: 'rgba(13, 40, 24, 0.45)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
   },
   compatRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 8,
-    marginBottom: 6,
-  },
-  familyRow: {
-    marginBottom: 8,
+    marginTop: 4,
   },
   compatDot: {
-    width: 8,
-    height: 8,
+    width: 7,
+    height: 7,
     borderRadius: 4,
     marginTop: 5,
   },
   compatText: {
     flex: 1,
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
     lineHeight: 17,
     color: 'rgba(245, 239, 230, 0.9)',
   },
-  cardBio: {
-    fontFamily: 'Satoshi-Medium',
-    fontSize: 14,
-    lineHeight: 20,
-    color: 'rgba(245, 239, 230, 0.85)',
-    marginBottom: 10,
-  },
-  tagsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 6,
-    marginTop: 6,
-  },
-  tagChip: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 999,
-    backgroundColor: 'rgba(212, 168, 67, 0.25)',
-    borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.4)',
-  },
-  tagText: {
-    fontFamily: 'Satoshi-Bold',
-    fontSize: 11,
-    color: COLORS.linen,
-  },
-  photoDots: {
+  expandHintWrap: {
     position: 'absolute',
-    top: 12,
     alignSelf: 'center',
+    bottom: DISCOVERY_CARD_HINT_BOTTOM,
     flexDirection: 'row',
-    gap: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
+    zIndex: 14,
+  },
+  photoBars: {
+    position: 'absolute',
+    top: 10,
+    left: 12,
+    right: 12,
+    flexDirection: 'row',
+    gap: 4,
     zIndex: 8,
   },
-  photoDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: 'rgba(255,255,255,0.35)',
+  photoBar: {
+    flex: 1,
+    height: 2,
+    borderRadius: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
   },
-  photoDotActive: {
-    width: 18,
-    backgroundColor: COLORS.gold,
+  photoBarActive: {
+    backgroundColor: COLORS.linen,
   },
   photoTapLeft: {
     position: 'absolute',
     left: 0,
     top: 0,
-    bottom: 0,
-    width: '35%',
+    bottom: 100,
+    width: '34%',
     zIndex: 5,
   },
   photoTapRight: {
     position: 'absolute',
     right: 0,
     top: 0,
-    bottom: 0,
-    width: '35%',
+    bottom: 100,
+    width: '34%',
     zIndex: 5,
   },
 });

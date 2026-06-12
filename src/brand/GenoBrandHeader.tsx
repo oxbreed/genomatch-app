@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { StyleSheet, Text, View, type ViewStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { COLORS } from '../theme';
+import { FONT_FAMILY, COLORS } from '../theme';
 import { GenoBondMark } from './GenoSignaturePattern';
 
 type Props = {
@@ -79,19 +79,19 @@ const styles = StyleSheet.create({
     paddingTop: 2,
   },
   kicker: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 10,
     letterSpacing: 2.4,
     color: COLORS.gold,
   },
   title: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 28,
     letterSpacing: -0.5,
     color: COLORS.forestDeep,
   },
   subtitle: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
     lineHeight: 20,
     color: COLORS.sage,

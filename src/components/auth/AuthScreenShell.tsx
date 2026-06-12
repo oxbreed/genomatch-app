@@ -3,8 +3,9 @@ import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { GenoSignaturePattern } from '../../brand';
+import { GenoGlassSurface } from '../../brand/graphics';
 import GenoMatchLogo from '../GenoMatchLogo';
-import { COLORS } from '../../theme';
+import { FONT_FAMILY, COLORS, RADIUS } from '../../theme';
 
 type Props = {
   kicker: string;
@@ -49,10 +50,19 @@ export default function AuthScreenShell({
           },
         ]}
       >
-        <Pressable style={styles.back} onPress={onBack} accessibilityLabel="Go back">
-          <Ionicons name="chevron-back" size={20} color={COLORS.linen} />
-          <Text style={styles.backText}>Back</Text>
-        </Pressable>
+        <GenoGlassSurface
+          variant="dark"
+          borderRadius={RADIUS.pill}
+          shadow="glass"
+          intensity={36}
+          style={styles.backGlass}
+          contentStyle={styles.backInner}
+        >
+          <Pressable style={styles.back} onPress={onBack} accessibilityLabel="Go back">
+            <Ionicons name="chevron-back" size={20} color={COLORS.linen} />
+            <Text style={styles.backText}>Back</Text>
+          </Pressable>
+        </GenoGlassSurface>
 
         <View style={styles.kickerRow}>
           <View style={styles.kickerDot} />
@@ -61,12 +71,15 @@ export default function AuthScreenShell({
 
         {showLogo && logoScale ? (
           <Animated.View style={[styles.logoOrb, { transform: [{ scale: logoScale }] }]}>
-            <LinearGradient
-              colors={['rgba(245, 239, 230, 0.15)', 'rgba(245, 239, 230, 0.05)']}
-              style={styles.logoOrbGradient}
+            <GenoGlassSurface
+              variant="dark"
+              borderRadius={40}
+              shadow="glassFloat"
+              intensity={32}
+              contentStyle={styles.logoOrbInner}
             >
               <GenoMatchLogo size={52} />
-            </LinearGradient>
+            </GenoGlassSurface>
           </Animated.View>
         ) : null}
 
@@ -84,11 +97,21 @@ export default function AuthScreenShell({
         ]}
       >
         <LinearGradient
-          colors={[COLORS.white, COLORS.linen]}
-          style={styles.formCard}
+          colors={['rgba(212, 168, 67, 0.45)', 'rgba(61, 122, 82, 0.28)', 'rgba(212, 168, 67, 0.38)']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.formBorder}
         >
-          <View style={styles.formAccent} pointerEvents="none" />
-          {children}
+          <GenoGlassSurface
+            variant="linen"
+            borderRadius={25}
+            shadow="glassElevated"
+            showTopRule
+            contentStyle={styles.formCard}
+          >
+            <View style={styles.formAccent} pointerEvents="none" />
+            {children}
+          </GenoGlassSurface>
         </LinearGradient>
       </Animated.View>
     </View>
@@ -114,22 +137,25 @@ const styles = StyleSheet.create({
   hero: {
     marginBottom: 22,
   },
-  back: {
+  backGlass: {
     alignSelf: 'flex-start',
+    marginBottom: 20,
+    overflow: 'hidden',
+  },
+  backInner: {
+    paddingHorizontal: 0,
+    paddingVertical: 0,
+  },
+  back: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
     minHeight: 44,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    borderRadius: 22,
-    borderWidth: 1,
-    borderColor: 'rgba(245, 239, 230, 0.22)',
-    backgroundColor: 'rgba(245, 239, 230, 0.08)',
-    marginBottom: 20,
   },
   backText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 14,
     color: COLORS.linen,
   },
@@ -146,7 +172,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.gold,
   },
   kicker: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 11,
     letterSpacing: 2,
     color: COLORS.gold,
@@ -154,17 +180,14 @@ const styles = StyleSheet.create({
   logoOrb: {
     marginBottom: 16,
   },
-  logoOrbGradient: {
+  logoOrbInner: {
     width: 80,
     height: 80,
-    borderRadius: 40,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(245, 239, 230, 0.2)',
   },
   title: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 32,
     lineHeight: 38,
     letterSpacing: -0.6,
@@ -173,7 +196,7 @@ const styles = StyleSheet.create({
     maxWidth: '95%',
   },
   subtitle: {
-    fontFamily: 'Satoshi-Regular',
+    fontFamily: FONT_FAMILY.gothamBook,
     fontSize: 16,
     lineHeight: 24,
     color: 'rgba(245, 239, 230, 0.78)',
@@ -182,18 +205,14 @@ const styles = StyleSheet.create({
   formWrap: {
     borderRadius: 26,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.15,
-    shadowRadius: 24,
-    elevation: 10,
+  },
+  formBorder: {
+    borderRadius: 26,
+    padding: 1,
   },
   formCard: {
-    borderRadius: 26,
     paddingHorizontal: 20,
     paddingVertical: 22,
-    borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.2)',
   },
   formAccent: {
     position: 'absolute',

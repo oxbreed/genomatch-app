@@ -3,7 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { GenoCardFrame } from '../../brand/graphics';
 import { GenoBondMark } from '../../brand';
-import { COLORS } from '../../theme';
+import { FONT_FAMILY, COLORS } from '../../theme';
 import { PROFILE } from './profileTokens';
 
 type Props = {
@@ -48,13 +48,13 @@ const styles = StyleSheet.create({
   },
   copy: { flex: 1, gap: 8 },
   title: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: PROFILE.sectionTitleSize,
     color: COLORS.forestDeep,
     letterSpacing: -0.2,
   },
   body: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: PROFILE.metaSize,
     lineHeight: 16,
     color: COLORS.sage,
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   btnText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 14,
     color: COLORS.linen,
   },

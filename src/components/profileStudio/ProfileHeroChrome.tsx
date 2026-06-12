@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path } from 'react-native-svg';
 import { INBOX } from '../inbox/inboxTokens';
-import { COLORS, RADIUS, SHADOWS } from '../../theme';
+import { FONT_FAMILY, COLORS, RADIUS, SHADOWS } from '../../theme';
 
 type Props = {
   studio?: boolean;
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(212, 168, 67, 0.35)',
   },
   studioTagText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 9,
     letterSpacing: 1.6,
     textTransform: 'uppercase',

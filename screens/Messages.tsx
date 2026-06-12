@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+  Animated,
   FlatList,
-  Pressable,
   RefreshControl,
   StyleSheet,
   Text,
@@ -11,11 +11,18 @@ import { StatusBar } from 'expo-status-bar';
 import * as Haptics from 'expo-haptics';
 import EmptyState from '../src/components/EmptyState';
 import { GenoPremiumChrome, GenoLogoCeremony } from '../src/brand/graphics';
-import { GenoInboxCountBadge, GenoInboxHeader } from '../src/components/inbox';
+import {
+  GenoInboxCountBadge,
+  GenoInboxHeader,
+  GenoInboxMatchStrip,
+  GenoInboxRetryPanel,
+  GenoInboxUnreadBanner,
+} from '../src/components/inbox';
 import ConversationListCard from '../src/components/messages/ConversationListCard';
+import { isRecentMatch } from '../src/components/matches/MatchListCard';
 import { logAuthState } from '../src/lib/auth';
 import { TAB_SCENE_BOTTOM_PADDING } from '../src/components/navigation/tabBarLayout';
-import { COLORS } from '../src/theme';
+import { FONT_FAMILY, COLORS, MOTION } from '../src/theme';
 import { fetchConversations } from '../src/lib/messages';
 import { fetchMatches } from '../src/lib/matches';
 import type { ConversationPreview, DiscoveryProfile, MatchWithProfile } from '../src/types/database';
@@ -44,6 +51,7 @@ export default function Messages({
   onImmersiveChange,
 }: MessagesProps) {
   const [conversations, setConversations] = useState<ConversationPreview[]>([]);
+  const [newMatches, setNewMatches] = useState<MatchWithProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
@@ -52,8 +60,20 @@ export default function Messages({
     profile: DiscoveryProfile;
   } | null>(null);
   const [selectedMatch, setSelectedMatch] = useState<MatchWithProfile | null>(null);
+  const listFade = useRef(new Animated.Value(0)).current;
 
   const unreadCount = conversations.filter((c) => c.unread).length;
+
+  const sortedConversations = useMemo(
+    () =>
+      [...conversations].sort((a, b) => {
+        if (a.unread !== b.unread) return a.unread ? -1 : 1;
+        const aTime = a.lastMessageAt ? new Date(a.lastMessageAt).getTime() : 0;
+        const bTime = b.lastMessageAt ? new Date(b.lastMessageAt).getTime() : 0;
+        return bTime - aTime;
+      }),
+    [conversations]
+  );
 
   const openChat = (matchId: string, profile: DiscoveryProfile) => {
     setSelectedMatch(null);
@@ -82,6 +102,17 @@ export default function Messages({
   useEffect(() => {
     onImmersiveChange?.(!!activeChat || !!selectedMatch);
   }, [activeChat, onImmersiveChange, selectedMatch]);
+
+  useEffect(() => {
+    if (loading) return;
+    listFade.setValue(0);
+    Animated.timing(listFade, {
+      toValue: 1,
+      duration: MOTION.tabFadeMs + 80,
+      easing: MOTION.easing.sheetOut,
+      useNativeDriver: true,
+    }).start();
+  }, [listFade, loading, sortedConversations.length]);
 
   useEffect(() => {
     if (!initialChatMatchId) return;
@@ -146,12 +177,14 @@ export default function Messages({
 
   return (
     <View style={styles.container}>
-      <GenoPremiumChrome variant="linen" />
+      <GenoPremiumChrome variant="discover" />
       <StatusBar style="dark" />
 
       <GenoInboxHeader
         title="Messages"
-        subtitle="Conversations with your genotype-aligned matches"
+        subtitle="Chat with your genotype-aligned matches"
+        ceremonyMark={conversations.length > 0}
+        glass
         right={
           unreadCount > 0 ? (
             <GenoInboxCountBadge count={unreadCount} variant="alert" />
@@ -168,14 +201,12 @@ export default function Messages({
         </View>
       ) : error ? (
         <View style={styles.centered}>
-          <Text style={styles.error}>{error}</Text>
-          <Pressable style={styles.retryBtn} onPress={() => loadConversations()}>
-            <Text style={styles.retryText}>Try again</Text>
-          </Pressable>
+          <GenoInboxRetryPanel message={error} onRetry={() => loadConversations()} />
         </View>
       ) : (
-        <FlatList
-          data={conversations}
+        <Animated.View style={[styles.listWrap, { opacity: listFade }]}>
+          <FlatList
+            data={sortedConversations}
           keyExtractor={(item) => item.matchId}
           contentContainerStyle={conversations.length === 0 ? styles.emptyList : styles.list}
           refreshControl={
@@ -187,6 +218,17 @@ export default function Messages({
               }}
               tintColor={COLORS.forest}
             />
+          }
+          ListHeaderComponent={
+            conversations.length > 0 || newMatches.length > 0 ? (
+              <>
+                <GenoInboxMatchStrip
+                  matches={newMatches}
+                  onOpenMatch={(match) => openChat(match.matchId, match.profile)}
+                />
+                <GenoInboxUnreadBanner count={unreadCount} />
+              </>
+            ) : null
           }
           renderItem={({ item }) => (
             <ConversationListCard
@@ -205,7 +247,8 @@ export default function Messages({
               subtitle="When you match and start chatting, conversations will show up here."
             />
           }
-        />
+          />
+        </Animated.View>
       )}
     </View>
   );
@@ -215,28 +258,11 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.linen },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, gap: 12 },
   loadingText: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
     color: COLORS.sage,
   },
-  list: { paddingBottom: TAB_SCENE_BOTTOM_PADDING },
+  listWrap: { flex: 1 },
+  list: { paddingTop: 4, paddingBottom: TAB_SCENE_BOTTOM_PADDING },
   emptyList: { flexGrow: 1 },
-  error: {
-    fontFamily: 'Satoshi-Medium',
-    fontSize: 15,
-    color: COLORS.error,
-    textAlign: 'center',
-    marginBottom: 12,
-  },
-  retryBtn: {
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 12,
-    backgroundColor: COLORS.gold,
-  },
-  retryText: {
-    fontFamily: 'Satoshi-Bold',
-    fontSize: 15,
-    color: COLORS.forestDeep,
-  },
 });

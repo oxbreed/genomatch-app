@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS } from '../../theme';
+import { GenoGlassSurface } from '../../brand/graphics';
+import { FONT_FAMILY, COLORS, RADIUS } from '../../theme';
 
 type Props = {
   icon: 'lock-closed' | 'shield-checkmark' | 'eye-off';
@@ -9,38 +10,47 @@ type Props = {
 
 export default function AuthTrustBanner({ icon, text }: Props) {
   return (
-    <View style={styles.box}>
+    <GenoGlassSurface
+      variant="linen"
+      borderRadius={RADIUS.md}
+      shadow="glass"
+      showTopRule
+      intensity={48}
+      style={styles.wrap}
+      contentStyle={styles.box}
+    >
       <View style={styles.icon}>
         <Ionicons name={icon} size={18} color={COLORS.verified} />
       </View>
       <Text style={styles.text}>{text}</Text>
-    </View>
+    </GenoGlassSurface>
   );
 }
 
 const styles = StyleSheet.create({
+  wrap: {
+    marginTop: 16,
+    overflow: 'hidden',
+  },
   box: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 12,
-    marginTop: 16,
     padding: 14,
-    borderRadius: 14,
-    backgroundColor: COLORS.mint,
-    borderWidth: 1,
-    borderColor: COLORS.borderLight,
   },
   icon: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: 'rgba(61, 122, 82, 0.12)',
+    backgroundColor: 'rgba(255, 255, 255, 0.55)',
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.65)',
   },
   text: {
     flex: 1,
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 13,
     lineHeight: 19,
     color: COLORS.forest,

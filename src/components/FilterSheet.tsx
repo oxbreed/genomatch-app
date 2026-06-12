@@ -12,7 +12,9 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { GenoBondMark } from '../brand';
-import { COLORS } from '../theme';
+import { GenoGlassBackdrop, GenoGlassSurface } from '../brand/graphics';
+import { FONT_FAMILY, COLORS, GLASS } from '../theme';
+import { DISTANCE_BAND_FILTER_OPTIONS } from '../lib/distanceBands';
 import {
   DEFAULT_DISCOVERY_FILTERS,
   applyDiscoveryFilters,
@@ -73,15 +75,35 @@ export default function FilterSheet({
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable style={styles.backdrop} onPress={onClose}>
+      <View style={styles.backdrop}>
+        <GenoGlassBackdrop />
+        <Pressable style={styles.backdropPress} onPress={onClose} />
         <View style={styles.sheet} onStartShouldSetResponder={() => true}>
           <LinearGradient
-            colors={['rgba(212, 168, 67, 0.35)', 'rgba(61, 122, 82, 0.2)']}
+            colors={['rgba(212, 168, 67, 0.52)', 'rgba(61, 122, 82, 0.34)', 'rgba(255, 255, 255, 0.18)']}
             style={styles.sheetBorder}
           >
-            <View style={styles.sheetInner}>
+            <GenoGlassSurface
+              variant="sheet"
+              borderRadius={30}
+              shadow="glassElevated"
+              showBorder={false}
+              showSheen
+              showTopRule
+              intensity={68}
+              style={styles.sheetGlass}
+              contentStyle={styles.sheetInner}
+            >
               <View style={styles.handle} />
-              <View style={styles.headerRow}>
+              <GenoGlassSurface
+                variant="light"
+                borderRadius={18}
+                intensity={52}
+                showSheen
+                showBorder
+                style={styles.headerGlass}
+                contentStyle={styles.headerRow}
+              >
                 <GenoBondMark size={28} opacity={0.9} />
                 <View style={styles.headerCopy}>
                   <Text style={styles.sheetKicker}>DISCOVER</Text>
@@ -92,14 +114,21 @@ export default function FilterSheet({
                     <Text style={styles.countText}>{activeCount}</Text>
                   </View>
                 ) : null}
-              </View>
+              </GenoGlassSurface>
 
-              <View style={styles.previewBar}>
+              <GenoGlassSurface
+                variant="light"
+                borderRadius={14}
+                intensity={48}
+                showBorder
+                style={styles.previewGlass}
+                contentStyle={styles.previewBar}
+              >
                 <Ionicons name="people-outline" size={18} color={COLORS.forest} />
                 <Text style={styles.previewText}>
                   {previewCount} profile{previewCount === 1 ? '' : 's'} match these filters
                 </Text>
-              </View>
+              </GenoGlassSurface>
 
               <ScrollView
                 style={styles.scroll}
@@ -154,6 +183,48 @@ export default function FilterSheet({
                   placeholderTextColor={COLORS.textSubtle}
                   autoCapitalize="words"
                 />
+
+                <Text style={styles.sectionLabel}>Distance</Text>
+                <Text style={styles.distanceHint}>
+                  Coarse km ranges from city centres — never exact GPS.
+                </Text>
+                <View style={styles.goalRow}>
+                  <Pressable
+                    style={[
+                      styles.goalChip,
+                      draft.distanceBand === 'any' && styles.goalChipActive,
+                    ]}
+                    onPress={() => setDraft((d) => ({ ...d, distanceBand: 'any' }))}
+                  >
+                    <Text
+                      style={[
+                        styles.goalChipText,
+                        draft.distanceBand === 'any' && styles.goalChipTextActive,
+                      ]}
+                    >
+                      Any
+                    </Text>
+                  </Pressable>
+                  {DISTANCE_BAND_FILTER_OPTIONS.map((opt) => (
+                    <Pressable
+                      key={opt.id}
+                      style={[
+                        styles.goalChip,
+                        draft.distanceBand === opt.id && styles.goalChipActive,
+                      ]}
+                      onPress={() => setDraft((d) => ({ ...d, distanceBand: opt.id }))}
+                    >
+                      <Text
+                        style={[
+                          styles.goalChipText,
+                          draft.distanceBand === opt.id && styles.goalChipTextActive,
+                        ]}
+                      >
+                        {opt.label}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </View>
 
                 <Text style={styles.sectionLabel}>Age range</Text>
                 <View style={styles.ageRow}>
@@ -220,10 +291,10 @@ export default function FilterSheet({
               <Pressable style={styles.resetBtn} onPress={() => onApply(DEFAULT_DISCOVERY_FILTERS)}>
                 <Text style={styles.resetBtnText}>Reset all</Text>
               </Pressable>
-            </View>
+            </GenoGlassSurface>
           </LinearGradient>
         </View>
-      </Pressable>
+      </View>
     </Modal>
   );
 }
@@ -231,48 +302,54 @@ export default function FilterSheet({
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(13, 40, 24, 0.5)',
     justifyContent: 'flex-end',
+  },
+  backdropPress: {
+    ...StyleSheet.absoluteFillObject,
   },
   sheet: {
     maxHeight: '90%',
   },
   sheetBorder: {
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    padding: 2,
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
+    padding: 2.5,
+  },
+  sheetGlass: {
+    overflow: 'hidden',
   },
   sheetInner: {
-    backgroundColor: COLORS.linen,
-    borderTopLeftRadius: 22,
-    borderTopRightRadius: 22,
     paddingHorizontal: 20,
     paddingBottom: 28,
   },
   handle: {
     alignSelf: 'center',
-    width: 40,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: 'rgba(13, 40, 24, 0.15)',
+    width: 44,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: 'rgba(255, 255, 255, 0.55)',
     marginTop: 10,
+    marginBottom: 14,
+  },
+  headerGlass: {
     marginBottom: 12,
   },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    marginBottom: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
   },
   headerCopy: { flex: 1, gap: 2 },
   sheetKicker: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.marketingExtrabold,
     fontSize: 10,
     letterSpacing: 2,
     color: COLORS.gold,
   },
   sheetTitle: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: FONT_FAMILY.gothamSemiBold,
     fontSize: 22,
     color: COLORS.forestDeep,
     letterSpacing: -0.3,
@@ -287,31 +364,36 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   countText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 13,
     color: COLORS.forestDeep,
+  },
+  previewGlass: {
+    marginBottom: 10,
   },
   previewBar: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    padding: 12,
-    borderRadius: 12,
-    backgroundColor: COLORS.mint,
-    borderWidth: 1,
-    borderColor: COLORS.borderLight,
-    marginBottom: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
   },
   previewText: {
     flex: 1,
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 13,
     color: COLORS.forest,
   },
   scroll: { maxHeight: 380 },
   scrollContent: { paddingBottom: 8 },
+  distanceHint: {
+    fontFamily: FONT_FAMILY.gothamMedium,
+    fontSize: 12,
+    color: COLORS.textSubtle,
+    marginBottom: 8,
+  },
   sectionLabel: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 11,
     letterSpacing: 1.2,
     textTransform: 'uppercase',
@@ -323,22 +405,22 @@ const styles = StyleSheet.create({
   toggleChip: {
     paddingVertical: 12,
     paddingHorizontal: 14,
-    borderRadius: 12,
-    borderWidth: 1.5,
-    borderColor: COLORS.border,
-    backgroundColor: COLORS.white,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: GLASS.insetBorder,
+    backgroundColor: 'rgba(255, 255, 255, 0.42)',
   },
   toggleChipActive: {
-    borderColor: 'rgba(212, 168, 67, 0.55)',
-    backgroundColor: 'rgba(212, 168, 67, 0.15)',
+    borderColor: GLASS.insetActiveBorder,
+    backgroundColor: GLASS.insetActiveFill,
   },
   toggleChipText: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
     color: COLORS.textMuted,
   },
   toggleChipTextActive: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     color: COLORS.forestDeep,
   },
   verifyRow: {
@@ -350,26 +432,26 @@ const styles = StyleSheet.create({
   },
   verifyCopy: { flex: 1, paddingRight: 12 },
   verifyHint: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
     color: COLORS.textSubtle,
     marginTop: -4,
   },
   textInput: {
-    borderRadius: 12,
-    borderWidth: 1.5,
-    borderColor: 'rgba(13, 40, 24, 0.12)',
-    backgroundColor: COLORS.white,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: GLASS.insetBorder,
+    backgroundColor: 'rgba(255, 255, 255, 0.42)',
     paddingHorizontal: 14,
     paddingVertical: 12,
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 16,
     color: COLORS.forestDeep,
   },
   ageRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   ageInput: { flex: 1 },
   ageDash: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 18,
     color: COLORS.textSubtle,
   },
@@ -378,33 +460,33 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 14,
     borderRadius: 999,
-    borderWidth: 1.5,
-    borderColor: COLORS.border,
-    backgroundColor: COLORS.white,
+    borderWidth: 1,
+    borderColor: GLASS.insetBorder,
+    backgroundColor: 'rgba(255, 255, 255, 0.42)',
   },
   goalChipActive: {
-    borderColor: COLORS.gold,
-    backgroundColor: 'rgba(212, 168, 67, 0.2)',
+    borderColor: GLASS.insetActiveBorder,
+    backgroundColor: GLASS.insetActiveFill,
   },
   goalChipText: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 13,
     color: COLORS.textMuted,
   },
   goalChipTextActive: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     color: COLORS.forestDeep,
   },
   applyWrap: { marginTop: 16, borderRadius: 14, overflow: 'hidden' },
   applyBtn: { paddingVertical: 15, alignItems: 'center' },
   applyBtnText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 16,
     color: COLORS.forestDeep,
   },
   resetBtn: { marginTop: 12, alignItems: 'center', paddingVertical: 8 },
   resetBtnText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 15,
     color: COLORS.forest,
   },

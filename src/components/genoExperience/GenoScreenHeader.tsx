@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { COLORS } from '../../theme';
+import { FONT_FAMILY, COLORS } from '../../theme';
 
 type Props = {
   kicker?: string;
@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   kicker: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 10,
     letterSpacing: 2.4,
     color: COLORS.gold,
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     color: 'rgba(212, 168, 67, 0.85)',
   },
   title: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 30,
     letterSpacing: -0.6,
     color: COLORS.forestDeep,
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     color: COLORS.linen,
   },
   subtitle: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
     lineHeight: 20,
     color: COLORS.sage,

@@ -9,7 +9,7 @@ import {
   RELIGION_OPTIONS,
   formatHeightCm,
 } from '../../lib/profileDetails';
-import { COLORS } from '../../theme';
+import { FONT_FAMILY, COLORS } from '../../theme';
 import { PROFILE, PROFILE_TYPE } from './profileTokens';
 
 type Props = {
@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(212, 168, 67, 0.28)',
   },
   valuePillText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 11,
     color: COLORS.forestDeep,
   },
@@ -307,12 +307,12 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   heightChipText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 13,
     color: COLORS.forest,
   },
   heightChipTextActive: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 13,
     color: COLORS.forestDeep,
   },
@@ -330,12 +330,12 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(212, 168, 67, 0.35)',
     backgroundColor: COLORS.white,
     paddingHorizontal: 14,
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 15,
     color: COLORS.forest,
   },
   customHint: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
     color: COLORS.sage,
   },
@@ -364,13 +364,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   religionText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 13,
     color: COLORS.textMuted,
     textAlign: 'center',
   },
   religionTextActive: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 13,
     color: COLORS.forestDeep,
     textAlign: 'center',

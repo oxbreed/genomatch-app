@@ -7,6 +7,7 @@ drop policy if exists "Authenticated users can view profiles" on public.profiles
 
 -- 2) Users can read their OWN full row (including email).
 --    Existing insert/update own-row policies are untouched.
+drop policy if exists "Users can view their own profile" on public.profiles;
 create policy "Users can view their own profile"
   on public.profiles
   for select
@@ -17,6 +18,7 @@ create policy "Users can view their own profile"
 --    security_invoker = off (the default, stated explicitly): the view runs
 --    with the owner's (postgres) privileges and therefore bypasses profiles
 --    RLS. Column safety is enforced by the view definition itself.
+drop view if exists public.public_profiles;
 create view public.public_profiles
 with (security_invoker = off) as
 select

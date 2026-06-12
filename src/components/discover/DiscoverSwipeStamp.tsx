@@ -1,36 +1,39 @@
 import { Animated, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { COLORS } from '../../theme';
+import { GenoBondMark } from '../../brand';
+import { FONT_FAMILY, COLORS } from '../../theme';
 
 type Props = {
-  side: 'like' | 'nope';
-  opacity: Animated.AnimatedInterpolation<number>;
+  side: 'bond' | 'pass';
+  opacity: Animated.AnimatedInterpolation<number> | Animated.Value;
 };
 
+/** GenoMatch swipe feedback — BOND / PASS, not generic dating-app stamps */
 export default function DiscoverSwipeStamp({ side, opacity }: Props) {
-  const isLike = side === 'like';
+  const isBond = side === 'bond';
 
   return (
     <Animated.View
       pointerEvents="none"
       style={[
         styles.stamp,
-        isLike ? styles.stampLike : styles.stampNope,
+        isBond ? styles.stampBond : styles.stampPass,
         { opacity },
       ]}
     >
       <LinearGradient
         colors={
-          isLike
-            ? ['rgba(212, 168, 67, 0.35)', 'rgba(212, 168, 67, 0.08)']
-            : ['rgba(143, 175, 149, 0.35)', 'rgba(143, 175, 149, 0.08)']
+          isBond
+            ? ['rgba(212, 168, 67, 0.42)', 'rgba(212, 168, 67, 0.1)']
+            : ['rgba(143, 175, 149, 0.38)', 'rgba(143, 175, 149, 0.08)']
         }
         style={styles.stampFill}
       >
-        <Text style={[styles.stampText, isLike ? styles.stampTextLike : styles.stampTextNope]}>
-          {isLike ? 'LIKE' : 'PASS'}
+        {isBond ? <GenoBondMark size={18} opacity={0.95} /> : null}
+        <Text style={[styles.stampText, isBond ? styles.stampTextBond : styles.stampTextPass]}>
+          {isBond ? 'BOND' : 'PASS'}
         </Text>
-        <View style={[styles.stampRule, isLike ? styles.stampRuleLike : styles.stampRuleNope]} />
+        <View style={[styles.stampRule, isBond ? styles.stampRuleBond : styles.stampRulePass]} />
       </LinearGradient>
     </Animated.View>
   );
@@ -39,48 +42,48 @@ export default function DiscoverSwipeStamp({ side, opacity }: Props) {
 const styles = StyleSheet.create({
   stamp: {
     position: 'absolute',
-    top: 48,
+    top: 44,
     zIndex: 12,
-    borderRadius: 12,
-    borderWidth: 3,
+    borderRadius: 14,
+    borderWidth: 2.5,
     overflow: 'hidden',
   },
-  stampLike: {
-    left: 20,
+  stampBond: {
+    left: 18,
     borderColor: COLORS.gold,
-    transform: [{ rotate: '-14deg' }],
+    transform: [{ rotate: '-12deg' }],
   },
-  stampNope: {
-    right: 20,
+  stampPass: {
+    right: 18,
     borderColor: COLORS.sage,
-    transform: [{ rotate: '14deg' }],
+    transform: [{ rotate: '12deg' }],
   },
   stampFill: {
-    paddingHorizontal: 14,
+    paddingHorizontal: 16,
     paddingVertical: 10,
     alignItems: 'center',
-    gap: 6,
+    gap: 5,
   },
   stampText: {
-    fontFamily: 'ClashDisplay-Semibold',
-    fontSize: 34,
-    letterSpacing: 3,
+    fontFamily: FONT_FAMILY.gothamBold,
+    fontSize: 30,
+    letterSpacing: 2.5,
   },
-  stampTextLike: {
+  stampTextBond: {
     color: COLORS.gold,
   },
-  stampTextNope: {
+  stampTextPass: {
     color: COLORS.sage,
   },
   stampRule: {
-    height: 3,
-    width: 48,
-    borderRadius: 2,
+    height: 2,
+    width: 44,
+    borderRadius: 1,
   },
-  stampRuleLike: {
+  stampRuleBond: {
     backgroundColor: COLORS.gold,
   },
-  stampRuleNope: {
+  stampRulePass: {
     backgroundColor: COLORS.sage,
   },
 });

@@ -12,10 +12,11 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { GenoBondMark } from '../../brand';
+import { GenoGlassBackdrop, GenoGlassSurface } from '../../brand/graphics';
 import ProfileAvatar from '../ProfileAvatar';
 import VerifiedBadge from '../VerifiedBadge';
 import { getPrimaryPhotoUri } from '../../lib/profilePhotos';
-import { COLORS, RADIUS, SHADOWS } from '../../theme';
+import { FONT_FAMILY, COLORS, RADIUS, SHADOWS } from '../../theme';
 import type { DiscoveryProfile } from '../../types/database';
 
 type ViewerSnapshot = {
@@ -125,6 +126,7 @@ export default function DiscoverMatchModal({
   return (
     <Modal visible={visible} transparent animationType="none" statusBarTranslucent>
       <Animated.View style={[styles.backdrop, { opacity: backdrop }]}>
+        <GenoGlassBackdrop />
         <Pressable style={StyleSheet.absoluteFill} onPress={onContinue} accessibilityLabel="Dismiss" />
 
         <Animated.View
@@ -137,18 +139,20 @@ export default function DiscoverMatchModal({
           ]}
         >
           <LinearGradient
-            colors={['rgba(212, 168, 67, 0.55)', 'rgba(61, 122, 82, 0.35)', 'rgba(212, 168, 67, 0.45)']}
+            colors={['rgba(212, 168, 67, 0.65)', 'rgba(61, 122, 82, 0.42)', 'rgba(212, 168, 67, 0.55)']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.cardBorder}
           >
-            <View style={styles.card}>
-              <LinearGradient
-                colors={['rgba(22, 53, 34, 0.82)', 'rgba(22, 53, 34, 0.82)']}
-                start={{ x: 0.2, y: 0 }}
-                end={{ x: 0.8, y: 1 }}
-                style={styles.cardFill}
-              >
+            <GenoGlassSurface
+              variant="dark"
+              borderRadius={RADIUS.xl - 1.5}
+              shadow="none"
+              showTopRule
+              showBorder={false}
+              style={styles.card}
+              contentStyle={styles.cardFill}
+            >
                 <View style={styles.kickerRow}>
                   <View style={styles.kickerLine} />
                   <Text style={styles.kicker}>Mutual match</Text>
@@ -249,8 +253,7 @@ export default function DiscoverMatchModal({
                     <Text style={styles.secondaryText}>Send a message</Text>
                   </Pressable>
                 ) : null}
-              </LinearGradient>
-            </View>
+            </GenoGlassSurface>
           </LinearGradient>
         </Animated.View>
       </Animated.View>
@@ -261,7 +264,6 @@ export default function DiscoverMatchModal({
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(13, 40, 24, 0.78)',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 28,
@@ -274,9 +276,9 @@ const styles = StyleSheet.create({
   cardBorder: {
     borderRadius: RADIUS.xl,
     padding: 1.5,
-    ...SHADOWS.cardElevated,
+    ...SHADOWS.glassElevated,
     shadowColor: COLORS.gold,
-    shadowOpacity: 0.22,
+    shadowOpacity: 0.28,
   },
   card: {
     borderRadius: RADIUS.xl - 1.5,
@@ -301,14 +303,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(212, 168, 67, 0.35)',
   },
   kicker: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 10,
     letterSpacing: 2,
     textTransform: 'uppercase',
     color: COLORS.gold,
   },
   title: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 32,
     letterSpacing: -0.6,
     color: COLORS.linen,
@@ -316,7 +318,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   subtitle: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 16,
     lineHeight: 22,
     color: 'rgba(245, 239, 230, 0.82)',
@@ -325,7 +327,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   name: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     color: COLORS.gold,
   },
   bondRow: {
@@ -376,7 +378,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   avatarLabel: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
     color: COLORS.sage,
     textAlign: 'center',
@@ -403,13 +405,13 @@ const styles = StyleSheet.create({
     marginHorizontal: 2,
   },
   compatText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 12,
     letterSpacing: 0.2,
     color: COLORS.linen,
   },
   verifiedText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 11,
     color: COLORS.verified,
   },
@@ -438,7 +440,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   ctaText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 16,
     color: COLORS.forestDeep,
     letterSpacing: 0.1,
@@ -452,7 +454,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   secondaryText: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
     color: COLORS.gold,
   },

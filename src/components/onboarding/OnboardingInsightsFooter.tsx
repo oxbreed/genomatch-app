@@ -1,6 +1,6 @@
 import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { COLORS } from '../../theme';
+import { FONT_FAMILY, COLORS } from '../../theme';
 
 type Props = {
   total: number;
@@ -103,19 +103,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   ctaLabel: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 17,
     color: COLORS.forestDeep,
     letterSpacing: 0.2,
   },
   ctaArrow: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 18,
     color: COLORS.forestDeep,
   },
   helperText: {
     marginTop: 14,
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 13,
     textAlign: 'center',
     color: 'rgba(245, 239, 230, 0.58)',

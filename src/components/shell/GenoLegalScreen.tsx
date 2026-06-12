@@ -1,9 +1,9 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { GenoPremiumChrome, GenoCardFrame } from '../../brand/graphics';
-import { GenoInboxHeader } from '../inbox';
-import { COLORS } from '../../theme';
+import { GenoGlassIconButton, GenoInboxHeader } from '../inbox';
+import { FONT_FAMILY, COLORS } from '../../theme';
 
 type Section = { title: string; body: string };
 
@@ -21,12 +21,9 @@ export default function GenoLegalScreen({ title, subtitle, sections, onBack }: P
       <StatusBar style="dark" />
 
       <View style={styles.topBar}>
-        <Pressable
-          style={({ pressed }) => [styles.backBtn, pressed && styles.pressed]}
-          onPress={onBack}
-        >
-          <Ionicons name="chevron-back" size={22} color={COLORS.forestDeep} />
-        </Pressable>
+        <GenoGlassIconButton onPress={onBack} accessibilityLabel="Go back">
+          <Ionicons name="chevron-back" size={20} color={COLORS.forestDeep} />
+        </GenoGlassIconButton>
       </View>
 
       <GenoInboxHeader title={title} subtitle={subtitle} />
@@ -52,28 +49,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     zIndex: 2,
   },
-  backBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: COLORS.mint,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.28)',
-  },
-  pressed: { opacity: 0.88 },
   scroll: { paddingBottom: 32 },
   sectionFrame: { marginTop: 4 },
   sectionInner: { padding: 16 },
   sectionTitle: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 17,
     color: COLORS.forestDeep,
     marginBottom: 8,
   },
   sectionBody: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
     lineHeight: 21,
     color: COLORS.sage,

@@ -1,6 +1,9 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { GENOMATCH_COMPANY } from '../../constants/company';
-import { COLORS } from '../../theme';
+import {
+  GENOMATCH_COMPANY,
+  GENOMATCH_PARENT_LINE,
+} from '../../constants/company';
+import { FONT_FAMILY, COLORS } from '../../theme';
 
 export default function AuthCompanyFooter() {
   return (
@@ -9,6 +12,7 @@ export default function AuthCompanyFooter() {
         {GENOMATCH_COMPANY.legalName} ({GENOMATCH_COMPANY.registration}) ·{' '}
         {GENOMATCH_COMPANY.jurisdiction}
       </Text>
+      <Text style={styles.parentLine}>{GENOMATCH_PARENT_LINE}</Text>
     </View>
   );
 }
@@ -19,12 +23,20 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     borderTopWidth: 1,
     borderTopColor: 'rgba(13, 40, 24, 0.08)',
+    gap: 6,
   },
   line: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 11,
     lineHeight: 16,
     textAlign: 'center',
     color: COLORS.textMuted,
+  },
+  parentLine: {
+    fontFamily: FONT_FAMILY.gothamMedium,
+    fontSize: 11,
+    lineHeight: 16,
+    textAlign: 'center',
+    color: COLORS.textSubtle,
   },
 });

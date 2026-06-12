@@ -1,7 +1,8 @@
 import type { PostgrestError } from '@supabase/supabase-js';
 import { getSeenProfileIds } from './likes';
 import { getBlockedUserIds } from './moderation';
-import type { DiscoveryProfile, Genotype, ProfileRow } from '../types/database';
+import { parseDistanceBand } from './distanceBands';
+import type { DiscoveryProfile, DistanceBand, Genotype, ProfileRow } from '../types/database';
 import { getAuthenticatedUserId, logSupabaseResult } from './auth';
 import { mapProfileRow, resolveProfilePhotos } from './profileMapper';
 import { getVerificationEligibility } from './verification';
@@ -37,6 +38,38 @@ function isMissingColumnError(error: PostgrestError | null): boolean {
     msg.includes('could not find') ||
     msg.includes('column')
   );
+}
+
+function isMissingRpcError(error: PostgrestError | null): boolean {
+  if (!error) return false;
+  const msg = error.message.toLowerCase();
+  return (
+    error.code === 'PGRST202' ||
+    error.code === '42883' ||
+    msg.includes('function') && msg.includes('does not exist')
+  );
+}
+
+export async function fetchDistanceBandsForProfiles(
+  profileIds: string[]
+): Promise<Map<string, DistanceBand>> {
+  const bands = new Map<string, DistanceBand>();
+  if (!profileIds.length) return bands;
+
+  const { data, error } = await supabase.rpc('coarse_distance_bands_for_profiles', {
+    target_ids: profileIds,
+  });
+
+  if (error) {
+    if (isMissingRpcError(error)) return bands;
+    throw error;
+  }
+
+  for (const row of (data ?? []) as { profile_id: string; distance_band: string }[]) {
+    bands.set(row.profile_id, parseDistanceBand(row.distance_band));
+  }
+
+  return bands;
 }
 
 function normalizeProfileRow(row: Record<string, unknown>): ProfileRow {
@@ -278,20 +311,39 @@ export async function fetchDiscoveryProfiles(): Promise<{
 
   const blockedSet = await getBlockedUserIds(userId);
 
-  const { data, error } = await fetchPublicProfilesWithFallback((fields) =>
-    supabase
-      .from('public_profiles')
-      .select(fields)
-      .neq('id', userId)
-      .order('created_at', { ascending: false })
-      .limit(50)
-  );
+  const rpcResult = await supabase.rpc('discovery_profiles_for_viewer', { max_rows: 50 });
 
-  if (error) throw error;
+  let rows: { row: ProfileRow; distanceBand: DistanceBand | null }[] = [];
 
-  const profiles = data
-    .filter((row) => !seenSet.has(row.id) && !blockedSet.has(row.id))
-    .map((row) => mapProfileRow(row, viewerGenotype));
+  if (!rpcResult.error && rpcResult.data) {
+    rows = (rpcResult.data as Record<string, unknown>[]).map((raw) => {
+      const { distance_band: distanceBandRaw, ...rest } = raw;
+      return {
+        row: normalizeProfileRow(rest),
+        distanceBand: parseDistanceBand(distanceBandRaw),
+      };
+    });
+  } else if (rpcResult.error && isMissingRpcError(rpcResult.error)) {
+    const { data, error } = await fetchPublicProfilesWithFallback((fields) =>
+      supabase
+        .from('public_profiles')
+        .select(fields)
+        .neq('id', userId)
+        .order('created_at', { ascending: false })
+        .limit(50)
+    );
+
+    if (error) throw error;
+    rows = data.map((row) => ({ row, distanceBand: null }));
+  } else if (rpcResult.error) {
+    throw rpcResult.error;
+  }
+
+  const profiles = rows
+    .filter(({ row }) => !seenSet.has(row.id) && !blockedSet.has(row.id))
+    .map(({ row, distanceBand }) =>
+      mapProfileRow(row, viewerGenotype, { distanceBand })
+    );
 
   return { profiles, viewerGenotype };
 }

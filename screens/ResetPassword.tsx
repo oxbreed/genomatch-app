@@ -14,7 +14,9 @@ import {
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { GenoLogoCeremony, GenoPremiumChrome } from '../src/brand/graphics';
-import { COLORS } from '../src/theme';
+import { AuthFormCard } from '../src/components/auth';
+import { COLORS } from '../src/theme'
+import { FONT_FAMILY, GLASS } from '../src/theme';
 import { supabase } from '../src/lib/supabase';
 
 type ResetPasswordProps = {
@@ -133,7 +135,7 @@ export default function ResetPassword({ email, onSuccess }: ResetPasswordProps) 
           </Text>
         </Animated.View>
 
-        <Animated.View style={[styles.formCard, { opacity: introOpacity }]}>
+        <AuthFormCard outerStyle={{ opacity: introOpacity }}>
           {requiresOtp ? (
             <>
               <Text style={styles.label}>6-Digit Code</Text>
@@ -209,7 +211,7 @@ export default function ResetPassword({ email, onSuccess }: ResetPasswordProps) 
               )}
             </Pressable>
           </Animated.View>
-        </Animated.View>
+        </AuthFormCard>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -233,7 +235,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   title: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: FONT_FAMILY.gothamBold,
     color: COLORS.forestDeep,
     fontSize: 34,
     lineHeight: 39,
@@ -247,12 +249,6 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     fontWeight: '500',
     maxWidth: '96%',
-  },
-  formCard: {
-    backgroundColor: COLORS.ivory,
-    borderRadius: 24,
-    paddingHorizontal: 18,
-    paddingVertical: 20,
   },
   hint: {
     color: 'rgba(27, 122, 110, 0.65)',
@@ -275,7 +271,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     borderWidth: 1.5,
     borderColor: 'rgba(27, 122, 110, 0.18)',
-    backgroundColor: COLORS.white,
+    backgroundColor: GLASS.insetFill,
     paddingHorizontal: 14,
     color: '#1D2B23',
     fontSize: 22,
@@ -288,7 +284,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     borderWidth: 1.5,
     borderColor: 'rgba(27, 122, 110, 0.18)',
-    backgroundColor: COLORS.white,
+    backgroundColor: GLASS.insetFill,
     paddingHorizontal: 14,
     color: '#1D2B23',
     fontSize: 16,

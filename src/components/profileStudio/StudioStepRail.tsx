@@ -11,7 +11,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps } from 'react';
-import { COLORS } from '../../theme';
+import { FONT_FAMILY, COLORS } from '../../theme';
 
 type IonName = ComponentProps<typeof Ionicons>['name'];
 
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(61, 122, 82, 0.25)',
   },
   stepBadgeText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 10,
     color: COLORS.sage,
   },
@@ -232,12 +232,12 @@ const styles = StyleSheet.create({
     color: COLORS.forestDeep,
   },
   pillLabel: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
     color: COLORS.sage,
   },
   pillLabelActive: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     color: COLORS.forestDeep,
   },
 });

@@ -5,7 +5,6 @@ import {
   Dimensions,
   Easing,
   ImageBackground,
-  Modal,
   PanResponder,
   Pressable,
   StyleSheet,
@@ -24,13 +23,26 @@ import FilterSheet, {
   hasActiveDiscoveryFilters,
   type DiscoveryFilters,
 } from '../src/components/FilterSheet';
-import { DiscoverMatchModal } from '../src/components/discover';
+import {
+  DiscoverActionDock,
+  DiscoverMatchModal,
+  DiscoverProfileSheet,
+  DiscoverSwipeCard,
+  DiscoverSwipeStamp,
+} from '../src/components/discover';
 import { GenoInboxHeader, GenoInboxIconButton } from '../src/components/inbox';
-import { getDiscoveryCardHeight } from '../src/components/navigation/tabBarLayout';
+import {
+  DISCOVERY_CARD_ACTIONS_LIFT,
+  DISCOVERY_CARD_ACTIONS_OVERLAY,
+  DISCOVERY_CARD_RADIUS,
+  DISCOVERY_DECK_BOTTOM_INSET,
+  DISCOVERY_STACK_PEEK,
+  getDiscoveryCardHeight,
+} from '../src/components/navigation/tabBarLayout';
 import { GenoPremiumChrome } from '../src/brand/graphics';
 import GenotypeBadge from '../src/components/GenotypeBadge';
 import ReportBlockSheet from '../src/components/ReportBlockSheet';
-import { COLORS, RADIUS, SHADOWS, TYPOGRAPHY, getInitials, getMockDiscoveryProfiles } from '../src/data/mockData';
+import { COLORS, RADIUS, SHADOWS, TYPOGRAPHY, getMockDiscoveryProfiles } from '../src/data/mockData';
 import {
   fetchDiscoveryProfiles,
   getViewerProfileSnapshot,
@@ -38,16 +50,17 @@ import {
 } from '../src/lib/profiles';
 import { recordLike, recordPass } from '../src/lib/likes';
 import { getMatchIdForProfile } from '../src/lib/matches';
+import { MOTION } from '../src/theme';
 import type { DiscoveryProfile, Genotype } from '../src/types/database';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const SWIPE_THRESHOLD = SCREEN_WIDTH * 0.22;
 const CARD_HEIGHT = getDiscoveryCardHeight(SCREEN_HEIGHT);
-const BACK_CARD_PEEK = 12;
-const BACK_CARD_VISIBLE = 60;
+const BACK_CARD_PEEK = DISCOVERY_STACK_PEEK;
 const HIGH_COMPATIBILITY_MIN = 75;
-const SWIPE_UP_THRESHOLD = 55;
-const PROFILE_SHEET_HEIGHT = SCREEN_HEIGHT * 0.65;
+const SWIPE_UP_THRESHOLD = 48;
+const SHEET_TRAVEL = SCREEN_HEIGHT;
+const SHEET_OPEN_SNAP = SHEET_TRAVEL * 0.42;
 const SUPER_LIKE_STAR_COUNT = 6;
 
 function triggerLikeHaptic() {
@@ -63,315 +76,6 @@ function triggerMatchCelebrationHaptic() {
   setTimeout(() => {
     void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   }, 300);
-}
-
-function getMatchLabel(percent: number): string {
-  if (percent >= 80) return 'Great match';
-  if (percent >= 60) return 'Good match';
-  return 'Compatible';
-}
-
-
-function getGenotypeCompatibilityLine(
-  viewerGenotype: Genotype | null,
-  candidateGenotype: Genotype
-): string {
-  const viewer = viewerGenotype ?? 'AA';
-  const pairLabel = `${viewer} × ${candidateGenotype}`;
-  const pairKey = [viewer, candidateGenotype].sort().join('');
-  const riskByPair: Record<string, string> = {
-    AAAA: 'Very low sickle cell risk',
-    AAAS: 'Low sickle cell risk',
-    AAAC: 'Low sickle cell risk',
-    AASS: 'Elevated sickle cell risk',
-    ASAS: 'Moderate sickle cell risk',
-    ASAC: 'Moderate sickle cell risk',
-    ASSS: 'Higher sickle cell risk',
-    ACAC: 'Moderate sickle cell risk',
-    ACCC: 'Moderate sickle cell risk',
-    SSSS: 'Higher sickle cell risk',
-  };
-  const risk = riskByPair[pairKey] ?? 'Genotype-compatible match';
-  return `${pairLabel} — ${risk}`;
-}
-
-
-function getCompatDotColor(percent: number): string {
-  if (percent >= 80) return '#D4A843';
-  if (percent >= 60) return '#8FAF95';
-  return '#FFFFFF';
-}
-
-function formatRelationshipGoal(goal: string | null | undefined): string {
-  if (!goal?.trim()) return 'Not specified';
-  return goal
-    .trim()
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, (char) => char.toUpperCase());
-}
-
-type SuperLikeButtonProps = {
-  onPress: () => void;
-  disabled?: boolean;
-};
-
-function SuperLikeButton({ onPress, disabled }: SuperLikeButtonProps) {
-  const burstStars = useRef(
-    Array.from({ length: SUPER_LIKE_STAR_COUNT }, () => ({
-      translate: new Animated.ValueXY({ x: 0, y: 0 }),
-      opacity: new Animated.Value(0),
-    }))
-  ).current;
-
-  const runBurst = useCallback(() => {
-    burstStars.forEach((star, index) => {
-      const angle = (index / SUPER_LIKE_STAR_COUNT) * Math.PI * 2;
-      const distance = 44;
-      const targetX = Math.cos(angle) * distance;
-      const targetY = Math.sin(angle) * distance;
-
-      star.translate.setValue({ x: 0, y: 0 });
-      star.opacity.setValue(1);
-
-      Animated.parallel([
-        Animated.timing(star.translate, {
-          toValue: { x: targetX, y: targetY },
-          duration: 600,
-          easing: Easing.out(Easing.cubic),
-          useNativeDriver: true,
-        }),
-        Animated.sequence([
-          Animated.delay(420),
-          Animated.timing(star.opacity, {
-            toValue: 0,
-            duration: 180,
-            useNativeDriver: true,
-          }),
-        ]),
-      ]).start();
-    });
-  }, [burstStars]);
-
-  const handlePress = () => {
-    runBurst();
-    onPress();
-  };
-
-  return (
-    <View style={styles.superLikeBtnWrap}>
-      {burstStars.map((star, index) => (
-        <Animated.Text
-          key={`burst-${index}`}
-          pointerEvents="none"
-          style={[
-            styles.superLikeBurstStar,
-            {
-              opacity: star.opacity,
-              transform: star.translate.getTranslateTransform(),
-            },
-          ]}
-        >
-          ⭐
-        </Animated.Text>
-      ))}
-      <Pressable
-        style={({ pressed }) => [
-          styles.superLikeBtn,
-          pressed && styles.btnPressed,
-          disabled && styles.btnDisabled,
-        ]}
-        onPress={handlePress}
-        disabled={disabled}
-      >
-        <Ionicons name="star" size={28} color="#D4A843" />
-      </Pressable>
-    </View>
-  );
-}
-
-function MatchPill({ percent }: { percent: number }) {
-  const high = percent >= HIGH_COMPATIBILITY_MIN;
-
-  return (
-    <View style={styles.matchPillWrap} pointerEvents="none">
-      <LinearGradient
-        colors={
-          high
-            ? ['rgba(212, 168, 67, 0.95)', 'rgba(196, 154, 58, 0.9)']
-            : ['rgba(61, 122, 82, 0.9)', 'rgba(45, 95, 65, 0.9)']
-        }
-        style={styles.matchPill}
-      >
-        <Text style={styles.matchPillText}>{percent}%</Text>
-      </LinearGradient>
-      <Text style={styles.matchPillLabel}>{getMatchLabel(percent)}</Text>
-    </View>
-  );
-}
-
-type ProfileCardProps = {
-  profile: DiscoveryProfile;
-  swipeIndex?: number;
-  totalProfiles?: number;
-  viewerGenotype?: Genotype | null;
-  progressFillWidth?: Animated.AnimatedInterpolation<string | number>;
-};
-
-function ProfileCard({ profile, swipeIndex, totalProfiles, viewerGenotype, progressFillWidth }: ProfileCardProps) {
-  const gallery = useMemo(() => {
-    if (profile.photos.length > 0) return profile.photos;
-    if (profile.avatarUrl) return [profile.avatarUrl];
-    return [];
-  }, [profile.photos, profile.avatarUrl]);
-
-  const [photoIndex, setPhotoIndex] = useState(0);
-  const hasMultiple = gallery.length > 1;
-  const currentUri = gallery[photoIndex] ?? gallery[0];
-
-  useEffect(() => {
-    setPhotoIndex(0);
-  }, [profile.id]);
-
-  const showPrev = () => {
-    setPhotoIndex((i) => (i <= 0 ? gallery.length - 1 : i - 1));
-  };
-
-  const showNext = () => {
-    setPhotoIndex((i) => (i >= gallery.length - 1 ? 0 : i + 1));
-  };
-
-  const progressRatio =
-    swipeIndex != null && totalProfiles != null && totalProfiles > 0
-      ? Math.min(1, Math.max(0, swipeIndex / totalProfiles))
-      : 0;
-
-  return (
-    <View style={styles.cardBody}>
-      {totalProfiles != null && totalProfiles > 0 && swipeIndex != null ? (
-        <View style={styles.swipeProgressTrack} pointerEvents="none">
-          <Animated.View
-            style={[
-              styles.swipeProgressFill,
-              progressFillWidth
-                ? { width: progressFillWidth }
-                : { width: `${progressRatio * 100}%` },
-            ]}
-          />
-        </View>
-      ) : null}
-
-      {currentUri ? (
-        <ImageBackground
-          source={{ uri: currentUri }}
-          style={styles.cardMedia}
-          imageStyle={styles.cardMediaImage}
-          resizeMode="cover"
-        />
-      ) : (
-        <LinearGradient
-          colors={[COLORS.forestDeep, COLORS.forest]}
-          style={[styles.cardMedia, styles.cardNoPhoto]}
-        >
-          <View style={styles.noPhotoPlaceholderWrap} pointerEvents="none">
-            <View style={styles.noPhotoCircle}>
-              <Text style={styles.noPhotoInitials}>{getInitials(profile.name)}</Text>
-            </View>
-            <Text style={styles.noPhotoCaption}>No photo yet</Text>
-          </View>
-        </LinearGradient>
-      )}
-
-      <LinearGradient
-        colors={['rgba(13, 40, 24, 0.28)', 'transparent']}
-        style={styles.cardTopShade}
-        pointerEvents="none"
-      />
-
-      <LinearGradient
-        colors={['transparent', 'rgba(13, 40, 24, 0.55)', 'rgba(13, 40, 24, 0.92)']}
-        locations={[0, 0.42, 1]}
-        style={styles.cardBottomShade}
-        pointerEvents="none"
-      />
-
-      <View style={styles.cardInfoFooter} pointerEvents="box-none">
-        <View style={styles.nameSection}>
-          <View style={styles.cardInfoAccent} pointerEvents="none" />
-          <View style={styles.nameBadgeRow}>
-            <Text style={styles.cardName} numberOfLines={1}>
-              {profile.name}
-              {profile.age != null ? `, ${profile.age}` : ''}
-            </Text>
-            <View style={styles.nameBadgeCluster}>
-              <GenotypeBadge genotype={profile.genotype} />
-              {profile.genotypeVerified ? (
-                <Ionicons
-                  name="shield-checkmark"
-                  size={18}
-                  color={COLORS.verified}
-                  accessibilityLabel="Genotype verified"
-                />
-              ) : null}
-            </View>
-          </View>
-        </View>
-
-        <View style={styles.cityRow}>
-          <Ionicons name="location-outline" size={14} color={COLORS.sage} />
-          <Text style={styles.cityText}>{profile.city}</Text>
-        </View>
-
-        <View style={styles.genotypeCompatRow}>
-          <View
-            style={[
-              styles.compatDot,
-              { backgroundColor: getCompatDotColor(profile.compatibility) },
-            ]}
-          />
-          <Text style={styles.genotypeCompatText}>
-            {profile.compatibility}% · {getGenotypeCompatibilityLine(viewerGenotype ?? null, profile.genotype)}
-          </Text>
-        </View>
-
-        <Text style={styles.cardBio} numberOfLines={3} ellipsizeMode="tail">
-          {profile.bio}
-        </Text>
-
-        <View style={styles.tagsRow}>
-          {profile.interests.slice(0, 4).map((interest) => (
-            <View key={interest} style={styles.tagChip}>
-              <Text style={styles.tagText}>{interest}</Text>
-            </View>
-          ))}
-        </View>
-      </View>
-
-      {hasMultiple ? (
-        <>
-          <View style={styles.photoDots} pointerEvents="none">
-            {gallery.map((_, i) => (
-              <View
-                key={i}
-                style={[styles.photoDot, i === photoIndex && styles.photoDotActive]}
-              />
-            ))}
-          </View>
-          <Pressable
-            style={styles.photoTapLeft}
-            onPress={showPrev}
-            accessibilityLabel="Previous photo"
-          />
-          <Pressable
-            style={styles.photoTapRight}
-            onPress={showNext}
-            accessibilityLabel="Next photo"
-          />
-        </>
-      ) : null}
-
-      <MatchPill percent={profile.compatibility} />
-    </View>
-  );
 }
 
 type DiscoveryProps = {
@@ -396,6 +100,7 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
   const [viewerGenotype, setViewerGenotype] = useState<Genotype | null>(null);
   const [superLikeToast, setSuperLikeToast] = useState(false);
   const [profileSheetVisible, setProfileSheetVisible] = useState(false);
+  const [sheetDragActive, setSheetDragActive] = useState(false);
   const [showModerationSheet, setShowModerationSheet] = useState(false);
 
   const profiles = useMemo(
@@ -468,7 +173,7 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
   }, [likePulseScale]);
 
   const progressAnim = useRef(new Animated.Value(0)).current;
-  const sheetTranslateY = useRef(new Animated.Value(PROFILE_SHEET_HEIGHT)).current;
+  const sheetTranslateY = useRef(new Animated.Value(SHEET_TRAVEL)).current;
   const sheetBackdropOpacity = useRef(new Animated.Value(0)).current;
   const superLikeToastY = useRef(new Animated.Value(-80)).current;
   const superLikeToastOpacity = useRef(new Animated.Value(0)).current;
@@ -541,45 +246,68 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
     }, 2000);
   }, [superLikeToastOpacity, superLikeToastY]);
 
-  const openProfileSheet = useCallback(() => {
-    if (showMatch || !profile) return;
-
-    setProfileSheetVisible(true);
-    sheetTranslateY.setValue(PROFILE_SHEET_HEIGHT);
-    sheetBackdropOpacity.setValue(0);
-
+  const completeSheetOpen = useCallback(() => {
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     Animated.parallel([
       Animated.spring(sheetTranslateY, {
         toValue: 0,
-        friction: 9,
-        tension: 68,
-        useNativeDriver: true,
+        ...MOTION.springSheet,
       }),
       Animated.timing(sheetBackdropOpacity, {
-        toValue: 1,
-        duration: 240,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [profile, sheetBackdropOpacity, sheetTranslateY, showMatch]);
-
-  const closeProfileSheet = useCallback(() => {
-    Animated.parallel([
-      Animated.spring(sheetTranslateY, {
-        toValue: PROFILE_SHEET_HEIGHT,
-        friction: 9,
-        tension: 68,
-        useNativeDriver: true,
-      }),
-      Animated.timing(sheetBackdropOpacity, {
-        toValue: 0,
-        duration: 200,
+        toValue: 0.28,
+        duration: MOTION.sheetOpenMs,
+        easing: MOTION.easing.sheetOut,
         useNativeDriver: true,
       }),
     ]).start(() => {
-      setProfileSheetVisible(false);
+      sheetYOffsetRef.current = 0;
+      setSheetDragActive(false);
+      sheetDragActiveRef.current = false;
+      Animated.spring(cardScale, { toValue: 1, ...MOTION.springReset }).start();
     });
-  }, [sheetBackdropOpacity, sheetTranslateY]);
+  }, [cardScale, sheetBackdropOpacity, sheetTranslateY]);
+
+  const completeSheetClose = useCallback(
+    (onClosed?: () => void) => {
+      Animated.parallel([
+        Animated.spring(sheetTranslateY, {
+          toValue: SHEET_TRAVEL,
+          ...MOTION.springSheetFloat,
+        }),
+        Animated.timing(sheetBackdropOpacity, {
+          toValue: 0,
+          duration: MOTION.sheetCloseMs,
+          easing: MOTION.easing.sheetIn,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        sheetYOffsetRef.current = SHEET_TRAVEL;
+        setProfileSheetVisible(false);
+        setSheetDragActive(false);
+        sheetDragActiveRef.current = false;
+        Animated.spring(cardScale, { toValue: 1, ...MOTION.springReset }).start();
+        onClosed?.();
+      });
+    },
+    [sheetBackdropOpacity, sheetTranslateY]
+  );
+
+  const openProfileSheet = useCallback(() => {
+    if (showMatch || !profile || profileSheetVisibleRef.current) return;
+
+    setProfileSheetVisible(true);
+    sheetTranslateY.setValue(SHEET_TRAVEL);
+    sheetBackdropOpacity.setValue(0);
+    completeSheetOpen();
+  }, [completeSheetOpen, profile, sheetBackdropOpacity, sheetTranslateY, showMatch]);
+
+  const closeProfileSheet = useCallback(
+    (onClosed?: () => void) => {
+      completeSheetClose(onClosed);
+    },
+    [completeSheetClose]
+  );
+
 
   const handleBlockedFromDiscover = useCallback(() => {
     if (!profile) return;
@@ -589,6 +317,14 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
     closeProfileSheet();
     setIndex((i) => Math.min(i, Math.max(0, profiles.length - 2)));
   }, [closeProfileSheet, profile, profiles.length]);
+
+  const profileSheetVisibleRef = useRef(false);
+  const sheetYOffsetRef = useRef(SHEET_TRAVEL);
+  const sheetDragActiveRef = useRef(false);
+
+  useEffect(() => {
+    profileSheetVisibleRef.current = profileSheetVisible;
+  }, [profileSheetVisible]);
 
   const openProfileSheetRef = useRef(openProfileSheet);
   openProfileSheetRef.current = openProfileSheet;
@@ -755,6 +491,31 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
     processSwipe('like');
   }, [loading, processSwipe, profile, seenAll, showMatch, showSuperLikeToastMessage]);
 
+  const handleSheetPass = useCallback(() => {
+    closeProfileSheet(() => processSwipe('pass'));
+  }, [closeProfileSheet, processSwipe]);
+
+  const handleSheetLike = useCallback(() => {
+    closeProfileSheet(() => processSwipe('like'));
+  }, [closeProfileSheet, processSwipe]);
+
+  const handleSheetSuperLike = useCallback(() => {
+    closeProfileSheet(() => {
+      if (seenAll || showMatch || !profile || loading || isSwipeAnimatingRef.current) return;
+      triggerLikeHaptic();
+      showSuperLikeToastMessage();
+      processSwipe('like');
+    });
+  }, [
+    closeProfileSheet,
+    loading,
+    processSwipe,
+    profile,
+    seenAll,
+    showMatch,
+    showSuperLikeToastMessage,
+  ]);
+
   const handleLikeRef = useRef(handleLike);
   const handlePassRef = useRef(handlePass);
   handleLikeRef.current = handleLike;
@@ -762,23 +523,62 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
 
   const panResponder = useRef(
     PanResponder.create({
-      onMoveShouldSetPanResponder: (_, gesture) =>
-        Math.abs(gesture.dx) > 8 || Math.abs(gesture.dy) > 8,
+      onMoveShouldSetPanResponder: (_, gesture) => {
+        if (profileSheetVisibleRef.current) return false;
+        return Math.abs(gesture.dx) > 5 || Math.abs(gesture.dy) > 5;
+      },
+      onMoveShouldSetPanResponderCapture: (_, gesture) => {
+        if (profileSheetVisibleRef.current) return false;
+        return gesture.dy < -8 && Math.abs(gesture.dy) > Math.abs(gesture.dx);
+      },
+      onPanResponderTerminationRequest: () => false,
       onPanResponderMove: (_, gesture) => {
-        position.setValue({ x: gesture.dx, y: gesture.dy * 0.15 });
+        if (profileSheetVisibleRef.current && !sheetDragActiveRef.current) return;
+
+        const absDx = Math.abs(gesture.dx);
+        const absDy = Math.abs(gesture.dy);
+
+        if (gesture.dy < 0 && absDy > absDx) {
+          if (!profileSheetVisibleRef.current) {
+            setProfileSheetVisible(true);
+            profileSheetVisibleRef.current = true;
+          }
+          setSheetDragActive(true);
+          sheetDragActiveRef.current = true;
+
+          const dragUp = Math.min(SHEET_TRAVEL, Math.max(0, -gesture.dy));
+          const nextY = SHEET_TRAVEL - dragUp;
+          sheetYOffsetRef.current = nextY;
+          sheetTranslateY.setValue(nextY);
+          sheetBackdropOpacity.setValue((dragUp / SHEET_TRAVEL) * 0.28);
+          cardScale.setValue(1 - (dragUp / SHEET_TRAVEL) * 0.035);
+          position.setValue({ x: gesture.dx * 0.08, y: gesture.dy * 0.05 });
+          return;
+        }
+
+        if (sheetDragActiveRef.current) return;
+        position.setValue({ x: gesture.dx, y: gesture.dy * 0.12 });
       },
       onPanResponderRelease: (_, gesture) => {
         const absDx = Math.abs(gesture.dx);
         const absDy = Math.abs(gesture.dy);
 
-        if (gesture.dy < -SWIPE_UP_THRESHOLD && absDy > absDx) {
-          openProfileSheetRef.current();
+        if (sheetDragActiveRef.current || sheetYOffsetRef.current < SHEET_TRAVEL - 12) {
+          const shouldOpen =
+            gesture.dy < -SWIPE_UP_THRESHOLD ||
+            gesture.vy < -0.75 ||
+            sheetYOffsetRef.current < SHEET_OPEN_SNAP;
+
           Animated.spring(position, {
             toValue: { x: 0, y: 0 },
-            friction: 7,
-            tension: 80,
-            useNativeDriver: true,
+            ...MOTION.springReset,
           }).start();
+
+          if (shouldOpen) {
+            completeSheetOpen();
+          } else {
+            completeSheetClose();
+          }
           return;
         }
 
@@ -789,9 +589,7 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
         } else {
           Animated.spring(position, {
             toValue: { x: 0, y: 0 },
-            friction: 7,
-            tension: 80,
-            useNativeDriver: true,
+            ...MOTION.springReset,
           }).start();
         }
       },
@@ -805,14 +603,20 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
   });
 
   const behindScale = position.x.interpolate({
-    inputRange: [-SCREEN_WIDTH, 0, SCREEN_WIDTH],
-    outputRange: [1, 0.95, 1],
+    inputRange: [-SCREEN_WIDTH, -72, 0, 72, SCREEN_WIDTH],
+    outputRange: [1, 0.985, 0.968, 0.985, 1],
+    extrapolate: 'clamp',
+  });
+
+  const behindTranslateY = position.x.interpolate({
+    inputRange: [-SCREEN_WIDTH, -48, 0, 48, SCREEN_WIDTH],
+    outputRange: [0, 3, 8, 3, 0],
     extrapolate: 'clamp',
   });
 
   const behindOpacity = position.x.interpolate({
-    inputRange: [-SCREEN_WIDTH, 0, SCREEN_WIDTH],
-    outputRange: [1, 0.85, 1],
+    inputRange: [-SCREEN_WIDTH, -80, 0, 80, SCREEN_WIDTH],
+    outputRange: [1, 0.96, 0.9, 0.96, 1],
     extrapolate: 'clamp',
   });
 
@@ -867,6 +671,7 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
         <GenoInboxHeader
           title="Discover"
           subtitle={discoverSubtitle}
+          subtitleStyle={styles.discoverHeaderSubtitle}
           ceremonyMark
           right={
             <View style={styles.filterBtnWrap}>
@@ -981,7 +786,7 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
                             styles.card,
                             styles.cardInStack,
                             {
-                              zIndex: stackSize + 1,
+                              zIndex: 3,
                               opacity: cardOpacity,
                               transform: [
                                 { translateX: position.x },
@@ -992,16 +797,8 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
                             },
                           ]}
                         >
-                          <Animated.View
-                            style={[styles.stamp, styles.stampLike, { opacity: likeOpacity }]}
-                          >
-                            <Text style={styles.stampLikeText}>LIKE</Text>
-                          </Animated.View>
-                          <Animated.View
-                            style={[styles.stamp, styles.stampNope, { opacity: nopeOpacity }]}
-                          >
-                            <Text style={styles.stampNopeText}>NOPE</Text>
-                          </Animated.View>
+                          <DiscoverSwipeStamp side="bond" opacity={likeOpacity} />
+                          <DiscoverSwipeStamp side="pass" opacity={nopeOpacity} />
                           <Animated.View
                             pointerEvents="none"
                             style={[styles.cardDragTint, styles.cardDragTintLike, { opacity: likeTintOpacity }]}
@@ -1010,12 +807,14 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
                             pointerEvents="none"
                             style={[styles.cardDragTint, styles.cardDragTintNope, { opacity: nopeTintOpacity }]}
                           />
-                          <ProfileCard
+                          <DiscoverSwipeCard
                             profile={stackProfile}
                             swipeIndex={index}
                             totalProfiles={profiles.length}
                             viewerGenotype={viewerGenotype}
                             progressFillWidth={progressFillWidth}
+                            height={CARD_HEIGHT}
+                            onExpand={openProfileSheet}
                           />
                         </Animated.View>
                       );
@@ -1029,14 +828,18 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
                           style={[
                             styles.card,
                             styles.cardInStack,
+                            styles.cardBehind,
                             {
-                              zIndex: depthFromTop,
-                              opacity: 0.92,
-                              transform: [{ scale: 0.96 }],
+                              zIndex: 2,
+                              opacity: behindOpacity,
+                              transform: [
+                                { scale: behindScale },
+                                { translateY: behindTranslateY },
+                              ],
                             },
                           ]}
                         >
-                          <ProfileCard profile={stackProfile} />
+                          <DiscoverSwipeCard profile={stackProfile} height={CARD_HEIGHT} />
                         </Animated.View>
                       );
                     }
@@ -1052,33 +855,31 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
                           { zIndex: depthFromTop, opacity: 0 },
                         ]}
                       >
-                        <ProfileCard profile={stackProfile} />
+                        <DiscoverSwipeCard profile={stackProfile} height={CARD_HEIGHT} />
                       </Animated.View>
                     );
                   })}
                 </View>
-              </View>
 
-              <View style={styles.actionBar}>
-                {actionError ? <Text style={styles.actionError}>{actionError}</Text> : null}
-                <View style={styles.actions}>
-                <Pressable
-                  style={({ pressed }) => [styles.passBtn, pressed && styles.btnPressed]}
-                  onPress={handlePass}
-                  disabled={showMatch}
-                >
-                  <Ionicons name="close" size={24} color="#8FAF95" />
-                </Pressable>
-                <SuperLikeButton onPress={handleSuperLike} disabled={showMatch} />
-                <Animated.View style={{ transform: [{ scale: likePulseScale }] }}>
-                  <Pressable
-                    style={({ pressed }) => [styles.likeBtn, pressed && styles.btnPressed]}
-                    onPress={handleLike}
+                {actionError ? (
+                  <Text style={styles.actionError}>{actionError}</Text>
+                ) : null}
+                <View style={styles.cardActionsOverlay} pointerEvents="box-none">
+                  <LinearGradient
+                    colors={['transparent', 'rgba(13, 40, 24, 0.22)', 'rgba(13, 40, 24, 0.48)']}
+                    locations={[0, 0.55, 1]}
+                    style={styles.cardActionsFade}
+                    pointerEvents="none"
+                  />
+                  <DiscoverActionDock
+                    variant="glass"
+                    onPass={handlePass}
+                    onLike={handleLike}
+                    onSuperLike={handleSuperLike}
+                    likePulseScale={likePulseScale}
                     disabled={showMatch}
-                  >
-                    <Ionicons name="heart" size={28} color="#FFFFFF" />
-                  </Pressable>
-                </Animated.View>
+                    style={styles.cardActionsRow}
+                  />
                 </View>
               </View>
             </View>
@@ -1087,62 +888,19 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
       </View>
 
 
-      <Modal
+      <DiscoverProfileSheet
         visible={profileSheetVisible}
-        transparent
-        animationType="none"
-        statusBarTranslucent
-        onRequestClose={closeProfileSheet}
-      >
-        <View style={styles.profileSheetRoot}>
-          <Pressable style={styles.profileSheetBackdropPress} onPress={closeProfileSheet}>
-            <Animated.View
-              style={[styles.profileSheetBackdrop, { opacity: sheetBackdropOpacity }]}
-            />
-          </Pressable>
-          <Animated.View
-            style={[styles.profileSheet, { transform: [{ translateY: sheetTranslateY }] }]}
-          >
-            <View style={styles.profileSheetHandle} />
-            <Text style={styles.profileSheetName}>{profile?.name}</Text>
-            <Text style={styles.profileSheetBio}>{profile?.bio}</Text>
-            {profile?.interests?.length ? (
-              <View style={styles.profileSheetTags}>
-                {profile.interests.map((interest) => (
-                  <View key={interest} style={styles.profileSheetTagChip}>
-                    <Text style={styles.profileSheetTagText}>{interest}</Text>
-                  </View>
-                ))}
-              </View>
-            ) : null}
-            <Text style={styles.profileSheetMeta}>
-              Relationship goal: {formatRelationshipGoal(profile?.relationshipGoal)}
-            </Text>
-            <Pressable
-              style={({ pressed }) => [
-                styles.profileSheetSafetyBtn,
-                pressed && styles.profileSheetChatBtnPressed,
-              ]}
-              onPress={() => setShowModerationSheet(true)}
-            >
-              <Ionicons name="shield-outline" size={18} color={COLORS.sage} />
-              <Text style={styles.profileSheetSafetyText}>Report or block</Text>
-            </Pressable>
-            <Pressable
-              style={({ pressed }) => [
-                styles.profileSheetChatBtn,
-                pressed && styles.profileSheetChatBtnPressed,
-              ]}
-              onPress={() => {
-                closeProfileSheet();
-                processSwipe('like');
-              }}
-            >
-              <Text style={styles.profileSheetChatBtnText}>Start Chat</Text>
-            </Pressable>
-          </Animated.View>
-        </View>
-      </Modal>
+        profile={profile ?? null}
+        viewerGenotype={viewerGenotype}
+        backdropOpacity={sheetBackdropOpacity}
+        translateY={sheetTranslateY}
+        likePulseScale={likePulseScale}
+        interactionLocked={sheetDragActive}
+        onClose={() => closeProfileSheet()}
+        onPass={handleSheetPass}
+        onLike={handleSheetLike}
+        onSuperLike={handleSheetSuperLike}
+      />
 
       {profile ? (
         <ReportBlockSheet
@@ -1170,6 +928,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.linen,
+  },
+  discoverHeaderSubtitle: {
+    fontSize: 11,
+    lineHeight: 15,
+    letterSpacing: 0.1,
   },
   screenRoot: {
     flex: 1,
@@ -1241,28 +1004,49 @@ const styles = StyleSheet.create({
   },
   deckArea: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 6,
+    paddingHorizontal: 10,
+    paddingTop: 0,
+    paddingBottom: DISCOVERY_DECK_BOTTOM_INSET,
   },
   deckColumn: {
     flex: 1,
     width: '100%',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
   },
   deckCardSlot: {
     width: '100%',
-    flex: 1,
-    minHeight: 0,
-    maxHeight: CARD_HEIGHT + BACK_CARD_PEEK,
-    overflow: 'hidden',
+    height: CARD_HEIGHT + BACK_CARD_PEEK,
+    position: 'relative',
+    overflow: 'visible',
+  },
+  cardActionsOverlay: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top:
+      CARD_HEIGHT -
+      DISCOVERY_CARD_ACTIONS_OVERLAY -
+      DISCOVERY_CARD_ACTIONS_LIFT,
+    height: DISCOVERY_CARD_ACTIONS_OVERLAY,
+    justifyContent: 'center',
+    zIndex: 40,
+  },
+  cardActionsFade: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: -6,
+    height: DISCOVERY_CARD_ACTIONS_OVERLAY + 20,
+  },
+  cardActionsRow: {
+    zIndex: 2,
   },
   cardStackContainer: {
     position: 'relative',
     width: '100%',
     height: CARD_HEIGHT + BACK_CARD_PEEK,
-    overflow: 'hidden',
+    overflow: 'visible',
   },
   cardInStack: {
     position: 'absolute',
@@ -1270,23 +1054,8 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
   },
-  cardBehindPeek: {
-    position: 'absolute',
-    top: CARD_HEIGHT - BACK_CARD_VISIBLE + BACK_CARD_PEEK,
-    left: 0,
-    right: 0,
-    height: BACK_CARD_VISIBLE,
-    overflow: 'hidden',
-    borderRadius: 24,
-    width: '100%',
-  },
-  cardBehindClip: {
-    height: BACK_CARD_VISIBLE,
-    overflow: 'hidden',
-    width: '100%',
-  },
-  cardBehindClipInner: {
-    marginTop: -(CARD_HEIGHT - BACK_CARD_VISIBLE),
+  cardBehind: {
+    zIndex: 2,
   },
   cardStackBack: {
     opacity: 0,
@@ -1294,16 +1063,9 @@ const styles = StyleSheet.create({
   card: {
     width: '100%',
     height: CARD_HEIGHT,
-    borderRadius: 24,
+    borderRadius: DISCOVERY_CARD_RADIUS,
     overflow: 'hidden',
-    backgroundColor: COLORS.forestDeep,
-    borderWidth: 1.5,
-    borderColor: 'rgba(212, 168, 67, 0.35)',
-    shadowColor: COLORS.gold,
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.22,
-    shadowRadius: 22,
-    elevation: 10,
+    backgroundColor: 'transparent',
   },
   cardBody: {
     width: '100%',
@@ -1374,101 +1136,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     fontSize: 14,
     color: '#D4A843',
-  },
-  profileSheetRoot: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
-  profileSheetBackdropPress: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  profileSheetBackdrop: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(13, 40, 24, 0.72)',
-  },
-  profileSheet: {
-    backgroundColor: COLORS.forest,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    paddingHorizontal: 24,
-    paddingTop: 12,
-    paddingBottom: 32,
-    maxHeight: PROFILE_SHEET_HEIGHT,
-  },
-  profileSheetHandle: {
-    alignSelf: 'center',
-    width: 40,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: 'rgba(255,255,255,0.35)',
-    marginBottom: 16,
-  },
-  profileSheetName: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 12,
-  },
-  profileSheetBio: {
-    fontFamily: 'Satoshi-Medium',
-    fontSize: 15,
-    lineHeight: 22,
-    color: '#FFFFFF',
-    opacity: 0.92,
-    marginBottom: 16,
-  },
-  profileSheetTags: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 16,
-  },
-  profileSheetTagChip: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 999,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-  },
-  profileSheetTagText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#FFFFFF',
-  },
-  profileSheetMeta: {
-    fontFamily: 'Satoshi-Medium',
-    fontSize: 14,
-    color: '#8FAF95',
-    marginBottom: 20,
-  },
-  profileSheetSafetyBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    marginTop: 16,
-    paddingVertical: 12,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)',
-  },
-  profileSheetSafetyText: {
-    fontFamily: 'Satoshi-Medium',
-    fontSize: 14,
-    color: COLORS.sage,
-  },
-  profileSheetChatBtn: {
-    backgroundColor: COLORS.gold,
-    borderRadius: 999,
-    paddingVertical: 16,
-    alignItems: 'center',
-  },
-  profileSheetChatBtnPressed: {
-    opacity: 0.9,
-  },
-  profileSheetChatBtnText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#0D2818',
   },
   btnDisabled: {
     opacity: 0.5,
@@ -1740,18 +1407,6 @@ const styles = StyleSheet.create({
     fontSize: 22,
     color: '#D4A843',
   },
-  actionBar: {
-    width: '100%',
-    paddingTop: 12,
-    paddingBottom: 6,
-    alignItems: 'center',
-  },
-  actions: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 24,
-  },
   passBtn: {
     width: 60,
     height: 60,
@@ -1785,8 +1440,14 @@ const styles = StyleSheet.create({
   actionError: {
     fontFamily: 'Satoshi-Medium',
     position: 'absolute',
-    top: -28,
-    alignSelf: 'center',
+    top:
+      CARD_HEIGHT -
+      DISCOVERY_CARD_ACTIONS_OVERLAY -
+      DISCOVERY_CARD_ACTIONS_LIFT -
+      28,
+    left: 16,
+    right: 16,
+    zIndex: 41,
     color: '#A32D2D',
     fontSize: 12,
     fontWeight: '600',

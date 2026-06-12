@@ -13,10 +13,13 @@ import {
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { LinearGradient } from 'expo-linear-gradient';
+import { GenoPremiumChrome, GenoGlassSurface } from '../src/brand/graphics';
+import GenoFormCard from '../src/components/shell/GenoFormCard';
+import { COLORS, GLASS, RADIUS, SHADOWS } from '../src/theme';
 import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps } from 'react';
 import AvatarPhotoPicker from '../src/components/AvatarPhotoPicker';
-import { COLORS } from '../src/theme';
 
 const STEPS = ['Basic Info', 'About You', 'Your Goal'];
 const TOTAL_STEPS = STEPS.length;
@@ -443,10 +446,12 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
+    <View style={styles.container}>
+      <GenoPremiumChrome variant="linen" />
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
       <StatusBar style="dark" />
 
       <View style={styles.header}>
@@ -499,11 +504,18 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
             transform: [{ translateX: contentTranslateX }],
           }}
         >
-          {renderStepContent()}
+          <GenoFormCard>{renderStepContent()}</GenoFormCard>
         </Animated.View>
       </ScrollView>
 
-      <View style={styles.footer}>
+      <GenoGlassSurface
+        variant="linen"
+        borderRadius={0}
+        shadow="glassFloat"
+        showTopRule
+        intensity={64}
+        style={styles.footerGlass}
+        contentStyle={styles.footer}>
         {error ? <Text style={styles.error}>{error}</Text> : null}
 
         <View style={styles.footerActions}>
@@ -517,7 +529,7 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
             style={[styles.ctaWrap, step === 0 && styles.ctaWrapFull, { transform: [{ scale: ctaScale }] }]}
           >
             <Pressable
-              style={[styles.ctaBtn, saving && styles.ctaBtnDisabled]}
+              style={[styles.ctaWrapInner, saving && styles.ctaBtnDisabled]}
               disabled={saving}
               onPressIn={() => {
                 Animated.spring(ctaScale, {
@@ -537,29 +549,37 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
               }}
               onPress={handleNext}
             >
-              {saving ? (
-                <View style={styles.ctaInner}>
-                  <ActivityIndicator color={COLORS.forest} size="small" />
-                  <Text style={styles.ctaText}>Saving...</Text>
-                </View>
-              ) : (
-                <Text style={styles.ctaText}>
-                  {step === TOTAL_STEPS - 1 ? 'Complete Profile' : 'Continue'}
-                </Text>
-              )}
+              <LinearGradient
+                colors={[COLORS.gold, '#C49A38']}
+                style={styles.ctaBtn}
+              >
+                {saving ? (
+                  <View style={styles.ctaInner}>
+                    <ActivityIndicator color={COLORS.forest} size="small" />
+                    <Text style={styles.ctaText}>Saving...</Text>
+                  </View>
+                ) : (
+                  <Text style={styles.ctaText}>
+                    {step === TOTAL_STEPS - 1 ? 'Complete Profile' : 'Continue'}
+                  </Text>
+                )}
+              </LinearGradient>
             </Pressable>
           </Animated.View>
         </View>
-      </View>
+      </GenoGlassSurface>
     </KeyboardAvoidingView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.ivory,
+    backgroundColor: COLORS.linen,
   },
+  flex: { flex: 1 },
+  footerGlass: { overflow: 'hidden' },
   header: {
     paddingTop: 58,
     paddingHorizontal: 24,
@@ -675,8 +695,8 @@ const styles = StyleSheet.create({
     height: 52,
     borderRadius: 14,
     borderWidth: 1.5,
-    borderColor: 'rgba(7, 77, 46, 0.14)',
-    backgroundColor: COLORS.white,
+    borderColor: GLASS.insetBorder,
+    backgroundColor: GLASS.insetFill,
     paddingHorizontal: 14,
     fontSize: 16,
     color: '#1D2B23',
@@ -691,8 +711,8 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: 14,
     borderWidth: 1.5,
-    borderColor: 'rgba(7, 77, 46, 0.14)',
-    backgroundColor: COLORS.white,
+    borderColor: GLASS.insetBorder,
+    backgroundColor: GLASS.insetFill,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -723,8 +743,8 @@ const styles = StyleSheet.create({
     minHeight: 140,
     borderRadius: 14,
     borderWidth: 1.5,
-    borderColor: 'rgba(7, 77, 46, 0.14)',
-    backgroundColor: COLORS.white,
+    borderColor: GLASS.insetBorder,
+    backgroundColor: GLASS.insetFill,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 16,
@@ -743,8 +763,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 999,
     borderWidth: 1.5,
-    borderColor: 'rgba(7, 77, 46, 0.14)',
-    backgroundColor: COLORS.white,
+    borderColor: GLASS.insetBorder,
+    backgroundColor: GLASS.insetFill,
   },
   chipSelected: {
     borderColor: COLORS.forest,
@@ -764,8 +784,8 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 18,
     borderWidth: 1.5,
-    borderColor: 'rgba(7, 77, 46, 0.12)',
-    backgroundColor: COLORS.white,
+    borderColor: GLASS.insetBorder,
+    backgroundColor: GLASS.insetFill,
     marginBottom: 12,
     gap: 14,
   },
@@ -824,9 +844,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingBottom: 34,
     paddingTop: 12,
-    backgroundColor: COLORS.ivory,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(7, 77, 46, 0.08)',
+    
   },
   footerActions: {
     flexDirection: 'row',
@@ -853,10 +871,13 @@ const styles = StyleSheet.create({
   ctaWrapFull: {
     flex: 1,
   },
+  ctaWrapInner: {
+    borderRadius: 16,
+    overflow: 'hidden',
+    ...SHADOWS.button,
+  },
   ctaBtn: {
     height: 56,
-    borderRadius: 16,
-    backgroundColor: COLORS.gold,
     alignItems: 'center',
     justifyContent: 'center',
   },

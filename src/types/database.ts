@@ -1,6 +1,10 @@
+import type { DistanceBand } from '../lib/distanceBands';
+
 export type Genotype = 'AA' | 'AS' | 'SS' | 'AC';
 
 export type PresenceState = 'online' | 'recently_online' | 'offline';
+
+export type { DistanceBand };
 
 export type ProfileRow = {
   id: string;
@@ -50,6 +54,7 @@ export type DiscoveryProfile = {
   name: string;
   age: number | null;
   city: string;
+  distanceBand?: DistanceBand | null;
   genotype: Genotype;
   compatibility: number;
   bio: string;

@@ -44,13 +44,22 @@ const ONBOARDING_SLIDES: GenoOnboardingSlide[] = [
 ];
 
 export default function App() {
-  const [fontsLoaded] = useFonts(FONTS_TO_LOAD);
+  const [fontsLoaded, fontError] = useFonts(FONTS_TO_LOAD);
   const [bootstrapping, setBootstrapping] = useState(true);
   const [screen, setScreen] = useState<
     'onboarding' | 'register' | 'signIn' | 'resetPassword' | 'profileSetup' | 'main'
   >('onboarding');
   const [splashDone, setSplashDone] = useState(false);
   const [resetPasswordEmail, setResetPasswordEmail] = useState<string | null>(null);
+
+  const fontsReady = fontsLoaded || !!fontError;
+  const appReady = fontsReady && !bootstrapping;
+
+  useEffect(() => {
+    if (fontError) {
+      console.warn('[App] custom fonts failed to load — using system fallbacks', fontError);
+    }
+  }, [fontError]);
 
   useEffect(() => {
     let mounted = true;
@@ -124,6 +133,13 @@ export default function App() {
       }
     })();
 
+    const bootstrapTimeout = setTimeout(() => {
+      if (mounted) {
+        console.warn('[App] bootstrap timeout — continuing');
+        setBootstrapping(false);
+      }
+    }, 12000);
+
     const linkSubscription = Linking.addEventListener('url', (event) => {
       void handleResetPasswordUrl(event.url);
     });
@@ -139,16 +155,21 @@ export default function App() {
 
     return () => {
       mounted = false;
+      clearTimeout(bootstrapTimeout);
       linkSubscription.remove();
       subscription.unsubscribe();
     };
   }, []);
 
-  if (!fontsLoaded || !splashDone || bootstrapping) {
+  if (!splashDone) {
     return (
       <View style={styles.boot}>
         <StatusBar style="light" />
-        <GenoSplashScreen bootstrapping={bootstrapping} onFinish={() => setSplashDone(true)} />
+        <GenoSplashScreen
+          bootstrapping={!appReady}
+          readyToExit={appReady}
+          onFinish={() => setSplashDone(true)}
+        />
       </View>
     );
   }

@@ -17,8 +17,10 @@ import {
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { GenoLogoCeremony, GenoPremiumChrome, GENO_VISUAL } from '../src/brand/graphics';
-import { COLORS, RADIUS, SHADOWS } from '../src/theme';
+import { GenoLogoCeremony, GenoPremiumChrome } from '../src/brand/graphics';
+import { AuthFormCard } from '../src/components/auth';
+import { COLORS, RADIUS, SHADOWS } from '../src/theme'
+import { FONT_FAMILY, GLASS } from '../src/theme';
 import { resolvePostSignInScreen } from '../src/lib/profiles';
 import { supabase } from '../src/lib/supabase';
 
@@ -190,22 +192,12 @@ export default function SignIn({
           </Text>
         </Animated.View>
 
-        <Animated.View
-          style={[
-            styles.formCardOuter,
-            {
-              opacity: introOpacity,
-              transform: [{ translateY: introTranslateY }],
-            },
-          ]}
+        <AuthFormCard
+          outerStyle={{
+            opacity: introOpacity,
+            transform: [{ translateY: introTranslateY }],
+          }}
         >
-          <LinearGradient
-            colors={GENO_VISUAL.chrome.cardBorder}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.formCardBorder}
-          >
-            <View style={styles.formCard}>
               <Text style={[styles.label, styles.labelFirst]}>Email Address</Text>
               <TextInput
                 style={[styles.input, focusedField === 'email' && styles.inputFocused]}
@@ -307,9 +299,7 @@ export default function SignIn({
                   Privacy Policy
                 </Text>
               </Text>
-            </View>
-          </LinearGradient>
-        </Animated.View>
+        </AuthFormCard>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -339,8 +329,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: RADIUS.pill,
     borderWidth: 1,
-    borderColor: 'rgba(13, 40, 24, 0.1)',
-    backgroundColor: COLORS.white,
+    borderColor: GLASS.insetBorder,
+    backgroundColor: GLASS.insetFill,
     marginBottom: 18,
     ...SHADOWS.card,
     shadowOpacity: 0.06,
@@ -352,7 +342,7 @@ const styles = StyleSheet.create({
   },
   backText: {
     color: COLORS.forestDeep,
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 14,
     letterSpacing: 0.1,
   },
@@ -371,7 +361,7 @@ const styles = StyleSheet.create({
   },
   brandChipText: {
     color: '#8C6A00',
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 10,
     letterSpacing: 1.6,
   },
@@ -380,7 +370,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   title: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: FONT_FAMILY.gothamBold,
     color: COLORS.forestDeep,
     fontSize: 32,
     lineHeight: 38,
@@ -389,31 +379,14 @@ const styles = StyleSheet.create({
     maxWidth: '96%',
   },
   subtitle: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     color: 'rgba(13, 40, 24, 0.62)',
     fontSize: 15,
     lineHeight: 24,
     maxWidth: '96%',
   },
-  formCardOuter: {
-    width: '100%',
-  },
-  formCardBorder: {
-    borderRadius: RADIUS.xl,
-    padding: 1.5,
-    ...SHADOWS.cardElevated,
-    shadowColor: COLORS.gold,
-    shadowOpacity: 0.12,
-  },
-  formCard: {
-    backgroundColor: COLORS.ivory,
-    borderRadius: RADIUS.xl - 1.5,
-    paddingHorizontal: 20,
-    paddingTop: 8,
-    paddingBottom: 22,
-  },
   label: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     color: COLORS.forest,
     fontSize: 14,
     marginBottom: 8,
@@ -428,10 +401,10 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.md,
     borderWidth: 1.5,
     borderColor: 'rgba(27, 122, 110, 0.16)',
-    backgroundColor: COLORS.white,
+    backgroundColor: GLASS.insetFill,
     paddingHorizontal: 14,
     color: COLORS.forestDeep,
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 16,
   },
   inputFocused: {
@@ -447,7 +420,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   togglePassText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     color: COLORS.forest,
     fontSize: 13,
     marginBottom: 8,
@@ -459,7 +432,7 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
   },
   forgotPasswordText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     color: '#8C6A00',
     fontSize: 13,
     letterSpacing: 0.1,
@@ -486,14 +459,14 @@ const styles = StyleSheet.create({
   },
   trustText: {
     flex: 1,
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     color: COLORS.forest,
     fontSize: 12,
     lineHeight: 18,
   },
   error: {
     marginTop: 12,
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     color: COLORS.error,
     fontSize: 13,
   },
@@ -520,7 +493,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   submitText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     color: COLORS.forestDeep,
     fontSize: 17,
     letterSpacing: 0.1,
@@ -530,24 +503,24 @@ const styles = StyleSheet.create({
     paddingVertical: 18,
   },
   createText: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     color: 'rgba(27, 122, 110, 0.65)',
     fontSize: 14,
   },
   createBold: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     color: COLORS.forest,
   },
   legalText: {
     textAlign: 'center',
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     color: 'rgba(27, 122, 110, 0.55)',
     fontSize: 12,
     lineHeight: 18,
     paddingBottom: 4,
   },
   legalLink: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     color: COLORS.forest,
     textDecorationLine: 'underline',
   },

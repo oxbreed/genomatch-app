@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GenoBondHalo } from '../../brand/graphics';
-import { COLORS } from '../../theme';
+import { FONT_FAMILY, COLORS } from '../../theme';
 
 type Props = {
   percent: number;
@@ -122,12 +122,12 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   percent: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 22,
     letterSpacing: -0.5,
   },
   label: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 9,
     letterSpacing: 1.2,
     textTransform: 'uppercase',

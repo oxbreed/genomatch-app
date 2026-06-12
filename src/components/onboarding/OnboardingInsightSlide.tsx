@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { GenoSignaturePattern } from '../../brand';
-import { COLORS } from '../../theme';
+import { FONT_FAMILY, COLORS } from '../../theme';
 import type { OnboardingInsight } from './onboardingInsights';
 
 type Props = {
@@ -99,24 +99,24 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(245, 239, 230, 0.12)',
   },
   statValue: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 22,
     letterSpacing: -0.5,
   },
   statLabel: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
     color: 'rgba(245, 239, 230, 0.65)',
   },
   kicker: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 11,
     letterSpacing: 2.4,
     color: COLORS.gold,
     marginBottom: 10,
   },
   title: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 36,
     lineHeight: 42,
     letterSpacing: -0.8,
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     maxWidth: '98%',
   },
   body: {
-    fontFamily: 'Satoshi-Regular',
+    fontFamily: FONT_FAMILY.gothamBook,
     fontSize: 17,
     lineHeight: 26,
     color: 'rgba(245, 239, 230, 0.82)',

@@ -1,3 +1,4 @@
+export { default as DiscoverBondEdge } from './DiscoverBondEdge';
 export { default as DiscoverActionDock } from './DiscoverActionDock';
 export { default as DiscoverMatchCelebration } from './DiscoverMatchCelebration';
 export { default as DiscoverMatchModal } from './DiscoverMatchModal';

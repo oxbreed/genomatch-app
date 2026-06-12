@@ -2,7 +2,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { GenoBondMark } from '../../brand';
-import { COLORS } from '../../theme';
+import { FONT_FAMILY, COLORS } from '../../theme';
 
 type Props = {
   kicker?: string;
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   backText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 14,
   },
   row: {
@@ -102,19 +102,19 @@ const styles = StyleSheet.create({
   },
   copy: { flex: 1, gap: 4 },
   kicker: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.marketingExtrabold,
     fontSize: 10,
     letterSpacing: 2.4,
     color: COLORS.gold,
   },
   title: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: FONT_FAMILY.gothamSemiBold,
     fontSize: 28,
     letterSpacing: -0.5,
     lineHeight: 32,
   },
   subtitle: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 15,
     lineHeight: 22,
     marginTop: 4,

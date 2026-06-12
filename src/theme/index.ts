@@ -1,15 +1,31 @@
-export { COLORS, FOREST_DEEP, FOREST, GOLD, LINEN, SAGE, MINT, WHITE } from './colors';
-export { TYPOGRAPHY, FONT_FAMILY } from './typography';
+import {
+  Montserrat_400Regular,
+  Montserrat_500Medium,
+  Montserrat_600SemiBold,
+  Montserrat_700Bold,
+  Montserrat_800ExtraBold,
+} from '@expo-google-fonts/montserrat';
+
+export { COLORS, GLASS, FOREST_DEEP, FOREST, GOLD, LINEN, SAGE, MINT, WHITE } from './colors';
+export { TYPOGRAPHY, FONT_FAMILY, FONT_ROLE, SYSTEM_FONT } from './typography';
 export { RADIUS, SHADOWS } from './shadows';
 export { SCENE } from './sceneLayout';
+export { MOTION } from './motion';
 
-/** Load with `useFonts(FONTS_TO_LOAD)` in App.tsx before rendering UI.
- *  PostScript names must match `fontFamily` in styles (see FONT_FAMILY in typography.ts). */
+/**
+ * Load with `useFonts(FONTS_TO_LOAD)` in App.tsx before rendering UI.
+ *
+ * Typography hierarchy:
+ * - Gotham Rounded (Montserrat stand-in) — primary UI
+ * - Proxima Nova (Montserrat ExtraBold stand-in) — marketing / editorial
+ * - Helvetica / Roboto — system nav (no load required)
+ *
+ * Replace stand-ins with licensed files — see assets/fonts/README.md.
+ */
 export const FONTS_TO_LOAD = {
-  'ClashDisplay-Semibold': require('../../assets/fonts/ClashDisplay-Semibold.otf'),
-  'ClashDisplay-Medium': require('../../assets/fonts/ClashDisplay-Medium.otf'),
-  'ClashDisplay-Regular': require('../../assets/fonts/ClashDisplay-Regular.otf'),
-  'Satoshi-Regular': require('../../assets/fonts/Satoshi-Regular.otf'),
-  'Satoshi-Medium': require('../../assets/fonts/Satoshi-Medium.otf'),
-  'Satoshi-Bold': require('../../assets/fonts/Satoshi-Bold.otf'),
+  Montserrat_400Regular,
+  Montserrat_500Medium,
+  Montserrat_600SemiBold,
+  Montserrat_700Bold,
+  Montserrat_800ExtraBold,
 } as const;

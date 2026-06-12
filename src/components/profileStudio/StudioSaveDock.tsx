@@ -2,8 +2,8 @@ import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-nati
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
-import { GenoLogoCeremony } from '../../brand/graphics';
-import { COLORS } from '../../theme';
+import { GenoGlassSurface, GenoLogoCeremony } from '../../brand/graphics';
+import { FONT_FAMILY, COLORS } from '../../theme';
 
 type Props = {
   hasChanges: boolean;
@@ -33,7 +33,14 @@ export default function StudioSaveDock({
         style={styles.fade}
         pointerEvents="none"
       />
-      <View style={styles.panel}>
+      <GenoGlassSurface
+        variant="linen"
+        borderRadius={22}
+        shadow="glassElevated"
+        showTopRule
+        style={styles.panelGlass}
+        contentStyle={styles.panel}
+      >
         <View style={styles.meta}>
           <GenoLogoCeremony variant="mark" tone="dark" subtle style={styles.mark} />
           <View style={styles.metaCopy}>
@@ -88,7 +95,7 @@ export default function StudioSaveDock({
             </LinearGradient>
           </Pressable>
         </View>
-      </View>
+      </GenoGlassSurface>
     </View>
   );
 }
@@ -105,20 +112,13 @@ const styles = StyleSheet.create({
     height: 28,
     width: '100%',
   },
+  panelGlass: {
+    overflow: 'hidden',
+  },
   panel: {
-    backgroundColor: COLORS.white,
-    borderTopLeftRadius: 22,
-    borderTopRightRadius: 22,
     paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 24,
-    borderTopWidth: 2,
-    borderColor: COLORS.gold,
-    shadowColor: COLORS.forestDeep,
-    shadowOffset: { width: 0, height: -6 },
-    shadowOpacity: 0.12,
-    shadowRadius: 16,
-    elevation: 12,
     gap: 12,
   },
   meta: {
@@ -153,12 +153,12 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
   },
   metaTitle: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 16,
     color: COLORS.forestDeep,
   },
   metaSub: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
     lineHeight: 16,
     color: COLORS.sage,
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.linen,
   },
   discardText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 14,
     color: COLORS.forest,
   },
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   saveText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 15,
     color: COLORS.forestDeep,
   },

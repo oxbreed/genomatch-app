@@ -1,5 +1,10 @@
 import { GenoLegalScreen } from '../src/components/shell';
-import { GENOMATCH_COMPANY, GENOMATCH_CONTACT_LINE } from '../src/constants/company';
+import {
+  GENOMATCH_COMPANY,
+  GENOMATCH_CONTACT_LINE,
+  GENOMATCH_OPERATOR_INTRO,
+  GENOMATCH_PARENT_LINE,
+} from '../src/constants/company';
 
 type PrivacyPolicyProps = {
   onBack: () => void;
@@ -8,7 +13,7 @@ type PrivacyPolicyProps = {
 const SECTIONS = [
   {
     title: 'Introduction',
-    body: `${GENOMATCH_COMPANY.legalName} (${GENOMATCH_COMPANY.registration}), registered in ${GENOMATCH_COMPANY.jurisdiction}, collects and processes your personal data to provide genotype-aware matchmaking services. This policy explains what we collect, how we use it, and your rights.`,
+    body: `${GENOMATCH_OPERATOR_INTRO}, collects and processes your personal data to provide genotype-aware matchmaking services. This policy explains what we collect, how we use it, and your rights.`,
   },
   {
     title: 'Data We Collect',
@@ -49,7 +54,7 @@ export default function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
   return (
     <GenoLegalScreen
       title="Privacy Policy"
-      subtitle={`Last updated June 2026 · ${GENOMATCH_COMPANY.locationLine}`}
+      subtitle={`Last updated June 2026 · ${GENOMATCH_PARENT_LINE}`}
       sections={SECTIONS}
       onBack={onBack}
     />

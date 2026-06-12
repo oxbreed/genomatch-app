@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Animated,
@@ -9,45 +9,62 @@ import {
 import { GenoPremiumChrome, GenoLogoCeremony } from '../../brand/graphics';
 import { COLORS } from '../../theme';
 
+const MIN_DISPLAY_MS = 2200;
+const FADE_MS = 550;
+
 type Props = {
+  /** Still loading fonts or session — keep logo visible with spinner */
   bootstrapping?: boolean;
+  /** When false, splash waits after min display before fading out */
+  readyToExit?: boolean;
   onFinish: () => void;
 };
 
-export default function GenoSplashScreen({ bootstrapping, onFinish }: Props) {
+export default function GenoSplashScreen({
+  bootstrapping,
+  readyToExit = true,
+  onFinish,
+}: Props) {
   const splashOpacity = useRef(new Animated.Value(1)).current;
   const splashScale = useRef(new Animated.Value(0.88)).current;
+  const [minDisplayElapsed, setMinDisplayElapsed] = useState(false);
+  const exitStarted = useRef(false);
 
   useEffect(() => {
-    const splashIn = Animated.timing(splashScale, {
+    Animated.timing(splashScale, {
       toValue: 1,
       duration: 900,
       easing: Easing.out(Easing.cubic),
       useNativeDriver: true,
+    }).start();
+  }, [splashScale]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setMinDisplayElapsed(true), MIN_DISPLAY_MS);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (!minDisplayElapsed || !readyToExit || exitStarted.current) return;
+    exitStarted.current = true;
+
+    Animated.parallel([
+      Animated.timing(splashOpacity, {
+        toValue: 0,
+        duration: FADE_MS,
+        easing: Easing.inOut(Easing.quad),
+        useNativeDriver: true,
+      }),
+      Animated.timing(splashScale, {
+        toValue: 1.05,
+        duration: FADE_MS,
+        easing: Easing.in(Easing.cubic),
+        useNativeDriver: true,
+      }),
+    ]).start(({ finished }) => {
+      if (finished) onFinish();
     });
-    splashIn.start();
-
-    const timeout = setTimeout(() => {
-      Animated.parallel([
-        Animated.timing(splashOpacity, {
-          toValue: 0,
-          duration: 550,
-          easing: Easing.inOut(Easing.quad),
-          useNativeDriver: true,
-        }),
-        Animated.timing(splashScale, {
-          toValue: 1.05,
-          duration: 550,
-          easing: Easing.in(Easing.cubic),
-          useNativeDriver: true,
-        }),
-      ]).start(({ finished }) => {
-        if (finished) onFinish();
-      });
-    }, 2600);
-
-    return () => clearTimeout(timeout);
-  }, [onFinish, splashOpacity, splashScale]);
+  }, [minDisplayElapsed, onFinish, readyToExit, splashOpacity, splashScale]);
 
   return (
     <View style={styles.root}>

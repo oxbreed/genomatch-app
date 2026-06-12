@@ -4,3 +4,8 @@ export { default as GenoInboxCardShell } from './GenoInboxCardShell';
 export { default as GenoInboxAvatar } from './GenoInboxAvatar';
 export { default as GenoInboxIconButton } from './GenoInboxIconButton';
 export { default as GenoInboxCountBadge } from './GenoInboxCountBadge';
+export { default as GenoInboxRetryPanel } from './GenoInboxRetryPanel';
+export { default as GenoInboxNewBanner } from './GenoInboxNewBanner';
+export { default as GenoInboxUnreadBanner } from './GenoInboxUnreadBanner';
+export { default as GenoInboxMatchStrip } from './GenoInboxMatchStrip';
+export { default as GenoGlassIconButton } from './GenoGlassIconButton';

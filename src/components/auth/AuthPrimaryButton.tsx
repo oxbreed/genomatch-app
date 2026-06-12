@@ -1,6 +1,6 @@
 import { ActivityIndicator, Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { COLORS } from '../../theme';
+import { FONT_FAMILY, COLORS } from '../../theme';
 
 type Props = {
   label: string;
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   text: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 17,
     color: COLORS.forestDeep,
     letterSpacing: 0.2,

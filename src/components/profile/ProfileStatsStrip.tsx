@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { COLORS } from '../../theme';
+import { FONT_FAMILY, COLORS } from '../../theme';
 
 type Stats = {
   matches: number;
@@ -50,12 +50,12 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   value: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 26,
     color: COLORS.gold,
   },
   label: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 11,
     letterSpacing: 0.8,
     textTransform: 'uppercase',

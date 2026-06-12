@@ -1,10 +1,11 @@
-import type { DiscoveryProfile } from '../types/database';
+import type { DiscoveryProfile, DistanceBand } from '../types/database';
 
 export const HIGH_COMPATIBILITY_MIN = 75;
 
 export type DiscoveryFilters = {
   compatibilityMode: 'all' | 'high';
   city: string;
+  distanceBand: 'any' | DistanceBand;
   minAge: string;
   maxAge: string;
   relationshipGoal: 'any' | 'marriage' | 'serious' | 'casual' | 'friendship';
@@ -14,6 +15,7 @@ export type DiscoveryFilters = {
 export const DEFAULT_DISCOVERY_FILTERS: DiscoveryFilters = {
   compatibilityMode: 'all',
   city: '',
+  distanceBand: 'any',
   minAge: '',
   maxAge: '',
   relationshipGoal: 'any',
@@ -24,6 +26,7 @@ export function countActiveDiscoveryFilters(filters: DiscoveryFilters): number {
   let count = 0;
   if (filters.compatibilityMode === 'high') count += 1;
   if (filters.city.trim().length > 0) count += 1;
+  if (filters.distanceBand !== 'any') count += 1;
   if (filters.minAge.trim().length > 0) count += 1;
   if (filters.maxAge.trim().length > 0) count += 1;
   if (filters.relationshipGoal !== 'any') count += 1;
@@ -49,6 +52,10 @@ export function applyDiscoveryFilters(
     const cityQuery = filters.city.trim().toLowerCase();
     if (cityQuery && !p.city.toLowerCase().includes(cityQuery)) {
       return false;
+    }
+    if (filters.distanceBand !== 'any') {
+      const band = p.distanceBand ?? 'unknown';
+      if (band !== filters.distanceBand) return false;
     }
     if (filters.minAge.trim() || filters.maxAge.trim()) {
       if (p.age == null) return false;
@@ -81,6 +88,7 @@ export function normalizeDiscoveryFilters(draft: DiscoveryFilters): DiscoveryFil
   return {
     compatibilityMode: draft.compatibilityMode,
     city: draft.city.trim(),
+    distanceBand: draft.distanceBand,
     minAge,
     maxAge,
     relationshipGoal: draft.relationshipGoal,

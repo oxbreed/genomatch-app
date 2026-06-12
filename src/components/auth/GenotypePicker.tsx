@@ -1,7 +1,7 @@
 import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps } from 'react';
-import { COLORS } from '../../theme';
+import { FONT_FAMILY, COLORS } from '../../theme';
 
 type IonName = ComponentProps<typeof Ionicons>['name'];
 
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   label: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 13,
     color: COLORS.forestDeep,
   },
@@ -103,13 +103,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(212, 168, 67, 0.2)',
   },
   requiredText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 10,
     color: '#8C6A00',
     letterSpacing: 0.3,
   },
   hint: {
-    fontFamily: 'Satoshi-Regular',
+    fontFamily: FONT_FAMILY.gothamBook,
     fontSize: 12,
     color: COLORS.sage,
     marginTop: 6,
@@ -154,13 +154,13 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   genoId: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 22,
     color: COLORS.forestDeep,
     marginBottom: 2,
   },
   genoName: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 11,
     color: COLORS.sage,
     textAlign: 'center',

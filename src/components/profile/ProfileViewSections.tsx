@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import LifestyleBadges from '../LifestyleBadges';
 import PresenceBadge from '../PresenceBadge';
 import { COLORS, RELATIONSHIP_GOAL_LABELS } from '../../data/mockData';
+import { GLASS } from '../../theme';
 import type { PresenceState } from '../../types/database';
 import { PROFILE, PROFILE_TYPE } from './profileTokens';
 
@@ -137,9 +138,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 999,
-    backgroundColor: COLORS.white,
+    backgroundColor: GLASS.insetFill,
     borderWidth: 1,
-    borderColor: 'rgba(143, 175, 149, 0.45)',
+    borderColor: GLASS.insetBorder,
   },
   chipText: {
     ...PROFILE_TYPE.chip,
@@ -154,9 +155,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 11,
     borderRadius: 12,
-    backgroundColor: COLORS.mint,
+    backgroundColor: GLASS.insetFill,
     borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.22)',
+    borderColor: GLASS.insetBorder,
   },
   goalText: {
     ...PROFILE_TYPE.goal,

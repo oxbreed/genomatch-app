@@ -8,10 +8,12 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "supabase:link": "supabase link --project-ref rxmrfazktupegpfxaljo",
-    "supabase:push": "supabase db push --linked"
+    "supabase:push": "supabase db push --linked",
+    "zap:baseline": "bash scripts/zap-baseline.sh"
   },
   "dependencies": {
     "@expo-google-fonts/dm-sans": "^0.4.2",
+    "@expo-google-fonts/montserrat": "^0.4.2",
     "@expo-google-fonts/outfit": "^0.4.3",
     "@expo/ngrok": "^4.1.3",
     "@expo/vector-icons": "^15.0.3",
@@ -20,6 +22,7 @@
     "@tanstack/react-query": "^5.100.14",
     "date-fns": "^4.3.0",
     "expo": "~54.0.33",
+    "expo-blur": "~15.0.8",
     "expo-device": "~8.0.10",
     "expo-font": "~14.0.12",
     "expo-haptics": "~15.0.8",

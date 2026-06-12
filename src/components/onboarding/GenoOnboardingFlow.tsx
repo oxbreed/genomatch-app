@@ -13,10 +13,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps } from 'react';
 import * as Haptics from 'expo-haptics';
-import { GenoPremiumChrome, GenoHelixField } from '../../brand/graphics';
+import { GenoPremiumChrome, GenoGlassSurface, GenoHelixField } from '../../brand/graphics';
 import { GenoBondMark } from '../../brand';
 import GenoMatchLogo from '../GenoMatchLogo';
-import { COLORS } from '../../theme';
+import { FONT_FAMILY, COLORS, RADIUS } from '../../theme';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -144,19 +144,31 @@ export default function GenoOnboardingFlow({
                 colors={['rgba(212, 168, 67, 0.35)', 'rgba(61, 122, 82, 0.25)']}
                 style={styles.slideCardBorder}
               >
-                <View style={styles.slideCard}>
+                <GenoGlassSurface
+                  variant="dark"
+                  borderRadius={RADIUS.xl}
+                  shadow="glassFloat"
+                  showTopRule
+                  showSheen
+                  intensity={56}
+                  style={styles.slideCardGlass}
+                  contentStyle={styles.slideCard}
+                >
                   <Animated.View style={{ transform: [{ scale: iconPulse }] }}>
-                    <LinearGradient
-                      colors={['rgba(237, 243, 238, 0.15)', 'rgba(212, 168, 67, 0.2)']}
-                      style={styles.iconOrb}
+                    <GenoGlassSurface
+                      variant="dark"
+                      borderRadius={44}
+                      shadow="glass"
+                      intensity={48}
+                      contentStyle={styles.iconOrb}
                     >
                       <Ionicons name={slide.icon} size={40} color={COLORS.gold} />
-                    </LinearGradient>
+                    </GenoGlassSurface>
                   </Animated.View>
                   <Text style={styles.slideKicker}>{slide.subtitle}</Text>
                   <Text style={styles.slideTitle}>{slide.title}</Text>
                   <Text style={styles.slideBody}>{slide.body}</Text>
-                </View>
+                </GenoGlassSurface>
               </LinearGradient>
             </View>
           ))}
@@ -237,7 +249,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   skip: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 14,
     color: 'rgba(245, 239, 230, 0.7)',
   },
@@ -254,40 +266,36 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     padding: 2,
   },
+  slideCardGlass: {
+    overflow: 'hidden',
+  },
   slideCard: {
-    backgroundColor: 'rgba(13, 40, 24, 0.75)',
-    borderRadius: 26,
     padding: 28,
-    borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.25)',
   },
   iconOrb: {
     width: 88,
     height: 88,
-    borderRadius: 44,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.35)',
   },
   slideKicker: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.marketingExtrabold,
     fontSize: 11,
-    letterSpacing: 2,
+    letterSpacing: 2.2,
     color: COLORS.gold,
     marginBottom: 8,
   },
   slideTitle: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: FONT_FAMILY.marketingExtrabold,
     fontSize: 32,
     lineHeight: 38,
     color: COLORS.linen,
-    letterSpacing: -0.6,
+    letterSpacing: -0.45,
     marginBottom: 12,
   },
   slideBody: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamBook,
     fontSize: 16,
     lineHeight: 24,
     color: 'rgba(245, 239, 230, 0.8)',
@@ -319,12 +327,12 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   ctaText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 17,
     color: COLORS.forestDeep,
   },
   helper: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 13,
     color: 'rgba(245, 239, 230, 0.55)',
     textAlign: 'center',

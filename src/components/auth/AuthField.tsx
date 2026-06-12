@@ -1,7 +1,8 @@
 import { StyleSheet, Text, TextInput, View, type TextInputProps } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps } from 'react';
-import { COLORS } from '../../theme';
+import { GenoGlassSurface } from '../../brand/graphics';
+import { FONT_FAMILY, COLORS, RADIUS } from '../../theme';
 
 type IonName = ComponentProps<typeof Ionicons>['name'];
 
@@ -22,7 +23,14 @@ export default function AuthField({ label, icon, rightAction, style, ...inputPro
           </Text>
         ) : null}
       </View>
-      <View style={styles.inputRow}>
+      <GenoGlassSurface
+        variant="light"
+        borderRadius={RADIUS.md}
+        shadow="none"
+        intensity={52}
+        style={styles.glass}
+        contentStyle={styles.inputRow}
+      >
         {icon ? (
           <View style={styles.iconWrap}>
             <Ionicons name={icon} size={18} color={COLORS.sage} />
@@ -33,7 +41,7 @@ export default function AuthField({ label, icon, rightAction, style, ...inputPro
           placeholderTextColor={COLORS.textSubtle}
           {...inputProps}
         />
-      </View>
+      </GenoGlassSurface>
     </View>
   );
 }
@@ -49,24 +57,23 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   label: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 13,
     color: COLORS.forestDeep,
     letterSpacing: 0.2,
   },
   rightAction: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 13,
     color: COLORS.forest,
+  },
+  glass: {
+    overflow: 'hidden',
   },
   inputRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: 14,
-    borderWidth: 1.5,
-    borderColor: COLORS.border,
-    backgroundColor: COLORS.white,
-    overflow: 'hidden',
+    minHeight: 52,
   },
   iconWrap: {
     paddingLeft: 14,
@@ -75,7 +82,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 52,
     paddingHorizontal: 14,
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 16,
     color: COLORS.forestDeep,
   },

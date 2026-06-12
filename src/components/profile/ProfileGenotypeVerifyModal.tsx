@@ -11,7 +11,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { GenoBondMark } from '../../brand';
 import { VERIFICATION_ATTESTATIONS, type VerificationAttestationId } from '../../lib/verification';
-import { COLORS, RADIUS } from '../../theme';
+import { FONT_FAMILY, COLORS, RADIUS } from '../../theme';
 
 type Props = {
   visible: boolean;
@@ -144,14 +144,14 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   title: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 22,
     letterSpacing: -0.3,
     color: COLORS.forestDeep,
     textAlign: 'center',
   },
   body: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
     lineHeight: 21,
     color: COLORS.sage,
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   bold: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     color: COLORS.forestDeep,
   },
   checklist: {
@@ -191,13 +191,13 @@ const styles = StyleSheet.create({
   },
   checkLabel: {
     flex: 1,
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
     lineHeight: 20,
     color: COLORS.forestDeep,
   },
   note: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
     lineHeight: 17,
     color: COLORS.textSubtle,
@@ -214,12 +214,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   confirmText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 16,
     color: COLORS.forestDeep,
   },
   cancel: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 15,
     color: COLORS.sage,
     marginTop: 14,

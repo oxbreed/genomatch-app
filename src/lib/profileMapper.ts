@@ -1,4 +1,4 @@
-import type { DiscoveryProfile, Genotype, ProfileRow } from '../types/database';
+import type { DiscoveryProfile, DistanceBand, Genotype, ProfileRow } from '../types/database';
 import { computeCompatibility } from './compatibility';
 import { isNewMember, resolvePresenceState } from './presence';
 
@@ -56,7 +56,8 @@ export function isGenotypeVerified(row: Pick<ProfileRow, 'genotype_verified' | '
 
 export function mapProfileRow(
   row: ProfileRow,
-  viewerGenotype: Genotype | null
+  viewerGenotype: Genotype | null,
+  options?: { distanceBand?: DistanceBand | null }
 ): DiscoveryProfile {
   const genotype = row.genotype ?? 'AA';
   const photos = resolveProfilePhotos(row.avatar_url, row.photos);
@@ -65,6 +66,7 @@ export function mapProfileRow(
     name: row.display_name?.trim() || 'GenoMatch Member',
     age: ageFromDateOfBirth(row.date_of_birth),
     city: row.city?.trim() || 'Nearby',
+    distanceBand: options?.distanceBand ?? null,
     genotype,
     compatibility: computeCompatibility(viewerGenotype, genotype),
     bio: row.bio?.trim() || '',

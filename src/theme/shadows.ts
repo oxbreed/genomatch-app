@@ -31,4 +31,25 @@ export const SHADOWS = {
     shadowOffset: { width: 0, height: 4 },
     elevation: 3,
   } satisfies ViewStyle,
+  glass: {
+    shadowColor: COLORS.forestDeep,
+    shadowOpacity: 0.14,
+    shadowRadius: 24,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 8,
+  } satisfies ViewStyle,
+  glassElevated: {
+    shadowColor: '#0B1F13',
+    shadowOpacity: 0.22,
+    shadowRadius: 28,
+    shadowOffset: { width: 0, height: 14 },
+    elevation: 14,
+  } satisfies ViewStyle,
+  glassFloat: {
+    shadowColor: COLORS.gold,
+    shadowOpacity: 0.12,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 10,
+  } satisfies ViewStyle,
 } as const;

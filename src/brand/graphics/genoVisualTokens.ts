@@ -1,4 +1,4 @@
-import { COLORS } from '../../theme';
+import { COLORS, GLASS } from '../../theme';
 
 /** GenoMatch-exclusive visual language — helix, bond, gold ceremony */
 export const GENO_VISUAL = {
@@ -41,6 +41,64 @@ export const GENO_VISUAL = {
     haloSm: 56,
     haloMd: 88,
     haloLg: 120,
+  },
+  glass: {
+    topRule: GLASS.topRule,
+    variants: {
+      light: {
+        tint: GLASS.lightTint,
+        border: GLASS.lightBorder,
+        sheen: GLASS.lightSheen,
+        intensity: 64,
+        blurTint: 'light' as const,
+      },
+      dark: {
+        tint: GLASS.darkTint,
+        border: GLASS.darkBorder,
+        sheen: GLASS.darkSheen,
+        intensity: 72,
+        blurTint: 'dark' as const,
+      },
+      linen: {
+        tint: GLASS.linenTint,
+        border: GLASS.linenBorder,
+        sheen: GLASS.linenSheen,
+        intensity: 58,
+        blurTint: 'light' as const,
+      },
+      sheet: {
+        tint: GLASS.sheetTint,
+        border: GLASS.sheetBorder,
+        sheen: GLASS.linenSheen,
+        intensity: 68,
+        blurTint: 'light' as const,
+      },
+      tabBar: {
+        tint: GLASS.tabBarTint,
+        border: GLASS.tabBarBorder,
+        sheen: GLASS.tabBarSheen,
+        intensity: 78,
+        blurTint: 'light' as const,
+      },
+    },
+    backdrop: {
+      dark: {
+        tint: GLASS.backdropDark,
+        intensity: 48,
+        blurTint: 'dark' as const,
+      },
+      light: {
+        tint: GLASS.backdropLight,
+        intensity: 36,
+        blurTint: 'light' as const,
+      },
+    },
+    motion: {
+      springFriction: 8,
+      springTension: 200,
+      pressScale: 0.96,
+      tabScale: 1.06,
+    },
   },
 } as const;
 

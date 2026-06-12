@@ -11,7 +11,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { GenoBondMark, GenoSignaturePattern } from '../../brand';
-import { COLORS, RADIUS, SHADOWS } from '../../theme';
+import { FONT_FAMILY, COLORS, RADIUS, SHADOWS } from '../../theme';
 
 type Props = {
   reviewedCount: number;
@@ -277,14 +277,14 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   statusText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 11,
     letterSpacing: 1.2,
     textTransform: 'uppercase',
     color: COLORS.forestDeep,
   },
   title: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 26,
     letterSpacing: -0.5,
     color: COLORS.forestDeep,
@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   subtitle: {
-    fontFamily: 'Satoshi-Regular',
+    fontFamily: FONT_FAMILY.gothamBook,
     fontSize: 15,
     lineHeight: 22,
     color: COLORS.sage,
@@ -325,14 +325,14 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   tomorrowLabel: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 11,
     letterSpacing: 1,
     textTransform: 'uppercase',
     color: COLORS.sage,
   },
   tomorrowValue: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 15,
     color: COLORS.forestDeep,
   },
@@ -351,7 +351,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   primaryText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 16,
     color: COLORS.linen,
   },
@@ -363,7 +363,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   secondaryText: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 15,
     color: COLORS.forest,
   },

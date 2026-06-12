@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS } from '../theme';
+import { FONT_FAMILY, COLORS } from '../theme';
 
 type Props = {
   compact?: boolean;
@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(61, 122, 82, 0.25)',
   },
   text: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 10,
     letterSpacing: 0.3,
     color: COLORS.forestDeep,

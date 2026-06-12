@@ -14,7 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { GenoBondMark, GenoSignaturePattern } from '../../brand';
 import ProfileAvatar from '../ProfileAvatar';
-import { COLORS } from '../../theme';
+import { FONT_FAMILY, COLORS } from '../../theme';
 import type { DiscoveryProfile } from '../../types/database';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -497,13 +497,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(212, 168, 67, 0.35)',
   },
   crownKicker: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 10,
     letterSpacing: 2.8,
     color: COLORS.gold,
   },
   title: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 40,
     letterSpacing: -1,
     color: COLORS.linen,
@@ -523,7 +523,7 @@ const styles = StyleSheet.create({
     height: 2,
   },
   subtitleMatch: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 18,
     lineHeight: 26,
     color: COLORS.linen,
@@ -532,7 +532,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   subtitleHint: {
-    fontFamily: 'Satoshi-Regular',
+    fontFamily: FONT_FAMILY.gothamBook,
     fontSize: 14,
     lineHeight: 20,
     color: 'rgba(245, 239, 230, 0.62)',
@@ -541,7 +541,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   nameHighlight: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     color: COLORS.gold,
   },
   avatarStage: {
@@ -613,7 +613,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   initials: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 24,
     color: COLORS.gold,
   },
@@ -631,7 +631,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(212, 168, 67, 0.4)',
   },
   avatarLabel: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 12,
     color: COLORS.sage,
     maxWidth: 88,
@@ -661,7 +661,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(13, 40, 24, 0.5)',
   },
   compatPercent: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 15,
     color: COLORS.gold,
   },
@@ -670,12 +670,12 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   compatTitle: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 14,
     color: COLORS.linen,
   },
   compatSub: {
-    fontFamily: 'Satoshi-Regular',
+    fontFamily: FONT_FAMILY.gothamBook,
     fontSize: 12,
     color: 'rgba(245, 239, 230, 0.6)',
   },
@@ -697,7 +697,7 @@ const styles = StyleSheet.create({
     paddingVertical: 17,
   },
   ctaText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 17,
     color: COLORS.forestDeep,
   },
@@ -711,7 +711,7 @@ const styles = StyleSheet.create({
     opacity: 0.75,
   },
   skipText: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
     color: 'rgba(245, 239, 230, 0.55)',
   },

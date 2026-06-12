@@ -2,10 +2,10 @@ import { COLORS } from '../../theme';
 
 /** Shared typography & layout for Matches + Messages lists */
 export const INBOX = {
-  avatarSize: 48,
-  iconBtnSize: 36,
-  cardRadius: 16,
-  cardPaddingV: 12,
+  avatarSize: 52,
+  iconBtnSize: 38,
+  cardRadius: 18,
+  cardPaddingV: 14,
   cardPaddingH: 12,
   cardGap: 10,
   cardMarginH: 16,

@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GenoHelixField } from '../../brand/graphics';
-import { COLORS } from '../../theme';
+import { FONT_FAMILY, COLORS } from '../../theme';
 import { PROFILE } from './profileTokens';
 
 const INTEREST_PRESETS = [
@@ -142,13 +142,13 @@ const styles = StyleSheet.create({
     top: -8,
   },
   hint: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
     color: COLORS.sage,
     marginBottom: 8,
   },
   label: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: PROFILE.sectionTitleSize,
     letterSpacing: -0.2,
     color: COLORS.forestDeep,
@@ -160,13 +160,13 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   counter: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
     color: COLORS.sage,
   },
   counterWarn: {
     color: COLORS.gold,
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
   },
   labelSpaced: { marginTop: 14, marginBottom: 8 },
   bioInput: {
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(212, 168, 67, 0.35)',
     backgroundColor: COLORS.white,
     padding: 14,
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: PROFILE.bodySize,
     lineHeight: 22,
     color: COLORS.forest,
@@ -200,12 +200,12 @@ const styles = StyleSheet.create({
     borderRadius: 999,
   },
   chipText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 13,
     color: COLORS.forest,
   },
   chipTextActive: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 13,
     color: COLORS.forestDeep,
   },
@@ -228,12 +228,12 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   goalText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 14,
     color: COLORS.textMuted,
   },
   goalTextActive: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 14,
     color: COLORS.forestDeep,
   },

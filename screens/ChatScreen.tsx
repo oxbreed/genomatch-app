@@ -10,14 +10,17 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import FamilyPlanningCard from '../src/components/FamilyPlanningCard';
 import ProfileAvatar from '../src/components/ProfileAvatar';
 import ReportBlockSheet from '../src/components/ReportBlockSheet';
+import { GenoGlassSurface, GenoLogoCeremony, GenoPremiumChrome } from '../src/brand/graphics';
+import { GenoGlassIconButton } from '../src/components/inbox';
 import { getInitials } from '../src/data/mockData';
-import { COLORS, RADIUS, SHADOWS } from '../src/theme';
+import { FONT_FAMILY, COLORS, RADIUS, SHADOWS } from '../src/theme';
 import { getCurrentProfile } from '../src/lib/profiles';
 import type { DiscoveryProfile, Genotype, MatchWithProfile } from '../src/types/database';
 import { sendLocalNotification } from '../src/lib/notifications';
@@ -203,16 +206,28 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
             item.isMine ? styles.bubbleRowSent : styles.bubbleRowReceived,
           ]}
         >
-          <View
-            style={[
-              styles.bubble,
-              item.isMine ? styles.bubbleSent : styles.bubbleReceived,
-            ]}
-          >
-            <Text style={[styles.bubbleText, item.isMine && styles.bubbleTextSent]}>
-              {item.body}
-            </Text>
-          </View>
+          {item.isMine ? (
+            <LinearGradient
+              colors={[COLORS.forest, COLORS.forestDeep]}
+              start={{ x: 0, y: 0.5 }}
+              end={{ x: 1, y: 0.5 }}
+              style={[styles.bubble, styles.bubbleSent]}
+            >
+              <Text style={[styles.bubbleText, styles.bubbleTextSent]}>{item.body}</Text>
+            </LinearGradient>
+          ) : (
+            <GenoGlassSurface
+              variant="light"
+              borderRadius={20}
+              shadow="glass"
+              showTopRule={false}
+              intensity={54}
+              style={styles.bubbleGlass}
+              contentStyle={[styles.bubble, styles.bubbleReceived]}
+            >
+              <Text style={styles.bubbleText}>{item.body}</Text>
+            </GenoGlassSurface>
+          )}
           {showRead ? (
             <View style={styles.readReceipt}>
               <Ionicons name="checkmark-done" size={14} color={COLORS.textSubtle} />
@@ -240,55 +255,64 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 4 : 0}
     >
+      <GenoPremiumChrome variant="discover" />
       <StatusBar style="dark" />
 
-      <View style={styles.header}>
+      <GenoGlassSurface
+        variant="linen"
+        borderRadius={0}
+        shadow="glass"
+        showTopRule
+        style={styles.headerGlass}
+        contentStyle={styles.header}
+      >
+        <GenoGlassIconButton onPress={onBack} accessibilityLabel="Go back" size={40}>
+          <Ionicons name="chevron-back" size={20} color={COLORS.forestDeep} />
+        </GenoGlassIconButton>
         <Pressable
-          style={({ pressed }) => [styles.backBtn, pressed && styles.headerIconBtnPressed]}
-          onPress={onBack}
-          accessibilityLabel="Go back"
+          style={({ pressed }) => [styles.headerProfileTap, pressed && styles.headerIconBtnPressed]}
+          onPress={() => setShowProfile(true)}
         >
-          <Ionicons name="chevron-back" size={20} color={COLORS.forest} />
-        </Pressable>
-        {profile.avatarUrl?.trim() || profile.photos[0]?.trim() ? (
-          <ProfileAvatar
-            name={profile.name}
-            gradient={profile.gradient}
-            avatarUrl={profile.avatarUrl ?? profile.photos[0]}
-            size={42}
-            noPhotoBackground={COLORS.forest}
-            noPhotoInitialColor={COLORS.linen}
-          />
-        ) : (
-          <View style={styles.chatHeaderAvatarFallback}>
-            <Text style={styles.chatHeaderAvatarInitials}>
-              {getInitials(profile.name)}
-            </Text>
-          </View>
-        )}
-        <View style={styles.headerText}>
-          <Text style={styles.chatName}>{profile.name}</Text>
-          {otherTyping ? (
-            <Text style={styles.typingMeta}>typing…</Text>
+          {profile.avatarUrl?.trim() || profile.photos[0]?.trim() ? (
+            <ProfileAvatar
+              name={profile.name}
+              gradient={profile.gradient}
+              avatarUrl={profile.avatarUrl ?? profile.photos[0]}
+              size={42}
+              noPhotoBackground={COLORS.forest}
+              noPhotoInitialColor={COLORS.linen}
+            />
           ) : (
-            <Text style={styles.chatMeta}>{profile.compatibility}% genotype match</Text>
+            <View style={styles.chatHeaderAvatarFallback}>
+              <Text style={styles.chatHeaderAvatarInitials}>
+                {getInitials(profile.name)}
+              </Text>
+            </View>
           )}
-        </View>
-        <Pressable
-          style={({ pressed }) => [styles.headerActionBtn, pressed && styles.headerIconBtnPressed]}
+          <View style={styles.headerText}>
+            <Text style={styles.chatName}>{profile.name}</Text>
+            {otherTyping ? (
+              <Text style={styles.typingMeta}>typing…</Text>
+            ) : (
+              <Text style={styles.chatMeta}>{profile.compatibility}% genotype match</Text>
+            )}
+          </View>
+        </Pressable>
+        <GenoGlassIconButton
           onPress={() => setShowProfile(true)}
           accessibilityLabel="View profile"
+          size={40}
         >
-          <Ionicons name="person-circle-outline" size={22} color={COLORS.forest} />
-        </Pressable>
-        <Pressable
-          style={({ pressed }) => [styles.headerActionBtn, pressed && styles.headerIconBtnPressed]}
+          <Ionicons name="person-circle-outline" size={20} color={COLORS.forestDeep} />
+        </GenoGlassIconButton>
+        <GenoGlassIconButton
           onPress={() => setShowModerationSheet(true)}
           accessibilityLabel="Report or block"
+          size={40}
         >
-          <Ionicons name="ellipsis-vertical" size={20} color={COLORS.forest} />
-        </Pressable>
-      </View>
+          <Ionicons name="ellipsis-vertical" size={18} color={COLORS.forestDeep} />
+        </GenoGlassIconButton>
+      </GenoGlassSurface>
 
       <ReportBlockSheet
         visible={showModerationSheet}
@@ -298,11 +322,24 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
         onBlocked={onBack}
       />
 
-      {error ? <Text style={styles.errorBanner}>{error}</Text> : null}
+      {error ? (
+        <View style={styles.errorWrap}>
+          <GenoGlassSurface
+            variant="light"
+            borderRadius={RADIUS.md}
+            shadow="glass"
+            style={styles.errorGlass}
+            contentStyle={styles.errorBanner}
+          >
+            <Text style={styles.errorText}>{error}</Text>
+          </GenoGlassSurface>
+        </View>
+      ) : null}
 
       {loading ? (
         <View style={styles.loadingWrap}>
-          <ActivityIndicator color={COLORS.forest} size="large" />
+          <GenoLogoCeremony variant="compact" tone="dark" />
+          <Text style={styles.loadingText}>Loading messages…</Text>
         </View>
       ) : (
         <FlatList
@@ -326,7 +363,14 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
         />
       )}
 
-      <View style={styles.composer}>
+      <GenoGlassSurface
+        variant="linen"
+        borderRadius={0}
+        showTopRule
+        shadow="glass"
+        style={styles.composerGlass}
+        contentStyle={styles.composer}
+      >
         <TextInput
           style={styles.composerInput}
           value={draft}
@@ -350,7 +394,7 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
             )}
           </View>
         </Pressable>
-      </View>
+      </GenoGlassSurface>
     </KeyboardAvoidingView>
   );
 }
@@ -360,39 +404,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.linen,
   },
+  headerGlass: {
+    zIndex: 2,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingTop: 56,
-    paddingHorizontal: 16,
-    paddingBottom: 14,
-    backgroundColor: COLORS.linen,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-    gap: 10,
+    paddingHorizontal: 12,
+    paddingBottom: 12,
+    gap: 8,
   },
-  backBtn: {
+  headerProfileTap: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    width: 40,
-    height: 40,
-    borderRadius: RADIUS.pill,
-    backgroundColor: COLORS.mint,
-    borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.28)',
-    flexShrink: 0,
-  },
-  headerActionBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: RADIUS.pill,
-    backgroundColor: COLORS.mint,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexShrink: 0,
-    borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.2)',
+    gap: 10,
+    minWidth: 0,
   },
   headerIconBtnPressed: {
     opacity: 0.88,
@@ -413,42 +441,57 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   chatHeaderAvatarInitials: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 16,
     color: COLORS.gold,
     textAlign: 'center',
   },
   chatName: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 17,
     letterSpacing: -0.2,
     color: COLORS.forestDeep,
   },
   chatMeta: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
     color: COLORS.textSubtle,
     marginTop: 2,
   },
   typingMeta: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
     color: COLORS.sage,
     fontStyle: 'italic',
     marginTop: 2,
   },
+  errorWrap: {
+    paddingHorizontal: 16,
+    paddingTop: 8,
+  },
+  errorGlass: {
+    overflow: 'hidden',
+  },
   errorBanner: {
-    fontFamily: 'Satoshi-Medium',
-    backgroundColor: COLORS.errorBg,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+  },
+  errorText: {
+    fontFamily: FONT_FAMILY.gothamMedium,
     color: COLORS.error,
     textAlign: 'center',
-    paddingVertical: 8,
     fontSize: 13,
   },
   loadingWrap: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 12,
+  },
+  loadingText: {
+    fontFamily: FONT_FAMILY.gothamMedium,
+    fontSize: 14,
+    color: COLORS.sage,
   },
   listContent: {
     padding: 16,
@@ -456,7 +499,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   timeDivider: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     alignSelf: 'center',
     fontSize: 11,
     letterSpacing: 0.3,
@@ -472,7 +515,7 @@ const styles = StyleSheet.create({
   },
   emptyHintText: {
     alignSelf: 'center',
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 13,
     color: COLORS.forest,
     textAlign: 'center',
@@ -503,18 +546,18 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 20,
   },
+  bubbleGlass: {
+    overflow: 'hidden',
+    maxWidth: '100%',
+  },
   bubbleSent: {
-    backgroundColor: '#1A3D28',
-    borderBottomRightRadius: 4,
+    borderBottomRightRadius: 6,
   },
   bubbleReceived: {
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#E8E0D5',
-    borderBottomLeftRadius: 4,
+    borderBottomLeftRadius: 6,
   },
   bubbleText: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 15,
     lineHeight: 21,
     color: COLORS.forest,
@@ -530,9 +573,12 @@ const styles = StyleSheet.create({
     marginRight: 2,
   },
   readReceiptText: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 11,
     color: COLORS.textSubtle,
+  },
+  composerGlass: {
+    overflow: 'hidden',
   },
   composer: {
     flexDirection: 'row',
@@ -541,9 +587,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     paddingBottom: 10,
-    backgroundColor: COLORS.white,
-    borderTopWidth: 1,
-    borderTopColor: '#D4A843',
   },
   composerInput: {
     flex: 1,
@@ -551,11 +594,11 @@ const styles = StyleSheet.create({
     maxHeight: 120,
     borderRadius: 25,
     borderWidth: 1,
-    borderColor: '#D4A843',
-    backgroundColor: '#FFFFFF',
+    borderColor: 'rgba(212, 168, 67, 0.35)',
+    backgroundColor: 'rgba(255, 255, 255, 0.55)',
     paddingHorizontal: 14,
     paddingVertical: 10,
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 16,
     color: COLORS.forest,
   },
@@ -577,7 +620,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#D4A843',
   },
   sendBtnText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 15,
     color: '#0D2818',
   },

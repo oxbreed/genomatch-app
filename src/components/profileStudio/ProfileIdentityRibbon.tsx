@@ -2,7 +2,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { GenoCardFrame } from '../../brand/graphics';
-import { COLORS } from '../../theme';
+import { FONT_FAMILY, COLORS } from '../../theme';
 import { PROFILE, PROFILE_TYPE } from '../profile/profileTokens';
 
 type Props = {
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   verifyText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 13,
     color: COLORS.forestDeep,
   },

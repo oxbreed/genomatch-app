@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import ProfileAvatar from '../ProfileAvatar';
 import { PresenceDot } from '../PresenceBadge';
-import { COLORS } from '../../theme';
+import { FONT_FAMILY, COLORS } from '../../theme';
 import { getInitials } from '../../data/mockData';
 import type { PresenceState } from '../../types/database';
 import { INBOX } from './inboxTokens';
@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   initials: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 17,
     color: COLORS.gold,
   },

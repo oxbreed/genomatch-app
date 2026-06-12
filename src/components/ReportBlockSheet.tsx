@@ -7,8 +7,10 @@ import {
   Text,
   View,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS } from '../theme';
+import { GenoGlassBackdrop, GenoGlassSurface } from '../brand/graphics';
+import { COLORS, GLASS } from '../theme';
 import { blockUser, reportUser, REPORT_REASONS } from '../lib/moderation';
 
 type ReportBlockSheetProps = {
@@ -92,8 +94,17 @@ export default function ReportBlockSheet({
       animationType="slide"
       onRequestClose={handleClose}
     >
-      <Pressable style={styles.backdrop} onPress={handleClose}>
-        <View style={styles.sheet} onStartShouldSetResponder={() => true}>
+      <View style={styles.backdrop}>
+        <GenoGlassBackdrop />
+        <Pressable style={styles.backdropPress} onPress={handleClose} />
+        <View style={styles.sheetWrap} onStartShouldSetResponder={() => true}>
+        <GenoGlassSurface
+          variant="sheet"
+          borderRadius={24}
+          shadow="glassElevated"
+          style={styles.sheet}
+          contentStyle={styles.sheetContent}
+        >
           <View style={styles.handle} />
 
           {step === 'menu' && (
@@ -160,13 +171,16 @@ export default function ReportBlockSheet({
                 <Ionicons name="checkmark-circle" size={48} color={COLORS.forest} />
               </View>
               <Text style={styles.successText}>{successMessage}</Text>
-              <Pressable style={styles.doneBtn} onPress={handleDone}>
-                <Text style={styles.doneBtnText}>Done</Text>
+              <Pressable style={styles.doneBtnWrap} onPress={handleDone}>
+                <LinearGradient colors={[COLORS.gold, '#C49A3A']} style={styles.doneBtn}>
+                  <Text style={styles.doneBtnText}>Done</Text>
+                </LinearGradient>
               </Pressable>
             </>
           )}
+        </GenoGlassSurface>
         </View>
-      </Pressable>
+      </View>
     </Modal>
   );
 }
@@ -174,13 +188,19 @@ export default function ReportBlockSheet({
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(13, 40, 24, 0.45)',
     justifyContent: 'flex-end',
   },
+  backdropPress: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  sheetWrap: {
+    overflow: 'hidden',
+  },
   sheet: {
-    backgroundColor: COLORS.linen,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
+  },
+  sheetContent: {
     paddingHorizontal: 20,
     paddingBottom: 36,
     paddingTop: 12,
@@ -211,13 +231,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    backgroundColor: COLORS.white,
+    backgroundColor: GLASS.insetFill,
     borderRadius: 14,
     paddingVertical: 14,
     paddingHorizontal: 16,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: GLASS.insetBorder,
   },
   optionPressed: {
     opacity: 0.88,
@@ -232,13 +252,13 @@ const styles = StyleSheet.create({
     color: COLORS.error,
   },
   reasonRow: {
-    backgroundColor: COLORS.white,
+    backgroundColor: GLASS.insetFill,
     borderRadius: 12,
     paddingVertical: 14,
     paddingHorizontal: 16,
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: GLASS.insetBorder,
   },
   reasonText: {
     fontSize: 15,
@@ -289,10 +309,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 20,
   },
+  doneBtnWrap: {
+    borderRadius: 14,
+    overflow: 'hidden',
+  },
   doneBtn: {
     height: 52,
-    borderRadius: 14,
-    backgroundColor: COLORS.gold,
     alignItems: 'center',
     justifyContent: 'center',
   },

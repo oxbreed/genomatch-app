@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
+  Animated,
   FlatList,
-  Pressable,
   RefreshControl,
   StyleSheet,
   Text,
@@ -12,11 +12,16 @@ import { StatusBar } from 'expo-status-bar';
 import * as Haptics from 'expo-haptics';
 import EmptyState from '../src/components/EmptyState';
 import { GenoPremiumChrome, GenoLogoCeremony } from '../src/brand/graphics';
-import { GenoInboxCountBadge, GenoInboxHeader } from '../src/components/inbox';
-import MatchListCard from '../src/components/matches/MatchListCard';
+import {
+  GenoInboxCountBadge,
+  GenoInboxHeader,
+  GenoInboxNewBanner,
+  GenoInboxRetryPanel,
+} from '../src/components/inbox';
+import MatchListCard, { isRecentMatch } from '../src/components/matches/MatchListCard';
 import { logAuthState } from '../src/lib/auth';
 import { TAB_SCENE_BOTTOM_PADDING } from '../src/components/navigation/tabBarLayout';
-import { COLORS } from '../src/theme';
+import { FONT_FAMILY, COLORS, MOTION } from '../src/theme';
 import type { DiscoveryProfile, Genotype, MatchWithProfile } from '../src/types/database';
 import { fetchMatches, unmatchByMatchId } from '../src/lib/matches';
 import MatchProfile from './MatchProfile';
@@ -33,6 +38,23 @@ export default function Matches({ onStartChat, onImmersiveChange }: MatchesProps
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
   const [selectedMatch, setSelectedMatch] = useState<MatchWithProfile | null>(null);
+  const listFade = useRef(new Animated.Value(0)).current;
+
+  const sortedMatches = useMemo(
+    () =>
+      [...matches].sort((a, b) => {
+        const aNew = isRecentMatch(a.matchedAt);
+        const bNew = isRecentMatch(b.matchedAt);
+        if (aNew !== bNew) return aNew ? -1 : 1;
+        return new Date(b.matchedAt).getTime() - new Date(a.matchedAt).getTime();
+      }),
+    [matches]
+  );
+
+  const newMatchCount = useMemo(
+    () => matches.filter((m) => isRecentMatch(m.matchedAt)).length,
+    [matches]
+  );
 
   const loadMatches = useCallback(async (isRefresh = false) => {
     if (!isRefresh) setLoading(true);
@@ -57,6 +79,17 @@ export default function Matches({ onStartChat, onImmersiveChange }: MatchesProps
   useEffect(() => {
     onImmersiveChange?.(!!selectedMatch);
   }, [onImmersiveChange, selectedMatch]);
+
+  useEffect(() => {
+    if (loading) return;
+    listFade.setValue(0);
+    Animated.timing(listFade, {
+      toValue: 1,
+      duration: MOTION.tabFadeMs + 80,
+      easing: MOTION.easing.sheetOut,
+      useNativeDriver: true,
+    }).start();
+  }, [listFade, loading, sortedMatches.length]);
 
   const handleUnmatch = (item: MatchWithProfile) => {
     Alert.alert(
@@ -102,12 +135,14 @@ export default function Matches({ onStartChat, onImmersiveChange }: MatchesProps
 
   return (
     <View style={styles.container}>
-      <GenoPremiumChrome variant="linen" />
+      <GenoPremiumChrome variant="discover" />
       <StatusBar style="dark" />
 
       <GenoInboxHeader
         title="Your matches"
-        subtitle="People who liked you back — genotype bond at a glance"
+        subtitle="Mutual likes — bond score and chat in one place"
+        ceremonyMark={matches.length > 0}
+        glass
         right={<GenoInboxCountBadge count={matches.length} />}
       />
 
@@ -118,46 +153,48 @@ export default function Matches({ onStartChat, onImmersiveChange }: MatchesProps
         </View>
       ) : error ? (
         <View style={styles.centered}>
-          <Text style={styles.error}>{error}</Text>
-          <Pressable style={styles.retryBtn} onPress={() => loadMatches()}>
-            <Text style={styles.retryText}>Try again</Text>
-          </Pressable>
+          <GenoInboxRetryPanel message={error} onRetry={() => loadMatches()} />
         </View>
       ) : (
-        <FlatList
-          data={matches}
-          keyExtractor={(item) => item.matchId}
-          contentContainerStyle={matches.length === 0 ? styles.emptyList : styles.list}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={() => {
-                setRefreshing(true);
-                loadMatches(true);
-              }}
-              tintColor={COLORS.forest}
-            />
-          }
-          renderItem={({ item }) => (
-            <MatchListCard
-              item={item}
-              viewerGenotype={viewerGenotype}
-              onOpenProfile={() => setSelectedMatch(item)}
-              onStartChat={() => {
-                void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                onStartChat?.(item.matchId, item.profile);
-              }}
-              onUnmatch={() => handleUnmatch(item)}
-            />
-          )}
-          ListEmptyComponent={
-            <EmptyState
-              type="no-matches"
-              title="No matches yet"
-              subtitle="Keep discovering — when you both like each other, they'll appear here."
-            />
-          }
-        />
+        <Animated.View style={[styles.listWrap, { opacity: listFade }]}>
+          <FlatList
+            data={sortedMatches}
+            keyExtractor={(item) => item.matchId}
+            contentContainerStyle={matches.length === 0 ? styles.emptyList : styles.list}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={() => {
+                  setRefreshing(true);
+                  loadMatches(true);
+                }}
+                tintColor={COLORS.forest}
+              />
+            }
+            ListHeaderComponent={
+              matches.length > 0 ? <GenoInboxNewBanner count={newMatchCount} /> : null
+            }
+            renderItem={({ item }) => (
+              <MatchListCard
+                item={item}
+                viewerGenotype={viewerGenotype}
+                onOpenProfile={() => setSelectedMatch(item)}
+                onStartChat={() => {
+                  void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  onStartChat?.(item.matchId, item.profile);
+                }}
+                onUnmatch={() => handleUnmatch(item)}
+              />
+            )}
+            ListEmptyComponent={
+              <EmptyState
+                type="no-matches"
+                title="No matches yet"
+                subtitle="Keep discovering — when you both like each other, they'll appear here."
+              />
+            }
+          />
+        </Animated.View>
       )}
     </View>
   );
@@ -167,28 +204,11 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.linen },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, gap: 12 },
   loadingText: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
     color: COLORS.sage,
   },
-  list: { paddingBottom: TAB_SCENE_BOTTOM_PADDING },
+  listWrap: { flex: 1 },
+  list: { paddingTop: 4, paddingBottom: TAB_SCENE_BOTTOM_PADDING },
   emptyList: { flexGrow: 1 },
-  error: {
-    fontFamily: 'Satoshi-Medium',
-    fontSize: 15,
-    color: COLORS.error,
-    textAlign: 'center',
-    marginBottom: 12,
-  },
-  retryBtn: {
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 12,
-    backgroundColor: COLORS.gold,
-  },
-  retryText: {
-    fontFamily: 'Satoshi-Bold',
-    fontSize: 15,
-    color: COLORS.forestDeep,
-  },
 });

@@ -3,6 +3,7 @@
 alter table public.messages
   add column if not exists read_at timestamptz;
 
+drop policy if exists "Recipients can mark messages as read" on public.messages;
 create policy "Recipients can mark messages as read"
   on public.messages for update to authenticated
   using (

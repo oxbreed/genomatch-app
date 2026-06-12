@@ -1,3 +1,4 @@
+import { resolveDistanceBandFromCities } from '../lib/distanceBands';
 import type { DiscoveryProfile } from '../types/database';
 
 export { COLORS, TYPOGRAPHY, RADIUS, SHADOWS } from '../theme';
@@ -132,7 +133,8 @@ export function getFirstName(name: string) {
 }
 
 /** Mock cards shown in Discovery when no real profiles exist yet. */
-export function getMockDiscoveryProfiles(): DiscoveryProfile[] {
+export function getMockDiscoveryProfiles(viewerCity?: string | null): DiscoveryProfile[] {
+  const originCity = viewerCity?.trim() || MOCK_CURRENT_USER.city;
   return MOCK_MATCHES.map((p, index) => {
     const photos = p.photoUrl ? [p.photoUrl] : [];
     return {
@@ -140,6 +142,7 @@ export function getMockDiscoveryProfiles(): DiscoveryProfile[] {
       name: p.name,
       age: p.age,
       city: p.city,
+      distanceBand: resolveDistanceBandFromCities(originCity, p.city),
       genotype: p.genotype,
       compatibility: p.compatibility,
       bio: p.bio,

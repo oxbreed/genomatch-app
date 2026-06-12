@@ -10,7 +10,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { GenoLogoCeremony } from '../../brand/graphics';
 import { INBOX } from '../inbox/inboxTokens';
-import { COLORS, RADIUS, SHADOWS } from '../../theme';
+import { FONT_FAMILY, COLORS, RADIUS, SHADOWS } from '../../theme';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const COLS = 3;
@@ -111,7 +111,7 @@ export default function ProfilePhotosGrid({
 
 const styles = StyleSheet.create({
   hint: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
     color: COLORS.sage,
     marginBottom: 12,
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(212, 168, 67, 0.35)',
   },
   mainText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 9,
     letterSpacing: 0.8,
     textTransform: 'uppercase',
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
     elevation: 0,
   },
   addLabel: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 11,
     color: COLORS.sage,
   },
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
   },
   emptyText: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
     lineHeight: 21,
     color: COLORS.sage,
@@ -209,13 +209,13 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   emptyStudioTitle: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 17,
     color: COLORS.forestDeep,
     marginTop: 4,
   },
   emptyStudioSub: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
     color: COLORS.sage,
     textAlign: 'center',
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.gold,
   },
   emptyStudioBtnText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 13,
     color: COLORS.forestDeep,
   },

@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS } from '../theme';
+import { FONT_FAMILY, COLORS } from '../theme';
 import type { PresenceState } from '../types/database';
 
 type Props = {
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.22)',
   },
   text: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 10,
     letterSpacing: 0.3,
   },
@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(212, 168, 67, 0.5)',
   },
   newText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 10,
     letterSpacing: 0.3,
     color: COLORS.forestDeep,

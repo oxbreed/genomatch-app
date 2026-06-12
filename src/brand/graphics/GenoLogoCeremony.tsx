@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Animated, Easing, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import GenoMatchLogo from '../../components/GenoMatchLogo';
-import { COLORS } from '../../theme';
+import { FONT_FAMILY, COLORS } from '../../theme';
 import GenoBondHalo from './GenoBondHalo';
 
 export type GenoLogoCeremonySize = 'splash' | 'auth' | 'hero' | 'studio' | 'compact' | 'mark';
@@ -143,13 +143,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   wordmark: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 28,
     letterSpacing: -0.6,
     textAlign: 'center',
   },
   tagline: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
     marginTop: 6,
     textAlign: 'center',

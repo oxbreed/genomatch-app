@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
   Animated,
-  Easing,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -13,14 +12,16 @@ import {
   type LayoutChangeEvent,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import About from './About';
 import CommunityGuidelines from './CommunityGuidelines';
 import PrivacyPolicy from './PrivacyPolicy';
-import { GenoCardFrame, GenoPremiumChrome, GenoLogoCeremony } from '../src/brand/graphics';
-import { Ionicons } from '@expo/vector-icons';
-import { GenoInboxHeader, GenoInboxIconButton } from '../src/components/inbox';
+import { GenoPremiumChrome, GenoLogoCeremony } from '../src/brand/graphics';
+import EmptyState from '../src/components/EmptyState';
+import { GenoInboxHeader, GenoInboxIconButton, GenoInboxRetryPanel } from '../src/components/inbox';
 import {
   ProfileDetailsFields,
   ProfileEditFields,
+  ProfileFooterCard,
   ProfileGenotypeVerifyModal,
   ProfileHero,
   ProfilePhotosGrid,
@@ -44,8 +45,8 @@ import {
   type StudioStep,
 } from '../src/components/profileStudio';
 import { GENO_TAB_BAR_HEIGHT } from '../src/components/navigation/tabBarLayout';
-import { PROFILE, PROFILE_TYPE } from '../src/components/profile/profileTokens';
-import { COLORS, RADIUS } from '../src/theme';
+import { PROFILE } from '../src/components/profile/profileTokens';
+import { FONT_FAMILY, COLORS, MOTION } from '../src/theme';
 import { uploadAdditionalPhoto } from '../src/lib/photoUpload';
 import { mapProfileRow } from '../src/lib/profileMapper';
 import { logAuthState } from '../src/lib/auth';
@@ -139,6 +140,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
   const [saving, setSaving] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
   const [showCommunityGuidelines, setShowCommunityGuidelines] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showVerifyModal, setShowVerifyModal] = useState(false);
@@ -151,6 +153,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
   const scrollRef = useRef<ScrollView>(null);
   const sectionOffsets = useRef<Record<string, number>>({});
   const studioFade = useRef(new Animated.Value(0)).current;
+  const viewFade = useRef(new Animated.Value(0)).current;
 
   const loadProfile = useCallback(async () => {
     setError('');
@@ -220,11 +223,22 @@ export default function Profile({ onSignOut }: ProfileProps) {
   useEffect(() => {
     Animated.timing(studioFade, {
       toValue: editing ? 1 : 0,
-      duration: 420,
-      easing: Easing.out(Easing.cubic),
+      duration: MOTION.sheetOpenMs,
+      easing: MOTION.easing.sheetOut,
       useNativeDriver: true,
     }).start();
   }, [editing, studioFade]);
+
+  useEffect(() => {
+    if (loading || editing) return;
+    viewFade.setValue(0);
+    Animated.timing(viewFade, {
+      toValue: 1,
+      duration: MOTION.tabFadeMs + 80,
+      easing: MOTION.easing.sheetOut,
+      useNativeDriver: true,
+    }).start();
+  }, [editing, loading, viewFade]);
 
   const data = editing ? draft : profile;
   const completionPercent = data ? calculateProfileCompletion(data) : 0;
@@ -388,18 +402,26 @@ export default function Profile({ onSignOut }: ProfileProps) {
     return (
       <View style={[styles.root, styles.centered]}>
         <GenoMeshBackdrop />
-        <Text style={styles.emptyText}>
-          {authUserId ? 'Complete profile setup to continue.' : 'Sign in to view your profile.'}
-        </Text>
+        <GenoPremiumChrome variant="linen" />
         {authUserId ? (
-          <Pressable style={styles.retryBtn} onPress={loadProfile}>
-            <Text style={styles.retryText}>Retry</Text>
-          </Pressable>
-        ) : null}
+          <GenoInboxRetryPanel
+            message="Complete profile setup to continue."
+            onRetry={loadProfile}
+          />
+        ) : (
+          <EmptyState
+            type="no-profiles"
+            title="Sign in required"
+            subtitle="Sign in to view and edit your profile."
+          />
+        )}
       </View>
     );
   }
 
+  if (showAbout) {
+    return <About onBack={() => setShowAbout(false)} />;
+  }
   if (showCommunityGuidelines) {
     return <CommunityGuidelines onBack={() => setShowCommunityGuidelines(false)} />;
   }
@@ -428,6 +450,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
               : `${completionPercent}% complete · live on Discover`
           }
           ceremonyMark={editing}
+          glass
           right={
             editing ? (
               <GenoInboxIconButton
@@ -489,7 +512,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
               ) : null}
             </Animated.View>
           ) : (
-            <View style={styles.viewStack}>
+            <Animated.View style={[styles.viewStack, { opacity: viewFade }]}>
               <ProfileStrengthPanel
                 percent={completionPercent}
                 hint={getStrengthLabel(completionPercent)}
@@ -501,7 +524,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
                 genotype={data.genotype}
                 onVerify={requestVerification}
               />
-            </View>
+            </Animated.View>
           )}
 
           {editing ? (
@@ -638,64 +661,37 @@ export default function Profile({ onSignOut }: ProfileProps) {
                 />
               </ProfileSectionCard>
 
-              <GenoCardFrame showWatermark={false} style={styles.footerCard}>
-                <View style={styles.footerInner}>
-                  <Pressable
-                    style={({ pressed }) => [styles.footerLink, pressed && styles.footerLinkPressed]}
-                    onPress={() => setShowCommunityGuidelines(true)}
-                  >
-                    <Text style={styles.footerLinkText}>Community Guidelines</Text>
-                    <Ionicons name="chevron-forward" size={16} color={COLORS.sage} />
-                  </Pressable>
-                  <View style={styles.footerDivider} />
-                  <Pressable
-                    style={({ pressed }) => [styles.footerLink, pressed && styles.footerLinkPressed]}
-                    onPress={() => setShowPrivacy(true)}
-                  >
-                    <Text style={styles.footerLinkText}>Privacy Policy</Text>
-                    <Ionicons name="chevron-forward" size={16} color={COLORS.sage} />
-                  </Pressable>
-                  <View style={styles.footerDivider} />
-                  <Pressable
-                    style={({ pressed }) => [styles.footerLink, pressed && styles.footerLinkPressed]}
-                    onPress={requestDeleteAccount}
-                  >
-                    <Text style={styles.deleteAccountText}>Delete Account</Text>
-                  </Pressable>
-                  <View style={styles.footerDivider} />
-                  <Pressable
-                    style={({ pressed }) => [
-                      styles.signOutBtn,
-                      pressed && styles.footerLinkPressed,
-                      signingOut && styles.signOutDisabled,
-                    ]}
-                    onPress={() => {
-                      Alert.alert('Sign Out', 'Are you sure?', [
-                        { text: 'Cancel', style: 'cancel' },
-                        {
-                          text: 'Sign Out',
-                          style: 'destructive',
-                          onPress: async () => {
-                            setSigningOut(true);
-                            try {
-                              await supabase.auth.signOut();
-                            } finally {
-                              setSigningOut(false);
-                              onSignOut?.();
-                            }
-                          },
+              <ProfileSectionCard
+                kicker="ABOUT & LEGAL"
+                label="Company & policies"
+                hint="Operator details and member policies"
+              >
+                <ProfileFooterCard
+                  signingOut={signingOut}
+                  onAbout={() => setShowAbout(true)}
+                  onCommunity={() => setShowCommunityGuidelines(true)}
+                  onPrivacy={() => setShowPrivacy(true)}
+                  onDeleteAccount={requestDeleteAccount}
+                  onSignOut={() => {
+                    Alert.alert('Sign Out', 'Are you sure?', [
+                      { text: 'Cancel', style: 'cancel' },
+                      {
+                        text: 'Sign Out',
+                        style: 'destructive',
+                        onPress: async () => {
+                          setSigningOut(true);
+                          try {
+                            await supabase.auth.signOut();
+                          } finally {
+                            setSigningOut(false);
+                            onSignOut?.();
+                          }
                         },
-                      ]);
-                    }}
-                    disabled={signingOut}
-                  >
-                    <Ionicons name="log-out-outline" size={18} color={COLORS.forestDeep} />
-                    <Text style={styles.signOutText}>
-                      {signingOut ? 'Signing out…' : 'Sign out'}
-                    </Text>
-                  </Pressable>
-                </View>
-              </GenoCardFrame>
+                      },
+                    ]);
+                  }}
+                />
+              </ProfileSectionCard>
             </View>
           )}
         </ScrollView>
@@ -744,21 +740,18 @@ const styles = StyleSheet.create({
   viewStack: {
     gap: 2,
   },
-  footerCard: {
-    marginBottom: 4,
-  },
   errorBanner: {
     marginHorizontal: 16,
     marginBottom: 8,
     padding: 12,
     borderRadius: 12,
     backgroundColor: 'rgba(220, 80, 60, 0.1)',
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
     color: COLORS.forest,
   },
   emptyText: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 16,
     color: COLORS.forest,
     textAlign: 'center',
@@ -770,54 +763,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: COLORS.gold,
   },
-  retryText: { fontFamily: 'Satoshi-Bold', fontSize: 15, color: COLORS.forest },
+  retryText: { fontFamily: FONT_FAMILY.gothamBold, fontSize: 15, color: COLORS.forest },
   loadingText: {
     marginTop: 16,
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
     color: COLORS.sage,
-  },
-  footerInner: {
-    paddingVertical: 4,
-    paddingHorizontal: PROFILE.cardPadding,
-  },
-  footerLink: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 14,
-  },
-  footerLinkPressed: { opacity: 0.82 },
-  footerLinkText: {
-    fontFamily: 'Satoshi-Medium',
-    fontSize: 15,
-    color: COLORS.forestDeep,
-  },
-  footerDivider: {
-    height: 1,
-    backgroundColor: COLORS.border,
-  },
-  deleteAccountText: {
-    fontFamily: 'Satoshi-Medium',
-    fontSize: 15,
-    color: COLORS.error,
-  },
-  signOutBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    marginTop: 4,
-    marginBottom: 8,
-    paddingVertical: 14,
-    borderRadius: RADIUS.md,
-    backgroundColor: COLORS.mint,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  signOutDisabled: { opacity: 0.6 },
-  signOutText: {
-    ...PROFILE_TYPE.footerAction,
-    color: COLORS.forestDeep,
   },
 });

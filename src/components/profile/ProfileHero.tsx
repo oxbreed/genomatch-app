@@ -12,7 +12,7 @@ import { GenoLogoCeremony } from '../../brand/graphics';
 import { GenoBondMark } from '../../brand';
 import GenotypeBadge from '../GenotypeBadge';
 import VerifiedBadge from '../VerifiedBadge';
-import { COLORS } from '../../theme';
+import { FONT_FAMILY, COLORS } from '../../theme';
 import { PROFILE_TYPE } from './profileTokens';
 import type { Genotype } from '../../types/database';
 
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
   placeholderHint: {
     position: 'absolute',
     bottom: 72,
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
     color: 'rgba(143, 175, 149, 0.85)',
   },
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(13, 40, 24, 0.78)',
   },
   brandText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 11,
     color: COLORS.linen,
     letterSpacing: 0.3,
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   nameInput: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 24,
     color: COLORS.linen,
     borderBottomWidth: 2,
@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
     color: 'rgba(245, 239, 230, 0.82)',
   },
   locationInput: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
     color: COLORS.linen,
     borderBottomWidth: 1,
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(245, 239, 230, 0.28)',
   },
   editText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 12,
     color: COLORS.linen,
     letterSpacing: 0.2,

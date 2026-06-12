@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { getFamilyPlanningInsight, type FamilyPlanningTier } from '../lib/compatibility';
-import { COLORS } from '../theme';
+import { FONT_FAMILY, COLORS } from '../theme';
 import type { Genotype } from '../types/database';
 
 type Props = {
@@ -133,33 +133,33 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   kicker: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 10,
     letterSpacing: 1.4,
     textTransform: 'uppercase',
   },
   title: {
-    fontFamily: 'ClashDisplay-Medium',
+    fontFamily: FONT_FAMILY.gothamSemiBold,
     fontSize: 17,
     letterSpacing: -0.3,
   },
   pair: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
     marginTop: 2,
   },
   summary: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 14,
     lineHeight: 20,
   },
   detail: {
-    fontFamily: 'Satoshi-Regular',
+    fontFamily: FONT_FAMILY.gothamBook,
     fontSize: 13,
     lineHeight: 19,
   },
   disclaimer: {
-    fontFamily: 'Satoshi-Regular',
+    fontFamily: FONT_FAMILY.gothamBook,
     fontSize: 10,
     lineHeight: 14,
     marginTop: 2,
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   compactTitle: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 11,
     flexShrink: 1,
   },

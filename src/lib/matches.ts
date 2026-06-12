@@ -2,7 +2,7 @@ import type { Genotype, MatchWithProfile, ProfileRow } from '../types/database';
 import { logSupabaseResult } from './auth';
 import { mapProfileRow } from './profileMapper';
 import { getBlockedUserIds, severConnection } from './moderation';
-import { fetchPublicProfilesByIds, getCurrentUserId } from './profiles';
+import { fetchDistanceBandsForProfiles, fetchPublicProfilesByIds, getCurrentUserId } from './profiles';
 import { supabase } from './supabase';
 
 export type FetchMatchesResult = {
@@ -50,6 +50,7 @@ export async function fetchMatches(): Promise<FetchMatchesResult> {
   );
 
   const profiles = await fetchPublicProfilesByIds(otherIds);
+  const distanceBands = await fetchDistanceBandsForProfiles(otherIds);
 
   logSupabaseResult('matches.matchedProfiles', profiles, null);
 
@@ -63,7 +64,9 @@ export async function fetchMatches(): Promise<FetchMatchesResult> {
         if (!row) return null;
         return {
           matchId: match.id,
-          profile: mapProfileRow(row, viewerGenotype),
+          profile: mapProfileRow(row, viewerGenotype, {
+            distanceBand: distanceBands.get(otherId) ?? null,
+          }),
           matchedAt: match.created_at,
         };
       })

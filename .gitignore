@@ -42,3 +42,7 @@ yarn-error.*
 
 # Supabase CLI local state
 supabase/.temp/
+
+# OWASP ZAP local install + scan output
+.tools/
+security-reports/

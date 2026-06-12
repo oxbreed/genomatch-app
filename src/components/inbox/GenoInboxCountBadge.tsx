@@ -1,6 +1,6 @@
 import { StyleSheet, Text } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { COLORS } from '../../theme';
+import { FONT_FAMILY, COLORS } from '../../theme';
 import { INBOX } from './inboxTokens';
 
 type Props = {
@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   text: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 13,
     color: COLORS.forestDeep,
   },

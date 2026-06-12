@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   Animated,
-  Easing,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -12,8 +11,9 @@ import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
-import { GenoPremiumChrome, GenoCardFrame } from '../src/brand/graphics';
+import { GenoPremiumChrome, GenoCardFrame, GenoGlassSurface } from '../src/brand/graphics';
 import { GenoBackHeader } from '../src/components/genoExperience';
+import { GenoGlassIconButton } from '../src/components/inbox';
 import GenotypeBadge from '../src/components/GenotypeBadge';
 import ProfileAvatar from '../src/components/ProfileAvatar';
 import FamilyPlanningCard from '../src/components/FamilyPlanningCard';
@@ -22,7 +22,8 @@ import PresenceBadge from '../src/components/PresenceBadge';
 import { ProfileViewSections } from '../src/components/profile';
 import { ProfileVitalityRing } from '../src/components/profileStudio';
 import ReportBlockSheet from '../src/components/ReportBlockSheet';
-import { COLORS, RADIUS, SHADOWS } from '../src/theme';
+import LocationLine from '../src/components/LocationLine';
+import { FONT_FAMILY, COLORS, MOTION, RADIUS, SHADOWS } from '../src/theme';
 import { getCurrentProfile } from '../src/lib/profiles';
 import type { Genotype, MatchWithProfile } from '../src/types/database';
 
@@ -49,14 +50,14 @@ export default function MatchProfile({ match, onBack, onSendMessage }: MatchProf
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
-        duration: 380,
-        easing: Easing.out(Easing.cubic),
+        duration: MOTION.sheetOpenMs,
+        easing: MOTION.easing.sheetOut,
         useNativeDriver: true,
       }),
       Animated.timing(slideAnim, {
         toValue: 0,
-        duration: 420,
-        easing: Easing.out(Easing.cubic),
+        duration: MOTION.sheetOpenMs + 40,
+        easing: MOTION.easing.sheetOut,
         useNativeDriver: true,
       }),
     ]).start();
@@ -65,18 +66,14 @@ export default function MatchProfile({ match, onBack, onSendMessage }: MatchProf
   const onCtaPressIn = () => {
     Animated.spring(ctaScale, {
       toValue: 0.97,
-      friction: 8,
-      tension: 180,
-      useNativeDriver: true,
+      ...MOTION.springSnappy,
     }).start();
   };
 
   const onCtaPressOut = () => {
     Animated.spring(ctaScale, {
       toValue: 1,
-      friction: 8,
-      tension: 180,
-      useNativeDriver: true,
+      ...MOTION.springSnappy,
     }).start();
   };
 
@@ -86,18 +83,18 @@ export default function MatchProfile({ match, onBack, onSendMessage }: MatchProf
   };
 
   const menuBtn = (
-    <Pressable
-      style={({ pressed }) => [styles.menuBtn, pressed && styles.menuBtnPressed]}
+    <GenoGlassIconButton
       onPress={() => setShowModerationSheet(true)}
       accessibilityLabel="Report or block"
+      size={40}
     >
-      <Ionicons name="ellipsis-vertical" size={20} color={COLORS.forest} />
-    </Pressable>
+      <Ionicons name="ellipsis-vertical" size={18} color={COLORS.forestDeep} />
+    </GenoGlassIconButton>
   );
 
   return (
     <View style={styles.container}>
-      <GenoPremiumChrome variant="linen" />
+      <GenoPremiumChrome variant="discover" />
       <StatusBar style="dark" />
 
       <GenoBackHeader title="Match profile" onBack={onBack} right={menuBtn} />
@@ -137,10 +134,7 @@ export default function MatchProfile({ match, onBack, onSendMessage }: MatchProf
 
             <View style={styles.heroMeta}>
               <GenotypeBadge genotype={profile.genotype} />
-              <View style={styles.cityRow}>
-                <Ionicons name="location-outline" size={14} color={COLORS.sage} />
-                <Text style={styles.city}>{profile.city}</Text>
-              </View>
+              <LocationLine city={profile.city} distanceBand={profile.distanceBand} />
             </View>
 
             {(profile.presenceState !== 'offline' || profile.isNewMember) ? (
@@ -191,28 +185,37 @@ export default function MatchProfile({ match, onBack, onSendMessage }: MatchProf
 
       <View style={styles.footer}>
         <LinearGradient
-          colors={['rgba(245, 239, 230, 0)', 'rgba(245, 239, 230, 0.96)', COLORS.linen]}
+          colors={['rgba(245, 239, 230, 0)', 'rgba(245, 239, 230, 0.95)', COLORS.linen]}
           style={styles.footerFade}
           pointerEvents="none"
         />
-        <Animated.View style={[styles.footerInner, { transform: [{ scale: ctaScale }] }]}>
-          <Pressable
-            style={({ pressed }) => [styles.messageBtnWrap, pressed && styles.messageBtnPressed]}
-            onPressIn={onCtaPressIn}
-            onPressOut={onCtaPressOut}
-            onPress={handleSend}
-          >
-            <LinearGradient
-              colors={[COLORS.forest, COLORS.forestDeep]}
-              start={{ x: 0, y: 0.5 }}
-              end={{ x: 1, y: 0.5 }}
-              style={styles.messageBtn}
+        <GenoGlassSurface
+          variant="linen"
+          borderRadius={24}
+          shadow="glassElevated"
+          showTopRule
+          style={styles.footerGlass}
+          contentStyle={styles.footerGlassInner}
+        >
+          <Animated.View style={{ transform: [{ scale: ctaScale }] }}>
+            <Pressable
+              style={({ pressed }) => [styles.messageBtnWrap, pressed && styles.messageBtnPressed]}
+              onPressIn={onCtaPressIn}
+              onPressOut={onCtaPressOut}
+              onPress={handleSend}
             >
-              <Ionicons name="chatbubble-ellipses-outline" size={18} color={COLORS.linen} />
-              <Text style={styles.messageBtnText}>Send message</Text>
-            </LinearGradient>
-          </Pressable>
-        </Animated.View>
+              <LinearGradient
+                colors={[COLORS.forest, COLORS.forestDeep]}
+                start={{ x: 0, y: 0.5 }}
+                end={{ x: 1, y: 0.5 }}
+                style={styles.messageBtn}
+              >
+                <Ionicons name="chatbubble-ellipses-outline" size={18} color={COLORS.linen} />
+                <Text style={styles.messageBtnText}>Send message</Text>
+              </LinearGradient>
+            </Pressable>
+          </Animated.View>
+        </GenoGlassSurface>
       </View>
     </View>
   );
@@ -222,19 +225,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.linen,
-  },
-  menuBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: RADIUS.pill,
-    backgroundColor: COLORS.mint,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.28)',
-  },
-  menuBtnPressed: {
-    opacity: 0.88,
   },
   scroll: {
     paddingBottom: 120,
@@ -259,14 +249,14 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   ringLabel: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 10,
     letterSpacing: 1.2,
     textTransform: 'uppercase',
     color: COLORS.sage,
   },
   displayName: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 26,
     color: COLORS.forestDeep,
     textAlign: 'center',
@@ -293,7 +283,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   city: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
     lineHeight: 20,
     color: COLORS.textMuted,
@@ -311,7 +301,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   matchBadgeText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 11,
     letterSpacing: 1,
     textTransform: 'uppercase',
@@ -341,14 +331,17 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     right: 0,
-    top: -28,
-    height: 28,
+    top: -32,
+    height: 32,
   },
-  footerInner: {
-    width: '100%',
+  footerGlass: {
+    overflow: 'hidden',
+  },
+  footerGlassInner: {
+    padding: 12,
   },
   messageBtnWrap: {
-    borderRadius: RADIUS.md,
+    borderRadius: RADIUS.pill,
     overflow: 'hidden',
     ...SHADOWS.button,
   },
@@ -364,7 +357,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   messageBtnText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 16,
     color: COLORS.linen,
     letterSpacing: 0.1,

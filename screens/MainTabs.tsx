@@ -1,20 +1,43 @@
-import { useCallback, useEffect, useState, type ReactNode } from 'react';
-import { AppState, StyleSheet, View } from 'react-native';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { Animated, AppState, StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import Discovery from './Discovery';
 import Matches from './Matches';
 import Messages from './Messages';
 import Profile from './Profile';
 import GenoTabBar, { type GenoTabId } from '../src/components/navigation/GenoTabBar';
-import { COLORS } from '../src/theme';
+import { COLORS, MOTION } from '../src/theme';
 import { fetchConversations } from '../src/lib/messages';
 import { fetchMatches } from '../src/lib/matches';
 import { touchLastActive } from '../src/lib/presence';
 import type { DiscoveryProfile } from '../src/types/database';
 
+const TAB_IDS: GenoTabId[] = ['discover', 'matches', 'messages', 'profile'];
+
 type MainTabsProps = {
   onSignOut?: () => void;
 };
+
+function useTabSceneAnimation(activeTab: GenoTabId) {
+  const scenes = useRef(
+    Object.fromEntries(
+      TAB_IDS.map((id) => [id, new Animated.Value(id === 'discover' ? 1 : 0)])
+    ) as Record<GenoTabId, Animated.Value>
+  ).current;
+
+  useEffect(() => {
+    TAB_IDS.forEach((id) => {
+      Animated.timing(scenes[id], {
+        toValue: activeTab === id ? 1 : 0,
+        duration: MOTION.tabFadeMs,
+        easing: MOTION.easing.out,
+        useNativeDriver: true,
+      }).start();
+    });
+  }, [activeTab, scenes]);
+
+  return scenes;
+}
 
 export default function MainTabs({ onSignOut }: MainTabsProps) {
   const [activeTab, setActiveTab] = useState<GenoTabId>('discover');
@@ -23,6 +46,7 @@ export default function MainTabs({ onSignOut }: MainTabsProps) {
   const [matchCount, setMatchCount] = useState(0);
   const [unreadCount, setUnreadCount] = useState(0);
   const [immersiveOverlay, setImmersiveOverlay] = useState(false);
+  const tabScenes = useTabSceneAnimation(activeTab);
 
   const refreshBadges = useCallback(async () => {
     try {
@@ -66,15 +90,38 @@ export default function MainTabs({ onSignOut }: MainTabsProps) {
     void refreshBadges();
   };
 
-  const tabPane = (tab: GenoTabId, child: ReactNode) => (
-    <View
-      key={tab}
-      style={[styles.tabPane, activeTab !== tab && styles.tabHidden]}
-      pointerEvents={activeTab === tab ? 'auto' : 'none'}
-    >
-      {child}
-    </View>
-  );
+  const tabPane = (tab: GenoTabId, child: ReactNode) => {
+    const progress = tabScenes[tab];
+    return (
+      <Animated.View
+        key={tab}
+        style={[
+          styles.tabPane,
+          {
+            opacity: progress,
+            transform: [
+              {
+                translateY: progress.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [MOTION.tabSlidePx, 0],
+                }),
+              },
+              {
+                scale: progress.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0.992, 1],
+                }),
+              },
+            ],
+          },
+          activeTab !== tab && styles.tabHidden,
+        ]}
+        pointerEvents={activeTab === tab ? 'auto' : 'none'}
+      >
+        {child}
+      </Animated.View>
+    );
+  };
 
   return (
     <View style={styles.root}>
@@ -103,7 +150,9 @@ export default function MainTabs({ onSignOut }: MainTabsProps) {
         {tabPane('profile', <Profile onSignOut={onSignOut} />)}
       </View>
       {!immersiveOverlay ? (
-        <GenoTabBar tabs={tabsFromCounts(matchCount, unreadCount)} activeTab={activeTab} onSelect={setActiveTab} />
+        <View style={styles.tabBarOverlay} pointerEvents="box-none">
+          <GenoTabBar tabs={tabsFromCounts(matchCount, unreadCount)} activeTab={activeTab} onSelect={setActiveTab} />
+        </View>
       ) : null}
     </View>
   );
@@ -139,11 +188,17 @@ const styles = StyleSheet.create({
     flex: 1,
     position: 'relative',
   },
+  tabBarOverlay: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 50,
+  },
   tabPane: {
     ...StyleSheet.absoluteFillObject,
   },
   tabHidden: {
-    opacity: 0,
     zIndex: -1,
   },
 });

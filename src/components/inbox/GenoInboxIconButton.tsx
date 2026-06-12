@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import { GenoGlassSurface } from '../../brand/graphics';
 import { COLORS } from '../../theme';
 import { INBOX } from './inboxTokens';
 
@@ -28,30 +29,47 @@ export default function GenoInboxIconButton({
         onPress={onPress}
         accessibilityLabel={accessibilityLabel}
       >
-        <LinearGradient colors={INBOX.colors.goldBtn} style={[styles.gradient, { width: size, height: size }]}>
-          <Ionicons name={icon} size={17} color={COLORS.forestDeep} />
-        </LinearGradient>
+        <GenoGlassSurface
+          variant="tabBar"
+          borderRadius={size / 2}
+          shadow="glassFloat"
+          showTopRule={false}
+          intensity={70}
+          style={{ width: size, height: size, overflow: 'hidden' }}
+          contentStyle={styles.glassInner}
+        >
+          <LinearGradient colors={INBOX.colors.goldBtn} style={styles.goldFill}>
+            <Ionicons name={icon} size={17} color={COLORS.forestDeep} />
+          </LinearGradient>
+        </GenoGlassSurface>
       </Pressable>
     );
   }
 
   return (
     <Pressable
-      style={({ pressed }) => [
-        styles.btn,
-        styles.plain,
-        variant === 'danger' && styles.danger,
-        { width: size, height: size },
-        pressed && styles.pressed,
-      ]}
+      style={({ pressed }) => [styles.btn, pressed && styles.pressed]}
       onPress={onPress}
       accessibilityLabel={accessibilityLabel}
     >
-      <Ionicons
-        name={icon}
-        size={17}
-        color={variant === 'danger' ? COLORS.error : COLORS.sage}
-      />
+      <GenoGlassSurface
+        variant="light"
+        borderRadius={size / 2}
+        shadow="glass"
+        showTopRule={false}
+        intensity={58}
+        style={{ width: size, height: size, overflow: 'hidden' }}
+        contentStyle={[
+          styles.glassInner,
+          variant === 'danger' && styles.dangerInner,
+        ]}
+      >
+        <Ionicons
+          name={icon}
+          size={17}
+          color={variant === 'danger' ? COLORS.error : COLORS.sage}
+        />
+      </GenoGlassSurface>
     </Pressable>
   );
 }
@@ -59,23 +77,20 @@ export default function GenoInboxIconButton({
 const styles = StyleSheet.create({
   btn: {
     borderRadius: INBOX.iconBtnSize / 2,
-    overflow: 'hidden',
   },
-  gradient: {
-    borderRadius: INBOX.iconBtnSize / 2,
+  glassInner: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  plain: {
+  goldFill: {
+    flex: 1,
+    width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(237, 243, 238, 0.9)',
-    borderWidth: 1,
-    borderColor: 'rgba(61, 122, 82, 0.12)',
   },
-  danger: {
-    backgroundColor: 'rgba(163, 45, 45, 0.08)',
-    borderColor: 'rgba(163, 45, 45, 0.18)',
+  dangerInner: {
+    backgroundColor: 'rgba(163, 45, 45, 0.06)',
   },
   pressed: {
     opacity: 0.88,

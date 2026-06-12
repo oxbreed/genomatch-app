@@ -2,7 +2,8 @@ import type { ReactElement } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Line, Path, Rect } from 'react-native-svg';
 import { LinearGradient } from 'expo-linear-gradient';
-import { COLORS, FOREST, FOREST_DEEP, GOLD, LINEN, RADIUS, SAGE, SHADOWS } from '../theme';
+import { GenoCardFrame, GenoGlassSurface } from '../brand/graphics';
+import { FONT_FAMILY, COLORS, FOREST, FOREST_DEEP, GOLD, LINEN, RADIUS, SAGE, SHADOWS } from '../theme';
 import { INBOX } from './inbox/inboxTokens';
 
 const ILLUS_SIZE = 128;
@@ -159,26 +160,37 @@ export default function EmptyState({
 
   return (
     <View style={styles.wrap}>
-      <View style={styles.illusWrap}>
-        <Illustration />
-      </View>
-      <Text style={styles.title}>{title}</Text>
-      <Text style={styles.subtitle}>{subtitle}</Text>
-      {actionLabel && onAction ? (
-        <Pressable
-          style={({ pressed }) => [styles.ctaWrap, pressed && styles.ctaPressed]}
-          onPress={onAction}
+      <GenoCardFrame style={styles.cardFrame} showWatermark={false}>
+        <GenoGlassSurface
+          variant="light"
+          borderRadius={RADIUS.xl - 1}
+          shadow="none"
+          showTopRule
+          style={styles.glassCard}
+          contentStyle={styles.glassInner}
         >
-          <LinearGradient
-            colors={[COLORS.gold, '#C49A38']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.cta}
-          >
-            <Text style={styles.ctaText}>{actionLabel}</Text>
-          </LinearGradient>
-        </Pressable>
-      ) : null}
+          <View style={styles.illusWrap}>
+            <Illustration />
+          </View>
+          <Text style={styles.title}>{title}</Text>
+          <Text style={styles.subtitle}>{subtitle}</Text>
+          {actionLabel && onAction ? (
+            <Pressable
+              style={({ pressed }) => [styles.ctaWrap, pressed && styles.ctaPressed]}
+              onPress={onAction}
+            >
+              <LinearGradient
+                colors={[COLORS.gold, '#C49A38']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.cta}
+              >
+                <Text style={styles.ctaText}>{actionLabel}</Text>
+              </LinearGradient>
+            </Pressable>
+          ) : null}
+        </GenoGlassSurface>
+      </GenoCardFrame>
     </View>
   );
 }
@@ -186,9 +198,24 @@ export default function EmptyState({
 const styles = StyleSheet.create({
   wrap: {
     alignItems: 'center',
-    paddingHorizontal: INBOX.cardMarginH + 8,
-    paddingTop: 44,
+    paddingHorizontal: INBOX.cardMarginH,
+    paddingTop: 32,
     paddingBottom: 24,
+  },
+  cardFrame: {
+    width: '100%',
+    maxWidth: 320,
+    marginHorizontal: 0,
+    marginBottom: 0,
+  },
+  glassCard: {
+    overflow: 'hidden',
+  },
+  glassInner: {
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingTop: 32,
+    paddingBottom: 28,
   },
   illusWrap: {
     marginBottom: 18,
@@ -196,7 +223,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   title: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: INBOX.headerTitleSize,
     color: COLORS.forestDeep,
     textAlign: 'center',
@@ -204,7 +231,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   subtitle: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: INBOX.headerSubtitleSize + 1,
     lineHeight: 22,
     color: COLORS.sage,
@@ -227,7 +254,7 @@ const styles = StyleSheet.create({
     opacity: 0.9,
   },
   ctaText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 15,
     color: COLORS.forestDeep,
     letterSpacing: 0.1,

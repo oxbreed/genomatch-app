@@ -1,11 +1,24 @@
-import { useEffect, useRef } from 'react';
-import { Animated, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { useEffect, useRef, useState } from 'react';
+import {
+  Animated,
+  Dimensions,
+  LayoutChangeEvent,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps } from 'react';
 import * as Haptics from 'expo-haptics';
-import { COLORS, TYPOGRAPHY } from '../../theme';
-import { GENO_TAB_BAR_HEIGHT } from './tabBarLayout';
+import { GenoGlassSurface } from '../../brand/graphics';
+import { GENO_VISUAL } from '../../brand/graphics/genoVisualTokens';
+import { FONT_FAMILY, COLORS, GLASS, MOTION, TYPOGRAPHY } from '../../theme';
+import { GENO_TAB_BAR_BOTTOM_MARGIN, GENO_TAB_BAR_HEIGHT, GENO_TAB_BAR_PILL_HEIGHT } from './tabBarLayout';
+
+const TAB_BAR_H_MARGIN = 14;
+const TAB_BAR_RADIUS = 999;
 
 type IonName = ComponentProps<typeof Ionicons>['name'];
 
@@ -34,24 +47,27 @@ function TabItem({
   active: boolean;
   onPress: () => void;
 }) {
-  const scale = useRef(new Animated.Value(active ? 1 : 1)).current;
+  const scale = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     Animated.spring(scale, {
-      toValue: active ? 1.06 : 1,
-      friction: 8,
-      tension: 160,
-      useNativeDriver: true,
+      toValue: active ? GENO_VISUAL.glass.motion.tabScale : 1,
+      ...MOTION.springSnappy,
     }).start();
   }, [active, scale]);
 
   return (
-    <Pressable style={styles.tabItem} onPress={onPress} accessibilityRole="tab" accessibilityState={{ selected: active }}>
-      <Animated.View style={[styles.iconWrap, active && styles.iconWrapActive, { transform: [{ scale }] }]}>
+    <Pressable
+      style={styles.tabItem}
+      onPress={onPress}
+      accessibilityRole="tab"
+      accessibilityState={{ selected: active }}
+    >
+      <Animated.View style={[styles.iconWrap, { transform: [{ scale }] }]}>
         <Ionicons
           name={active ? tab.iconActive : tab.icon}
           size={22}
-          color={active ? COLORS.gold : 'rgba(245, 239, 230, 0.48)'}
+          color={active ? COLORS.forestDeep : 'rgba(22, 53, 34, 0.4)'}
         />
         {tab.badge != null && tab.badge > 0 ? (
           <View style={styles.badge}>
@@ -67,33 +83,65 @@ function TabItem({
 }
 
 export default function GenoTabBar({ tabs, activeTab, onSelect }: Props) {
+  const [barWidth, setBarWidth] = useState(
+    Dimensions.get('window').width - TAB_BAR_H_MARGIN * 2
+  );
+  const indicatorX = useRef(new Animated.Value(0)).current;
+  const tabWidth = barWidth / tabs.length;
+  const activeIndex = Math.max(0, tabs.findIndex((t) => t.id === activeTab));
+
+  useEffect(() => {
+    Animated.spring(indicatorX, {
+      toValue: activeIndex * tabWidth + 6,
+      ...MOTION.springSheetFloat,
+    }).start();
+  }, [activeIndex, indicatorX, tabWidth]);
+
+  const onBarLayout = (event: LayoutChangeEvent) => {
+    setBarWidth(event.nativeEvent.layout.width);
+  };
+
   return (
-    <View style={styles.wrap}>
-      <LinearGradient
-        colors={['transparent', 'rgba(212, 168, 67, 0.55)', 'transparent']}
-        start={{ x: 0, y: 0.5 }}
-        end={{ x: 1, y: 0.5 }}
-        style={styles.topRule}
-        pointerEvents="none"
-      />
-      <View style={styles.tabsRow}>
-        {tabs.map((tab) => {
-          const active = tab.id === activeTab;
-          return (
-            <TabItem
-              key={tab.id}
-              tab={tab}
-              active={active}
-              onPress={() => {
-                if (tab.id !== activeTab) {
-                  void Haptics.selectionAsync();
-                }
-                onSelect(tab.id);
-              }}
-            />
-          );
-        })}
-      </View>
+    <View style={styles.outer}>
+      <GenoGlassSurface
+        variant="tabBar"
+        borderRadius={TAB_BAR_RADIUS}
+        shadow="glassFloat"
+        showTopRule={false}
+        showSheen
+        intensity={72}
+        style={styles.wrap}
+        contentStyle={styles.barInner}
+      >
+        <View style={styles.tabsRow} onLayout={onBarLayout}>
+          <Animated.View
+            pointerEvents="none"
+            style={[
+              styles.indicator,
+              {
+                width: Math.max(0, tabWidth - 12),
+                transform: [{ translateX: indicatorX }],
+              },
+            ]}
+          />
+          {tabs.map((tab) => {
+            const active = tab.id === activeTab;
+            return (
+              <TabItem
+                key={tab.id}
+                tab={tab}
+                active={active}
+                onPress={() => {
+                  if (tab.id !== activeTab) {
+                    void Haptics.selectionAsync();
+                  }
+                  onSelect(tab.id);
+                }}
+              />
+            );
+          })}
+        </View>
+      </GenoGlassSurface>
     </View>
   );
 }
@@ -101,78 +149,83 @@ export default function GenoTabBar({ tabs, activeTab, onSelect }: Props) {
 export { GENO_TAB_BAR_HEIGHT };
 
 const styles = StyleSheet.create({
-  wrap: {
-    height: GENO_TAB_BAR_HEIGHT,
-    paddingTop: 8,
-    paddingBottom: 8,
-    paddingHorizontal: 4,
-    marginHorizontal: 16,
-    marginBottom: Platform.OS === 'ios' ? 24 : 16,
-    borderRadius: 28,
-    backgroundColor: 'rgba(22, 53, 34, 0.82)',
-    overflow: 'hidden',
-    shadowColor: '#0B1F13',
-    shadowOpacity: 0.28,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 12,
+  outer: {
+    marginHorizontal: TAB_BAR_H_MARGIN,
+    marginBottom: GENO_TAB_BAR_BOTTOM_MARGIN,
+    borderRadius: TAB_BAR_RADIUS,
+    ...Platform.select({
+      ios: {
+        shadowColor: COLORS.forestDeep,
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.1,
+        shadowRadius: 24,
+      },
+      android: { elevation: 10 },
+      default: {},
+    }),
   },
-  topRule: {
-    position: 'absolute',
-    top: 0,
-    left: 24,
-    right: 24,
-    height: 1,
+  wrap: {
+    borderRadius: TAB_BAR_RADIUS,
+    overflow: 'hidden',
+  },
+  barInner: {
+    paddingVertical: 4,
+    paddingHorizontal: 4,
   },
   tabsRow: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
+    minHeight: GENO_TAB_BAR_PILL_HEIGHT - 8,
+    position: 'relative',
+  },
+  indicator: {
+    position: 'absolute',
+    top: 3,
+    bottom: 3,
+    left: 0,
+    borderRadius: TAB_BAR_RADIUS,
+    backgroundColor: GLASS.tabBarIndicator,
+    borderWidth: 1,
+    borderColor: 'rgba(212, 168, 67, 0.22)',
   },
   tabItem: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 3,
-    paddingTop: 2,
+    gap: 2,
+    paddingVertical: 3,
+    zIndex: 1,
   },
   iconWrap: {
     position: 'relative',
-    width: 36,
-    height: 36,
+    width: 34,
+    height: 26,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 18,
-  },
-  iconWrapActive: {
-    backgroundColor: 'rgba(212, 168, 67, 0.14)',
   },
   badge: {
     position: 'absolute',
-    top: -2,
-    right: -6,
-    minWidth: 16,
-    height: 16,
-    borderRadius: 8,
+    top: -4,
+    right: -2,
+    minWidth: 17,
+    height: 17,
+    borderRadius: 9,
     backgroundColor: COLORS.gold,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 4,
-    borderWidth: 1.5,
-    borderColor: COLORS.tabBar,
+    borderWidth: 2,
+    borderColor: COLORS.white,
   },
   badgeText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 9,
     color: COLORS.forestDeep,
   },
   tabLabel: {
-    ...TYPOGRAPHY.caption,
-    fontSize: 10,
-    color: 'rgba(245, 239, 230, 0.48)',
+    ...TYPOGRAPHY.navLabel,
   },
   tabLabelActive: {
-    color: COLORS.gold,
-    fontFamily: TYPOGRAPHY.label.fontFamily,
+    ...TYPOGRAPHY.navLabelActive,
   },
 });
