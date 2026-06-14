@@ -45,6 +45,10 @@ const SECTIONS = [
       'Data for active accounts is retained while your account remains open. When you request account deletion, we delete or anonymise your personal data in line with applicable Nigerian law, subject to limited retention where required for legal or security purposes.',
   },
   {
+    title: 'Data Protection Contact',
+    body: `For data-protection and privacy matters, contact ${GENOMATCH_COMPANY.privacyEmail}.`,
+  },
+  {
     title: 'Contact',
     body: GENOMATCH_CONTACT_LINE,
   },

@@ -10,6 +10,7 @@ export const GENOMATCH_COMPANY = {
   jurisdiction: 'Nigeria',
   locationLine: 'Genomatch Ltd Nigeria',
   contactEmail: 'hello@genomatch.app',
+  privacyEmail: 'privacy@genomatch.app',
   website: 'genomatch.app',
   parentLegalName: OXBREED_PARENT.legalName,
 } as const;
