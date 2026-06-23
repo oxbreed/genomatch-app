@@ -24,6 +24,7 @@ import { COLORS, RADIUS, SHADOWS } from '../src/theme'
 import { FONT_FAMILY, GLASS } from '../src/theme';
 import { supabase } from '../src/lib/supabase';
 import { validateEmail } from '../src/lib/validation';
+import { GENOTYPE_SELF_REPORT_DISCLAIMER } from '../src/constants/healthDisclaimers';
 
 type IonName = ComponentProps<typeof Ionicons>['name'];
 
@@ -325,7 +326,8 @@ export default function Register({
                   <Ionicons name="shield-checkmark" size={16} color={COLORS.verified} />
                 </View>
                 <Text style={styles.privacyText}>
-                  Your genotype is kept private, secured, and only used for compatibility intelligence.
+                  Your genotype is kept private and used for compatibility only.{' '}
+                  {GENOTYPE_SELF_REPORT_DISCLAIMER}
                 </Text>
               </View>
 

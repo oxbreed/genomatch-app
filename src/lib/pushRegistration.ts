@@ -10,12 +10,27 @@ export async function syncPushTokenToProfile(): Promise<string | null> {
   const userId = await getAuthenticatedUserId();
   if (!userId) return null;
 
-  const { error } = await supabase
-    .from('profiles')
-    .update({ expo_push_token: token })
-    .eq('id', userId);
+  const { error } = await supabase.rpc('save_expo_push_token', { token });
 
   if (error) {
+    const missingRpc =
+      error.code === 'PGRST202' ||
+      error.code === '42883' ||
+      error.message.toLowerCase().includes('does not exist');
+
+    if (missingRpc) {
+      const { error: fallbackError } = await supabase
+        .from('profiles')
+        .update({ expo_push_token: token })
+        .eq('id', userId);
+
+      if (fallbackError) {
+        console.warn('[push] failed to save expo_push_token', fallbackError.message);
+        return null;
+      }
+      return token;
+    }
+
     console.warn('[push] failed to save expo_push_token', error.message);
     return null;
   }

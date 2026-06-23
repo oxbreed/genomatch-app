@@ -5,7 +5,8 @@ import {
   setLargeSecureItem,
 } from './largeSecureStore';
 
-const supabaseUrl = 'https://rxmrfazktupegpfxaljo.supabase.co';
+const supabaseUrl =
+  process.env.EXPO_PUBLIC_SUPABASE_URL ?? 'https://rxmrfazktupegpfxaljo.supabase.co';
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 
 if (!supabaseAnonKey) {

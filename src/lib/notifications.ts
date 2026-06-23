@@ -3,6 +3,14 @@ import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import { AppState, Platform } from 'react-native';
 
+export function isExpoGoClient(): boolean {
+  return Constants.appOwnership === 'expo';
+}
+
+export function canUseRemotePush(): boolean {
+  return Device.isDevice && !isExpoGoClient();
+}
+
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -45,6 +53,15 @@ async function ensureAndroidChannels(): Promise<void> {
 export async function registerForPushNotifications(): Promise<string | null> {
   if (!Device.isDevice) {
     console.warn('[notifications] Push tokens require a physical device');
+    return null;
+  }
+
+  if (isExpoGoClient()) {
+    if (__DEV__) {
+      console.warn(
+        '[notifications] Remote push is limited in Expo Go. Use `eas build` + TestFlight for real push notifications.'
+      );
+    }
     return null;
   }
 

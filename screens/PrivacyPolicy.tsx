@@ -28,7 +28,7 @@ const SECTIONS = [
   {
     title: 'Genotype Data',
     body:
-      'Genotype information is treated as sensitive health-related data. It is never sold to third parties and is used solely for compatibility scoring and safety-aware matching within GenoMatch.',
+      'Genotype information is self-reported, treated as sensitive health-related data, and used solely for compatibility guidance within GenoMatch — not as medical advice or a laboratory test. It is never sold to third parties.',
   },
   {
     title: 'Data Sharing',

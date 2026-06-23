@@ -34,9 +34,12 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "ng.genomatch.app",
+      "buildNumber": "1",
       "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
         "NSPhotoLibraryUsageDescription": "GenoMatch needs access to your photos so you can upload a profile picture.",
-        "NSLocationWhenInUseUsageDescription": "GenoMatch uses your location to set your city on your profile and improve nearby matching."
+        "NSLocationWhenInUseUsageDescription": "GenoMatch uses your location to set your city on your profile and improve nearby matching.",
+        "UIBackgroundModes": ["remote-notification"]
       }
     },
     "android": {
@@ -82,7 +85,9 @@
         "expo-notifications",
         {
           "icon": "./assets/icon.png",
-          "color": "#0D2818"
+          "color": "#0D2818",
+          "defaultChannel": "messages",
+          "sounds": []
         }
       ],
       [

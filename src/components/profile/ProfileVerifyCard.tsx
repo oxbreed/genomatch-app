@@ -3,6 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { GenoCardFrame } from '../../brand/graphics';
 import { GenoBondMark } from '../../brand';
+import { GENOTYPE_VERIFY_DISCLAIMER } from '../../constants/healthDisclaimers';
 import { FONT_FAMILY, COLORS } from '../../theme';
 import { PROFILE } from './profileTokens';
 
@@ -19,7 +20,8 @@ export default function ProfileVerifyCard({ genotype, onVerify }: Props) {
         <View style={styles.copy}>
           <Text style={styles.title}>Verify you&apos;re real</Text>
           <Text style={styles.body}>
-            Confirm your {genotype} genotype so matches know your profile is authentic.
+            Confirm your {genotype} genotype so matches know your profile is authentic.{' '}
+            {GENOTYPE_VERIFY_DISCLAIMER}
           </Text>
           <Pressable
             style={({ pressed }) => [styles.btn, pressed && styles.pressed]}

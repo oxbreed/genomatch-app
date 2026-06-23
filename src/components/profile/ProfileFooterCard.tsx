@@ -9,6 +9,7 @@ type Props = {
   onAbout: () => void;
   onCommunity: () => void;
   onPrivacy: () => void;
+  onTerms: () => void;
   onDeleteAccount: () => void;
   onSignOut: () => void;
 };
@@ -40,6 +41,7 @@ export default function ProfileFooterCard({
   onAbout,
   onCommunity,
   onPrivacy,
+  onTerms,
   onDeleteAccount,
   onSignOut,
 }: Props) {
@@ -50,6 +52,8 @@ export default function ProfileFooterCard({
       <FooterLink label="Community Guidelines" onPress={onCommunity} />
       <View style={styles.divider} />
       <FooterLink label="Privacy Policy" onPress={onPrivacy} />
+      <View style={styles.divider} />
+      <FooterLink label="Terms of Service" onPress={onTerms} />
       <View style={styles.divider} />
       <FooterLink label="Delete Account" onPress={onDeleteAccount} destructive />
       <View style={styles.divider} />

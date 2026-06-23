@@ -3,6 +3,7 @@ import {
   Alert,
   Animated,
   KeyboardAvoidingView,
+  Linking,
   Platform,
   Pressable,
   ScrollView,
@@ -47,6 +48,7 @@ import { uploadAdditionalPhoto } from '../src/lib/photoUpload';
 import { mapProfileRow } from '../src/lib/profileMapper';
 import { logAuthState } from '../src/lib/auth';
 import { deleteUserAccount } from '../src/lib/accountDeletion';
+import { GENOMATCH_COMPANY } from '../src/constants/company';
 import { detectDeviceCity, syncProfileCityFromDevice } from '../src/lib/location';
 import { fetchMatches } from '../src/lib/matches';
 import {
@@ -789,6 +791,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
                   onAbout={() => setShowAbout(true)}
                   onCommunity={() => setShowCommunityGuidelines(true)}
                   onPrivacy={() => setShowPrivacy(true)}
+                  onTerms={() => void Linking.openURL(`https://${GENOMATCH_COMPANY.website}/terms`)}
                   onDeleteAccount={requestDeleteAccount}
                   onSignOut={() => {
                     Alert.alert('Sign Out', 'Are you sure?', [
