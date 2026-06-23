@@ -7,7 +7,7 @@ import Messages from './Messages';
 import Profile from './Profile';
 import GenoTabBar, { type GenoTabId } from '../src/components/navigation/GenoTabBar';
 import { COLORS, MOTION } from '../src/theme';
-import { fetchConversations, subscribeToInboxRealtime } from '../src/lib/messages';
+import { fetchConversations, startInboxRealtime, subscribeToInboxRealtime } from '../src/lib/messages';
 import { fetchMatches } from '../src/lib/matches';
 import { addNotificationOpenedListener, sendLocalNotification } from '../src/lib/notifications';
 import { touchLastActive } from '../src/lib/presence';
@@ -83,6 +83,7 @@ export default function MainTabs({ onSignOut }: MainTabsProps) {
     void (async () => {
       await refreshBadges();
       await syncPushTokenToProfile();
+      startInboxRealtime();
       const userId = await getAuthenticatedUserId();
       if (cancelled || !userId) return;
 

@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  ActivityIndicator,
   FlatList,
   KeyboardAvoidingView,
   Platform,
@@ -10,67 +9,62 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import FamilyPlanningCard from '../src/components/FamilyPlanningCard';
 import ProfileAvatar from '../src/components/ProfileAvatar';
 import ReportBlockSheet from '../src/components/ReportBlockSheet';
-import { GenoGlassSurface, GenoLogoCeremony, GenoPremiumChrome } from '../src/brand/graphics';
+import ChatMessageBubble from '../src/components/messages/ChatMessageBubble';
+import { GenoGlassSurface, GenoPremiumChrome } from '../src/brand/graphics';
 import { GenoGlassIconButton } from '../src/components/inbox';
 import { getInitials } from '../src/data/mockData';
 import { FONT_FAMILY, COLORS, RADIUS, SHADOWS } from '../src/theme';
-import { getAuthenticatedUserId } from '../src/lib/auth';
+import { getAuthenticatedUserId, peekUserId } from '../src/lib/auth';
 import { setOpenChatMatchId } from '../src/lib/activeChat';
+import { subscribeToLiveMatch } from '../src/lib/chatLive';
 import type { DiscoveryProfile, Genotype, MatchWithProfile } from '../src/types/database';
 import { getCurrentProfile } from '../src/lib/profiles';
 import { rateLimitAction } from '../src/lib/rateLimit';
 import {
+  appendMessageToList,
   ChatMessage,
   fetchMessages,
-  formatMessageTime,
   markMessagesAsRead,
   peekCachedMessages,
   sendMessage,
   subscribeToChatRealtime,
+  upsertMessageInList,
 } from '../src/lib/messages';
 import MatchProfile from './MatchProfile';
 
 const TYPING_STOP_MS = 2000;
+const MARK_READ_DELAY_MS = 350;
 
 type ChatScreenProps = {
   matchId: string;
   profile: DiscoveryProfile;
+  userId?: string | null;
   onBack: () => void;
 };
 
-function mergeMessage(prev: ChatMessage[], next: ChatMessage): ChatMessage[] {
-  const idx = prev.findIndex((m) => m.id === next.id);
-  if (idx >= 0) {
-    const copy = [...prev];
-    copy[idx] = next;
-    return copy;
-  }
-  return [...prev, next];
-}
-
-export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps) {
-  const cached = peekCachedMessages(matchId);
-  const [messages, setMessages] = useState<ChatMessage[]>(cached ?? []);
+export default function ChatScreen({ matchId, profile, userId: userIdProp, onBack }: ChatScreenProps) {
+  const initialCache = peekCachedMessages(matchId);
+  const [messages, setMessages] = useState<ChatMessage[]>(initialCache ?? []);
   const [draft, setDraft] = useState('');
-  const [loading, setLoading] = useState(!cached);
-  const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
   const [showProfile, setShowProfile] = useState(false);
   const [showModerationSheet, setShowModerationSheet] = useState(false);
   const [otherTyping, setOtherTyping] = useState(false);
   const [viewerGenotype, setViewerGenotype] = useState<Genotype | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
-  const listRef = useRef<FlatList<ChatMessage>>(null);
+  const [userId, setUserId] = useState<string | null>(() => userIdProp ?? peekUserId());
+  const listRef = useRef<FlatList<{ item: ChatMessage; prevCreatedAt: string | null }>>(null);
   const realtimeRef = useRef<ReturnType<typeof subscribeToChatRealtime> | null>(null);
   const typingStopRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const markReadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isTypingRef = useRef(false);
+  const messagesRef = useRef(messages);
+  messagesRef.current = messages;
 
   const match: MatchWithProfile = {
     matchId,
@@ -78,32 +72,33 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
     matchedAt: new Date().toISOString(),
   };
 
-  const markRead = useCallback(async () => {
-    try {
-      await markMessagesAsRead(matchId);
-    } catch {
-      // non-blocking
-    }
+  const scrollToEnd = useCallback((animated = false) => {
+    requestAnimationFrame(() => {
+      listRef.current?.scrollToEnd({ animated });
+    });
+  }, []);
+
+  const scheduleMarkRead = useCallback(() => {
+    if (markReadTimerRef.current) clearTimeout(markReadTimerRef.current);
+    markReadTimerRef.current = setTimeout(() => {
+      void markMessagesAsRead(matchId).catch(() => {});
+    }, MARK_READ_DELAY_MS);
   }, [matchId]);
 
-  const loadMessages = useCallback(async () => {
-    const hasCache = !!peekCachedMessages(matchId);
-    if (!hasCache) {
-      setLoading(true);
-    }
-    setError('');
-    try {
-      const rows = await fetchMessages(matchId, { force: true });
-      setMessages(rows);
-      await markRead();
-    } catch (err) {
-      if (!hasCache) {
-        setError(err instanceof Error ? err.message : 'Could not load messages');
+  const syncMessages = useCallback(
+    async (background = false) => {
+      try {
+        const rows = await fetchMessages(matchId, { force: true });
+        setMessages(rows);
+        scheduleMarkRead();
+      } catch (err) {
+        if (!background && messagesRef.current.length === 0) {
+          setError(err instanceof Error ? err.message : 'Could not load messages');
+        }
       }
-    } finally {
-      setLoading(false);
-    }
-  }, [matchId, markRead]);
+    },
+    [matchId, scheduleMarkRead]
+  );
 
   useEffect(() => {
     setOpenChatMatchId(matchId);
@@ -111,44 +106,52 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
   }, [matchId]);
 
   useEffect(() => {
-    void getAuthenticatedUserId().then((id) => setUserId(id));
+    if (userIdProp) {
+      setUserId(userIdProp);
+      return;
+    }
+    if (userId) return;
+    void getAuthenticatedUserId().then((id) => {
+      if (id) setUserId(id);
+    });
+  }, [userId, userIdProp]);
+
+  useEffect(() => {
     void getCurrentProfile().then((row) => setViewerGenotype(row?.genotype ?? null));
   }, []);
 
   useEffect(() => {
-    void loadMessages();
-  }, [loadMessages]);
+    void syncMessages(!!initialCache?.length);
+  }, [matchId, syncMessages]);
+
+  useEffect(() => {
+    const unsubLive = subscribeToLiveMatch(matchId, {
+      onMessage: (incoming) => {
+        setMessages((prev) => appendMessageToList(prev, incoming));
+        if (!incoming.isMine) scheduleMarkRead();
+        scrollToEnd(false);
+      },
+      onMessageUpdated: (updated) => {
+        setMessages((prev) => upsertMessageInList(prev, updated));
+      },
+    });
+    return unsubLive;
+  }, [matchId, scheduleMarkRead, scrollToEnd]);
 
   useEffect(() => {
     if (!userId) return;
 
     const handle = subscribeToChatRealtime(matchId, profile.id, userId, {
-      onMessage: (incoming) => {
-        setMessages((prev) => {
-          const base = incoming.isMine
-            ? prev.filter((m) => !m.id.startsWith('pending-'))
-            : prev;
-          if (base.some((m) => m.id === incoming.id)) return base;
-          return [...base, incoming];
-        });
-        if (!incoming.isMine) {
-          void markRead();
-        }
-        setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 50);
-      },
-      onMessageUpdated: (updated) => {
-        setMessages((prev) => mergeMessage(prev, updated));
-      },
-      onTyping: (isTyping) => {
-        setOtherTyping(isTyping);
-      },
+      onMessage: () => {},
+      onMessageUpdated: () => {},
+      onTyping: setOtherTyping,
     });
     realtimeRef.current = handle;
     return () => {
       handle.unsubscribe();
       realtimeRef.current = null;
     };
-  }, [matchId, profile.id, userId, markRead]);
+  }, [matchId, profile.id, userId]);
 
   const setTyping = useCallback((isTyping: boolean) => {
     if (isTypingRef.current === isTyping) return;
@@ -171,13 +174,15 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
   useEffect(() => {
     return () => {
       if (typingStopRef.current) clearTimeout(typingStopRef.current);
+      if (markReadTimerRef.current) clearTimeout(markReadTimerRef.current);
       setTyping(false);
     };
   }, [setTyping]);
 
-  const handleSend = async () => {
+  const handleSend = () => {
     const text = draft.trim();
-    if (!text || sending) return;
+    const senderId = userId ?? peekUserId();
+    if (!text || !senderId) return;
 
     if (!rateLimitAction('message_send', 50, 3_600_000)) {
       setError('Message limit reached. You can send up to 50 messages per hour.');
@@ -185,89 +190,64 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
     }
 
     setTyping(false);
-    setSending(true);
+    setError('');
     setDraft('');
+
     const optimisticId = `pending-${Date.now()}`;
     const optimistic: ChatMessage = {
       id: optimisticId,
       body: text,
-      senderId: userId ?? '',
+      senderId,
       createdAt: new Date().toISOString(),
       readAt: null,
       isMine: true,
     };
+
     setMessages((prev) => [...prev, optimistic]);
-    setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 50);
-    try {
-      const sent = await sendMessage(matchId, text);
-      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      setMessages((prev) => {
-        const withoutPending = prev.filter((m) => m.id !== optimisticId);
-        if (withoutPending.some((m) => m.id === sent.id)) return withoutPending;
-        return [...withoutPending, sent];
+    scrollToEnd(false);
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+    void sendMessage(matchId, text, { userId: senderId })
+      .then((sent) => {
+        setMessages((prev) => {
+          const withoutPending = prev.filter((m) => m.id !== optimisticId);
+          return appendMessageToList(withoutPending, sent);
+        });
+        scrollToEnd(false);
+      })
+      .catch((err) => {
+        setMessages((prev) => prev.filter((m) => m.id !== optimisticId));
+        setDraft(text);
+        setError(err instanceof Error ? err.message : 'Failed to send message');
       });
-      setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 50);
-    } catch (err) {
-      setMessages((prev) => prev.filter((m) => m.id !== optimisticId));
-      setDraft(text);
-      setError(err instanceof Error ? err.message : 'Failed to send message');
-    } finally {
-      setSending(false);
+  };
+
+  const lastMineId = useMemo(() => {
+    for (let i = messages.length - 1; i >= 0; i -= 1) {
+      if (messages[i].isMine) return messages[i].id;
     }
-  };
+    return null;
+  }, [messages]);
 
-  const lastMineId = [...messages].reverse().find((m) => m.isMine)?.id;
+  const messageRows = useMemo(
+    () =>
+      messages.map((item, index) => ({
+        item,
+        prevCreatedAt: index > 0 ? messages[index - 1].createdAt : null,
+      })),
+    [messages]
+  );
 
-  const renderItem = ({ item, index }: { item: ChatMessage; index: number }) => {
-    const prev = index > 0 ? messages[index - 1] : null;
-    const showTime =
-      !prev ||
-      new Date(item.createdAt).getTime() - new Date(prev.createdAt).getTime() > 5 * 60 * 1000;
-    const showRead = item.isMine && !!item.readAt && item.id === lastMineId;
-
-    return (
-      <View>
-        {showTime && (
-          <Text style={styles.timeDivider}>{formatMessageTime(item.createdAt)}</Text>
-        )}
-        <View
-          style={[
-            styles.bubbleRow,
-            item.isMine ? styles.bubbleRowSent : styles.bubbleRowReceived,
-          ]}
-        >
-          {item.isMine ? (
-            <LinearGradient
-              colors={[COLORS.forest, COLORS.forestDeep]}
-              start={{ x: 0, y: 0.5 }}
-              end={{ x: 1, y: 0.5 }}
-              style={[styles.bubble, styles.bubbleSent]}
-            >
-              <Text style={[styles.bubbleText, styles.bubbleTextSent]}>{item.body}</Text>
-            </LinearGradient>
-          ) : (
-            <GenoGlassSurface
-              variant="light"
-              borderRadius={20}
-              shadow="glass"
-              showTopRule={false}
-              intensity={54}
-              style={styles.bubbleGlass}
-              contentStyle={[styles.bubble, styles.bubbleReceived]}
-            >
-              <Text style={styles.bubbleText}>{item.body}</Text>
-            </GenoGlassSurface>
-          )}
-          {showRead ? (
-            <View style={styles.readReceipt}>
-              <Ionicons name="checkmark-done" size={14} color={COLORS.textSubtle} />
-              <Text style={styles.readReceiptText}>Read</Text>
-            </View>
-          ) : null}
-        </View>
-      </View>
-    );
-  };
+  const renderItem = useCallback(
+    ({ item: row }: { item: { item: ChatMessage; prevCreatedAt: string | null } }) => (
+      <ChatMessageBubble
+        item={row.item}
+        prevCreatedAt={row.prevCreatedAt}
+        showRead={row.item.isMine && !!row.item.readAt && row.item.id === lastMineId}
+      />
+    ),
+    [lastMineId]
+  );
 
   if (showProfile) {
     return (
@@ -314,9 +294,7 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
             />
           ) : (
             <View style={styles.chatHeaderAvatarFallback}>
-              <Text style={styles.chatHeaderAvatarInitials}>
-                {getInitials(profile.name)}
-              </Text>
+              <Text style={styles.chatHeaderAvatarInitials}>{getInitials(profile.name)}</Text>
             </View>
           )}
           <View style={styles.headerText}>
@@ -366,32 +344,32 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
         </View>
       ) : null}
 
-      {loading ? (
-        <View style={styles.loadingWrap}>
-          <GenoLogoCeremony variant="compact" tone="dark" />
-          <Text style={styles.loadingText}>Loading messages…</Text>
-        </View>
-      ) : (
-        <FlatList
-          ref={listRef}
-          data={messages}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.listContent}
-          renderItem={renderItem}
-          onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: false })}
-          ListEmptyComponent={
-            <View style={styles.emptyHint}>
-              <FamilyPlanningCard
-                viewerGenotype={viewerGenotype}
-                candidateGenotype={profile.genotype}
-              />
-              <Text style={styles.emptyHintText}>
-                You matched! Say hello and start your compatibility journey.
-              </Text>
-            </View>
-          }
-        />
-      )}
+      <FlatList
+        ref={listRef}
+        data={messageRows}
+        keyExtractor={(row) => row.item.id}
+        extraData={lastMineId}
+        contentContainerStyle={styles.listContent}
+        renderItem={renderItem}
+        initialNumToRender={18}
+        maxToRenderPerBatch={12}
+        windowSize={9}
+        removeClippedSubviews={Platform.OS === 'android'}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="interactive"
+        onContentSizeChange={() => scrollToEnd(false)}
+        ListEmptyComponent={
+          <View style={styles.emptyHint}>
+            <FamilyPlanningCard
+              viewerGenotype={viewerGenotype}
+              candidateGenotype={profile.genotype}
+            />
+            <Text style={styles.emptyHintText}>
+              You matched! Say hello and start your compatibility journey.
+            </Text>
+          </View>
+        }
+      />
 
       <GenoGlassSurface
         variant="linen"
@@ -409,19 +387,18 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
           placeholderTextColor={COLORS.textSubtle}
           multiline
           maxLength={1000}
-          editable={!sending}
         />
         <Pressable
-          style={({ pressed }) => [styles.sendBtnWrap, pressed && styles.sendBtnPressed]}
+          style={({ pressed }) => [
+            styles.sendBtnWrap,
+            pressed && styles.sendBtnPressed,
+            !draft.trim() && styles.sendBtnDisabled,
+          ]}
           onPress={handleSend}
-          disabled={sending || !draft.trim()}
+          disabled={!draft.trim()}
         >
           <View style={styles.sendBtn}>
-            {sending ? (
-              <ActivityIndicator color="#0D2818" size="small" />
-            ) : (
-              <Text style={styles.sendBtnText}>Send</Text>
-            )}
+            <Text style={styles.sendBtnText}>Send</Text>
           </View>
         </Pressable>
       </GenoGlassSurface>
@@ -512,29 +489,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 13,
   },
-  loadingWrap: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 12,
-  },
-  loadingText: {
-    fontFamily: FONT_FAMILY.gothamMedium,
-    fontSize: 14,
-    color: COLORS.sage,
-  },
   listContent: {
     padding: 16,
     paddingBottom: 8,
     flexGrow: 1,
-  },
-  timeDivider: {
-    fontFamily: FONT_FAMILY.gothamMedium,
-    alignSelf: 'center',
-    fontSize: 11,
-    letterSpacing: 0.3,
-    color: COLORS.textSubtle,
-    marginVertical: 10,
   },
   emptyHint: {
     alignSelf: 'stretch',
@@ -558,54 +516,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.border,
     overflow: 'hidden',
-  },
-  bubbleRow: {
-    marginBottom: 8,
-    maxWidth: '82%',
-  },
-  bubbleRowSent: {
-    alignSelf: 'flex-end',
-    alignItems: 'flex-end',
-  },
-  bubbleRowReceived: {
-    alignSelf: 'flex-start',
-    alignItems: 'flex-start',
-  },
-  bubble: {
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 20,
-  },
-  bubbleGlass: {
-    overflow: 'hidden',
-    maxWidth: '100%',
-  },
-  bubbleSent: {
-    borderBottomRightRadius: 6,
-  },
-  bubbleReceived: {
-    borderBottomLeftRadius: 6,
-  },
-  bubbleText: {
-    fontFamily: FONT_FAMILY.gothamMedium,
-    fontSize: 15,
-    lineHeight: 21,
-    color: COLORS.forest,
-  },
-  bubbleTextSent: {
-    color: COLORS.linen,
-  },
-  readReceipt: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 3,
-    marginTop: 3,
-    marginRight: 2,
-  },
-  readReceiptText: {
-    fontFamily: FONT_FAMILY.gothamMedium,
-    fontSize: 11,
-    color: COLORS.textSubtle,
   },
   composerGlass: {
     overflow: 'hidden',
@@ -639,6 +549,9 @@ const styles = StyleSheet.create({
   },
   sendBtnPressed: {
     opacity: 0.9,
+  },
+  sendBtnDisabled: {
+    opacity: 0.45,
   },
   sendBtn: {
     minWidth: 76,

@@ -5,7 +5,8 @@ import type {
   ProfileRow,
 } from '../types/database';
 import { getOpenChatMatchId } from './activeChat';
-import { logSupabaseResult } from './auth';
+import { peekUserId, logSupabaseResult } from './auth';
+import { publishLiveMessage, publishLiveMessageUpdated } from './chatLive';
 import { mapProfileRow } from './profileMapper';
 import { getBlockedUserIds } from './moderation';
 import { fetchPublicProfilesByIds, getCurrentUserId } from './profiles';
@@ -43,6 +44,32 @@ function mergeCachedMessage(matchId: string, message: ChatMessage): void {
     return;
   }
   messagesByMatch.set(matchId, [...prev, message]);
+}
+
+export function appendMessageToList(prev: ChatMessage[], incoming: ChatMessage): ChatMessage[] {
+  const base = incoming.isMine ? prev.filter((m) => !m.id.startsWith('pending-')) : prev;
+  if (base.some((m) => m.id === incoming.id)) return base;
+  return [...base, incoming];
+}
+
+export function upsertMessageInList(prev: ChatMessage[], updated: ChatMessage): ChatMessage[] {
+  const idx = prev.findIndex((m) => m.id === updated.id);
+  if (idx >= 0) {
+    const copy = [...prev];
+    copy[idx] = updated;
+    return copy;
+  }
+  return [...prev, updated];
+}
+
+function deliverLiveMessage(matchId: string, message: ChatMessage): void {
+  mergeCachedMessage(matchId, message);
+  publishLiveMessage(matchId, message);
+}
+
+function deliverLiveMessageUpdated(matchId: string, message: ChatMessage): void {
+  mergeCachedMessage(matchId, message);
+  publishLiveMessageUpdated(matchId, message);
 }
 
 export function clearMessageCache(matchId?: string): void {
@@ -238,8 +265,12 @@ export async function markMessagesAsRead(matchId: string): Promise<void> {
   if (error) throw error;
 }
 
-export async function sendMessage(matchId: string, body: string): Promise<ChatMessage> {
-  const userId = await getCurrentUserId();
+export async function sendMessage(
+  matchId: string,
+  body: string,
+  options?: { userId?: string }
+): Promise<ChatMessage> {
+  const userId = options?.userId ?? (await getCurrentUserId());
   if (!userId) throw new Error('Not signed in');
 
   const sanitized = validateMessage(body);
@@ -295,7 +326,7 @@ export function subscribeToChatRealtime(
       },
       (payload) => {
         const message = rowToChatMessage(payload.new as MessageRow, userId);
-        mergeCachedMessage(matchId, message);
+        deliverLiveMessage(matchId, message);
         callbacks.onMessage(message);
       }
     )
@@ -309,7 +340,7 @@ export function subscribeToChatRealtime(
       },
       (payload) => {
         const message = rowToChatMessage(payload.new as MessageRow, userId);
-        mergeCachedMessage(matchId, message);
+        deliverLiveMessageUpdated(matchId, message);
         callbacks.onMessageUpdated(message);
       }
     )
@@ -341,6 +372,11 @@ export type InboxRealtimeCallbacks = {
   onNewMatch: () => void;
 };
 
+/** Start the shared inbox realtime channel as early as possible. */
+export function startInboxRealtime(): void {
+  ensureInboxChannel();
+}
+
 /** Inbox-wide realtime for conversation list + badges (RLS-scoped). */
 export function subscribeToInboxRealtime(callbacks: InboxRealtimeCallbacks): () => void {
   inboxListeners.add(callbacks);
@@ -368,6 +404,21 @@ function emitInboxEvent(
   });
 }
 
+function routeRowToLiveChat(row: MessageRow, kind: 'insert' | 'update'): void {
+  const userId = peekUserId();
+  if (!userId) return;
+
+  const message = rowToChatMessage(row, userId);
+  const openMatchId = getOpenChatMatchId();
+  if (openMatchId && openMatchId === row.match_id) {
+    if (kind === 'insert') {
+      deliverLiveMessage(row.match_id, message);
+    } else {
+      deliverLiveMessageUpdated(row.match_id, message);
+    }
+  }
+}
+
 function ensureInboxChannel(): void {
   if (inboxChannel) return;
 
@@ -377,14 +428,18 @@ function ensureInboxChannel(): void {
       'postgres_changes',
       { event: 'INSERT', schema: 'public', table: 'messages' },
       (payload) => {
-        emitInboxEvent('onNewMessage', payload.new as MessageRow);
+        const row = payload.new as MessageRow;
+        routeRowToLiveChat(row, 'insert');
+        emitInboxEvent('onNewMessage', row);
       }
     )
     .on(
       'postgres_changes',
       { event: 'UPDATE', schema: 'public', table: 'messages' },
       (payload) => {
-        emitInboxEvent('onMessageUpdated', payload.new as MessageRow);
+        const row = payload.new as MessageRow;
+        routeRowToLiveChat(row, 'update');
+        emitInboxEvent('onMessageUpdated', row);
       }
     )
     .on(

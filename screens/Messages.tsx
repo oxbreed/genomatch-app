@@ -21,7 +21,7 @@ import {
 import ConversationListCard from '../src/components/messages/ConversationListCard';
 import { isRecentMatch } from '../src/components/matches/MatchListCard';
 import { getOpenChatMatchId } from '../src/lib/activeChat';
-import { logAuthState, getAuthenticatedUserId } from '../src/lib/auth';
+import { logAuthState, getAuthenticatedUserId, peekUserId } from '../src/lib/auth';
 import { sendLocalNotification } from '../src/lib/notifications';
 import { TAB_SCENE_BOTTOM_PADDING } from '../src/components/navigation/tabBarLayout';
 import { FONT_FAMILY, COLORS, MOTION } from '../src/theme';
@@ -66,7 +66,7 @@ export default function Messages({
     profile: DiscoveryProfile;
   } | null>(null);
   const [selectedMatch, setSelectedMatch] = useState<MatchWithProfile | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(() => peekUserId());
   const conversationsRef = useRef(conversations);
   const listFade = useRef(new Animated.Value(0)).current;
 
@@ -203,6 +203,7 @@ export default function Messages({
       <ChatScreen
         matchId={activeChat.matchId}
         profile={activeChat.profile}
+        userId={userId}
         onBack={() => {
           setActiveChat(null);
           loadConversations();

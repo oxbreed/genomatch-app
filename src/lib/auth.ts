@@ -1,8 +1,20 @@
 import type { PostgrestError } from '@supabase/supabase-js';
 import { supabase } from './supabase';
 
+let cachedUserId: string | null = null;
+
+supabase.auth.onAuthStateChange((_event, session) => {
+  cachedUserId = session?.user?.id ?? null;
+});
+
+export function peekUserId(): string | null {
+  return cachedUserId;
+}
+
 /** Prefer local session (fast, works offline) before validating with getUser(). */
 export async function getAuthenticatedUserId(): Promise<string | null> {
+  if (cachedUserId) return cachedUserId;
+
   const {
     data: { session },
     error: sessionError,
@@ -16,7 +28,10 @@ export async function getAuthenticatedUserId(): Promise<string | null> {
     });
   }
 
-  if (session?.user?.id) return session.user.id;
+  if (session?.user?.id) {
+    cachedUserId = session.user.id;
+    return cachedUserId;
+  }
 
   const {
     data: { user },
@@ -30,7 +45,8 @@ export async function getAuthenticatedUserId(): Promise<string | null> {
     });
   }
 
-  return user?.id ?? null;
+  cachedUserId = user?.id ?? null;
+  return cachedUserId;
 }
 
 export async function logAuthState(context: string): Promise<void> {

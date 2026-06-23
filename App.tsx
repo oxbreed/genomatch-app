@@ -13,8 +13,9 @@ import ResetPassword from './screens/ResetPassword';
 import ProfileSetup from './screens/ProfileSetup';
 import MainTabs from './screens/MainTabs';
 import { resolveInitialScreen } from './src/lib/profiles';
-import { logAuthState } from './src/lib/auth';
+import { getAuthenticatedUserId, logAuthState } from './src/lib/auth';
 import { syncPushTokenToProfile } from './src/lib/pushRegistration';
+import { startInboxRealtime } from './src/lib/messages';
 import {
   establishSessionFromResetUrl,
   isResetPasswordDeepLink,
@@ -107,6 +108,11 @@ export default function App() {
           userId: session?.user?.id ?? null,
           sessionError: sessionError?.message ?? null,
         });
+
+        if (session?.user?.id) {
+          void getAuthenticatedUserId();
+          startInboxRealtime();
+        }
 
         await logAuthState('App.startup');
 
