@@ -7,6 +7,7 @@ export { default as ProfilePhotosGrid } from './ProfilePhotosGrid';
 export { default as ProfileEditFields } from './ProfileEditFields';
 export { default as ProfileVerifyCard } from './ProfileVerifyCard';
 export { default as ProfileGenotypeVerifyModal } from './ProfileGenotypeVerifyModal';
+export { default as ProfileDeleteAccountModal } from './ProfileDeleteAccountModal';
 export { default as ProfileViewSections } from './ProfileViewSections';
 export { default as ProfileFooterCard } from './ProfileFooterCard';
 export { default as ProfileSectionHeader } from './ProfileSectionHeader';

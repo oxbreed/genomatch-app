@@ -22,6 +22,7 @@ import {
   ProfileDetailsFields,
   ProfileEditFields,
   ProfileFooterCard,
+  ProfileDeleteAccountModal,
   ProfileGenotypeVerifyModal,
   ProfileHero,
   ProfilePhotosGrid,
@@ -50,6 +51,7 @@ import { FONT_FAMILY, COLORS, MOTION } from '../src/theme';
 import { uploadAdditionalPhoto } from '../src/lib/photoUpload';
 import { mapProfileRow } from '../src/lib/profileMapper';
 import { logAuthState } from '../src/lib/auth';
+import { deleteUserAccount } from '../src/lib/accountDeletion';
 import { fetchMatches } from '../src/lib/matches';
 import {
   getCurrentProfile,
@@ -140,6 +142,8 @@ export default function Profile({ onSignOut }: ProfileProps) {
   const [saving, setSaving] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
   const [showCommunityGuidelines, setShowCommunityGuidelines] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
@@ -352,9 +356,44 @@ export default function Profile({ onSignOut }: ProfileProps) {
 
   const requestDeleteAccount = () => {
     Alert.alert(
-      'Delete Account',
-      'Are you sure you want to delete your account? This cannot be undone. Please email hello@genomatch.app to complete deletion.'
+      'Delete account permanently?',
+      'This will permanently delete your profile, photos, matches, and messages. This cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Continue',
+          style: 'destructive',
+          onPress: () => setShowDeleteModal(true),
+        },
+      ]
     );
+  };
+
+  const handleDeleteAccount = async (password: string) => {
+    setDeletingAccount(true);
+    try {
+      await deleteUserAccount(password);
+
+      try {
+        await supabase.auth.signOut();
+      } catch {
+        // Session may already be invalid after account deletion.
+      }
+
+      setShowDeleteModal(false);
+      Alert.alert(
+        'Account deleted',
+        'Your GenoMatch account and personal data have been permanently removed.',
+        [{ text: 'OK', onPress: () => onSignOut?.() }]
+      );
+    } catch (err) {
+      Alert.alert(
+        'Could not delete account',
+        err instanceof Error ? err.message : 'Please try again.'
+      );
+    } finally {
+      setDeletingAccount(false);
+    }
   };
 
   const requestVerification = async () => {
@@ -726,6 +765,13 @@ export default function Profile({ onSignOut }: ProfileProps) {
           }
         }}
         onClose={() => !verifying && setShowVerifyModal(false)}
+      />
+
+      <ProfileDeleteAccountModal
+        visible={showDeleteModal}
+        deleting={deletingAccount}
+        onConfirm={(password) => void handleDeleteAccount(password)}
+        onClose={() => !deletingAccount && setShowDeleteModal(false)}
       />
     </View>
   );

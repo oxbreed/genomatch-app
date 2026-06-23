@@ -22,3 +22,6 @@ enabled = false
 [studio]
 enabled = true
 port = 54323
+
+[functions.delete-account]
+verify_jwt = true

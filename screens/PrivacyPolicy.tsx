@@ -37,7 +37,7 @@ const SECTIONS = [
   },
   {
     title: 'Your Rights',
-    body: `You may request access to, correction of, or deletion of your personal data at any time. Contact ${GENOMATCH_COMPANY.contactEmail} and we will respond within a reasonable timeframe.`,
+    body: `You may request access to, correction of, or deletion of your personal data at any time. Delete your account from Profile → Delete Account in the app, or contact ${GENOMATCH_COMPANY.privacyEmail} and we will respond within a reasonable timeframe.`,
   },
   {
     title: 'Data Retention',
