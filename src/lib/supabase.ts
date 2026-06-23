@@ -1,5 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
-import * as SecureStore from 'expo-secure-store';
+import {
+  deleteLargeSecureItem,
+  getLargeSecureItem,
+  setLargeSecureItem,
+} from './largeSecureStore';
 
 const supabaseUrl = 'https://rxmrfazktupegpfxaljo.supabase.co';
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
@@ -14,16 +18,16 @@ if (!supabaseAnonKey) {
 const secureStoreAdapter = {
   getItem: async (key: string): Promise<string | null> => {
     try {
-      return await SecureStore.getItemAsync(key);
+      return await getLargeSecureItem(key);
     } catch {
       return null;
     }
   },
   setItem: async (key: string, value: string): Promise<void> => {
-    await SecureStore.setItemAsync(key, value);
+    await setLargeSecureItem(key, value);
   },
   removeItem: async (key: string): Promise<void> => {
-    await SecureStore.deleteItemAsync(key);
+    await deleteLargeSecureItem(key);
   },
 };
 
@@ -35,5 +39,10 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     persistSession: true,
     detectSessionInUrl: false,
     flowType: 'pkce',
+  },
+  realtime: {
+    params: {
+      eventsPerSecond: 20,
+    },
   },
 });

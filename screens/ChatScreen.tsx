@@ -21,15 +21,17 @@ import { GenoGlassSurface, GenoLogoCeremony, GenoPremiumChrome } from '../src/br
 import { GenoGlassIconButton } from '../src/components/inbox';
 import { getInitials } from '../src/data/mockData';
 import { FONT_FAMILY, COLORS, RADIUS, SHADOWS } from '../src/theme';
-import { getCurrentProfile } from '../src/lib/profiles';
+import { getAuthenticatedUserId } from '../src/lib/auth';
+import { setOpenChatMatchId } from '../src/lib/activeChat';
 import type { DiscoveryProfile, Genotype, MatchWithProfile } from '../src/types/database';
-import { sendLocalNotification } from '../src/lib/notifications';
+import { getCurrentProfile } from '../src/lib/profiles';
 import { rateLimitAction } from '../src/lib/rateLimit';
 import {
   ChatMessage,
   fetchMessages,
   formatMessageTime,
   markMessagesAsRead,
+  peekCachedMessages,
   sendMessage,
   subscribeToChatRealtime,
 } from '../src/lib/messages';
@@ -54,15 +56,17 @@ function mergeMessage(prev: ChatMessage[], next: ChatMessage): ChatMessage[] {
 }
 
 export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps) {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const cached = peekCachedMessages(matchId);
+  const [messages, setMessages] = useState<ChatMessage[]>(cached ?? []);
   const [draft, setDraft] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!cached);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
   const [showProfile, setShowProfile] = useState(false);
   const [showModerationSheet, setShowModerationSheet] = useState(false);
   const [otherTyping, setOtherTyping] = useState(false);
   const [viewerGenotype, setViewerGenotype] = useState<Genotype | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const listRef = useRef<FlatList<ChatMessage>>(null);
   const realtimeRef = useRef<ReturnType<typeof subscribeToChatRealtime> | null>(null);
   const typingStopRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -83,41 +87,54 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
   }, [matchId]);
 
   const loadMessages = useCallback(async () => {
+    const hasCache = !!peekCachedMessages(matchId);
+    if (!hasCache) {
+      setLoading(true);
+    }
     setError('');
     try {
-      const rows = await fetchMessages(matchId);
+      const rows = await fetchMessages(matchId, { force: true });
       setMessages(rows);
       await markRead();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not load messages');
+      if (!hasCache) {
+        setError(err instanceof Error ? err.message : 'Could not load messages');
+      }
     } finally {
       setLoading(false);
     }
   }, [matchId, markRead]);
 
   useEffect(() => {
-    loadMessages();
-  }, [loadMessages]);
+    setOpenChatMatchId(matchId);
+    return () => setOpenChatMatchId(null);
+  }, [matchId]);
 
   useEffect(() => {
+    void getAuthenticatedUserId().then((id) => setUserId(id));
     void getCurrentProfile().then((row) => setViewerGenotype(row?.genotype ?? null));
   }, []);
 
   useEffect(() => {
-    const handle = subscribeToChatRealtime(matchId, profile.id, {
+    void loadMessages();
+  }, [loadMessages]);
+
+  useEffect(() => {
+    if (!userId) return;
+
+    const handle = subscribeToChatRealtime(matchId, profile.id, userId, {
       onMessage: (incoming) => {
-        let shouldNotify = false;
         setMessages((prev) => {
-          if (prev.some((m) => m.id === incoming.id)) return prev;
-          if (!incoming.isMine) shouldNotify = true;
-          return [...prev, incoming];
+          const base = incoming.isMine
+            ? prev.filter((m) => !m.id.startsWith('pending-'))
+            : prev;
+          if (base.some((m) => m.id === incoming.id)) return base;
+          return [...base, incoming];
         });
-        if (shouldNotify) {
-          const senderName = profile.name?.trim() || 'Someone';
-          void sendLocalNotification(senderName, incoming.body).catch(() => {});
+        if (!incoming.isMine) {
           void markRead();
         }
-        setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 80);
+        setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 50);
       },
       onMessageUpdated: (updated) => {
         setMessages((prev) => mergeMessage(prev, updated));
@@ -131,7 +148,7 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
       handle.unsubscribe();
       realtimeRef.current = null;
     };
-  }, [matchId, profile.id, profile.name, markRead]);
+  }, [matchId, profile.id, userId, markRead]);
 
   const setTyping = useCallback((isTyping: boolean) => {
     if (isTypingRef.current === isTyping) return;
@@ -170,15 +187,28 @@ export default function ChatScreen({ matchId, profile, onBack }: ChatScreenProps
     setTyping(false);
     setSending(true);
     setDraft('');
+    const optimisticId = `pending-${Date.now()}`;
+    const optimistic: ChatMessage = {
+      id: optimisticId,
+      body: text,
+      senderId: userId ?? '',
+      createdAt: new Date().toISOString(),
+      readAt: null,
+      isMine: true,
+    };
+    setMessages((prev) => [...prev, optimistic]);
+    setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 50);
     try {
       const sent = await sendMessage(matchId, text);
       void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       setMessages((prev) => {
-        if (prev.some((m) => m.id === sent.id)) return prev;
-        return [...prev, sent];
+        const withoutPending = prev.filter((m) => m.id !== optimisticId);
+        if (withoutPending.some((m) => m.id === sent.id)) return withoutPending;
+        return [...withoutPending, sent];
       });
-      setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 80);
+      setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 50);
     } catch (err) {
+      setMessages((prev) => prev.filter((m) => m.id !== optimisticId));
       setDraft(text);
       setError(err instanceof Error ? err.message : 'Failed to send message');
     } finally {

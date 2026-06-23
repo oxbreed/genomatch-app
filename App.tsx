@@ -14,7 +14,7 @@ import ProfileSetup from './screens/ProfileSetup';
 import MainTabs from './screens/MainTabs';
 import { resolveInitialScreen } from './src/lib/profiles';
 import { logAuthState } from './src/lib/auth';
-import { registerForPushNotifications } from './src/lib/notifications';
+import { syncPushTokenToProfile } from './src/lib/pushRegistration';
 import {
   establishSessionFromResetUrl,
   isResetPasswordDeepLink,
@@ -109,12 +109,15 @@ export default function App() {
         });
 
         await logAuthState('App.startup');
-        await registerForPushNotifications();
 
         const initial = await resolveInitialScreen();
         if (mounted && initial !== 'onboarding') {
           setScreen(initial);
         }
+
+        void syncPushTokenToProfile().catch((err) => {
+          console.warn('[App] push registration skipped', err);
+        });
       } catch (err) {
         console.error('[App] bootstrap failed', err);
       } finally {

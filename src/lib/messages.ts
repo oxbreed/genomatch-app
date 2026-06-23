@@ -4,11 +4,54 @@ import type {
   MessageRow,
   ProfileRow,
 } from '../types/database';
+import { getOpenChatMatchId } from './activeChat';
 import { logSupabaseResult } from './auth';
 import { mapProfileRow } from './profileMapper';
 import { getBlockedUserIds } from './moderation';
 import { fetchPublicProfilesByIds, getCurrentUserId } from './profiles';
 import { supabase } from './supabase';
+import { validateMessage } from './validation';
+
+type ConversationPreviewRow = {
+  match_id: string;
+  other_user_id: string;
+  last_message_body: string | null;
+  last_message_at: string;
+  last_sender_id: string | null;
+  last_read_at: string | null;
+  match_created_at: string;
+};
+
+const messagesByMatch = new Map<string, ChatMessage[]>();
+
+export function peekCachedMessages(matchId: string): ChatMessage[] | undefined {
+  const cached = messagesByMatch.get(matchId);
+  return cached ? [...cached] : undefined;
+}
+
+export function setCachedMessages(matchId: string, messages: ChatMessage[]): void {
+  messagesByMatch.set(matchId, messages);
+}
+
+function mergeCachedMessage(matchId: string, message: ChatMessage): void {
+  const prev = messagesByMatch.get(matchId) ?? [];
+  if (prev.some((m) => m.id === message.id)) {
+    messagesByMatch.set(
+      matchId,
+      prev.map((m) => (m.id === message.id ? message : m))
+    );
+    return;
+  }
+  messagesByMatch.set(matchId, [...prev, message]);
+}
+
+export function clearMessageCache(matchId?: string): void {
+  if (matchId) {
+    messagesByMatch.delete(matchId);
+    return;
+  }
+  messagesByMatch.clear();
+}
 
 export type ChatMessage = {
   id: string;
@@ -82,19 +125,52 @@ export async function fetchConversations(): Promise<ConversationPreview[]> {
   const profileMap = new Map(profiles.map((p) => [p.id, p]));
 
   const matchIds = visibleMatches.map((m) => m.id);
-  const { data: latestMessages, error: messagesError } = await supabase
-    .from('messages')
-    .select('id, match_id, sender_id, body, created_at, read_at')
-    .in('match_id', matchIds)
-    .order('created_at', { ascending: false });
 
-  logSupabaseResult('messages.latestMessages', latestMessages, messagesError);
-  if (messagesError) throw messagesError;
+  const { data: previewRows, error: previewError } = await supabase.rpc(
+    'get_my_conversation_previews'
+  );
 
-  const lastByMatch = new Map<string, MessageRow>();
-  for (const msg of (latestMessages ?? []) as MessageRow[]) {
-    if (!lastByMatch.has(msg.match_id)) {
-      lastByMatch.set(msg.match_id, msg);
+  logSupabaseResult('messages.conversationPreviews', previewRows, previewError);
+
+  let lastByMatch = new Map<string, MessageRow>();
+
+  if (previewError) {
+    if (previewError.code !== 'PGRST202' && previewError.code !== '42883') {
+      throw previewError;
+    }
+
+    const { data: latestMessages, error: messagesError } = await supabase
+      .from('messages')
+      .select('id, match_id, sender_id, body, created_at, read_at')
+      .in('match_id', matchIds)
+      .order('created_at', { ascending: false });
+
+    logSupabaseResult('messages.latestMessages', latestMessages, messagesError);
+    if (messagesError) throw messagesError;
+
+    for (const msg of (latestMessages ?? []) as MessageRow[]) {
+      if (!lastByMatch.has(msg.match_id)) {
+        lastByMatch.set(msg.match_id, msg);
+      }
+    }
+  } else {
+    for (const row of (previewRows ?? []) as ConversationPreviewRow[]) {
+      if (!row.last_message_body || !row.last_sender_id) continue;
+      lastByMatch.set(row.match_id, {
+        id: row.match_id,
+        match_id: row.match_id,
+        sender_id: row.last_sender_id,
+        body: row.last_message_body,
+        created_at: row.last_message_at,
+        read_at: row.last_read_at,
+      });
+    }
+  }
+
+  const previewTimeByMatch = new Map<string, string>();
+  if (!previewError) {
+    for (const row of (previewRows ?? []) as ConversationPreviewRow[]) {
+      previewTimeByMatch.set(row.match_id, row.last_message_at);
     }
   }
 
@@ -114,14 +190,22 @@ export async function fetchConversations(): Promise<ConversationPreview[]> {
         matchId: match.id,
         profile: mapProfileRow(row, viewerGenotype),
         lastMessage: last?.body ?? null,
-        lastMessageAt: last?.created_at ?? match.created_at,
+        lastMessageAt: previewTimeByMatch.get(match.id) ?? last?.created_at ?? match.created_at,
         unread,
       };
     })
     .filter((item): item is ConversationPreview => item !== null);
 }
 
-export async function fetchMessages(matchId: string): Promise<ChatMessage[]> {
+export async function fetchMessages(
+  matchId: string,
+  options?: { force?: boolean }
+): Promise<ChatMessage[]> {
+  if (!options?.force) {
+    const cached = peekCachedMessages(matchId);
+    if (cached) return cached;
+  }
+
   const userId = await getCurrentUserId();
   if (!userId) return [];
 
@@ -133,7 +217,9 @@ export async function fetchMessages(matchId: string): Promise<ChatMessage[]> {
 
   if (error) throw error;
 
-  return ((data ?? []) as MessageRow[]).map((row) => rowToChatMessage(row, userId));
+  const rows = ((data ?? []) as MessageRow[]).map((row) => rowToChatMessage(row, userId));
+  setCachedMessages(matchId, rows);
+  return rows;
 }
 
 /** Mark all unread messages from the other person in this match as read. */
@@ -156,22 +242,24 @@ export async function sendMessage(matchId: string, body: string): Promise<ChatMe
   const userId = await getCurrentUserId();
   if (!userId) throw new Error('Not signed in');
 
-  const trimmed = body.trim();
-  if (!trimmed) throw new Error('Message cannot be empty');
+  const sanitized = validateMessage(body);
+  if (!sanitized) throw new Error('Message cannot be empty');
 
   const { data, error } = await supabase
     .from('messages')
     .insert({
       match_id: matchId,
       sender_id: userId,
-      body: trimmed,
+      body: sanitized,
     })
     .select('id, match_id, sender_id, body, created_at, read_at')
     .single();
 
   if (error) throw error;
 
-  return rowToChatMessage(data as MessageRow, userId);
+  const message = rowToChatMessage(data as MessageRow, userId);
+  mergeCachedMessage(matchId, message);
+  return message;
 }
 
 export type ChatRealtimeCallbacks = {
@@ -189,9 +277,10 @@ export type ChatRealtimeHandle = {
 export function subscribeToChatRealtime(
   matchId: string,
   otherUserId: string,
+  userId: string,
   callbacks: ChatRealtimeCallbacks
 ): ChatRealtimeHandle {
-  const channel = supabase.channel(`chat:${matchId}`, {
+  const channel = supabase.channel(`chat:${matchId}:${userId}`, {
     config: { broadcast: { self: false } },
   });
 
@@ -204,9 +293,10 @@ export function subscribeToChatRealtime(
         table: 'messages',
         filter: `match_id=eq.${matchId}`,
       },
-      async (payload) => {
-        const userId = await getCurrentUserId();
-        callbacks.onMessage(rowToChatMessage(payload.new as MessageRow, userId));
+      (payload) => {
+        const message = rowToChatMessage(payload.new as MessageRow, userId);
+        mergeCachedMessage(matchId, message);
+        callbacks.onMessage(message);
       }
     )
     .on(
@@ -217,9 +307,10 @@ export function subscribeToChatRealtime(
         table: 'messages',
         filter: `match_id=eq.${matchId}`,
       },
-      async (payload) => {
-        const userId = await getCurrentUserId();
-        callbacks.onMessageUpdated(rowToChatMessage(payload.new as MessageRow, userId));
+      (payload) => {
+        const message = rowToChatMessage(payload.new as MessageRow, userId);
+        mergeCachedMessage(matchId, message);
+        callbacks.onMessageUpdated(message);
       }
     )
     .on('broadcast', { event: 'typing' }, ({ payload }) => {
@@ -232,13 +323,10 @@ export function subscribeToChatRealtime(
 
   return {
     broadcastTyping(isTyping: boolean) {
-      void getCurrentUserId().then((userId) => {
-        if (!userId) return;
-        void channel.send({
-          type: 'broadcast',
-          event: 'typing',
-          payload: { userId, isTyping },
-        });
+      void channel.send({
+        type: 'broadcast',
+        event: 'typing',
+        payload: { userId, isTyping },
       });
     },
     unsubscribe() {
@@ -247,12 +335,100 @@ export function subscribeToChatRealtime(
   };
 }
 
+export type InboxRealtimeCallbacks = {
+  onNewMessage: (row: MessageRow) => void;
+  onMessageUpdated: (row: MessageRow) => void;
+  onNewMatch: () => void;
+};
+
+/** Inbox-wide realtime for conversation list + badges (RLS-scoped). */
+export function subscribeToInboxRealtime(callbacks: InboxRealtimeCallbacks): () => void {
+  inboxListeners.add(callbacks);
+  ensureInboxChannel();
+
+  return () => {
+    inboxListeners.delete(callbacks);
+    if (inboxListeners.size === 0 && inboxChannel) {
+      supabase.removeChannel(inboxChannel);
+      inboxChannel = null;
+    }
+  };
+}
+
+const inboxListeners = new Set<InboxRealtimeCallbacks>();
+let inboxChannel: ReturnType<typeof supabase.channel> | null = null;
+
+function emitInboxEvent(
+  event: keyof InboxRealtimeCallbacks,
+  ...args: Parameters<InboxRealtimeCallbacks[typeof event]>
+): void {
+  inboxListeners.forEach((listener) => {
+    const handler = listener[event] as (...handlerArgs: unknown[]) => void;
+    handler(...args);
+  });
+}
+
+function ensureInboxChannel(): void {
+  if (inboxChannel) return;
+
+  inboxChannel = supabase
+    .channel('inbox:feed')
+    .on(
+      'postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'messages' },
+      (payload) => {
+        emitInboxEvent('onNewMessage', payload.new as MessageRow);
+      }
+    )
+    .on(
+      'postgres_changes',
+      { event: 'UPDATE', schema: 'public', table: 'messages' },
+      (payload) => {
+        emitInboxEvent('onMessageUpdated', payload.new as MessageRow);
+      }
+    )
+    .on(
+      'postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'matches' },
+      () => {
+        emitInboxEvent('onNewMatch');
+      }
+    )
+    .subscribe();
+}
+
+export function applyInboxMessageToConversations(
+  conversations: ConversationPreview[],
+  row: MessageRow,
+  userId: string
+): ConversationPreview[] | null {
+  const existingIdx = conversations.findIndex((c) => c.matchId === row.match_id);
+
+  if (existingIdx < 0) {
+    return null;
+  }
+
+  const existing = conversations[existingIdx];
+  const updated: ConversationPreview = {
+    ...existing,
+    lastMessage: row.body,
+    lastMessageAt: row.created_at,
+    unread:
+      getOpenChatMatchId() === row.match_id
+        ? false
+        : row.sender_id !== userId && (row.read_at == null || row.read_at === ''),
+  };
+  const next = [...conversations];
+  next.splice(existingIdx, 1);
+  return [updated, ...next];
+}
+
 /** @deprecated Use subscribeToChatRealtime */
 export function subscribeToMessages(
   matchId: string,
   onMessage: (message: ChatMessage) => void
 ) {
-  const handle = subscribeToChatRealtime(matchId, '', {
+  const handle = subscribeToChatRealtime(matchId, '', '', {
     onMessage,
     onMessageUpdated: () => {},
     onTyping: () => {},

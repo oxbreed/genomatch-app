@@ -20,10 +20,16 @@ import {
 } from '../src/components/inbox';
 import ConversationListCard from '../src/components/messages/ConversationListCard';
 import { isRecentMatch } from '../src/components/matches/MatchListCard';
-import { logAuthState } from '../src/lib/auth';
+import { getOpenChatMatchId } from '../src/lib/activeChat';
+import { logAuthState, getAuthenticatedUserId } from '../src/lib/auth';
+import { sendLocalNotification } from '../src/lib/notifications';
 import { TAB_SCENE_BOTTOM_PADDING } from '../src/components/navigation/tabBarLayout';
 import { FONT_FAMILY, COLORS, MOTION } from '../src/theme';
-import { fetchConversations } from '../src/lib/messages';
+import {
+  applyInboxMessageToConversations,
+  fetchConversations,
+  subscribeToInboxRealtime,
+} from '../src/lib/messages';
 import { fetchMatches } from '../src/lib/matches';
 import type { ConversationPreview, DiscoveryProfile, MatchWithProfile } from '../src/types/database';
 import ChatScreen from './ChatScreen';
@@ -60,7 +66,11 @@ export default function Messages({
     profile: DiscoveryProfile;
   } | null>(null);
   const [selectedMatch, setSelectedMatch] = useState<MatchWithProfile | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+  const conversationsRef = useRef(conversations);
   const listFade = useRef(new Animated.Value(0)).current;
+
+  conversationsRef.current = conversations;
 
   const unreadCount = conversations.filter((c) => c.unread).length;
 
@@ -96,8 +106,47 @@ export default function Messages({
   }, []);
 
   useEffect(() => {
+    void getAuthenticatedUserId().then((id) => setUserId(id));
+  }, []);
+
+  useEffect(() => {
     loadConversations();
   }, [loadConversations]);
+
+  useEffect(() => {
+    if (!userId) return;
+
+    return subscribeToInboxRealtime({
+      onNewMessage: (row) => {
+        setConversations((prev) => {
+          const next = applyInboxMessageToConversations(prev, row, userId);
+          if (!next) {
+            void loadConversations(true);
+            return prev;
+          }
+          return next;
+        });
+
+        if (row.sender_id !== userId && getOpenChatMatchId() !== row.match_id) {
+          const conversation = conversationsRef.current.find((c) => c.matchId === row.match_id);
+          const senderName = conversation?.profile.name?.trim() || 'New message';
+          void sendLocalNotification(senderName, row.body, {
+            kind: 'message',
+            data: { type: 'message', matchId: row.match_id },
+          }).catch(() => {});
+        }
+      },
+      onMessageUpdated: (row) => {
+        setConversations((prev) => {
+          const next = applyInboxMessageToConversations(prev, row, userId);
+          return next ?? prev;
+        });
+      },
+      onNewMatch: () => {
+        void loadConversations(true);
+      },
+    });
+  }, [loadConversations, userId]);
 
   useEffect(() => {
     onImmersiveChange?.(!!activeChat || !!selectedMatch);

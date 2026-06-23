@@ -1,5 +1,5 @@
 import { sendLocalNotification } from './notifications';
-import { getCurrentUserId } from './profiles';
+import { getAuthenticatedUserId } from './auth';
 import { rateLimitAction } from './rateLimit';
 import { supabase } from './supabase';
 
@@ -25,7 +25,7 @@ export type LikeResult = {
 
 /** Record a like; creates a match row when both users have liked each other. */
 export async function recordLike(likedId: string): Promise<LikeResult> {
-  const likerId = await getCurrentUserId();
+  const likerId = await getAuthenticatedUserId();
   if (!likerId) throw new Error('Not signed in');
 
   assertSwipeRateLimit(likerId);
@@ -85,7 +85,8 @@ export async function recordLike(likedId: string): Promise<LikeResult> {
   try {
     await sendLocalNotification(
       "It's a Match! 💚",
-      `You and ${name} liked each other. Start a conversation!`
+      `You and ${name} liked each other. Start a conversation!`,
+      { kind: 'match', data: { type: 'match', matchId } }
     );
   } catch {
     // Non-fatal if notification permission or delivery fails
@@ -96,7 +97,7 @@ export async function recordLike(likedId: string): Promise<LikeResult> {
 
 /** Record a pass so this profile is hidden from Discovery. */
 export async function recordPass(passedId: string): Promise<void> {
-  const passerId = await getCurrentUserId();
+  const passerId = await getAuthenticatedUserId();
   if (!passerId) throw new Error('Not signed in');
 
   assertSwipeRateLimit(passerId);

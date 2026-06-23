@@ -1,7 +1,7 @@
 import Constants from 'expo-constants';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
-import { Platform } from 'react-native';
+import { AppState, Platform } from 'react-native';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -13,15 +13,28 @@ Notifications.setNotificationHandler({
   }),
 });
 
-async function ensureAndroidChannel(): Promise<void> {
+async function ensureAndroidChannels(): Promise<void> {
   if (Platform.OS !== 'android') {
     return;
   }
 
-  await Notifications.setNotificationChannelAsync('default', {
-    name: 'default',
-    importance: Notifications.AndroidImportance.MAX,
+  await Notifications.setNotificationChannelAsync('messages', {
+    name: 'Messages',
+    importance: Notifications.AndroidImportance.HIGH,
     vibrationPattern: [0, 250, 250, 250],
+    lightColor: '#0D2818',
+  });
+
+  await Notifications.setNotificationChannelAsync('matches', {
+    name: 'Matches',
+    importance: Notifications.AndroidImportance.HIGH,
+    vibrationPattern: [0, 250, 250, 250],
+    lightColor: '#0D2818',
+  });
+
+  await Notifications.setNotificationChannelAsync('default', {
+    name: 'General',
+    importance: Notifications.AndroidImportance.DEFAULT,
     lightColor: '#0D2818',
   });
 }
@@ -35,7 +48,7 @@ export async function registerForPushNotifications(): Promise<string | null> {
     return null;
   }
 
-  await ensureAndroidChannel();
+  await ensureAndroidChannels();
 
   const { status: existingStatus } = await Notifications.getPermissionsAsync();
   let finalStatus = existingStatus;
@@ -59,13 +72,27 @@ export async function registerForPushNotifications(): Promise<string | null> {
   return token.data;
 }
 
+export type LocalNotificationKind = 'message' | 'match' | 'general';
+
+function isAppActive(): boolean {
+  return AppState.currentState === 'active';
+}
+
 /**
- * Shows a local notification immediately on the device.
+ * Shows a local notification when the app is backgrounded.
  */
 export async function sendLocalNotification(
   title: string,
-  body: string
+  body: string,
+  options?: {
+    kind?: LocalNotificationKind;
+    data?: Record<string, unknown>;
+  }
 ): Promise<void> {
+  if (isAppActive()) {
+    return;
+  }
+
   const { status } = await Notifications.getPermissionsAsync();
   if (status !== 'granted') {
     const { status: requested } = await Notifications.requestPermissionsAsync();
@@ -74,13 +101,35 @@ export async function sendLocalNotification(
     }
   }
 
-  await ensureAndroidChannel();
+  await ensureAndroidChannels();
+
+  const kind = options?.kind ?? 'general';
+  const channelId =
+    Platform.OS === 'android'
+      ? kind === 'message'
+        ? 'messages'
+        : kind === 'match'
+          ? 'matches'
+          : 'default'
+      : undefined;
 
   await Notifications.scheduleNotificationAsync({
     content: {
       title,
       body,
+      sound: 'default',
+      data: options?.data,
+      ...(channelId ? { channelId } : {}),
     },
     trigger: null,
   });
+}
+
+export function addNotificationOpenedListener(
+  handler: (data: Record<string, unknown> | undefined) => void
+): () => void {
+  const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
+    handler(response.notification.request.content.data);
+  });
+  return () => subscription.remove();
 }

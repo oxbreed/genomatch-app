@@ -7,10 +7,14 @@ import Messages from './Messages';
 import Profile from './Profile';
 import GenoTabBar, { type GenoTabId } from '../src/components/navigation/GenoTabBar';
 import { COLORS, MOTION } from '../src/theme';
-import { fetchConversations } from '../src/lib/messages';
+import { fetchConversations, subscribeToInboxRealtime } from '../src/lib/messages';
 import { fetchMatches } from '../src/lib/matches';
+import { addNotificationOpenedListener, sendLocalNotification } from '../src/lib/notifications';
 import { touchLastActive } from '../src/lib/presence';
+import { syncPushTokenToProfile } from '../src/lib/pushRegistration';
 import { syncProfileCityFromDevice } from '../src/lib/location';
+import { getOpenChatMatchId } from '../src/lib/activeChat';
+import { getAuthenticatedUserId } from '../src/lib/auth';
 import type { DiscoveryProfile } from '../src/types/database';
 
 const TAB_IDS: GenoTabId[] = ['discover', 'matches', 'messages', 'profile'];
@@ -62,9 +66,65 @@ export default function MainTabs({ onSignOut }: MainTabsProps) {
     }
   }, []);
 
+  const handleStartChatFromNotification = useCallback((matchId: string) => {
+    setOpenChatMatchId(matchId);
+    setOpenChatProfile(null);
+    setActiveTab('messages');
+    void refreshBadges();
+  }, [refreshBadges]);
+
+  const activeTabRef = useRef(activeTab);
+  activeTabRef.current = activeTab;
+
   useEffect(() => {
-    refreshBadges();
-  }, [refreshBadges, activeTab]);
+    let cancelled = false;
+    let unsubInbox = () => {};
+
+    void (async () => {
+      await refreshBadges();
+      await syncPushTokenToProfile();
+      const userId = await getAuthenticatedUserId();
+      if (cancelled || !userId) return;
+
+      unsubInbox = subscribeToInboxRealtime({
+        onNewMessage: (row) => {
+          void refreshBadges();
+          if (
+            row.sender_id !== userId &&
+            getOpenChatMatchId() !== row.match_id &&
+            activeTabRef.current !== 'messages'
+          ) {
+            void sendLocalNotification('New message', row.body, {
+              kind: 'message',
+              data: { type: 'message', matchId: row.match_id },
+            }).catch(() => {});
+          }
+        },
+        onMessageUpdated: () => {
+          void refreshBadges();
+        },
+        onNewMatch: () => {
+          void refreshBadges();
+          void sendLocalNotification('New match on GenoMatch', 'You have a new genotype match!', {
+            kind: 'match',
+          }).catch(() => {});
+        },
+      });
+    })();
+
+    const unsubNotification = addNotificationOpenedListener((data) => {
+      const matchId = typeof data?.matchId === 'string' ? data.matchId : null;
+      if (matchId) {
+        handleStartChatFromNotification(matchId);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+      unsubInbox();
+      unsubNotification();
+    };
+  }, [handleStartChatFromNotification, refreshBadges]);
 
   useEffect(() => {
     void touchLastActive();
@@ -74,13 +134,15 @@ export default function MainTabs({ onSignOut }: MainTabsProps) {
       if (state === 'active') {
         void touchLastActive();
         void syncProfileCityFromDevice();
+        void syncPushTokenToProfile();
+        void refreshBadges();
       }
     });
     return () => {
       clearInterval(interval);
       subscription.remove();
     };
-  }, []);
+  }, [refreshBadges]);
 
   useEffect(() => {
     if (activeTab !== 'messages' && activeTab !== 'matches') {
