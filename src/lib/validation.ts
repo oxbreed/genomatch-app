@@ -47,3 +47,17 @@ export function validateDisplayName(name: string): boolean {
   }
   return /^[a-zA-Z\u00C0-\u024F\s-]+$/.test(trimmed);
 }
+
+const MAX_MESSAGE_LENGTH = 2000;
+
+/** Sanitizes chat input; returns null when empty or invalid. */
+export function validateMessage(input: string): string | null {
+  if (SCRIPT_BLOCK_REGEX.test(input) || /<script/i.test(input)) {
+    return null;
+  }
+  const sanitized = sanitizeText(input);
+  if (!sanitized || sanitized.length > MAX_MESSAGE_LENGTH) {
+    return null;
+  }
+  return sanitized;
+}

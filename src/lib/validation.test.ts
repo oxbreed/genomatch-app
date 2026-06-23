@@ -18,7 +18,7 @@ describe('validation', () => {
 
   it('validateGenotype allows app genotype codes only', () => {
     expect(validateGenotype('AA')).toBe(true);
-    expect(validateGenotype('SC')).toBe(false);
+    expect(validateGenotype('XX')).toBe(false);
   });
 
   it('validateDisplayName enforces letter-only names', () => {

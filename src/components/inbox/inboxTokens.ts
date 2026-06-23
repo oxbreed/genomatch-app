@@ -1,4 +1,4 @@
-import { COLORS } from '../../theme';
+import { COLORS } from '../../theme/colors';
 
 /** Shared typography & layout for Matches + Messages lists */
 export const INBOX = {

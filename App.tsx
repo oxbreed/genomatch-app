@@ -109,12 +109,15 @@ export default function App() {
         });
 
         await logAuthState('App.startup');
-        await registerForPushNotifications();
 
         const initial = await resolveInitialScreen();
         if (mounted && initial !== 'onboarding') {
           setScreen(initial);
         }
+
+        void registerForPushNotifications().catch((err) => {
+          console.warn('[App] push registration skipped', err);
+        });
       } catch (err) {
         console.error('[App] bootstrap failed', err);
       } finally {

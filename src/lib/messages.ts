@@ -9,6 +9,7 @@ import { mapProfileRow } from './profileMapper';
 import { getBlockedUserIds } from './moderation';
 import { fetchPublicProfilesByIds, getCurrentUserId } from './profiles';
 import { supabase } from './supabase';
+import { validateMessage } from './validation';
 
 export type ChatMessage = {
   id: string;
@@ -156,15 +157,15 @@ export async function sendMessage(matchId: string, body: string): Promise<ChatMe
   const userId = await getCurrentUserId();
   if (!userId) throw new Error('Not signed in');
 
-  const trimmed = body.trim();
-  if (!trimmed) throw new Error('Message cannot be empty');
+  const sanitized = validateMessage(body);
+  if (!sanitized) throw new Error('Message cannot be empty');
 
   const { data, error } = await supabase
     .from('messages')
     .insert({
       match_id: matchId,
       sender_id: userId,
-      body: trimmed,
+      body: sanitized,
     })
     .select('id, match_id, sender_id, body, created_at, read_at')
     .single();
