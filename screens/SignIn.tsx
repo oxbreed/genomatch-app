@@ -22,6 +22,7 @@ import { AuthFormCard } from '../src/components/auth';
 import { COLORS, RADIUS, SHADOWS } from '../src/theme'
 import { FONT_FAMILY, GLASS } from '../src/theme';
 import { resolvePostSignInScreen } from '../src/lib/profiles';
+import { sendPasswordResetEmail } from '../src/lib/resetPassword';
 import { supabase } from '../src/lib/supabase';
 
 type SignInProps = {
@@ -131,9 +132,7 @@ export default function SignIn({
       return;
     }
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-      redirectTo: 'https://www.genomatch.app/reset-password',
-    });
+    const { error } = await sendPasswordResetEmail(trimmedEmail);
     if (error) {
       setError(error.message);
       return;
@@ -141,8 +140,8 @@ export default function SignIn({
 
     Alert.alert(
       'Check your email',
-      'We sent a password reset link to ' + email.trim() + '. Open it on this phone to reset your password.',
-      [{ text: 'OK', onPress: () => onNavigateResetPassword(email.trim()) }]
+      `We sent a 6-digit code and reset link to ${trimmedEmail}. Enter the code on the next screen, or open the link on this device.`,
+      [{ text: 'OK', onPress: () => onNavigateResetPassword(trimmedEmail) }]
     );
   };
 

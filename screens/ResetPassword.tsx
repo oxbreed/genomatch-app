@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -13,30 +13,93 @@ import {
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { Ionicons } from '@expo/vector-icons';
 import { GenoLogoCeremony, GenoPremiumChrome } from '../src/brand/graphics';
 import { AuthFormCard } from '../src/components/auth';
-import { COLORS } from '../src/theme'
+import { COLORS, RADIUS, SHADOWS } from '../src/theme';
 import { FONT_FAMILY, GLASS } from '../src/theme';
+import {
+  isRecoveryTokenExpiredMessage,
+  sendPasswordResetEmail,
+} from '../src/lib/resetPassword';
 import { supabase } from '../src/lib/supabase';
+
+const RESEND_COOLDOWN_SECONDS = 60;
 
 type ResetPasswordProps = {
   email?: string;
+  onBack: () => void;
+  onCreateAccount: () => void;
   onSuccess: () => void;
 };
 
-export default function ResetPassword({ email, onSuccess }: ResetPasswordProps) {
+export default function ResetPassword({
+  email,
+  onBack,
+  onCreateAccount,
+  onSuccess,
+}: ResetPasswordProps) {
   const [otpCode, setOtpCode] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPass, setShowPass] = useState(false);
   const [showConfirmPass, setShowConfirmPass] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
   const [error, setError] = useState('');
+  const [sessionExpired, setSessionExpired] = useState(false);
 
   const introOpacity = useRef(new Animated.Value(1)).current;
   const ctaScale = useRef(new Animated.Value(1)).current;
 
   const requiresOtp = Boolean(email?.trim());
+
+  useEffect(() => {
+    if (requiresOtp) return;
+
+    let mounted = true;
+
+    const checkSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!mounted) return;
+
+      if (!session) {
+        setSessionExpired(true);
+        setError('Your reset link has expired. Go back to sign in and request a new code.');
+      }
+    };
+
+    void checkSession();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!mounted || requiresOtp) return;
+      if (!session) {
+        setSessionExpired(true);
+        setError('Your reset session expired. Go back to sign in and request a new code.');
+      }
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, [requiresOtp]);
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+
+    const timer = setInterval(() => {
+      setResendCooldown((prev) => (prev <= 1 ? 0 : prev - 1));
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [resendCooldown]);
 
   const onCtaPressIn = () => {
     Animated.spring(ctaScale, {
@@ -56,7 +119,39 @@ export default function ResetPassword({ email, onSuccess }: ResetPasswordProps) 
     }).start();
   };
 
+  const handleResendCode = async () => {
+    if (!email?.trim() || resendCooldown > 0 || resending) return;
+
+    setResending(true);
+    setError('');
+
+    try {
+      const { error: resendError } = await sendPasswordResetEmail(email);
+
+      if (resendError) {
+        setError(resendError.message);
+        return;
+      }
+
+      setOtpCode('');
+      setResendCooldown(RESEND_COOLDOWN_SECONDS);
+      Alert.alert(
+        'New code sent',
+        `We sent a fresh 6-digit code to ${email}. Enter it below along with your new password.`
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not resend code. Please try again.');
+    } finally {
+      setResending(false);
+    }
+  };
+
   const handleSubmit = async () => {
+    if (sessionExpired && !requiresOtp) {
+      setError('Your reset link has expired. Go back to sign in and request a new code.');
+      return;
+    }
+
     if (requiresOtp) {
       const trimmedOtp = otpCode.trim();
       if (!trimmedOtp || trimmedOtp.length !== 6) {
@@ -87,7 +182,12 @@ export default function ResetPassword({ email, onSuccess }: ResetPasswordProps) 
         });
 
         if (verifyError) {
-          setError(verifyError.message);
+          const message = verifyError.message;
+          if (isRecoveryTokenExpiredMessage(message)) {
+            setError(`${message} Tap "Resend code" below to get a new one.`);
+          } else {
+            setError(message);
+          }
           return;
         }
       }
@@ -95,7 +195,13 @@ export default function ResetPassword({ email, onSuccess }: ResetPasswordProps) 
       const { error: updateError } = await supabase.auth.updateUser({ password });
 
       if (updateError) {
-        setError(updateError.message);
+        const message = updateError.message;
+        if (isRecoveryTokenExpiredMessage(message)) {
+          setError(`${message} Go back to sign in and request a new reset code.`);
+          setSessionExpired(true);
+        } else {
+          setError(message);
+        }
         return;
       }
 
@@ -124,13 +230,23 @@ export default function ResetPassword({ email, onSuccess }: ResetPasswordProps) 
         keyboardShouldPersistTaps="handled"
       >
         <Animated.View style={[styles.hero, { opacity: introOpacity }]}>
+          <Pressable
+            style={({ pressed }) => [styles.back, pressed && styles.backPressed]}
+            onPress={onBack}
+            accessibilityRole="button"
+            accessibilityLabel="Go back to sign in"
+          >
+            <Ionicons name="chevron-back" size={18} color={COLORS.forestDeep} />
+            <Text style={styles.backText}>Back</Text>
+          </Pressable>
+
           <View style={styles.logoWrap}>
             <GenoLogoCeremony variant="auth" tone="dark" />
           </View>
           <Text style={styles.title}>Reset Password</Text>
           <Text style={styles.subtitle}>
             {requiresOtp
-              ? `Enter the 6-digit code we sent to ${email}, then choose a new password.`
+              ? `Enter the 6-digit code we sent to ${email}, then choose a new password. You can also open the reset link from your email on this device.`
               : 'Choose a new password for your GenoMatch account.'}
           </Text>
         </Animated.View>
@@ -150,6 +266,27 @@ export default function ResetPassword({ email, onSuccess }: ResetPasswordProps) 
                 textContentType="oneTimeCode"
                 maxLength={6}
               />
+              <Pressable
+                style={styles.resendRow}
+                onPress={() => void handleResendCode()}
+                disabled={resending || resendCooldown > 0}
+                hitSlop={8}
+              >
+                {resending ? (
+                  <ActivityIndicator color={COLORS.forest} size="small" />
+                ) : (
+                  <Text
+                    style={[
+                      styles.resendText,
+                      resendCooldown > 0 && styles.resendTextDisabled,
+                    ]}
+                  >
+                    {resendCooldown > 0
+                      ? `Resend code in ${resendCooldown}s`
+                      : 'Resend code'}
+                  </Text>
+                )}
+              </Pressable>
             </>
           ) : null}
 
@@ -171,6 +308,7 @@ export default function ResetPassword({ email, onSuccess }: ResetPasswordProps) 
             secureTextEntry={!showPass}
             autoComplete="new-password"
             textContentType="newPassword"
+            editable={!sessionExpired || requiresOtp}
           />
 
           <Text style={styles.label}>Confirm Password</Text>
@@ -189,17 +327,18 @@ export default function ResetPassword({ email, onSuccess }: ResetPasswordProps) 
             secureTextEntry={!showConfirmPass}
             autoComplete="new-password"
             textContentType="newPassword"
+            editable={!sessionExpired || requiresOtp}
           />
 
           {error ? <Text style={styles.error}>{error}</Text> : null}
 
           <Animated.View style={{ transform: [{ scale: ctaScale }] }}>
             <Pressable
-              style={[styles.submitBtn, loading && styles.submitBtnDisabled]}
+              style={[styles.submitBtn, (loading || sessionExpired) && styles.submitBtnDisabled]}
               onPressIn={onCtaPressIn}
               onPressOut={onCtaPressOut}
               onPress={() => void handleSubmit()}
-              disabled={loading}
+              disabled={loading || (sessionExpired && !requiresOtp)}
             >
               {loading ? (
                 <View style={styles.submitContent}>
@@ -211,6 +350,12 @@ export default function ResetPassword({ email, onSuccess }: ResetPasswordProps) 
               )}
             </Pressable>
           </Animated.View>
+
+          <Pressable style={styles.createRow} onPress={onCreateAccount}>
+            <Text style={styles.createText}>
+              New to GenoMatch? <Text style={styles.createBold}>Create account</Text>
+            </Text>
+          </Pressable>
         </AuthFormCard>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -224,11 +369,39 @@ const styles = StyleSheet.create({
   },
   scroll: {
     paddingHorizontal: 20,
-    paddingTop: 58,
+    paddingTop: 56,
     paddingBottom: 40,
   },
   hero: {
     marginBottom: 20,
+  },
+  back: {
+    alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    minHeight: 44,
+    justifyContent: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: RADIUS.pill,
+    borderWidth: 1,
+    borderColor: GLASS.insetBorder,
+    backgroundColor: GLASS.insetFill,
+    marginBottom: 18,
+    ...SHADOWS.card,
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+  },
+  backPressed: {
+    opacity: 0.88,
+    transform: [{ scale: 0.98 }],
+  },
+  backText: {
+    color: COLORS.forestDeep,
+    fontFamily: FONT_FAMILY.gothamBold,
+    fontSize: 14,
+    letterSpacing: 0.1,
   },
   logoWrap: {
     marginBottom: 16,
@@ -278,6 +451,21 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     letterSpacing: 8,
     textAlign: 'center',
+  },
+  resendRow: {
+    alignSelf: 'flex-end',
+    marginTop: 10,
+    minHeight: 28,
+    justifyContent: 'center',
+  },
+  resendText: {
+    fontFamily: FONT_FAMILY.gothamBold,
+    color: '#8C6A00',
+    fontSize: 13,
+    letterSpacing: 0.1,
+  },
+  resendTextDisabled: {
+    color: 'rgba(27, 122, 110, 0.45)',
   },
   input: {
     height: 54,
@@ -333,5 +521,18 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '700',
     letterSpacing: 0.1,
+  },
+  createRow: {
+    alignItems: 'center',
+    paddingVertical: 18,
+  },
+  createText: {
+    fontFamily: FONT_FAMILY.gothamMedium,
+    color: 'rgba(27, 122, 110, 0.65)',
+    fontSize: 14,
+  },
+  createBold: {
+    fontFamily: FONT_FAMILY.gothamBold,
+    color: COLORS.forest,
   },
 });

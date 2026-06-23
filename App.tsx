@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Linking, View, StyleSheet } from 'react-native';
 import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
@@ -15,6 +15,10 @@ import MainTabs from './screens/MainTabs';
 import { resolveInitialScreen } from './src/lib/profiles';
 import { logAuthState } from './src/lib/auth';
 import { registerForPushNotifications } from './src/lib/notifications';
+import {
+  establishSessionFromResetUrl,
+  isResetPasswordDeepLink,
+} from './src/lib/resetPassword';
 import { supabase } from './src/lib/supabase';
 
 type IonName = ComponentProps<typeof Ionicons>['name'];
@@ -51,8 +55,13 @@ export default function App() {
   >('onboarding');
   const [splashDone, setSplashDone] = useState(false);
   const [resetPasswordEmail, setResetPasswordEmail] = useState<string | null>(null);
+  const screenRef = useRef(screen);
 
   const fontsReady = fontsLoaded || !!fontError;
+
+  useEffect(() => {
+    screenRef.current = screen;
+  }, [screen]);
   const appReady = fontsReady && !bootstrapping;
 
   useEffect(() => {
@@ -64,31 +73,10 @@ export default function App() {
   useEffect(() => {
     let mounted = true;
 
-    const isResetPasswordDeepLink = (url: string) =>
-      url.includes('genomatch://reset-password') || url.includes('genomatch.app/reset-password');
-
-    const extractResetTokens = (url: string) => {
-      const hashStart = url.indexOf('#');
-      const hash = hashStart >= 0 ? url.slice(hashStart + 1) : '';
-      const params = new URLSearchParams(hash);
-      const access_token = params.get('access_token');
-      if (!access_token) return null;
-      return {
-        access_token,
-        refresh_token: params.get('refresh_token') ?? '',
-      };
-    };
-
     const handleResetPasswordUrl = async (url: string | null): Promise<boolean> => {
       if (!url || !isResetPasswordDeepLink(url)) return false;
 
-      const tokens = extractResetTokens(url);
-      if (!tokens) return false;
-
-      const { error } = await supabase.auth.setSession({
-        access_token: tokens.access_token,
-        refresh_token: tokens.refresh_token,
-      });
+      const { error } = await establishSessionFromResetUrl(url);
 
       if (error) {
         console.error('[App] reset password deep link failed', error.message);
@@ -96,6 +84,7 @@ export default function App() {
       }
 
       if (mounted) {
+        setResetPasswordEmail(null);
         setScreen('resetPassword');
       }
       return true;
@@ -149,7 +138,10 @@ export default function App() {
     } = supabase.auth.onAuthStateChange((event, session) => {
       console.log('[App] auth state change', { event, hasSession: !!session });
       if (!session) {
-        setScreen('onboarding');
+        const current = screenRef.current;
+        if (current === 'main' || current === 'profileSetup') {
+          setScreen('onboarding');
+        }
       }
     });
 
@@ -202,6 +194,14 @@ export default function App() {
     return (
       <ResetPassword
         email={resetPasswordEmail ?? undefined}
+        onBack={() => {
+          setResetPasswordEmail(null);
+          setScreen('signIn');
+        }}
+        onCreateAccount={() => {
+          setResetPasswordEmail(null);
+          setScreen('register');
+        }}
         onSuccess={() => {
           setResetPasswordEmail(null);
           setScreen('signIn');
