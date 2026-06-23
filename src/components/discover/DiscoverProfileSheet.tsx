@@ -43,6 +43,7 @@ type Props = {
   visible: boolean;
   profile: DiscoveryProfile | null;
   viewerGenotype: Genotype | null;
+  hideGenotype?: boolean;
   backdropOpacity: Animated.Value;
   translateY: Animated.Value;
   likePulseScale: Animated.Value;
@@ -122,6 +123,7 @@ export default function DiscoverProfileSheet({
   visible,
   profile,
   viewerGenotype,
+  hideGenotype = false,
   backdropOpacity,
   translateY,
   likePulseScale,
@@ -191,7 +193,6 @@ export default function DiscoverProfileSheet({
   if (!visible || !profile) return null;
 
   const detailRows = buildDetailRows(profile);
-  const riskShort = getGenotypeRiskShort(viewerGenotype, profile.genotype);
   const hasPhotos = gallery.length > 0;
 
   return (
@@ -295,7 +296,7 @@ export default function DiscoverProfileSheet({
                 </Text>
                 <LocationLine city={profile.city} distanceBand={profile.distanceBand} dark />
                 <View style={styles.heroBadges}>
-                  <GenotypeBadge genotype={profile.genotype} />
+                  {!hideGenotype ? <GenotypeBadge genotype={profile.genotype} /> : null}
                   {profile.genotypeVerified ? <VerifiedBadge compact /> : null}
                   {profile.presenceState !== 'offline' || profile.isNewMember ? (
                     <PresenceBadge
@@ -314,7 +315,9 @@ export default function DiscoverProfileSheet({
                   <Text style={styles.bondKicker}>Genotype bond</Text>
                 </View>
                 <GenoCompatRing percent={profile.compatibility} size={88} />
-                <Text style={styles.bondRisk}>{riskShort}</Text>
+                <Text style={styles.bondRisk}>
+                  {getGenotypeRiskShort(viewerGenotype, profile.genotype)}
+                </Text>
                 <Text style={styles.bondDisclaimer}>Informational only — not medical advice.</Text>
               </View>
 
@@ -327,6 +330,7 @@ export default function DiscoverProfileSheet({
               <FamilyPlanningCard
                 viewerGenotype={viewerGenotype}
                 candidateGenotype={profile.genotype}
+                locked={hideGenotype}
               />
 
               {detailRows.length > 0 ? (

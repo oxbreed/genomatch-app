@@ -9,6 +9,7 @@ type Props = {
   candidateGenotype: Genotype;
   compact?: boolean;
   dark?: boolean;
+  locked?: boolean;
 };
 
 const TIER_STYLE: Record<
@@ -50,11 +51,52 @@ export default function FamilyPlanningCard({
   candidateGenotype,
   compact,
   dark,
+  locked = false,
 }: Props) {
-  const insight = getFamilyPlanningInsight(viewerGenotype, candidateGenotype);
-  const tier = TIER_STYLE[insight.tier];
   const textPrimary = dark ? COLORS.linen : COLORS.forestDeep;
   const textSecondary = dark ? 'rgba(245, 239, 230, 0.82)' : COLORS.sage;
+  const lockedBg = dark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(237, 243, 238, 0.95)';
+  const lockedBorder = dark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(143, 175, 149, 0.45)';
+
+  if (locked) {
+    if (compact) {
+      return (
+        <View style={[styles.compact, { backgroundColor: lockedBg, borderColor: lockedBorder }]}>
+          <Ionicons name="lock-closed-outline" size={14} color={dark ? COLORS.gold : COLORS.forest} />
+          <Text style={[styles.compactTitle, { color: textPrimary }]} numberOfLines={1}>
+            Unlocks after you match
+          </Text>
+        </View>
+      );
+    }
+
+    return (
+      <View style={[styles.card, { backgroundColor: lockedBg, borderColor: lockedBorder }]}>
+        <View style={styles.header}>
+          <View
+            style={[
+              styles.iconRing,
+              { borderColor: lockedBorder, backgroundColor: dark ? 'rgba(255,255,255,0.08)' : COLORS.white },
+            ]}
+          >
+            <Ionicons name="lock-closed-outline" size={18} color={dark ? COLORS.gold : COLORS.forest} />
+          </View>
+          <View style={styles.headerCopy}>
+            <Text style={[styles.kicker, { color: dark ? COLORS.gold : COLORS.sage }]}>
+              FAMILY PLANNING
+            </Text>
+            <Text style={[styles.title, { color: textPrimary }]}>Unlocks after you match</Text>
+            <Text style={[styles.pair, { color: textSecondary }]}>
+              Pairing-specific guidance stays private until you both like each other.
+            </Text>
+          </View>
+        </View>
+      </View>
+    );
+  }
+
+  const insight = getFamilyPlanningInsight(viewerGenotype, candidateGenotype);
+  const tier = TIER_STYLE[insight.tier];
 
   if (compact) {
     return (

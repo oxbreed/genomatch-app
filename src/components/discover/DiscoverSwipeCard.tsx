@@ -39,6 +39,7 @@ type Props = {
   swipeIndex?: number;
   totalProfiles?: number;
   viewerGenotype?: Genotype | null;
+  hideGenotype?: boolean;
   progressFillWidth?: Animated.AnimatedInterpolation<string | number>;
   height?: number;
   onExpand?: () => void;
@@ -50,6 +51,7 @@ export default function DiscoverSwipeCard({
   swipeIndex,
   totalProfiles,
   viewerGenotype,
+  hideGenotype = false,
   progressFillWidth,
   height = DISCOVER_CARD_HEIGHT,
   onExpand,
@@ -140,7 +142,7 @@ export default function DiscoverSwipeCard({
             {profile.age != null ? `, ${profile.age}` : ''}
           </Text>
           <View style={styles.nameBadgeCluster}>
-            <GenotypeBadge genotype={profile.genotype} />
+            {!hideGenotype ? <GenotypeBadge genotype={profile.genotype} /> : null}
             {profile.genotypeVerified ? (
               <Ionicons
                 name="shield-checkmark"

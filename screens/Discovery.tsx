@@ -861,6 +861,7 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
                             swipeIndex={index}
                             totalProfiles={profiles.length}
                             viewerGenotype={viewerGenotype}
+                            hideGenotype={true}
                             progressFillWidth={progressFillWidth}
                             height={cardHeight}
                             onExpand={openProfileSheet}
@@ -889,7 +890,7 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
                             },
                           ]}
                         >
-                          <DiscoverSwipeCard profile={stackProfile} height={cardHeight} />
+                          <DiscoverSwipeCard profile={stackProfile} hideGenotype={true} height={cardHeight} />
                         </Animated.View>
                       );
                     }
@@ -906,7 +907,7 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
                           { zIndex: depthFromTop, opacity: 0 },
                         ]}
                       >
-                        <DiscoverSwipeCard profile={stackProfile} height={cardHeight} />
+                        <DiscoverSwipeCard profile={stackProfile} hideGenotype={true} height={cardHeight} />
                       </Animated.View>
                     );
                   })}
@@ -943,6 +944,7 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
         visible={profileSheetVisible}
         profile={profile ?? null}
         viewerGenotype={viewerGenotype}
+        hideGenotype
         backdropOpacity={sheetBackdropOpacity}
         translateY={sheetTranslateY}
         likePulseScale={likePulseScale}
