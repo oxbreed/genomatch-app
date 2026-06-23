@@ -1,8 +1,8 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path } from 'react-native-svg';
 import { INBOX } from '../inbox/inboxTokens';
-import { FONT_FAMILY, COLORS, RADIUS, SHADOWS } from '../../theme';
+import { COLORS, RADIUS, SHADOWS } from '../../theme';
 
 type Props = {
   studio?: boolean;
@@ -53,11 +53,6 @@ export default function ProfileHeroChrome({ studio, height, children }: Props) {
           </View>
           <View style={styles.frameTR} pointerEvents="none">
             <FrameCorner flip="tr" />
-          </View>
-          <View style={styles.studioTag} pointerEvents="none">
-            <View style={styles.studioTagBg}>
-              <Text style={styles.studioTagText}>Live preview</Text>
-            </View>
           </View>
         </View>
       </LinearGradient>
@@ -136,28 +131,4 @@ const styles = StyleSheet.create({
   },
   frameTL: { position: 'absolute', top: 12, left: 12, zIndex: 4 },
   frameTR: { position: 'absolute', top: 12, right: 12, zIndex: 4 },
-  studioTag: {
-    position: 'absolute',
-    top: 14,
-    alignSelf: 'center',
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-    zIndex: 4,
-  },
-  studioTagBg: {
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    borderRadius: 999,
-    backgroundColor: 'rgba(13, 40, 24, 0.55)',
-    borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.35)',
-  },
-  studioTagText: {
-    fontFamily: FONT_FAMILY.gothamBold,
-    fontSize: 9,
-    letterSpacing: 1.6,
-    textTransform: 'uppercase',
-    color: COLORS.linen,
-  },
 });

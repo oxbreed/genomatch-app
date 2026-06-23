@@ -449,6 +449,16 @@ export async function verifyGenotype(): Promise<void> {
     throw new Error(eligibility.message);
   }
 
+  const { error: rpcError } = await supabase.rpc('verify_own_profile');
+
+  if (!rpcError) return;
+
+  if (!isMissingRpcError(rpcError)) {
+    throw new Error(rpcError.message);
+  }
+
+  console.warn('[profiles] verify_own_profile RPC missing — falling back to direct update');
+
   const payload: Record<string, unknown> = {
     verification_status: 'verified',
     genotype_verified: true,
@@ -456,7 +466,14 @@ export async function verifyGenotype(): Promise<void> {
 
   const { error } = await supabase.from('profiles').update(payload).eq('id', userId);
 
-  if (error) throw error;
+  if (error) {
+    if (isMissingColumnError(error)) {
+      throw new Error(
+        'Verification is not available yet. Run the latest Supabase migrations, then try again.'
+      );
+    }
+    throw error;
+  }
 }
 
 export type ViewerProfileSnapshot = {

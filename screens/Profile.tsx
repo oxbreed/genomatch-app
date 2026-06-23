@@ -9,7 +9,6 @@ import {
   StyleSheet,
   Text,
   View,
-  type LayoutChangeEvent,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import About from './About';
@@ -27,7 +26,6 @@ import {
   ProfileHero,
   ProfilePhotosGrid,
   ProfileSectionCard,
-  ProfileSectionHeader,
   ProfileStudioCTA,
   ProfileViewSections,
 } from '../src/components/profile';
@@ -39,19 +37,17 @@ import {
   ProfileStatGems,
   ProfileStrengthPanel,
   ProfileVitalityRing,
-  StudioBanner,
+  StudioCompletionStrip,
   StudioSaveDock,
-  StudioSectionShell,
-  StudioStepRail,
-  type StudioStep,
+  type StudioSaveState,
 } from '../src/components/profileStudio';
 import { GENO_TAB_BAR_HEIGHT } from '../src/components/navigation/tabBarLayout';
-import { PROFILE } from '../src/components/profile/profileTokens';
 import { FONT_FAMILY, COLORS, MOTION } from '../src/theme';
 import { uploadAdditionalPhoto } from '../src/lib/photoUpload';
 import { mapProfileRow } from '../src/lib/profileMapper';
 import { logAuthState } from '../src/lib/auth';
 import { deleteUserAccount } from '../src/lib/accountDeletion';
+import { detectDeviceCity, syncProfileCityFromDevice } from '../src/lib/location';
 import { fetchMatches } from '../src/lib/matches';
 import {
   getCurrentProfile,
@@ -59,18 +55,13 @@ import {
   updateProfilePhotos,
   verifyGenotype,
 } from '../src/lib/profiles';
-import { getVerificationEligibility } from '../src/lib/verification';
+import { getVerificationEligibility, type VerificationProfileInput } from '../src/lib/verification';
 import { supabase } from '../src/lib/supabase';
-import type { DiscoveryProfile, Genotype } from '../src/types/database';
+import type { DiscoveryProfile, Genotype, ProfileRow } from '../src/types/database';
 
 const HERO_HEIGHT = 288;
-
-const STUDIO_STEPS: StudioStep[] = [
-  { id: 'photos', label: 'Photos', icon: 'images-outline' },
-  { id: 'story', label: 'Story', icon: 'document-text-outline' },
-  { id: 'intent', label: 'Intent', icon: 'heart-outline' },
-  { id: 'details', label: 'Details', icon: 'options-outline' },
-];
+const HERO_HEIGHT_STUDIO = 200;
+const AUTOSAVE_MS = 1200;
 
 type ProfileProps = { onSignOut?: () => void };
 
@@ -134,6 +125,27 @@ function profilesEqual(a: EditableProfile, b: EditableProfile): boolean {
   );
 }
 
+const PLACEHOLDER_DISPLAY_NAME = 'GenoMatch Member';
+
+function buildVerificationInput(
+  data: EditableProfile,
+  dbRow: ProfileRow | null
+): VerificationProfileInput {
+  const dbName = dbRow?.display_name?.trim() ?? '';
+  const localName = data.displayName.trim();
+  const display_name =
+    dbName || (localName === PLACEHOLDER_DISPLAY_NAME ? '' : localName);
+
+  return {
+    display_name: display_name || null,
+    genotype: data.genotype,
+    avatar_url: data.avatarUrl,
+    photos: data.photos,
+    genotype_verified: data.genotypeVerified,
+    verification_status: data.genotypeVerified ? 'verified' : 'unverified',
+  };
+}
+
 export default function Profile({ onSignOut }: ProfileProps) {
   const [profile, setProfile] = useState<EditableProfile | null>(null);
   const [draft, setDraft] = useState<EditableProfile | null>(null);
@@ -149,13 +161,14 @@ export default function Profile({ onSignOut }: ProfileProps) {
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showVerifyModal, setShowVerifyModal] = useState(false);
   const [verifying, setVerifying] = useState(false);
+  const [locatingCity, setLocatingCity] = useState(false);
   const [error, setError] = useState('');
   const [authUserId, setAuthUserId] = useState<string | null>(null);
   const [stats, setStats] = useState({ matches: 0, likesReceived: 0, profileViews: 0 });
-  const [activeStep, setActiveStep] = useState(0);
+  const [saveState, setSaveState] = useState<StudioSaveState>('idle');
 
   const scrollRef = useRef<ScrollView>(null);
-  const sectionOffsets = useRef<Record<string, number>>({});
+  const autosaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const studioFade = useRef(new Animated.Value(0)).current;
   const viewFade = useRef(new Animated.Value(0)).current;
 
@@ -225,6 +238,19 @@ export default function Profile({ onSignOut }: ProfileProps) {
   }, [loadProfile]);
 
   useEffect(() => {
+    if (loading || editing) return;
+
+    void (async () => {
+      const result = await syncProfileCityFromDevice();
+      if (result.updated && result.city) {
+        const applyCity = (p: EditableProfile) => ({ ...p, city: result.city! });
+        setProfile((p) => (p ? applyCity(p) : p));
+        setDraft((p) => (p ? applyCity(p) : p));
+      }
+    })();
+  }, [loading, editing]);
+
+  useEffect(() => {
     Animated.timing(studioFade, {
       toValue: editing ? 1 : 0,
       duration: MOTION.sheetOpenMs,
@@ -252,87 +278,97 @@ export default function Profile({ onSignOut }: ProfileProps) {
     [profile, draft, editing]
   );
 
-  const stepComplete = useMemo((): boolean[] => {
-    if (!draft) return [false, false, false, false];
-    return [
-      draft.photos.length > 0 || !!draft.avatarUrl,
-      !!draft.bio.trim() && draft.interests.length > 0,
-      !!draft.relationshipGoal.trim(),
-      !!(draft.drinkingStatus || draft.smokingStatus || draft.educationStatus || draft.heightCm || draft.religion),
-    ];
-  }, [draft]);
+  const persistProfileFields = useCallback(async (target: EditableProfile) => {
+    const ageNum = parseInt(target.age, 10);
+    const year = Number.isNaN(ageNum) ? null : new Date().getFullYear() - ageNum;
+    await updateProfileFields({
+      display_name: target.displayName.trim(),
+      city: target.city.trim(),
+      bio: target.bio.trim(),
+      date_of_birth: year ? `${year}-01-01` : undefined,
+      interests: target.interests,
+      relationship_goal: target.relationshipGoal,
+      height_cm: target.heightCm,
+      religion: target.religion || null,
+      drinking_status: target.drinkingStatus || null,
+      smoking_status: target.smokingStatus || null,
+      education_status: target.educationStatus || null,
+    });
+  }, []);
+
+  const runAutosave = useCallback(
+    async (target: EditableProfile) => {
+      setSaveState('saving');
+      setError('');
+      try {
+        await persistProfileFields(target);
+        setProfile({ ...target });
+        setSaveState('saved');
+      } catch (err) {
+        setSaveState('error');
+        setError(err instanceof Error ? err.message : 'Could not save profile');
+      }
+    },
+    [persistProfileFields]
+  );
+
+  useEffect(() => {
+    if (!editing || !draft || !hasChanges) return;
+
+    setSaveState((prev) => (prev === 'saving' ? prev : 'idle'));
+    if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
+    autosaveTimer.current = setTimeout(() => {
+      void runAutosave(draft);
+    }, AUTOSAVE_MS);
+
+    return () => {
+      if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
+    };
+  }, [draft, editing, hasChanges, runAutosave]);
 
   const startStudio = () => {
     if (!profile) return;
     setDraft({ ...profile });
     setEditing(true);
-    setActiveStep(0);
+    setSaveState('idle');
+    scrollRef.current?.scrollTo({ y: 0, animated: false });
   };
 
-  const discardStudio = () => {
-    setDraft(profile);
+  const closeStudio = () => {
     setEditing(false);
-    setActiveStep(0);
+    setSaveState('idle');
+  };
+
+  const flushAndCloseStudio = async () => {
+    if (autosaveTimer.current) {
+      clearTimeout(autosaveTimer.current);
+      autosaveTimer.current = null;
+    }
+
+    if (draft && hasChanges) {
+      setSaving(true);
+      setSaveState('saving');
+      try {
+        await persistProfileFields(draft);
+        setProfile({ ...draft });
+        setSaveState('saved');
+      } catch (err) {
+        setSaveState('error');
+        Alert.alert(
+          'Could not save',
+          err instanceof Error ? err.message : 'Check your connection and try again.'
+        );
+        setSaving(false);
+        return;
+      }
+      setSaving(false);
+    }
+
+    closeStudio();
   };
 
   const requestExitStudio = () => {
-    if (hasChanges) {
-      Alert.alert(
-        'Discard changes?',
-        'Unpublished edits will be lost.',
-        [
-          { text: 'Keep editing', style: 'cancel' },
-          { text: 'Discard', style: 'destructive', onPress: discardStudio },
-        ]
-      );
-      return;
-    }
-    discardStudio();
-  };
-
-  const requestDiscardFromDock = () => {
-    if (hasChanges) {
-      Alert.alert(
-        'Discard draft?',
-        'Your studio changes have not been published.',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          { text: 'Discard', style: 'destructive', onPress: discardStudio },
-        ]
-      );
-      return;
-    }
-    discardStudio();
-  };
-
-  const saveEdit = async () => {
-    if (!draft) return;
-    setSaving(true);
-    setError('');
-    try {
-      const ageNum = parseInt(draft.age, 10);
-      const year = Number.isNaN(ageNum) ? null : new Date().getFullYear() - ageNum;
-      await updateProfileFields({
-        display_name: draft.displayName.trim(),
-        city: draft.city.trim(),
-        bio: draft.bio.trim(),
-        date_of_birth: year ? `${year}-01-01` : undefined,
-        interests: draft.interests,
-        relationship_goal: draft.relationshipGoal,
-        height_cm: draft.heightCm,
-        religion: draft.religion || null,
-        drinking_status: draft.drinkingStatus || null,
-        smoking_status: draft.smokingStatus || null,
-        education_status: draft.educationStatus || null,
-      });
-      setProfile({ ...draft });
-      setEditing(false);
-      setActiveStep(0);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not save profile');
-    } finally {
-      setSaving(false);
-    }
+    void flushAndCloseStudio();
   };
 
   const toggleInterest = (interest: string) => {
@@ -396,14 +432,81 @@ export default function Profile({ onSignOut }: ProfileProps) {
     }
   };
 
+  const refreshLocationFromDevice = async () => {
+    setLocatingCity(true);
+    setError('');
+    try {
+      const { city: detected, permissionDenied } = await detectDeviceCity();
+      if (detected) {
+        setDraft((p) => (p ? { ...p, city: detected } : p));
+        return;
+      }
+      if (permissionDenied) {
+        Alert.alert(
+          'Location access',
+          'Enable location in Settings or type your city manually.'
+        );
+      } else {
+        Alert.alert('Could not detect city', 'Please try again or enter your city manually.');
+      }
+    } catch (err) {
+      Alert.alert(
+        'Could not detect city',
+        err instanceof Error ? err.message : 'Please try again.'
+      );
+    } finally {
+      setLocatingCity(false);
+    }
+  };
+
   const requestVerification = async () => {
+    if (!data) return;
+
+    if (editing && draft && hasChanges) {
+      try {
+        await persistProfileFields(draft);
+        setProfile({ ...draft });
+        setSaveState('saved');
+      } catch (err) {
+        Alert.alert(
+          'Save your profile first',
+          err instanceof Error ? err.message : 'Finish saving before verifying.'
+        );
+        return;
+      }
+    }
+
     try {
       const row = await getCurrentProfile();
-      const eligibility = getVerificationEligibility(row);
+      const eligibility = getVerificationEligibility(buildVerificationInput(data, row));
+
       if (!eligibility.ok) {
+        if (eligibility.reason === 'missing_photo') {
+          Alert.alert('Add a profile photo', eligibility.message, [
+            { text: 'Not now', style: 'cancel' },
+            {
+              text: 'Add photos',
+              onPress: () => startStudio(),
+            },
+          ]);
+          return;
+        }
+
+        if (eligibility.reason === 'missing_name') {
+          Alert.alert('Add your display name', eligibility.message, [
+            { text: 'Not now', style: 'cancel' },
+            {
+              text: 'Edit profile',
+              onPress: () => startStudio(),
+            },
+          ]);
+          return;
+        }
+
         Alert.alert('Verification unavailable', eligibility.message);
         return;
       }
+
       setShowVerifyModal(true);
     } catch (err) {
       Alert.alert(
@@ -413,17 +516,27 @@ export default function Profile({ onSignOut }: ProfileProps) {
     }
   };
 
-  const scrollToStep = (index: number) => {
-    setActiveStep(index);
-    const id = STUDIO_STEPS[index]?.id;
-    const y = id ? sectionOffsets.current[id] : undefined;
-    if (y != null) {
-      scrollRef.current?.scrollTo({ y: Math.max(0, y - 12), animated: true });
+  const handleConfirmVerification = async () => {
+    setVerifying(true);
+    try {
+      await verifyGenotype();
+      const markVerified = (p: EditableProfile) => ({ ...p, genotypeVerified: true });
+      setProfile((p) => (p ? markVerified(p) : p));
+      setDraft((p) => (p ? markVerified(p) : p));
+      setShowVerifyModal(false);
+      await loadProfile();
+      Alert.alert(
+        'You are verified',
+        'Matches will now see your verified badge on your profile.'
+      );
+    } catch (err) {
+      Alert.alert(
+        'Verification failed',
+        err instanceof Error ? err.message : 'Please try again.'
+      );
+    } finally {
+      setVerifying(false);
     }
-  };
-
-  const onSectionLayout = (id: string) => (e: LayoutChangeEvent) => {
-    sectionOffsets.current[id] = e.nativeEvent.layout.y;
   };
 
   if (loading) {
@@ -482,10 +595,10 @@ export default function Profile({ onSignOut }: ProfileProps) {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <GenoInboxHeader
-          title={editing ? 'Profile studio' : 'Profile'}
+          title={editing ? 'Edit profile' : 'Profile'}
           subtitle={
             editing
-              ? 'Edit photos, story & intent — publish when ready'
+              ? 'Scroll to update · changes save automatically'
               : `${completionPercent}% complete · live on Discover`
           }
           ceremonyMark={editing}
@@ -512,7 +625,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          <ProfileHeroChrome studio={editing} height={HERO_HEIGHT}>
+          <ProfileHeroChrome studio={editing} height={editing ? HERO_HEIGHT_STUDIO : HERO_HEIGHT}>
             <ProfileHero
               displayName={data.displayName}
               city={data.city}
@@ -527,28 +640,90 @@ export default function Profile({ onSignOut }: ProfileProps) {
               draftCity={draft?.city}
               onChangeName={(t) => setDraft((p) => (p ? { ...p, displayName: t } : p))}
               onChangeCity={(t) => setDraft((p) => (p ? { ...p, city: t } : p))}
+              onRefreshLocation={() => void refreshLocationFromDevice()}
+              locatingCity={locatingCity}
               onEdit={startStudio}
               onCancel={requestExitStudio}
-              onSave={saveEdit}
             />
           </ProfileHeroChrome>
 
-          {editing ? (
-            <Animated.View style={{ opacity: studioFade }}>
-              <StudioBanner doneCount={essentialsDone} totalCount={6} />
-              <StudioStepRail
-                steps={STUDIO_STEPS}
-                activeIndex={activeStep}
-                onSelect={scrollToStep}
-                completedSteps={stepComplete}
+          {editing && draft ? (
+            <Animated.View style={[styles.studioStack, { opacity: studioFade }]}>
+              <StudioCompletionStrip
+                percent={completionPercent}
+                essentialsDone={essentialsDone}
+                essentialsTotal={6}
               />
-              {!data.genotypeVerified ? (
-                <ProfileIdentityRibbon
-                  verified={false}
-                  genotype={data.genotype}
-                  onVerify={requestVerification}
+
+              <ProfileSectionCard
+                kicker="GALLERY"
+                label="Photos"
+                hint="Up to 6 photos · first image is your main"
+                editing
+              >
+                <ProfilePhotosGrid
+                  photos={draft.photos}
+                  editing
+                  canAdd={draft.photos.length < 6}
+                  uploading={uploadingPhoto}
+                  onAdd={async () => {
+                    if (draft.photos.length >= 6) return;
+                    setUploadingPhoto(true);
+                    try {
+                      const url = await uploadAdditionalPhoto();
+                      if (url) await applyPhotos([...draft.photos, url]);
+                    } finally {
+                      setUploadingPhoto(false);
+                    }
+                  }}
+                  onDelete={async (index) => {
+                    await applyPhotos(draft.photos.filter((_, i) => i !== index));
+                  }}
                 />
-              ) : null}
+              </ProfileSectionCard>
+
+              <ProfileSectionCard
+                kicker="YOUR STORY"
+                label="About you"
+                hint="Bio, interests, and what you are looking for"
+                editing
+              >
+                <ProfileEditFields
+                  bio={draft.bio}
+                  interests={draft.interests}
+                  relationshipGoal={draft.relationshipGoal}
+                  onChangeBio={(t) => setDraft((p) => (p ? { ...p, bio: t } : p))}
+                  onToggleInterest={toggleInterest}
+                  onSelectGoal={(g) => setDraft((p) => (p ? { ...p, relationshipGoal: g } : p))}
+                  hideHint
+                />
+              </ProfileSectionCard>
+
+              <ProfileSectionCard
+                kicker="DETAILS"
+                label="Lifestyle"
+                hint="Optional details shown on your profile"
+                editing
+              >
+                <ProfileDetailsFields
+                  heightCm={draft.heightCm}
+                  religion={draft.religion}
+                  drinkingStatus={draft.drinkingStatus}
+                  smokingStatus={draft.smokingStatus}
+                  educationStatus={draft.educationStatus}
+                  onSelectHeight={(cm) => setDraft((p) => (p ? { ...p, heightCm: cm } : p))}
+                  onSelectReligion={(id) => setDraft((p) => (p ? { ...p, religion: id } : p))}
+                  onSelectDrinking={(id) =>
+                    setDraft((p) => (p ? { ...p, drinkingStatus: id } : p))
+                  }
+                  onSelectSmoking={(id) =>
+                    setDraft((p) => (p ? { ...p, smokingStatus: id } : p))
+                  }
+                  onSelectEducation={(id) =>
+                    setDraft((p) => (p ? { ...p, educationStatus: id } : p))
+                  }
+                />
+              </ProfileSectionCard>
             </Animated.View>
           ) : (
             <Animated.View style={[styles.viewStack, { opacity: viewFade }]}>
@@ -566,103 +741,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
             </Animated.View>
           )}
 
-          {editing ? (
-            <>
-              <StudioSectionShell
-                active={activeStep === 0}
-                onLayout={onSectionLayout('photos')}
-              >
-                <ProfileSectionHeader
-                  kicker="01 · GALLERY"
-                  title="Photos"
-                  hint="Up to 6 photos · first image is your main"
-                />
-                <ProfilePhotosGrid
-                  photos={data.photos}
-                  editing
-                  canAdd={data.photos.length < 6}
-                  uploading={uploadingPhoto}
-                  onAdd={async () => {
-                    if (data.photos.length >= 6) return;
-                    setUploadingPhoto(true);
-                    try {
-                      const url = await uploadAdditionalPhoto();
-                      if (url) await applyPhotos([...data.photos, url]);
-                    } finally {
-                      setUploadingPhoto(false);
-                    }
-                  }}
-                  onDelete={async (index) => {
-                    await applyPhotos(data.photos.filter((_, i) => i !== index));
-                  }}
-                />
-              </StudioSectionShell>
-
-              <StudioSectionShell active={activeStep === 1} onLayout={onSectionLayout('story')}>
-                <ProfileSectionHeader
-                  kicker="02 · STORY"
-                  title="Bio & interests"
-                  hint="Refine how matches see your bond profile"
-                />
-                <ProfileEditFields
-                  bio={draft?.bio ?? ''}
-                  interests={draft?.interests ?? []}
-                  relationshipGoal={draft?.relationshipGoal ?? 'serious'}
-                  onChangeBio={(t) => setDraft((p) => (p ? { ...p, bio: t } : p))}
-                  onToggleInterest={toggleInterest}
-                  onSelectGoal={(g) => setDraft((p) => (p ? { ...p, relationshipGoal: g } : p))}
-                  showGoals={false}
-                  hideHint
-                />
-              </StudioSectionShell>
-
-              <StudioSectionShell
-                active={activeStep === 2}
-                onLayout={onSectionLayout('intent')}
-              >
-                <ProfileSectionHeader
-                  kicker="03 · INTENT"
-                  title="Relationship goal"
-                  hint="How you appear on Discover & Matches"
-                />
-                <ProfileEditFields
-                  bio={draft?.bio ?? ''}
-                  interests={draft?.interests ?? []}
-                  relationshipGoal={draft?.relationshipGoal ?? 'serious'}
-                  onChangeBio={() => {}}
-                  onToggleInterest={() => {}}
-                  onSelectGoal={(g) => setDraft((p) => (p ? { ...p, relationshipGoal: g } : p))}
-                  showBio={false}
-                  showInterests={false}
-                  showGoals
-                />
-              </StudioSectionShell>
-
-              <StudioSectionShell
-                active={activeStep === 3}
-                onLayout={onSectionLayout('details')}
-                style={{ marginBottom: 8 }}
-              >
-                <ProfileSectionHeader
-                  kicker="04 · DETAILS"
-                  title="Lifestyle & background"
-                  hint="Drinking, smoking, education & more — shown on your profile"
-                />
-                <ProfileDetailsFields
-                  heightCm={draft?.heightCm ?? null}
-                  religion={draft?.religion ?? ''}
-                  drinkingStatus={draft?.drinkingStatus ?? ''}
-                  smokingStatus={draft?.smokingStatus ?? ''}
-                  educationStatus={draft?.educationStatus ?? ''}
-                  onSelectHeight={(cm) => setDraft((p) => (p ? { ...p, heightCm: cm } : p))}
-                  onSelectReligion={(id) => setDraft((p) => (p ? { ...p, religion: id } : p))}
-                  onSelectDrinking={(id) => setDraft((p) => (p ? { ...p, drinkingStatus: id } : p))}
-                  onSelectSmoking={(id) => setDraft((p) => (p ? { ...p, smokingStatus: id } : p))}
-                  onSelectEducation={(id) => setDraft((p) => (p ? { ...p, educationStatus: id } : p))}
-                />
-              </StudioSectionShell>
-            </>
-          ) : (
+          {!editing ? (
             <View style={styles.viewStack}>
               <ProfileSectionCard
                 kicker="YOUR PHOTOS"
@@ -732,16 +811,14 @@ export default function Profile({ onSignOut }: ProfileProps) {
                 />
               </ProfileSectionCard>
             </View>
-          )}
+          ) : null}
         </ScrollView>
 
         {editing ? (
           <StudioSaveDock
-            hasChanges={hasChanges}
-            saving={saving}
-            saveDisabled={saving || !hasChanges}
-            onDiscard={requestDiscardFromDock}
-            onSave={saveEdit}
+            saveState={saveState}
+            busy={saving || saveState === 'saving'}
+            onDone={() => void flushAndCloseStudio()}
           />
         ) : null}
       </KeyboardAvoidingView>
@@ -750,20 +827,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
         visible={showVerifyModal}
         genotype={data.genotype}
         verifying={verifying}
-        onConfirm={async () => {
-          setVerifying(true);
-          try {
-            await verifyGenotype();
-            const v = (p: EditableProfile) => ({ ...p, genotypeVerified: true });
-            setProfile((p) => (p ? v(p) : p));
-            setDraft((p) => (p ? v(p) : p));
-            setShowVerifyModal(false);
-          } catch (e) {
-            setError(e instanceof Error ? e.message : 'Verification failed');
-          } finally {
-            setVerifying(false);
-          }
-        }}
+        onConfirm={() => void handleConfirmVerification()}
         onClose={() => !verifying && setShowVerifyModal(false)}
       />
 
@@ -782,7 +846,11 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   centered: { alignItems: 'center', justifyContent: 'center', padding: 24 },
   scroll: { paddingBottom: GENO_TAB_BAR_HEIGHT + 20, paddingTop: 2 },
-  scrollStudio: { paddingBottom: 148 },
+  scrollStudio: { paddingBottom: GENO_TAB_BAR_HEIGHT + 118 },
+  studioStack: {
+    gap: 2,
+    paddingTop: 2,
+  },
   viewStack: {
     gap: 2,
   },

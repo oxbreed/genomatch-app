@@ -29,6 +29,8 @@ type Props = {
   draftCity?: string;
   onChangeName?: (text: string) => void;
   onChangeCity?: (text: string) => void;
+  onRefreshLocation?: () => void;
+  locatingCity?: boolean;
   onEdit: () => void;
   onCancel?: () => void;
   onSave?: () => void;
@@ -47,6 +49,8 @@ export default function ProfileHero({
   draftCity,
   onChangeName,
   onChangeCity,
+  onRefreshLocation,
+  locatingCity = false,
   onEdit,
   studioMode = false,
 }: Props) {
@@ -120,13 +124,27 @@ export default function ProfileHero({
           {genotypeVerified ? <VerifiedBadge compact /> : null}
         </View>
         {showInlineEdit ? (
-          <TextInput
-            style={styles.locationInput}
-            value={draftCity}
-            onChangeText={onChangeCity}
-            placeholder="City"
-            placeholderTextColor="rgba(143, 175, 149, 0.6)"
-          />
+          <View style={styles.locationRow}>
+            <TextInput
+              style={styles.locationInput}
+              value={draftCity}
+              onChangeText={onChangeCity}
+              placeholder="City"
+              placeholderTextColor="rgba(143, 175, 149, 0.6)"
+            />
+            <Pressable
+              style={({ pressed }) => [styles.locationRefresh, pressed && styles.pressed]}
+              onPress={onRefreshLocation}
+              disabled={locatingCity || !onRefreshLocation}
+              accessibilityLabel="Use current location"
+            >
+              <Ionicons
+                name={locatingCity ? 'hourglass-outline' : 'locate'}
+                size={18}
+                color={COLORS.linen}
+              />
+            </Pressable>
+          </View>
         ) : (
           <Text style={styles.location}>
             {age ? `${age} · ` : ''}
@@ -260,13 +278,29 @@ const styles = StyleSheet.create({
     ...PROFILE_TYPE.heroMeta,
     color: 'rgba(245, 239, 230, 0.82)',
   },
+  locationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
   locationInput: {
+    flex: 1,
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
     color: COLORS.linen,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(212, 168, 67, 0.5)',
     paddingVertical: 2,
+  },
+  locationRefresh: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(245, 239, 230, 0.14)',
+    borderWidth: 1,
+    borderColor: 'rgba(245, 239, 230, 0.28)',
   },
   editBtn: {
     flexDirection: 'row',

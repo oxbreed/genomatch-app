@@ -42,6 +42,7 @@ const INTERESTS = [
 const GENDERS = ['Male', 'Female', 'Other'] as const;
 
 import { gradientFromId } from '../src/lib/profileMapper';
+import { detectDeviceCity } from '../src/lib/location';
 import { pickAndUploadProfilePhoto } from '../src/lib/photoUpload';
 import { getCurrentProfile } from '../src/lib/profiles';
 import { supabase } from '../src/lib/supabase';
@@ -87,6 +88,8 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
   const [age, setAge] = useState('');
   const [gender, setGender] = useState<Gender | ''>('');
   const [city, setCity] = useState('');
+  const [cityLoading, setCityLoading] = useState(true);
+  const [locationDenied, setLocationDenied] = useState(false);
   const [bio, setBio] = useState('');
   const [interests, setInterests] = useState<string[]>([]);
   const [relationshipGoal, setRelationshipGoal] = useState('');
@@ -119,6 +122,29 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
         setAvatarGradient(gradientFromId(session.user.id));
       }
     })();
+  }, []);
+
+  const refreshCityFromDevice = async () => {
+    setCityLoading(true);
+    setError('');
+    try {
+      const { city: detected, permissionDenied } = await detectDeviceCity();
+      if (detected) {
+        setCity(detected);
+      }
+      setLocationDenied(permissionDenied);
+      if (permissionDenied && !detected) {
+        setError('Location access is off. Enter your city manually or enable location in Settings.');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not detect your city.');
+    } finally {
+      setCityLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void refreshCityFromDevice();
   }, []);
 
   const animateStepChange = (nextStep: number, direction: 'forward' | 'back') => {
@@ -170,7 +196,11 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
         return 'Please enter a valid age (18–100).';
       }
       if (!gender) return 'Please select your gender.';
-      if (!city.trim()) return 'Please enter your city.';
+      if (!city.trim()) {
+        return locationDenied
+          ? 'Please enter your city or enable location access.'
+          : 'Please wait for your city to be detected, or enter it manually.';
+      }
     }
     if (step === 1) {
       if (bio.trim().length < 20) return 'Tell us a bit more — bio must be at least 20 characters.';
@@ -353,14 +383,30 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
             </View>
 
             <Text style={styles.label}>City</Text>
-            <TextInput
-              style={styles.input}
-              value={city}
-              onChangeText={setCity}
-              placeholder="e.g. Lagos, Accra, Abuja"
-              placeholderTextColor="rgba(7, 77, 46, 0.35)"
-              autoCapitalize="words"
-            />
+            <Text style={styles.hint}>
+              We use your phone location to set your city for nearby matching.
+            </Text>
+            <View style={styles.cityRow}>
+              <TextInput
+                style={[styles.input, styles.cityInput]}
+                value={city}
+                onChangeText={setCity}
+                placeholder={cityLoading ? 'Detecting your city…' : 'e.g. Lagos, Accra, Abuja'}
+                placeholderTextColor="rgba(7, 77, 46, 0.35)"
+                autoCapitalize="words"
+              />
+              <Pressable
+                style={({ pressed }) => [styles.cityRefreshBtn, pressed && styles.pressed]}
+                onPress={() => void refreshCityFromDevice()}
+                disabled={cityLoading}
+              >
+                {cityLoading ? (
+                  <ActivityIndicator color={COLORS.forest} size="small" />
+                ) : (
+                  <Ionicons name="locate" size={20} color={COLORS.forestDeep} />
+                )}
+              </Pressable>
+            </View>
           </View>
         );
 
@@ -701,6 +747,27 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#1D2B23',
     fontWeight: '500',
+  },
+  cityRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  cityInput: {
+    flex: 1,
+  },
+  cityRefreshBtn: {
+    width: 52,
+    height: 52,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: GLASS.insetBorder,
+    backgroundColor: GLASS.insetFill,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  pressed: {
+    opacity: 0.88,
   },
   genderRow: {
     flexDirection: 'row',

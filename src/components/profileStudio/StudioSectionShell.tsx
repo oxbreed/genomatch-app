@@ -92,7 +92,7 @@ export default function StudioSectionShell({ active, children, onLayout, style }
 const styles = StyleSheet.create({
   outer: {
     marginHorizontal: 16,
-    marginTop: 12,
+    marginTop: 8,
     position: 'relative',
   },
   glow: {

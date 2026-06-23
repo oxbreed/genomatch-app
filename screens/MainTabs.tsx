@@ -10,6 +10,7 @@ import { COLORS, MOTION } from '../src/theme';
 import { fetchConversations } from '../src/lib/messages';
 import { fetchMatches } from '../src/lib/matches';
 import { touchLastActive } from '../src/lib/presence';
+import { syncProfileCityFromDevice } from '../src/lib/location';
 import type { DiscoveryProfile } from '../src/types/database';
 
 const TAB_IDS: GenoTabId[] = ['discover', 'matches', 'messages', 'profile'];
@@ -67,9 +68,13 @@ export default function MainTabs({ onSignOut }: MainTabsProps) {
 
   useEffect(() => {
     void touchLastActive();
+    void syncProfileCityFromDevice();
     const interval = setInterval(() => void touchLastActive(), 2 * 60 * 1000);
     const subscription = AppState.addEventListener('change', (state) => {
-      if (state === 'active') void touchLastActive();
+      if (state === 'active') {
+        void touchLastActive();
+        void syncProfileCityFromDevice();
+      }
     });
     return () => {
       clearInterval(interval);

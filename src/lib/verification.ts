@@ -1,6 +1,16 @@
 import type { ProfileRow } from '../types/database';
 import { resolveProfilePhotos } from './profileMapper';
 
+export type VerificationProfileInput = Pick<
+  ProfileRow,
+  | 'display_name'
+  | 'genotype'
+  | 'avatar_url'
+  | 'photos'
+  | 'genotype_verified'
+  | 'verification_status'
+>;
+
 export type VerificationBlockReason =
   | 'not_signed_in'
   | 'missing_photo'
@@ -25,7 +35,7 @@ const REASON_MESSAGES: Record<Exclude<VerificationBlockReason, 'already_verified
 
 /** Checks whether a member can complete identity verification. */
 export function getVerificationEligibility(
-  row: ProfileRow | null,
+  row: VerificationProfileInput | null,
   options?: { allowAlreadyVerified?: boolean }
 ): VerificationEligibility {
   if (!row) {

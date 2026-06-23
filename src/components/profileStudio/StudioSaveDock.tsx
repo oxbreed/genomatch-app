@@ -2,100 +2,81 @@ import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-nati
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
-import { GenoGlassSurface, GenoLogoCeremony } from '../../brand/graphics';
-import { FONT_FAMILY, COLORS } from '../../theme';
+import { FONT_FAMILY, COLORS, RADIUS } from '../../theme';
+import { GENO_TAB_BAR_HEIGHT } from '../navigation/tabBarLayout';
+
+export type StudioSaveState = 'idle' | 'saving' | 'saved' | 'error';
 
 type Props = {
-  hasChanges: boolean;
-  saving: boolean;
-  saveDisabled: boolean;
-  onDiscard: () => void;
-  onSave: () => void;
+  saveState: StudioSaveState;
+  onDone: () => void;
+  busy: boolean;
 };
 
-export default function StudioSaveDock({
-  hasChanges,
-  saving,
-  saveDisabled,
-  onDiscard,
-  onSave,
-}: Props) {
-  const handleSave = () => {
-    if (saveDisabled || saving) return;
-    void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    onSave();
+function statusCopy(saveState: StudioSaveState): { text: string; live: boolean } {
+  switch (saveState) {
+    case 'saving':
+      return { text: 'Saving changes…', live: true };
+    case 'saved':
+      return { text: 'All changes saved', live: true };
+    case 'error':
+      return { text: 'Could not save — check connection', live: false };
+    default:
+      return { text: 'Changes save automatically', live: false };
+  }
+}
+
+export default function StudioSaveDock({ saveState, onDone, busy }: Props) {
+  const status = statusCopy(saveState);
+
+  const handleDone = () => {
+    if (busy) return;
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    onDone();
   };
 
   return (
     <View style={styles.dock}>
       <LinearGradient
-        colors={['rgba(245, 239, 230, 0)', 'rgba(245, 239, 230, 0.95)', COLORS.linen]}
+        colors={['rgba(245, 239, 230, 0)', 'rgba(245, 239, 230, 0.96)', COLORS.linen]}
         style={styles.fade}
         pointerEvents="none"
       />
-      <GenoGlassSurface
-        variant="linen"
-        borderRadius={22}
-        shadow="glassElevated"
-        showTopRule
-        style={styles.panelGlass}
-        contentStyle={styles.panel}
-      >
-        <View style={styles.meta}>
-          <GenoLogoCeremony variant="mark" tone="dark" subtle style={styles.mark} />
-          <View style={styles.metaCopy}>
-            <View style={styles.metaTitleRow}>
-              <View style={[styles.statusDot, hasChanges && styles.statusDotLive]} />
-              <Text style={styles.metaTitle}>
-                {hasChanges ? 'Ready to publish' : 'Studio draft'}
-              </Text>
-            </View>
-            <Text style={styles.metaSub}>
-              {hasChanges
-                ? 'Matches will see updates on Discover after you publish'
-                : 'Make changes above, then publish when ready'}
-            </Text>
-          </View>
+
+      <View style={styles.panel}>
+        <View style={styles.statusRow}>
+          {saveState === 'saving' ? (
+            <ActivityIndicator size="small" color={COLORS.gold} />
+          ) : (
+            <View style={[styles.statusDot, status.live && styles.statusDotLive]} />
+          )}
+          <Text style={styles.statusText}>{status.text}</Text>
         </View>
-        <View style={styles.actions}>
-          <Pressable
-            style={({ pressed }) => [styles.discard, pressed && styles.pressed]}
-            onPress={onDiscard}
-            disabled={saving}
+
+        <Pressable
+          style={({ pressed }) => [styles.doneWrap, pressed && styles.pressed, busy && styles.busy]}
+          onPress={handleDone}
+          disabled={busy}
+          accessibilityRole="button"
+          accessibilityLabel="Done editing profile"
+        >
+          <LinearGradient
+            colors={busy ? ['rgba(143, 175, 149, 0.5)', 'rgba(143, 175, 149, 0.35)'] : [COLORS.gold, '#C49A38']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.done}
           >
-            <Text style={styles.discardText}>Discard</Text>
-          </Pressable>
-          <Pressable
-            style={({ pressed }) => [
-              styles.saveWrap,
-              pressed && styles.pressed,
-              saveDisabled && styles.saveDisabled,
-            ]}
-            onPress={handleSave}
-            disabled={saveDisabled}
-          >
-            <LinearGradient
-              colors={
-                saveDisabled
-                  ? ['rgba(143, 175, 149, 0.5)', 'rgba(143, 175, 149, 0.35)']
-                  : [COLORS.gold, '#C49A38']
-              }
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.save}
-            >
-              {saving ? (
-                <ActivityIndicator color={COLORS.forestDeep} size="small" />
-              ) : (
-                <>
-                  <Ionicons name="checkmark-done" size={18} color={COLORS.forestDeep} />
-                  <Text style={styles.saveText}>Publish profile</Text>
-                </>
-              )}
-            </LinearGradient>
-          </Pressable>
-        </View>
-      </GenoGlassSurface>
+            {busy ? (
+              <ActivityIndicator color={COLORS.forestDeep} size="small" />
+            ) : (
+              <>
+                <Text style={styles.doneText}>Done</Text>
+                <Ionicons name="checkmark" size={18} color={COLORS.forestDeep} />
+              </>
+            )}
+          </LinearGradient>
+        </Pressable>
+      </View>
     </View>
   );
 }
@@ -105,104 +86,68 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     right: 0,
-    bottom: 0,
+    bottom: GENO_TAB_BAR_HEIGHT,
     zIndex: 20,
   },
   fade: {
-    height: 28,
+    height: 20,
     width: '100%',
   },
-  panelGlass: {
-    overflow: 'hidden',
-  },
   panel: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 24,
-    gap: 12,
-  },
-  meta: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    marginHorizontal: 16,
+    padding: 12,
+    borderRadius: RADIUS.xl,
+    backgroundColor: COLORS.white,
+    borderWidth: 1,
+    borderColor: 'rgba(13, 40, 24, 0.08)',
     gap: 10,
+    shadowColor: COLORS.forestDeep,
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    elevation: 6,
   },
-  mark: {
-    width: 44,
-    height: 44,
-  },
-  metaCopy: {
-    flex: 1,
-    gap: 3,
-  },
-  metaTitleRow: {
+  statusRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+    paddingHorizontal: 2,
   },
   statusDot: {
-    width: 8,
-    height: 8,
+    width: 7,
+    height: 7,
     borderRadius: 4,
-    backgroundColor: 'rgba(143, 175, 149, 0.45)',
+    backgroundColor: 'rgba(143, 175, 149, 0.5)',
   },
   statusDotLive: {
     backgroundColor: COLORS.gold,
-    shadowColor: COLORS.gold,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.9,
-    shadowRadius: 6,
   },
-  metaTitle: {
-    fontFamily: FONT_FAMILY.gothamBold,
-    fontSize: 16,
-    color: COLORS.forestDeep,
-  },
-  metaSub: {
+  statusText: {
+    flex: 1,
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    lineHeight: 16,
     color: COLORS.sage,
   },
-  actions: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  discard: {
-    flex: 0.36,
-    height: 50,
-    borderRadius: 14,
-    borderWidth: 1.5,
-    borderColor: 'rgba(13, 40, 24, 0.12)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: COLORS.linen,
-  },
-  discardText: {
-    fontFamily: FONT_FAMILY.gothamBold,
-    fontSize: 14,
-    color: COLORS.forest,
-  },
-  saveWrap: {
-    flex: 1,
-    borderRadius: 14,
+  doneWrap: {
+    borderRadius: RADIUS.md,
     overflow: 'hidden',
   },
-  saveDisabled: {
-    opacity: 0.7,
+  busy: {
+    opacity: 0.85,
   },
-  save: {
-    height: 50,
+  done: {
+    height: 46,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
+    gap: 6,
   },
-  saveText: {
+  doneText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 15,
     color: COLORS.forestDeep,
   },
   pressed: {
-    opacity: 0.88,
+    opacity: 0.9,
   },
 });

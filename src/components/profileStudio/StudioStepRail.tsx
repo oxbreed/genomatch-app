@@ -147,15 +147,16 @@ export default function StudioStepRail({ steps, activeIndex, onSelect, completed
 
 const styles = StyleSheet.create({
   wrap: {
-    marginTop: 8,
-    gap: 10,
+    marginTop: 4,
+    marginBottom: 4,
   },
   trackWrap: {
     marginHorizontal: 16,
-    height: 4,
+    height: 3,
     borderRadius: 2,
     overflow: 'hidden',
     position: 'relative',
+    marginBottom: 8,
   },
   track: {
     flex: 1,
