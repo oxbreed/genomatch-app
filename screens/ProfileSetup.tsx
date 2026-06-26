@@ -42,10 +42,16 @@ const INTERESTS = [
 const GENDERS = ['Male', 'Female', 'Other'] as const;
 
 import { gradientFromId } from '../src/lib/profileMapper';
-import { detectDeviceCity } from '../src/lib/location';
+import {
+  detectDeviceCity,
+  getDeviceLocation,
+  saveProfileLocation,
+  type DeviceLocation,
+} from '../src/lib/location';
 import { pickAndUploadProfilePhoto } from '../src/lib/photoUpload';
 import { getCurrentProfile } from '../src/lib/profiles';
 import { supabase } from '../src/lib/supabase';
+import { dateOfBirthFromAge, isMinimumAge } from '../src/lib/validation';
 
 type IonName = ComponentProps<typeof Ionicons>['name'];
 
@@ -77,17 +83,13 @@ const RELATIONSHIP_GOALS: {
 
 type Gender = (typeof GENDERS)[number];
 
-function ageToDateOfBirth(age: number): string {
-  const year = new Date().getFullYear() - age;
-  return `${year}-01-01`;
-}
-
 export default function ProfileSetup({ onComplete }: { onComplete: () => void }) {
   const [step, setStep] = useState(0);
   const [displayName, setDisplayName] = useState('');
   const [age, setAge] = useState('');
   const [gender, setGender] = useState<Gender | ''>('');
   const [city, setCity] = useState('');
+  const [deviceLocation, setDeviceLocation] = useState<DeviceLocation | null>(null);
   const [cityLoading, setCityLoading] = useState(true);
   const [locationDenied, setLocationDenied] = useState(false);
   const [bio, setBio] = useState('');
@@ -128,12 +130,26 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
     setCityLoading(true);
     setError('');
     try {
-      const { city: detected, permissionDenied } = await detectDeviceCity();
-      if (detected) {
-        setCity(detected);
+      const detected = await detectDeviceCity();
+      if (detected.city) {
+        setCity(detected.city);
       }
-      setLocationDenied(permissionDenied);
-      if (permissionDenied && !detected) {
+      if (
+        detected.city &&
+        detected.latitude != null &&
+        detected.longitude != null
+      ) {
+        setDeviceLocation({
+          city: detected.city,
+          country: detected.country,
+          latitude: detected.latitude,
+          longitude: detected.longitude,
+        });
+      } else {
+        setDeviceLocation(null);
+      }
+      setLocationDenied(detected.permissionDenied);
+      if (detected.permissionDenied && !detected.city) {
         setError('Location access is off. Enter your city manually or enable location in Settings.');
       }
     } catch (err) {
@@ -192,8 +208,8 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
     if (step === 0) {
       if (!displayName.trim()) return 'Please enter your display name.';
       const ageNum = parseInt(age, 10);
-      if (!age || Number.isNaN(ageNum) || ageNum < 18 || ageNum > 100) {
-        return 'Please enter a valid age (18–100).';
+      if (!age || !isMinimumAge(ageNum)) {
+        return 'You must be at least 18 years old to use GenoMatch.';
       }
       if (!gender) return 'Please select your gender.';
       if (!city.trim()) {
@@ -254,7 +270,7 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
         display_name: displayName.trim(),
         city: city.trim(),
         bio: bio.trim(),
-        date_of_birth: ageToDateOfBirth(ageNum),
+        date_of_birth: dateOfBirthFromAge(ageNum),
         gender,
         interests,
         relationship_goal: relationshipGoal,
@@ -290,6 +306,18 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
         throw new Error('Profile saved but onboarding flag was not set. Please try again.');
       }
 
+      const locationToSave =
+        deviceLocation ??
+        (await getDeviceLocation()) ??
+        null;
+
+      if (locationToSave) {
+        await saveProfileLocation({
+          ...locationToSave,
+          city: city.trim() || locationToSave.city,
+        });
+      }
+
       const { error: metaError } = await supabase.auth.updateUser({
         data: {
           gender,
@@ -304,8 +332,11 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
 
       onComplete();
     } catch (err) {
-      const message =
+      const rawMessage =
         err instanceof Error ? err.message : 'Could not save your profile. Please try again.';
+      const message = rawMessage.includes('MINIMUM_AGE_18')
+        ? 'You must be at least 18 years old to use GenoMatch.'
+        : rawMessage;
       setError(message);
     } finally {
       setSaving(false);

@@ -31,6 +31,7 @@ type Props = {
   onChangeCity?: (text: string) => void;
   onRefreshLocation?: () => void;
   locatingCity?: boolean;
+  cityLocked?: boolean;
   onEdit: () => void;
   onCancel?: () => void;
   onSave?: () => void;
@@ -51,6 +52,7 @@ export default function ProfileHero({
   onChangeCity,
   onRefreshLocation,
   locatingCity = false,
+  cityLocked = false,
   onEdit,
   studioMode = false,
 }: Props) {
@@ -125,25 +127,34 @@ export default function ProfileHero({
         </View>
         {showInlineEdit ? (
           <View style={styles.locationRow}>
-            <TextInput
-              style={styles.locationInput}
-              value={draftCity}
-              onChangeText={onChangeCity}
-              placeholder="City"
-              placeholderTextColor="rgba(143, 175, 149, 0.6)"
-            />
-            <Pressable
-              style={({ pressed }) => [styles.locationRefresh, pressed && styles.pressed]}
-              onPress={onRefreshLocation}
-              disabled={locatingCity || !onRefreshLocation}
-              accessibilityLabel="Use current location"
-            >
-              <Ionicons
-                name={locatingCity ? 'hourglass-outline' : 'locate'}
-                size={18}
-                color={COLORS.linen}
+            {cityLocked ? (
+              <View style={styles.locationLocked}>
+                <Ionicons name="lock-closed" size={14} color="rgba(255,255,255,0.75)" />
+                <Text style={styles.locationLockedText}>{draftCity || city || 'City locked'}</Text>
+              </View>
+            ) : (
+              <TextInput
+                style={styles.locationInput}
+                value={draftCity}
+                onChangeText={onChangeCity}
+                placeholder="City"
+                placeholderTextColor="rgba(143, 175, 149, 0.6)"
               />
-            </Pressable>
+            )}
+            {!cityLocked ? (
+              <Pressable
+                style={({ pressed }) => [styles.locationRefresh, pressed && styles.pressed]}
+                onPress={onRefreshLocation}
+                disabled={locatingCity || !onRefreshLocation}
+                accessibilityLabel="Use current location"
+              >
+                <Ionicons
+                  name={locatingCity ? 'hourglass-outline' : 'locate'}
+                  size={18}
+                  color={COLORS.linen}
+                />
+              </Pressable>
+            ) : null}
           </View>
         ) : (
           <Text style={styles.location}>
@@ -291,6 +302,18 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(212, 168, 67, 0.5)',
     paddingVertical: 2,
+  },
+  locationLocked: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 4,
+  },
+  locationLockedText: {
+    fontFamily: FONT_FAMILY.gothamMedium,
+    fontSize: 14,
+    color: 'rgba(245, 239, 230, 0.82)',
   },
   locationRefresh: {
     width: 36,

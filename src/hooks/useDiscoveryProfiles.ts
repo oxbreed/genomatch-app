@@ -3,6 +3,7 @@ import { getMockDiscoveryProfiles } from '../data/mockData';
 import {
   fetchDiscoveryProfiles,
   getViewerProfileSnapshot,
+  type DiscoveryDeckStats,
   type ViewerProfileSnapshot,
 } from '../lib/profiles';
 import type { DiscoveryProfile, Genotype } from '../types/database';
@@ -15,6 +16,7 @@ type UseDiscoveryProfilesResult = {
   usingMockFallback: boolean;
   viewerGenotype: Genotype | null;
   viewerSnapshot: ViewerProfileSnapshot | null;
+  deckStats: DiscoveryDeckStats | null;
   loadProfiles: () => Promise<void>;
 };
 
@@ -26,17 +28,20 @@ export function useDiscoveryProfiles(onLoaded?: () => void): UseDiscoveryProfile
   const [usingMockFallback, setUsingMockFallback] = useState(false);
   const [viewerGenotype, setViewerGenotype] = useState<Genotype | null>(null);
   const [viewerSnapshot, setViewerSnapshot] = useState<ViewerProfileSnapshot | null>(null);
+  const [deckStats, setDeckStats] = useState<DiscoveryDeckStats | null>(null);
 
   const loadProfiles = useCallback(async () => {
     setLoadError('');
     setLoading(true);
     try {
-      const [{ profiles: rows, viewerGenotype: loadedViewerGenotype }, viewer] = await Promise.all([
+      const [{ profiles: rows, viewerGenotype: loadedViewerGenotype, deckStats: stats }, viewer] =
+        await Promise.all([
         fetchDiscoveryProfiles(),
         getViewerProfileSnapshot(),
       ]);
       setViewerGenotype(loadedViewerGenotype);
       setViewerSnapshot(viewer);
+      setDeckStats(stats);
       if (rows.length > 0) {
         setAllProfiles(rows);
         setUsingMockFallback(false);
@@ -54,6 +59,7 @@ export function useDiscoveryProfiles(onLoaded?: () => void): UseDiscoveryProfile
       setViewerSnapshot(viewer);
       setAllProfiles([]);
       setUsingMockFallback(false);
+      setDeckStats(null);
       setLoadError(err instanceof Error ? err.message : 'Could not load profiles');
       onLoaded?.();
     } finally {
@@ -73,6 +79,7 @@ export function useDiscoveryProfiles(onLoaded?: () => void): UseDiscoveryProfile
     usingMockFallback,
     viewerGenotype,
     viewerSnapshot,
+    deckStats,
     loadProfiles,
   };
 }

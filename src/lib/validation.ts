@@ -39,6 +39,24 @@ export function validateBio(bio: string): boolean {
   return sanitizeText(bio).length <= 500;
 }
 
+const MINIMUM_AGE = 18;
+const MAXIMUM_AGE = 100;
+
+/** True when age is a whole number and the user is at least 18. */
+export function isMinimumAge(age: number): boolean {
+  return Number.isInteger(age) && age >= MINIMUM_AGE && age <= MAXIMUM_AGE;
+}
+
+/** Derive a date_of_birth that satisfies the 18+ gate for the given age today. */
+export function dateOfBirthFromAge(age: number): string {
+  const dob = new Date();
+  dob.setFullYear(dob.getFullYear() - age);
+  const year = dob.getFullYear();
+  const month = String(dob.getMonth() + 1).padStart(2, '0');
+  const day = String(dob.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 /** 2–50 chars; letters, spaces, and hyphens only. */
 export function validateDisplayName(name: string): boolean {
   const trimmed = sanitizeText(name);

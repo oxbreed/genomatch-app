@@ -14,6 +14,7 @@ import ProfileSetup from './screens/ProfileSetup';
 import MainTabs from './screens/MainTabs';
 import { resolveInitialScreen } from './src/lib/profiles';
 import { getAuthenticatedUserId, logAuthState } from './src/lib/auth';
+import { enforceAccountAccess } from './src/lib/security';
 import { syncPushTokenToProfile } from './src/lib/pushRegistration';
 import { startInboxRealtime } from './src/lib/messages';
 import {
@@ -111,6 +112,11 @@ export default function App() {
 
         if (session?.user?.id) {
           void getAuthenticatedUserId();
+          const allowed = await enforceAccountAccess();
+          if (!allowed) {
+            if (mounted) setScreen('onboarding');
+            return;
+          }
           startInboxRealtime();
         }
 
@@ -151,6 +157,12 @@ export default function App() {
         if (current === 'main' || current === 'profileSetup') {
           setScreen('onboarding');
         }
+      } else if (event === 'TOKEN_REFRESHED') {
+        void enforceAccountAccess().then((allowed) => {
+          if (!allowed && screenRef.current === 'main') {
+            setScreen('onboarding');
+          }
+        });
       }
     });
 

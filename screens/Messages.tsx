@@ -19,7 +19,7 @@ import {
   GenoInboxUnreadBanner,
 } from '../src/components/inbox';
 import ConversationListCard from '../src/components/messages/ConversationListCard';
-import { isRecentMatch } from '../src/components/matches/MatchListCard';
+import { pickNewMatches } from '../src/lib/inboxMatches';
 import { getOpenChatMatchId } from '../src/lib/activeChat';
 import { logAuthState, getAuthenticatedUserId, peekUserId } from '../src/lib/auth';
 import { sendLocalNotification } from '../src/lib/notifications';
@@ -36,6 +36,7 @@ import ChatScreen from './ChatScreen';
 import MatchProfile from './MatchProfile';
 
 type MessagesProps = {
+  isActive?: boolean;
   initialChatMatchId?: string | null;
   initialChatProfile?: DiscoveryProfile | null;
   onChatOpened?: () => void;
@@ -51,13 +52,14 @@ function conversationToMatch(item: ConversationPreview): MatchWithProfile {
 }
 
 export default function Messages({
+  isActive,
   initialChatMatchId,
   initialChatProfile,
   onChatOpened,
   onImmersiveChange,
 }: MessagesProps) {
   const [conversations, setConversations] = useState<ConversationPreview[]>([]);
-  const [newMatches, setNewMatches] = useState<MatchWithProfile[]>([]);
+  const [allMatches, setAllMatches] = useState<MatchWithProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
@@ -73,6 +75,11 @@ export default function Messages({
   conversationsRef.current = conversations;
 
   const unreadCount = conversations.filter((c) => c.unread).length;
+
+  const newMatches = useMemo(
+    () => pickNewMatches(allMatches, conversations),
+    [allMatches, conversations]
+  );
 
   const sortedConversations = useMemo(
     () =>
@@ -95,8 +102,12 @@ export default function Messages({
     setError('');
     try {
       await logAuthState('Messages.loadConversations');
-      const rows = await fetchConversations();
+      const [rows, { matches }] = await Promise.all([
+        fetchConversations(),
+        fetchMatches(),
+      ]);
       setConversations(rows);
+      setAllMatches(matches);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not load messages');
     } finally {
@@ -112,6 +123,11 @@ export default function Messages({
   useEffect(() => {
     loadConversations();
   }, [loadConversations]);
+
+  useEffect(() => {
+    if (!isActive) return;
+    void loadConversations(true);
+  }, [isActive, loadConversations]);
 
   useEffect(() => {
     if (!userId) return;

@@ -16,6 +16,7 @@ import { FONT_FAMILY, COLORS, RADIUS } from '../../theme';
 type Props = {
   visible: boolean;
   genotype: string;
+  city: string;
   verifying: boolean;
   onConfirm: () => void;
   onClose: () => void;
@@ -24,6 +25,7 @@ type Props = {
 export default function ProfileGenotypeVerifyModal({
   visible,
   genotype,
+  city,
   verifying,
   onConfirm,
   onClose,
@@ -83,7 +85,9 @@ export default function ProfileGenotypeVerifyModal({
           </View>
 
           <Text style={styles.note}>
-            Verification requires a profile photo so matches can see the real you.
+            Verification requires a profile photo so matches can see the real you. Your city (
+            <Text style={styles.bold}>{city || 'not set'}</Text>) will be locked after verification.
+            If you move later, you can update it once per year using GPS.
           </Text>
 
           <Pressable

@@ -1,4 +1,6 @@
 import {
+  dateOfBirthFromAge,
+  isMinimumAge,
   sanitizeText,
   validateBio,
   validateDisplayName,
@@ -38,5 +40,26 @@ describe('validation', () => {
 
   it('sanitizeText removes script tags', () => {
     expect(sanitizeText('<b>Hi</b>')).toBe('Hi');
+  });
+
+  it('isMinimumAge requires 18 or older', () => {
+    expect(isMinimumAge(17)).toBe(false);
+    expect(isMinimumAge(18)).toBe(true);
+    expect(isMinimumAge(100)).toBe(true);
+    expect(isMinimumAge(101)).toBe(false);
+  });
+
+  it('dateOfBirthFromAge returns a calendar date 18 years ago today', () => {
+    const dob = dateOfBirthFromAge(18);
+    expect(dob).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+
+    const cutoff = new Date();
+    cutoff.setFullYear(cutoff.getFullYear() - 18);
+    const [year, month, day] = dob.split('-').map(Number);
+    const born = new Date(year, month - 1, day);
+
+    expect(born.getFullYear()).toBe(cutoff.getFullYear());
+    expect(born.getMonth()).toBe(cutoff.getMonth());
+    expect(born.getDate()).toBe(cutoff.getDate());
   });
 });

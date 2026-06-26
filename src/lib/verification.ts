@@ -9,6 +9,7 @@ export type VerificationProfileInput = Pick<
   | 'photos'
   | 'genotype_verified'
   | 'verification_status'
+  | 'city'
 >;
 
 export type VerificationBlockReason =
@@ -16,6 +17,7 @@ export type VerificationBlockReason =
   | 'missing_photo'
   | 'missing_name'
   | 'missing_genotype'
+  | 'missing_city'
   | 'already_verified';
 
 export type VerificationEligibility = {
@@ -31,6 +33,7 @@ const REASON_MESSAGES: Record<Exclude<VerificationBlockReason, 'already_verified
   missing_photo: 'Add at least one profile photo before verifying — matches need to see the real you.',
   missing_name: 'Add your display name before verifying.',
   missing_genotype: 'Set your genotype before verifying.',
+  missing_city: 'Set your city before verifying — it will be locked after verification.',
 };
 
 /** Checks whether a member can complete identity verification. */
@@ -63,6 +66,10 @@ export function getVerificationEligibility(
 
   if (!row.genotype) {
     return { ok: false, reason: 'missing_genotype', message: REASON_MESSAGES.missing_genotype };
+  }
+
+  if (!row.city?.trim()) {
+    return { ok: false, reason: 'missing_city', message: REASON_MESSAGES.missing_city };
   }
 
   return { ok: true };

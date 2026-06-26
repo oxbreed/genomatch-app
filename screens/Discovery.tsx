@@ -49,9 +49,11 @@ import { COLORS, RADIUS, SHADOWS, TYPOGRAPHY, getMockDiscoveryProfiles } from '.
 import {
   fetchDiscoveryProfiles,
   getViewerProfileSnapshot,
+  type DiscoveryDeckStats,
   type ViewerProfileSnapshot,
 } from '../src/lib/profiles';
-import { recordLike, recordPass } from '../src/lib/likes';
+import { clearMyPasses, recordLike, recordPass } from '../src/lib/likes';
+import { formatSecurityError } from '../src/lib/security';
 import { getMatchIdForProfile } from '../src/lib/matches';
 import { MOTION } from '../src/theme';
 import type { DiscoveryProfile, Genotype } from '../src/types/database';
@@ -65,6 +67,23 @@ const SWIPE_UP_THRESHOLD = 48;
 const SHEET_TRAVEL = SCREEN_HEIGHT;
 const SHEET_OPEN_SNAP = SHEET_TRAVEL * 0.42;
 const SUPER_LIKE_STAR_COUNT = 6;
+
+function discoveryDeckHint(stats: DiscoveryDeckStats | null): string {
+  if (!stats) return 'Check back soon for new people nearby.';
+  if (stats.eligible === 0) {
+    return 'No completed profiles yet. Check back as more members join.';
+  }
+  if (stats.passed > 0 && stats.liked > 0) {
+    return `You passed on ${stats.passed} and liked ${stats.liked}. Passed profiles stay hidden until you reset them.`;
+  }
+  if (stats.passed > 0) {
+    return `You passed on ${stats.passed} profile${stats.passed === 1 ? '' : 's'}. Reset passes below to see them again.`;
+  }
+  if (stats.liked > 0) {
+    return `You liked ${stats.liked} profile${stats.liked === 1 ? '' : 's'}. They stay hidden here until there is a mutual match.`;
+  }
+  return 'You have reviewed everyone available right now.';
+}
 
 function triggerLikeHaptic() {
   void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -82,11 +101,12 @@ function triggerMatchCelebrationHaptic() {
 }
 
 type DiscoveryProps = {
+  isActive?: boolean;
   onMatchCreated?: () => void;
   onStartChat?: (matchId: string, profile?: DiscoveryProfile) => void;
 };
 
-export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProps = {}) {
+export default function Discovery({ isActive = true, onMatchCreated, onStartChat }: DiscoveryProps = {}) {
   const [allProfiles, setAllProfiles] = useState<DiscoveryProfile[]>([]);
   const [filters, setFilters] = useState<DiscoveryFilters>(DEFAULT_DISCOVERY_FILTERS);
   const [showFilterSheet, setShowFilterSheet] = useState(false);
@@ -101,6 +121,8 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
   const [actionError, setActionError] = useState('');
   const [deckColumnHeight, setDeckColumnHeight] = useState(0);
   const [usingMockFallback, setUsingMockFallback] = useState(false);
+  const [deckStats, setDeckStats] = useState<DiscoveryDeckStats | null>(null);
+  const [clearingPasses, setClearingPasses] = useState(false);
   const [viewerGenotype, setViewerGenotype] = useState<Genotype | null>(null);
   const [superLikeToast, setSuperLikeToast] = useState(false);
   const [profileSheetVisible, setProfileSheetVisible] = useState(false);
@@ -118,19 +140,24 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
     setLoadError('');
     setLoading(true);
     try {
-      const [{ profiles: rows, viewerGenotype: loadedViewerGenotype }, viewer] = await Promise.all([
-        fetchDiscoveryProfiles(),
-        getViewerProfileSnapshot(),
-      ]);
+      const [{ profiles: rows, viewerGenotype: loadedViewerGenotype, deckStats: stats }, viewer] =
+        await Promise.all([
+          fetchDiscoveryProfiles(),
+          getViewerProfileSnapshot(),
+        ]);
       setViewerGenotype(loadedViewerGenotype);
       setViewerSnapshot(viewer);
+      setDeckStats(stats);
       if (rows.length > 0) {
         setAllProfiles(rows);
         setUsingMockFallback(false);
-      } else {
+      } else if (__DEV__) {
         setAllProfiles(getMockDiscoveryProfiles());
         setUsingMockFallback(true);
         if (!loadedViewerGenotype) setViewerGenotype('AA');
+      } else {
+        setAllProfiles([]);
+        setUsingMockFallback(false);
       }
       setIndex(0);
     } catch (err) {
@@ -138,6 +165,7 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
       setViewerSnapshot(viewer);
       setAllProfiles([]);
       setUsingMockFallback(false);
+      setDeckStats(null);
       setLoadError(err instanceof Error ? err.message : 'Could not load profiles');
       setIndex(0);
     } finally {
@@ -146,7 +174,22 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
   }, []);
 
   useEffect(() => {
-    loadProfiles();
+    if (isActive) {
+      void loadProfiles();
+    }
+  }, [isActive, loadProfiles]);
+
+  const handleClearPasses = useCallback(async () => {
+    setClearingPasses(true);
+    setActionError('');
+    try {
+      await clearMyPasses();
+      await loadProfiles();
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : 'Could not reset passed profiles');
+    } finally {
+      setClearingPasses(false);
+    }
   }, [loadProfiles]);
 
   const position = useRef(new Animated.ValueXY()).current;
@@ -456,7 +499,7 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
             }
           } catch (err) {
             setActionError(
-              err instanceof Error ? err.message : 'Could not save your like'
+              formatSecurityError(err, err instanceof Error ? err.message : 'Could not save your like')
             );
           }
         } else {
@@ -464,7 +507,7 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
             await recordPass(profile.id);
           } catch (err) {
             setActionError(
-              err instanceof Error ? err.message : 'Could not save your pass'
+              formatSecurityError(err, err instanceof Error ? err.message : 'Could not save your pass')
             );
           }
         }
@@ -648,6 +691,8 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
     extrapolate: 'clamp',
   });
 
+  const canResetPasses = !usingMockFallback && (deckStats?.passed ?? 0) > 0;
+  const deckEmptyHint = discoveryDeckHint(deckStats);
   const discoverSubtitle = usingMockFallback
     ? 'Preview profiles · real matches\nas members join'
     : 'Genotype-aware matches near you';
@@ -765,8 +810,22 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
               <EmptyState
                 type="no-profiles"
                 title="No profiles to show"
-                subtitle="Check back soon for new people nearby."
+                subtitle={deckEmptyHint}
               />
+              {canResetPasses ? (
+                <Pressable
+                  style={[styles.retryBtn, clearingPasses && styles.btnDisabled]}
+                  disabled={clearingPasses}
+                  onPress={() => void handleClearPasses()}
+                >
+                  <Text style={styles.retryText}>
+                    {clearingPasses ? 'Resetting…' : 'Show passed profiles again'}
+                  </Text>
+                </Pressable>
+              ) : null}
+              <Pressable style={styles.retryBtn} onPress={loadProfiles}>
+                <Text style={styles.retryText}>Refresh</Text>
+              </Pressable>
             </View>
           ) : isFilteredEmpty ? (
             <View style={styles.emptyState}>
@@ -791,7 +850,29 @@ export default function Discovery({ onMatchCreated, onStartChat }: DiscoveryProp
                     <Ionicons name="checkmark-done-outline" size={28} color={COLORS.forestDeep} />
                   </View>
                   <Text style={styles.seenAllTitle}>You're all caught up!</Text>
-                  <Text style={styles.seenAllSubtext}>New matches appear as more members join</Text>
+                  <Text style={styles.seenAllSubtext}>{deckEmptyHint}</Text>
+                  {canResetPasses ? (
+                    <Pressable
+                      style={({ pressed }) => [
+                        styles.refreshBtnWrap,
+                        styles.resetPassesBtnWrap,
+                        pressed && styles.btnPressed,
+                        clearingPasses && styles.btnDisabled,
+                      ]}
+                      disabled={clearingPasses}
+                      onPress={() => {
+                        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        void handleClearPasses();
+                      }}
+                    >
+                      <View style={styles.resetPassesBtn}>
+                        <Ionicons name="return-up-back-outline" size={18} color={COLORS.forestDeep} />
+                        <Text style={styles.refreshBtnText}>
+                          {clearingPasses ? 'Resetting…' : 'Show passed profiles again'}
+                        </Text>
+                      </View>
+                    </Pressable>
+                  ) : null}
                   <Pressable
                     style={({ pressed }) => [styles.refreshBtnWrap, pressed && styles.btnPressed]}
                     onPress={() => {
@@ -1571,6 +1652,23 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.xl,
     overflow: 'hidden',
     ...SHADOWS.button,
+  },
+  resetPassesBtnWrap: {
+    marginBottom: 12,
+    ...SHADOWS.card,
+    shadowOpacity: 0.08,
+  },
+  resetPassesBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    height: 52,
+    paddingHorizontal: 24,
+    backgroundColor: COLORS.white,
+    borderWidth: 1.5,
+    borderColor: 'rgba(7, 77, 46, 0.18)',
+    borderRadius: RADIUS.xl,
   },
   refreshBtn: {
     flexDirection: 'row',

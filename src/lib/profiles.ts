@@ -13,7 +13,7 @@ const CORE_PROFILE_FIELDS =
   'id, email, genotype, display_name, avatar_url, photos, bio, date_of_birth, city, country, gender, interests, relationship_goal, onboarding_completed, verification_status, genotype_verified, created_at, updated_at';
 
 const EXTENDED_PROFILE_FIELDS =
-  'height_cm, religion, drinking_status, smoking_status, education_status, last_active_at';
+  'height_cm, religion, drinking_status, smoking_status, education_status, last_active_at, city_updated_at';
 
 const PROFILE_FIELDS = `${CORE_PROFILE_FIELDS}, ${EXTENDED_PROFILE_FIELDS}`;
 
@@ -284,13 +284,38 @@ export async function resolveInitialScreen(): Promise<
   return 'main';
 }
 
+export type DiscoveryDeckStats = {
+  eligible: number;
+  liked: number;
+  passed: number;
+  blocked: number;
+};
+
+export async function fetchDiscoveryDeckStats(): Promise<DiscoveryDeckStats | null> {
+  const { data, error } = await supabase.rpc('get_my_discovery_deck_stats');
+
+  if (error) {
+    if (isMissingRpcError(error)) return null;
+    throw error;
+  }
+
+  const row = (data ?? {}) as Record<string, unknown>;
+  return {
+    eligible: Number(row.eligible ?? 0),
+    liked: Number(row.liked ?? 0),
+    passed: Number(row.passed ?? 0),
+    blocked: Number(row.blocked ?? 0),
+  };
+}
+
 export async function fetchDiscoveryProfiles(): Promise<{
   profiles: DiscoveryProfile[];
   viewerGenotype: Genotype | null;
+  deckStats: DiscoveryDeckStats | null;
 }> {
   const userId = await getCurrentUserId();
   if (!userId) {
-    return { profiles: [], viewerGenotype: null };
+    return { profiles: [], viewerGenotype: null, deckStats: null };
   }
 
   const { data: me, error: meError } = await supabase
@@ -345,7 +370,10 @@ export async function fetchDiscoveryProfiles(): Promise<{
       mapProfileRow(row, viewerGenotype, { distanceBand })
     );
 
-  return { profiles, viewerGenotype };
+  const deckStats =
+    profiles.length === 0 ? await fetchDiscoveryDeckStats().catch(() => null) : null;
+
+  return { profiles, viewerGenotype, deckStats };
 }
 
 export async function updateProfileAvatar(avatarUrl: string): Promise<void> {

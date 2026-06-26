@@ -128,3 +128,13 @@ export async function getSeenProfileIds(userId: string): Promise<Set<string>> {
 
   return seen;
 }
+
+/** Undo all passes so previously skipped profiles can appear in Discovery again. */
+export async function clearMyPasses(): Promise<number> {
+  const passerId = await getAuthenticatedUserId();
+  if (!passerId) throw new Error('Not signed in');
+
+  const { data, error } = await supabase.rpc('clear_my_passes');
+  if (error) throw error;
+  return typeof data === 'number' ? data : 0;
+}

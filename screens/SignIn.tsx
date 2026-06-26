@@ -23,6 +23,7 @@ import { COLORS, RADIUS, SHADOWS } from '../src/theme'
 import { FONT_FAMILY, GLASS } from '../src/theme';
 import { resolvePostSignInScreen } from '../src/lib/profiles';
 import { sendPasswordResetEmail } from '../src/lib/resetPassword';
+import { enforceAccountAccess, formatSecurityError } from '../src/lib/security';
 import { supabase } from '../src/lib/supabase';
 
 type SignInProps = {
@@ -84,12 +85,18 @@ export default function SignIn({
       });
 
       if (signInError) {
-        setError(signInError.message);
+        setError(formatSecurityError(signInError, signInError.message));
         return;
       }
 
       if (!data.session) {
         setError('Sign in failed. Please try again.');
+        return;
+      }
+
+      const allowed = await enforceAccountAccess();
+      if (!allowed) {
+        setError('This account has been suspended or banned.');
         return;
       }
 
@@ -99,8 +106,10 @@ export default function SignIn({
       console.log('[SignIn] routing →', destination);
       onSignedIn(destination);
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Something went wrong. Please try again.';
+      const message = formatSecurityError(
+        err,
+        err instanceof Error ? err.message : 'Something went wrong. Please try again.'
+      );
       setError(message);
     } finally {
       setLoading(false);

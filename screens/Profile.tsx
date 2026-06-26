@@ -24,6 +24,7 @@ import {
   ProfileFooterCard,
   ProfileDeleteAccountModal,
   ProfileGenotypeVerifyModal,
+  ProfileVerifiedCityCard,
   ProfileHero,
   ProfilePhotosGrid,
   ProfileSectionCard,
@@ -50,6 +51,12 @@ import { logAuthState } from '../src/lib/auth';
 import { deleteUserAccount } from '../src/lib/accountDeletion';
 import { GENOMATCH_COMPANY } from '../src/constants/company';
 import { detectDeviceCity, syncProfileCityFromDevice } from '../src/lib/location';
+import { dateOfBirthFromAge, isMinimumAge } from '../src/lib/validation';
+import {
+  fetchCityUpdateEligibility,
+  updateVerifiedCityFromDevice,
+  type CityUpdateEligibility,
+} from '../src/lib/cityUpdate';
 import { fetchMatches } from '../src/lib/matches';
 import {
   getCurrentProfile,
@@ -58,6 +65,7 @@ import {
   verifyGenotype,
 } from '../src/lib/profiles';
 import { getVerificationEligibility, type VerificationProfileInput } from '../src/lib/verification';
+import { formatSecurityError } from '../src/lib/security';
 import { supabase } from '../src/lib/supabase';
 import type { DiscoveryProfile, Genotype, ProfileRow } from '../src/types/database';
 
@@ -145,6 +153,7 @@ function buildVerificationInput(
     photos: data.photos,
     genotype_verified: data.genotypeVerified,
     verification_status: data.genotypeVerified ? 'verified' : 'unverified',
+    city: dbRow?.city?.trim() || data.city.trim() || null,
   };
 }
 
@@ -164,6 +173,10 @@ export default function Profile({ onSignOut }: ProfileProps) {
   const [showVerifyModal, setShowVerifyModal] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [locatingCity, setLocatingCity] = useState(false);
+  const [updatingCity, setUpdatingCity] = useState(false);
+  const [cityUpdateEligibility, setCityUpdateEligibility] = useState<CityUpdateEligibility>({
+    canUpdate: false,
+  });
   const [error, setError] = useState('');
   const [authUserId, setAuthUserId] = useState<string | null>(null);
   const [stats, setStats] = useState({ matches: 0, likesReceived: 0, profileViews: 0 });
@@ -212,6 +225,16 @@ export default function Profile({ onSignOut }: ProfileProps) {
       setProfile(loaded);
       setDraft(loaded);
 
+      if (loaded.genotypeVerified) {
+        try {
+          setCityUpdateEligibility(await fetchCityUpdateEligibility());
+        } catch {
+          setCityUpdateEligibility({ canUpdate: false });
+        }
+      } else {
+        setCityUpdateEligibility({ canUpdate: false });
+      }
+
       const userId = session?.user?.id;
       if (userId) {
         try {
@@ -240,7 +263,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
   }, [loadProfile]);
 
   useEffect(() => {
-    if (loading || editing) return;
+    if (loading || editing || profile?.genotypeVerified) return;
 
     void (async () => {
       const result = await syncProfileCityFromDevice();
@@ -250,7 +273,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
         setDraft((p) => (p ? applyCity(p) : p));
       }
     })();
-  }, [loading, editing]);
+  }, [loading, editing, profile?.genotypeVerified]);
 
   useEffect(() => {
     Animated.timing(studioFade, {
@@ -282,12 +305,14 @@ export default function Profile({ onSignOut }: ProfileProps) {
 
   const persistProfileFields = useCallback(async (target: EditableProfile) => {
     const ageNum = parseInt(target.age, 10);
-    const year = Number.isNaN(ageNum) ? null : new Date().getFullYear() - ageNum;
-    await updateProfileFields({
+    if (!Number.isNaN(ageNum) && !isMinimumAge(ageNum)) {
+      throw new Error('You must be at least 18 years old to use GenoMatch.');
+    }
+
+    const fields: Parameters<typeof updateProfileFields>[0] = {
       display_name: target.displayName.trim(),
-      city: target.city.trim(),
       bio: target.bio.trim(),
-      date_of_birth: year ? `${year}-01-01` : undefined,
+      date_of_birth: !Number.isNaN(ageNum) ? dateOfBirthFromAge(ageNum) : undefined,
       interests: target.interests,
       relationship_goal: target.relationshipGoal,
       height_cm: target.heightCm,
@@ -295,7 +320,13 @@ export default function Profile({ onSignOut }: ProfileProps) {
       drinking_status: target.drinkingStatus || null,
       smoking_status: target.smokingStatus || null,
       education_status: target.educationStatus || null,
-    });
+    };
+
+    if (!target.genotypeVerified) {
+      fields.city = target.city.trim();
+    }
+
+    await updateProfileFields(fields);
   }, []);
 
   const runAutosave = useCallback(
@@ -461,6 +492,42 @@ export default function Profile({ onSignOut }: ProfileProps) {
     }
   };
 
+  const handleVerifiedCityUpdate = () => {
+    Alert.alert(
+      'Update my city',
+      'We will use your phone GPS to confirm your new city. You can do this once every 12 months.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Continue',
+          onPress: () => {
+            void (async () => {
+              setUpdatingCity(true);
+              try {
+                const { city } = await updateVerifiedCityFromDevice();
+                const applyCity = (p: EditableProfile) => ({ ...p, city });
+                setProfile((p) => (p ? applyCity(p) : p));
+                setDraft((p) => (p ? applyCity(p) : p));
+                setCityUpdateEligibility(await fetchCityUpdateEligibility());
+                Alert.alert('City updated', `You are now shown in ${city}.`);
+              } catch (err) {
+                Alert.alert(
+                  'Could not update city',
+                  formatSecurityError(
+                    err,
+                    err instanceof Error ? err.message : 'Please try again.'
+                  )
+                );
+              } finally {
+                setUpdatingCity(false);
+              }
+            })();
+          },
+        },
+      ]
+    );
+  };
+
   const requestVerification = async () => {
     if (!data) return;
 
@@ -496,6 +563,17 @@ export default function Profile({ onSignOut }: ProfileProps) {
 
         if (eligibility.reason === 'missing_name') {
           Alert.alert('Add your display name', eligibility.message, [
+            { text: 'Not now', style: 'cancel' },
+            {
+              text: 'Edit profile',
+              onPress: () => startStudio(),
+            },
+          ]);
+          return;
+        }
+
+        if (eligibility.reason === 'missing_city') {
+          Alert.alert('Set your city', eligibility.message, [
             { text: 'Not now', style: 'cancel' },
             {
               text: 'Edit profile',
@@ -644,6 +722,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
               onChangeCity={(t) => setDraft((p) => (p ? { ...p, city: t } : p))}
               onRefreshLocation={() => void refreshLocationFromDevice()}
               locatingCity={locatingCity}
+              cityLocked={data.genotypeVerified}
               onEdit={startStudio}
               onCancel={requestExitStudio}
             />
@@ -740,6 +819,15 @@ export default function Profile({ onSignOut }: ProfileProps) {
                 genotype={data.genotype}
                 onVerify={requestVerification}
               />
+              {data.genotypeVerified ? (
+                <ProfileVerifiedCityCard
+                  city={data.city}
+                  canUpdate={cityUpdateEligibility.canUpdate}
+                  nextEligibleAt={cityUpdateEligibility.nextEligibleAt}
+                  updating={updatingCity}
+                  onUpdate={handleVerifiedCityUpdate}
+                />
+              ) : null}
             </Animated.View>
           )}
 
@@ -829,6 +917,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
       <ProfileGenotypeVerifyModal
         visible={showVerifyModal}
         genotype={data.genotype}
+        city={data.city}
         verifying={verifying}
         onConfirm={() => void handleConfirmVerification()}
         onClose={() => !verifying && setShowVerifyModal(false)}

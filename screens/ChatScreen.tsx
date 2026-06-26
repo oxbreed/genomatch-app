@@ -25,6 +25,7 @@ import { setOpenChatMatchId } from '../src/lib/activeChat';
 import { subscribeToLiveMatch } from '../src/lib/chatLive';
 import type { DiscoveryProfile, Genotype, MatchWithProfile } from '../src/types/database';
 import { getCurrentProfile } from '../src/lib/profiles';
+import { formatSecurityError } from '../src/lib/security';
 import { rateLimitAction } from '../src/lib/rateLimit';
 import {
   appendMessageToList,
@@ -218,7 +219,7 @@ export default function ChatScreen({ matchId, profile, userId: userIdProp, onBac
       .catch((err) => {
         setMessages((prev) => prev.filter((m) => m.id !== optimisticId));
         setDraft(text);
-        setError(err instanceof Error ? err.message : 'Failed to send message');
+        setError(formatSecurityError(err, err instanceof Error ? err.message : 'Failed to send message'));
       });
   };
 

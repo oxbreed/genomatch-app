@@ -8,6 +8,7 @@ import Profile from './Profile';
 import GenoTabBar, { type GenoTabId } from '../src/components/navigation/GenoTabBar';
 import { COLORS, MOTION } from '../src/theme';
 import { fetchConversations, startInboxRealtime, subscribeToInboxRealtime } from '../src/lib/messages';
+import { pickNewMatches } from '../src/lib/inboxMatches';
 import { fetchMatches } from '../src/lib/matches';
 import { addNotificationOpenedListener, sendLocalNotification } from '../src/lib/notifications';
 import { touchLastActive } from '../src/lib/presence';
@@ -59,7 +60,7 @@ export default function MainTabs({ onSignOut }: MainTabsProps) {
         fetchMatches(),
         fetchConversations(),
       ]);
-      setMatchCount(matches.length);
+      setMatchCount(pickNewMatches(matches, conversations).length);
       setUnreadCount(conversations.filter((c) => c.unread).length);
     } catch {
       // badges are non-critical
@@ -197,15 +198,24 @@ export default function MainTabs({ onSignOut }: MainTabsProps) {
       <View style={styles.content}>
         {tabPane(
           'discover',
-          <Discovery onMatchCreated={refreshBadges} onStartChat={handleStartChat} />
+          <Discovery
+            isActive={activeTab === 'discover'}
+            onMatchCreated={refreshBadges}
+            onStartChat={handleStartChat}
+          />
         )}
         {tabPane(
           'matches',
-          <Matches onStartChat={handleStartChat} onImmersiveChange={setImmersiveOverlay} />
+          <Matches
+            isActive={activeTab === 'matches'}
+            onStartChat={handleStartChat}
+            onImmersiveChange={setImmersiveOverlay}
+          />
         )}
         {tabPane(
           'messages',
           <Messages
+            isActive={activeTab === 'messages'}
             initialChatMatchId={openChatMatchId}
             initialChatProfile={openChatProfile}
             onChatOpened={() => {

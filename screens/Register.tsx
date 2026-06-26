@@ -22,6 +22,7 @@ import { GenoLogoCeremony, GenoPremiumChrome } from '../src/brand/graphics';
 import { AuthFormCard } from '../src/components/auth';
 import { COLORS, RADIUS, SHADOWS } from '../src/theme'
 import { FONT_FAMILY, GLASS } from '../src/theme';
+import { formatSecurityError } from '../src/lib/security';
 import { supabase } from '../src/lib/supabase';
 import { validateEmail } from '../src/lib/validation';
 import { GENOTYPE_SELF_REPORT_DISCLAIMER } from '../src/constants/healthDisclaimers';
@@ -48,6 +49,7 @@ export default function Register({
   const [password, setPassword] = useState('');
   const [genotype, setGenotype] = useState('');
   const [showPass, setShowPass] = useState(false);
+  const [ageConfirmed, setAgeConfirmed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
@@ -112,6 +114,10 @@ export default function Register({
       setError('Password must be at least 8 characters.');
       return;
     }
+    if (!ageConfirmed) {
+      setError('You must confirm that you are at least 18 years old.');
+      return;
+    }
 
     setError('');
     setSuccessMessage('');
@@ -127,7 +133,7 @@ export default function Register({
       });
 
       if (signUpError) {
-        setError(signUpError.message);
+        setError(formatSecurityError(signUpError, signUpError.message));
         return;
       }
 
@@ -341,6 +347,22 @@ export default function Register({
                   {selectedGenotype.name}
                 </Text>
               ) : null}
+
+              <Pressable
+                style={styles.ageConfirmRow}
+                onPress={() => setAgeConfirmed((prev) => !prev)}
+                accessibilityRole="checkbox"
+                accessibilityState={{ checked: ageConfirmed }}
+              >
+                <View style={[styles.ageConfirmBox, ageConfirmed && styles.ageConfirmBoxChecked]}>
+                  {ageConfirmed ? (
+                    <Ionicons name="checkmark" size={14} color={COLORS.ivory} />
+                  ) : null}
+                </View>
+                <Text style={styles.ageConfirmText}>
+                  I confirm I am at least 18 years old.
+                </Text>
+              </Pressable>
 
               {error ? <Text style={styles.error}>{error}</Text> : null}
               {successMessage ? (
@@ -655,6 +677,33 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     color: 'rgba(27, 122, 110, 0.7)',
     fontSize: 12,
+  },
+  ageConfirmRow: {
+    marginTop: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  ageConfirmBox: {
+    width: 22,
+    height: 22,
+    borderRadius: 6,
+    borderWidth: 1.5,
+    borderColor: 'rgba(27, 122, 110, 0.35)',
+    backgroundColor: GLASS.insetFill,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  ageConfirmBoxChecked: {
+    borderColor: COLORS.forest,
+    backgroundColor: COLORS.forest,
+  },
+  ageConfirmText: {
+    flex: 1,
+    fontFamily: FONT_FAMILY.gothamMedium,
+    color: COLORS.forest,
+    fontSize: 13,
+    lineHeight: 18,
   },
   error: {
     marginTop: 12,

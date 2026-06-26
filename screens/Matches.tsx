@@ -20,19 +20,28 @@ import {
 } from '../src/components/inbox';
 import MatchListCard, { isRecentMatch } from '../src/components/matches/MatchListCard';
 import { logAuthState } from '../src/lib/auth';
+import { pickNewMatches } from '../src/lib/inboxMatches';
+import { fetchConversations } from '../src/lib/messages';
 import { TAB_SCENE_BOTTOM_PADDING } from '../src/components/navigation/tabBarLayout';
 import { FONT_FAMILY, COLORS, MOTION } from '../src/theme';
-import type { DiscoveryProfile, Genotype, MatchWithProfile } from '../src/types/database';
+import type {
+  ConversationPreview,
+  DiscoveryProfile,
+  Genotype,
+  MatchWithProfile,
+} from '../src/types/database';
 import { fetchMatches, unmatchByMatchId } from '../src/lib/matches';
 import MatchProfile from './MatchProfile';
 
 type MatchesProps = {
+  isActive?: boolean;
   onStartChat?: (matchId: string, profile?: DiscoveryProfile) => void;
   onImmersiveChange?: (immersive: boolean) => void;
 };
 
-export default function Matches({ onStartChat, onImmersiveChange }: MatchesProps) {
+export default function Matches({ isActive, onStartChat, onImmersiveChange }: MatchesProps) {
   const [matches, setMatches] = useState<MatchWithProfile[]>([]);
+  const [conversations, setConversations] = useState<ConversationPreview[]>([]);
   const [viewerGenotype, setViewerGenotype] = useState<Genotype | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -52,8 +61,8 @@ export default function Matches({ onStartChat, onImmersiveChange }: MatchesProps
   );
 
   const newMatchCount = useMemo(
-    () => matches.filter((m) => isRecentMatch(m.matchedAt)).length,
-    [matches]
+    () => pickNewMatches(matches, conversations).length,
+    [matches, conversations]
   );
 
   const loadMatches = useCallback(async (isRefresh = false) => {
@@ -61,8 +70,12 @@ export default function Matches({ onStartChat, onImmersiveChange }: MatchesProps
     setError('');
     try {
       await logAuthState('Matches.load');
-      const { matches: rows, viewerGenotype: viewer } = await fetchMatches();
+      const [{ matches: rows, viewerGenotype: viewer }, convos] = await Promise.all([
+        fetchMatches(),
+        fetchConversations(),
+      ]);
       setMatches(rows);
+      setConversations(convos);
       setViewerGenotype(viewer);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not load matches');
@@ -75,6 +88,11 @@ export default function Matches({ onStartChat, onImmersiveChange }: MatchesProps
   useEffect(() => {
     loadMatches();
   }, [loadMatches]);
+
+  useEffect(() => {
+    if (!isActive) return;
+    void loadMatches(true);
+  }, [isActive, loadMatches]);
 
   useEffect(() => {
     onImmersiveChange?.(!!selectedMatch);
@@ -143,7 +161,7 @@ export default function Matches({ onStartChat, onImmersiveChange }: MatchesProps
         subtitle="Mutual likes — bond score and chat in one place"
         ceremonyMark={matches.length > 0}
         glass
-        right={<GenoInboxCountBadge count={matches.length} />}
+        right={<GenoInboxCountBadge count={newMatchCount} />}
       />
 
       {loading ? (

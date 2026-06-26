@@ -29,6 +29,7 @@ export type ProfileRow = {
   smoking_status: string | null;
   education_status: string | null;
   last_active_at: string | null;
+  city_updated_at?: string | null;
   created_at: string;
   updated_at: string;
 };
