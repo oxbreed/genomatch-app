@@ -15,6 +15,7 @@ import { StatusBar } from 'expo-status-bar';
 import About from './About';
 import CommunityGuidelines from './CommunityGuidelines';
 import PrivacyPolicy from './PrivacyPolicy';
+import IdentityVerification from './IdentityVerification';
 import { GenoPremiumChrome, GenoLogoCeremony } from '../src/brand/graphics';
 import EmptyState from '../src/components/EmptyState';
 import { GenoInboxHeader, GenoInboxIconButton, GenoInboxRetryPanel } from '../src/components/inbox';
@@ -64,7 +65,12 @@ import {
   updateProfilePhotos,
   verifyGenotype,
 } from '../src/lib/profiles';
-import { getVerificationEligibility, type VerificationProfileInput } from '../src/lib/verification';
+import {
+  getVerificationEligibility,
+  type SelfieIdentityStatus,
+  type VerificationProfileInput,
+} from '../src/lib/verification';
+import { getMyIdentityStatus } from '../src/lib/identityVerification';
 import { formatSecurityError } from '../src/lib/security';
 import { supabase } from '../src/lib/supabase';
 import type { DiscoveryProfile, Genotype, ProfileRow } from '../src/types/database';
@@ -171,6 +177,9 @@ export default function Profile({ onSignOut }: ProfileProps) {
   const [showCommunityGuidelines, setShowCommunityGuidelines] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showVerifyModal, setShowVerifyModal] = useState(false);
+  const [showIdentityVerification, setShowIdentityVerification] = useState(false);
+  const [identityStatus, setIdentityStatus] = useState<SelfieIdentityStatus>('unverified');
+  const [identityRejectionReason, setIdentityRejectionReason] = useState<string | null>(null);
   const [verifying, setVerifying] = useState(false);
   const [locatingCity, setLocatingCity] = useState(false);
   const [updatingCity, setUpdatingCity] = useState(false);
@@ -238,10 +247,16 @@ export default function Profile({ onSignOut }: ProfileProps) {
       const userId = session?.user?.id;
       if (userId) {
         try {
-          const [matchResult, likesResult] = await Promise.all([
+          const [matchResult, likesResult, identity] = await Promise.all([
             fetchMatches(),
             supabase.from('likes').select('id', { count: 'exact', head: true }).eq('liked_id', userId),
+            getMyIdentityStatus().catch(() => ({
+              status: 'unverified' as SelfieIdentityStatus,
+              rejectionReason: null,
+            })),
           ]);
+          setIdentityStatus(identity.status);
+          setIdentityRejectionReason(identity.rejectionReason);
           setStats({
             matches: matchResult.matches.length,
             likesReceived: likesResult.count ?? 0,
@@ -528,7 +543,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
     );
   };
 
-  const requestVerification = async () => {
+  const requestGenotypeVerification = async () => {
     if (!data) return;
 
     if (editing && draft && hasChanges) {
@@ -547,9 +562,25 @@ export default function Profile({ onSignOut }: ProfileProps) {
 
     try {
       const row = await getCurrentProfile();
-      const eligibility = getVerificationEligibility(buildVerificationInput(data, row));
+      const eligibility = getVerificationEligibility(buildVerificationInput(data, row), {
+        identityStatus,
+      });
 
       if (!eligibility.ok) {
+        if (eligibility.reason === 'identity_required' || eligibility.reason === 'identity_pending') {
+          Alert.alert(
+            eligibility.reason === 'identity_pending' ? 'Selfie under review' : 'Selfie required',
+            eligibility.message,
+            eligibility.reason === 'identity_required'
+              ? [
+                  { text: 'Not now', style: 'cancel' },
+                  { text: 'Take selfie', onPress: () => setShowIdentityVerification(true) },
+                ]
+              : [{ text: 'OK' }]
+          );
+          return;
+        }
+
         if (eligibility.reason === 'missing_photo') {
           Alert.alert('Add a profile photo', eligibility.message, [
             { text: 'Not now', style: 'cancel' },
@@ -815,9 +846,12 @@ export default function Profile({ onSignOut }: ProfileProps) {
               <ProfileStatGems {...stats} />
               <ProfileStudioCTA percent={completionPercent} onPress={startStudio} />
               <ProfileIdentityRibbon
-                verified={data.genotypeVerified}
+                genotypeVerified={data.genotypeVerified}
+                identityStatus={identityStatus}
                 genotype={data.genotype}
-                onVerify={requestVerification}
+                rejectionReason={identityRejectionReason}
+                onSelfieVerify={() => setShowIdentityVerification(true)}
+                onGenotypeVerify={() => void requestGenotypeVerification()}
               />
               {data.genotypeVerified ? (
                 <ProfileVerifiedCityCard
@@ -921,6 +955,17 @@ export default function Profile({ onSignOut }: ProfileProps) {
         verifying={verifying}
         onConfirm={() => void handleConfirmVerification()}
         onClose={() => !verifying && setShowVerifyModal(false)}
+      />
+
+      <IdentityVerification
+        visible={showIdentityVerification}
+        onClose={() => setShowIdentityVerification(false)}
+        onComplete={() => {
+          setIdentityStatus('pending');
+          setIdentityRejectionReason(null);
+          setShowIdentityVerification(false);
+          void loadProfile();
+        }}
       />
 
       <ProfileDeleteAccountModal

@@ -37,6 +37,7 @@
       "buildNumber": "1",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
+        "NSCameraUsageDescription": "GenoMatch uses your camera to verify your identity with a live selfie.",
         "NSPhotoLibraryUsageDescription": "GenoMatch needs access to your photos so you can upload a profile picture.",
         "NSLocationWhenInUseUsageDescription": "GenoMatch uses your location to set your city on your profile and improve nearby matching.",
         "UIBackgroundModes": ["remote-notification"]
@@ -102,7 +103,8 @@
             "./assets/fonts/Satoshi-Bold.otf"
           ]
         }
-      ]
+      ],
+      "expo-camera"
     ]
   }
 }

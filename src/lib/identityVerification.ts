@@ -1,5 +1,16 @@
 import { uploadImageToCloudinary } from './cloudinary';
 import { supabase } from './supabase';
+import type { SelfieIdentityStatus } from './verification';
+
+function isMissingRpcError(error: { code?: string; message?: string } | null): boolean {
+  if (!error) return false;
+  const msg = error.message?.toLowerCase() ?? '';
+  return (
+    error.code === 'PGRST202' ||
+    error.code === '42883' ||
+    (msg.includes('function') && msg.includes('does not exist'))
+  );
+}
 
 export async function submitIdentitySelfie(imageUri: string): Promise<{ status: string }> {
   const selfieUrl = await uploadImageToCloudinary(imageUri);
@@ -9,6 +20,9 @@ export async function submitIdentitySelfie(imageUri: string): Promise<{ status: 
   });
 
   if (error) {
+    if (isMissingRpcError(error)) {
+      throw new Error('Identity verification is not available yet. Please try again after the app updates.');
+    }
     throw error;
   }
 
@@ -17,12 +31,15 @@ export async function submitIdentitySelfie(imageUri: string): Promise<{ status: 
 }
 
 export async function getMyIdentityStatus(): Promise<{
-  status: string;
+  status: SelfieIdentityStatus;
   rejectionReason: string | null;
 }> {
   const { data, error } = await supabase.rpc('get_my_identity_status');
 
   if (error) {
+    if (isMissingRpcError(error)) {
+      return { status: 'unverified', rejectionReason: null };
+    }
     throw error;
   }
 
@@ -32,7 +49,7 @@ export async function getMyIdentityStatus(): Promise<{
   };
 
   return {
-    status: payload.status ?? 'unverified',
+    status: (payload.status ?? 'unverified') as SelfieIdentityStatus,
     rejectionReason: payload.rejection_reason ?? null,
   };
 }

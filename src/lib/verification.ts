@@ -18,7 +18,11 @@ export type VerificationBlockReason =
   | 'missing_name'
   | 'missing_genotype'
   | 'missing_city'
+  | 'identity_pending'
+  | 'identity_required'
   | 'already_verified';
+
+export type SelfieIdentityStatus = 'unverified' | 'pending' | 'verified' | 'rejected';
 
 export type VerificationEligibility = {
   ok: true;
@@ -34,12 +38,18 @@ const REASON_MESSAGES: Record<Exclude<VerificationBlockReason, 'already_verified
   missing_name: 'Add your display name before verifying.',
   missing_genotype: 'Set your genotype before verifying.',
   missing_city: 'Set your city before verifying — it will be locked after verification.',
+  identity_pending:
+    'Your selfie is under review. You can confirm your genotype once identity verification is approved.',
+  identity_required: 'Submit a live selfie for identity verification before confirming your genotype.',
 };
 
-/** Checks whether a member can complete identity verification. */
+/** Checks whether a member can complete genotype self-verification. */
 export function getVerificationEligibility(
   row: VerificationProfileInput | null,
-  options?: { allowAlreadyVerified?: boolean }
+  options?: {
+    allowAlreadyVerified?: boolean;
+    identityStatus?: SelfieIdentityStatus;
+  }
 ): VerificationEligibility {
   if (!row) {
     return { ok: false, reason: 'not_signed_in', message: REASON_MESSAGES.not_signed_in };
@@ -70,6 +80,23 @@ export function getVerificationEligibility(
 
   if (!row.city?.trim()) {
     return { ok: false, reason: 'missing_city', message: REASON_MESSAGES.missing_city };
+  }
+
+  const identityStatus = options?.identityStatus ?? 'unverified';
+  if (identityStatus === 'pending') {
+    return {
+      ok: false,
+      reason: 'identity_pending',
+      message: REASON_MESSAGES.identity_pending,
+    };
+  }
+
+  if (identityStatus !== 'verified') {
+    return {
+      ok: false,
+      reason: 'identity_required',
+      message: REASON_MESSAGES.identity_required,
+    };
   }
 
   return { ok: true };

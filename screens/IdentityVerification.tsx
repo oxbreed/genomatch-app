@@ -1,7 +1,8 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
+  Modal,
   Pressable,
   StyleSheet,
   Text,
@@ -18,7 +19,17 @@ import { COLORS, GLASS, RADIUS, SHADOWS } from '../src/theme';
 
 type ScreenPhase = 'camera' | 'preview' | 'success';
 
-export default function IdentityVerification() {
+type IdentityVerificationProps = {
+  visible?: boolean;
+  onComplete?: () => void;
+  onClose?: () => void;
+};
+
+export default function IdentityVerification({
+  visible = true,
+  onComplete,
+  onClose,
+}: IdentityVerificationProps = {}) {
   const cameraRef = useRef<CameraViewInstance>(null);
   const [permission, requestPermission] = useCameraPermissions();
   const [cameraReady, setCameraReady] = useState(false);
@@ -27,6 +38,17 @@ export default function IdentityVerification() {
   const [capturing, setCapturing] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!visible) {
+      setPhase('camera');
+      setCapturedUri(null);
+      setCapturing(false);
+      setSubmitting(false);
+      setError('');
+      setCameraReady(false);
+    }
+  }, [visible]);
 
   const handleCapture = async () => {
     if (!cameraRef.current || !cameraReady || capturing) return;
@@ -61,6 +83,7 @@ export default function IdentityVerification() {
     try {
       await submitIdentitySelfie(capturedUri);
       setPhase('success');
+      onComplete?.();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not submit your selfie. Please try again.');
     } finally {
@@ -68,124 +91,124 @@ export default function IdentityVerification() {
     }
   };
 
-  if (!permission) {
-    return (
-      <View style={styles.container}>
-        <GenoPremiumChrome variant="linen" />
-        <StatusBar style="dark" />
-        <View style={styles.centered}>
-          <ActivityIndicator size="large" color={COLORS.forest} />
-        </View>
-      </View>
-    );
-  }
+  const renderCloseButton = () =>
+    onClose ? (
+      <Pressable
+        style={({ pressed }) => [styles.closeBtn, pressed && styles.pressed]}
+        onPress={onClose}
+        accessibilityLabel="Close"
+      >
+        <Ionicons name="close" size={22} color={COLORS.forestDeep} />
+      </Pressable>
+    ) : null;
 
-  if (!permission.granted) {
-    return (
-      <View style={styles.container}>
-        <GenoPremiumChrome variant="linen" />
-        <StatusBar style="dark" />
-        <View style={styles.centered}>
-          <View style={styles.permissionCard}>
-            <View style={styles.permissionIconWrap}>
-              <Ionicons name="camera-outline" size={28} color={COLORS.forest} />
-            </View>
-            <Text style={styles.title}>Camera access needed</Text>
-            <Text style={styles.subtitle}>
-              We need your front camera to take a live selfie for identity verification. Gallery
-              photos are not accepted.
-            </Text>
-            <Pressable
-              style={({ pressed }) => [styles.primaryBtnWrap, pressed && styles.pressed]}
-              onPress={() => void requestPermission()}
-            >
-              <LinearGradient colors={[COLORS.gold, '#C49A38']} style={styles.primaryBtn}>
-                <Text style={styles.primaryBtnText}>Allow camera access</Text>
-              </LinearGradient>
-            </Pressable>
-          </View>
-        </View>
-      </View>
-    );
-  }
-
-  if (phase === 'success') {
-    return (
-      <View style={styles.container}>
-        <GenoPremiumChrome variant="linen" />
-        <StatusBar style="dark" />
-        <View style={styles.centered}>
-          <View style={styles.permissionCard}>
-            <View style={[styles.permissionIconWrap, styles.successIconWrap]}>
-              <Ionicons name="checkmark-circle" size={32} color={COLORS.forest} />
-            </View>
-            <Text style={styles.title}>Submitted — we'll review it shortly</Text>
-            <Text style={styles.subtitle}>
-              Our team will verify your selfie manually. You'll be notified once review is complete.
-            </Text>
-          </View>
-        </View>
-      </View>
-    );
-  }
-
-  if (phase === 'preview' && capturedUri) {
-    return (
-      <View style={styles.container}>
-        <GenoPremiumChrome variant="linen" />
-        <StatusBar style="dark" />
-        <View style={styles.content}>
-          <Text style={styles.title}>Review your selfie</Text>
-          <Text style={styles.subtitle}>
-            Make sure your face is clearly visible and well lit before submitting.
-          </Text>
-
-          <View style={styles.previewFrame}>
-            <Image source={{ uri: capturedUri }} style={styles.previewImage} resizeMode="cover" />
-          </View>
-
-          {error ? <Text style={styles.error}>{error}</Text> : null}
-
-          <View style={styles.actionsRow}>
-            <Pressable
-              style={({ pressed }) => [styles.secondaryBtn, pressed && styles.pressed]}
-              onPress={handleRetake}
-              disabled={submitting}
-            >
-              <Text style={styles.secondaryBtnText}>Retake</Text>
-            </Pressable>
-
-            <Pressable
-              style={({ pressed }) => [
-                styles.primaryBtnWrap,
-                styles.submitBtnWrap,
-                pressed && styles.pressed,
-                submitting && styles.disabled,
-              ]}
-              onPress={() => void handleSubmit()}
-              disabled={submitting}
-            >
-              <LinearGradient colors={[COLORS.gold, '#C49A38']} style={styles.primaryBtn}>
-                {submitting ? (
-                  <View style={styles.submittingRow}>
-                    <ActivityIndicator color={COLORS.forest} size="small" />
-                    <Text style={styles.primaryBtnText}>Submitting…</Text>
-                  </View>
-                ) : (
-                  <Text style={styles.primaryBtnText}>Submit</Text>
-                )}
-              </LinearGradient>
-            </Pressable>
-          </View>
-        </View>
-      </View>
-    );
-  }
-
-  return (
+  const content = !permission ? (
     <View style={styles.container}>
       <GenoPremiumChrome variant="linen" />
       <StatusBar style="dark" />
+      {renderCloseButton()}
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color={COLORS.forest} />
+      </View>
+    </View>
+  ) : !permission.granted ? (
+    <View style={styles.container}>
+      <GenoPremiumChrome variant="linen" />
+      <StatusBar style="dark" />
+      {renderCloseButton()}
+      <View style={styles.centered}>
+        <View style={styles.permissionCard}>
+          <View style={styles.permissionIconWrap}>
+            <Ionicons name="camera-outline" size={28} color={COLORS.forest} />
+          </View>
+          <Text style={styles.title}>Camera access needed</Text>
+          <Text style={styles.subtitle}>
+            We need your front camera to take a live selfie for identity verification. Gallery photos
+            are not accepted.
+          </Text>
+          <Pressable
+            style={({ pressed }) => [styles.primaryBtnWrap, pressed && styles.pressed]}
+            onPress={() => void requestPermission()}
+          >
+            <LinearGradient colors={[COLORS.gold, '#C49A38']} style={styles.primaryBtn}>
+              <Text style={styles.primaryBtnText}>Allow camera access</Text>
+            </LinearGradient>
+          </Pressable>
+        </View>
+      </View>
+    </View>
+  ) : phase === 'success' ? (
+    <View style={styles.container}>
+      <GenoPremiumChrome variant="linen" />
+      <StatusBar style="dark" />
+      {renderCloseButton()}
+      <View style={styles.centered}>
+        <View style={styles.permissionCard}>
+          <View style={[styles.permissionIconWrap, styles.successIconWrap]}>
+            <Ionicons name="checkmark-circle" size={32} color={COLORS.forest} />
+          </View>
+          <Text style={styles.title}>Submitted — we'll review it shortly</Text>
+          <Text style={styles.subtitle}>
+            Our team will verify your selfie manually. You'll be notified once review is complete.
+          </Text>
+        </View>
+      </View>
+    </View>
+  ) : phase === 'preview' && capturedUri ? (
+    <View style={styles.container}>
+      <GenoPremiumChrome variant="linen" />
+      <StatusBar style="dark" />
+      {renderCloseButton()}
+      <View style={styles.content}>
+        <Text style={styles.title}>Review your selfie</Text>
+        <Text style={styles.subtitle}>
+          Make sure your face is clearly visible and well lit before submitting.
+        </Text>
+
+        <View style={styles.previewFrame}>
+          <Image source={{ uri: capturedUri }} style={styles.previewImage} resizeMode="cover" />
+        </View>
+
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+
+        <View style={styles.actionsRow}>
+          <Pressable
+            style={({ pressed }) => [styles.secondaryBtn, pressed && styles.pressed]}
+            onPress={handleRetake}
+            disabled={submitting}
+          >
+            <Text style={styles.secondaryBtnText}>Retake</Text>
+          </Pressable>
+
+          <Pressable
+            style={({ pressed }) => [
+              styles.primaryBtnWrap,
+              styles.submitBtnWrap,
+              pressed && styles.pressed,
+              submitting && styles.disabled,
+            ]}
+            onPress={() => void handleSubmit()}
+            disabled={submitting}
+          >
+            <LinearGradient colors={[COLORS.gold, '#C49A38']} style={styles.primaryBtn}>
+              {submitting ? (
+                <View style={styles.submittingRow}>
+                  <ActivityIndicator color={COLORS.forest} size="small" />
+                  <Text style={styles.primaryBtnText}>Submitting…</Text>
+                </View>
+              ) : (
+                <Text style={styles.primaryBtnText}>Submit</Text>
+              )}
+            </LinearGradient>
+          </Pressable>
+        </View>
+      </View>
+    </View>
+  ) : (
+    <View style={styles.container}>
+      <GenoPremiumChrome variant="linen" />
+      <StatusBar style="dark" />
+      {renderCloseButton()}
       <View style={styles.content}>
         <Text style={styles.title}>Take a live selfie</Text>
         <Text style={styles.subtitle}>
@@ -224,6 +247,20 @@ export default function IdentityVerification() {
       </View>
     </View>
   );
+
+  if (!visible) {
+    return null;
+  }
+
+  if (onClose) {
+    return (
+      <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
+        {content}
+      </Modal>
+    );
+  }
+
+  return content;
 }
 
 const styles = StyleSheet.create({
@@ -243,6 +280,20 @@ const styles = StyleSheet.create({
     paddingTop: 72,
     paddingHorizontal: 24,
     paddingBottom: 40,
+  },
+  closeBtn: {
+    position: 'absolute',
+    top: 58,
+    right: 20,
+    zIndex: 20,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.92)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(7, 77, 46, 0.12)',
   },
   permissionCard: {
     width: '100%',

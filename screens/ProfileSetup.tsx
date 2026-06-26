@@ -296,8 +296,6 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
             .select('id, display_name, onboarding_completed')
             .single();
 
-      console.log('[ProfileSetup] save result', saveResult.data, saveResult.error);
-
       if (saveResult.error) {
         throw saveResult.error;
       }
