@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import GenoMatchLogo from '../src/components/GenoMatchLogo';
-import { COLORS } from '../src/theme';
+import {COLORS, MIRROR_RED_TEXT} from '../src/theme';
 
 type IonName = ComponentProps<typeof Ionicons>['name'];
 
@@ -35,7 +35,7 @@ export default function Onboarding({ onFinish }: { onFinish: () => void }) {
     <View style={styles.container}>
       <StatusBar style="light" />
       <View style={styles.logoWrap}>
-        <GenoMatchLogo size={72} />
+        <GenoMatchLogo size={72} surface="dark" />
       </View>
       <View style={styles.iconCard}>
         <Ionicons name={slide.icon} size={36} color={COLORS.gold} />
@@ -98,6 +98,6 @@ const styles = StyleSheet.create({
   ctaText: {
     fontSize: 17,
     fontWeight: '700',
-    color: COLORS.forest,
+    ...MIRROR_RED_TEXT,
   },
 });

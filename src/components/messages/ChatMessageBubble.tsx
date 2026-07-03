@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { FONT_FAMILY, COLORS } from '../../theme';
+import {FONT_FAMILY, COLORS, MIRROR_RED_TEXT} from '../../theme';
 import { formatMessageTime } from '../../lib/messages';
 import type { ChatMessage } from '../../lib/messages';
 import { Ionicons } from '@expo/vector-icons';
@@ -81,16 +81,16 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 6,
   },
   bubbleReceived: {
-    backgroundColor: 'rgba(255, 255, 255, 0.92)',
+    backgroundColor: COLORS.chipSolid,
     borderWidth: 1,
-    borderColor: 'rgba(61, 122, 82, 0.18)',
+    borderColor: 'rgba(200, 16, 46, 0.18)',
     borderBottomLeftRadius: 6,
   },
   bubbleText: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 15,
     lineHeight: 21,
-    color: COLORS.forest,
+    color: COLORS.text,
   },
   bubbleTextSent: {
     color: COLORS.linen,

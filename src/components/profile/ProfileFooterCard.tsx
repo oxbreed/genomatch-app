@@ -1,6 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { GenoGlassSurface } from '../../brand/graphics';
+import { GenoMirrorMetallicIcon, GenoMirrorRimFrame, GenoMirrorSteelFill } from '../../brand/graphics';
 import { GENOMATCH_ABOUT_LINE, GENOMATCH_PARENT_LINE } from '../../constants/company';
 import { FONT_FAMILY, COLORS, RADIUS } from '../../theme';
 
@@ -30,7 +29,7 @@ function FooterLink({
     >
       <Text style={[styles.linkText, destructive && styles.linkDestructive]}>{label}</Text>
       {!destructive ? (
-        <Ionicons name="chevron-forward" size={16} color={COLORS.sage} />
+        <GenoMirrorMetallicIcon name="chevron-forward" size={16} tone="steel" />
       ) : null}
     </Pressable>
   );
@@ -61,26 +60,20 @@ export default function ProfileFooterCard({
       <Text style={styles.parentLine}>{GENOMATCH_PARENT_LINE}</Text>
       <Pressable
         style={({ pressed }) => [
-          styles.signOutWrap,
           pressed && styles.linkPressed,
           signingOut && styles.signOutDisabled,
         ]}
         onPress={onSignOut}
         disabled={signingOut}
       >
-        <GenoGlassSurface
-          variant="light"
-          borderRadius={RADIUS.md}
-          shadow="glass"
-          intensity={48}
-          style={styles.signOutGlass}
-          contentStyle={styles.signOutInner}
-        >
-          <Ionicons name="log-out-outline" size={18} color={COLORS.forestDeep} />
-          <Text style={styles.signOutText}>
-            {signingOut ? 'Signing out…' : 'Sign out'}
-          </Text>
-        </GenoGlassSurface>
+        <GenoMirrorRimFrame kind="steel" borderRadius={RADIUS.md} style={styles.signOutRim}>
+          <GenoMirrorSteelFill style={styles.signOutInner}>
+            <GenoMirrorMetallicIcon name="log-out-outline" size={18} tone="steel" />
+            <Text style={styles.signOutText}>
+              {signingOut ? 'Signing out…' : 'Sign out'}
+            </Text>
+          </GenoMirrorSteelFill>
+        </GenoMirrorRimFrame>
       </Pressable>
     </View>
   );
@@ -100,14 +93,14 @@ const styles = StyleSheet.create({
   linkText: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 15,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
   },
   linkDestructive: {
     color: COLORS.error,
   },
   divider: {
     height: 1,
-    backgroundColor: COLORS.border,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
   },
   aboutLine: {
     marginTop: 8,
@@ -126,14 +119,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: COLORS.textSubtle,
   },
-  signOutWrap: {
+  signOutRim: {
     marginTop: 4,
     marginBottom: 8,
-    borderRadius: RADIUS.md,
-    overflow: 'hidden',
-  },
-  signOutGlass: {
-    overflow: 'hidden',
+    alignSelf: 'stretch',
+    width: '100%',
   },
   signOutInner: {
     flexDirection: 'row',
@@ -141,14 +131,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     paddingVertical: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.65)',
-    borderRadius: RADIUS.md,
+    borderRadius: RADIUS.md - 1.5,
   },
   signOutDisabled: { opacity: 0.6 },
   signOutText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 15,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
   },
 });

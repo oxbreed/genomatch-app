@@ -1,13 +1,16 @@
 import type { ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import DiscoverInterestChips from '../discover/DiscoverInterestChips';
 import LifestyleBadges from '../LifestyleBadges';
 import PresenceBadge from '../PresenceBadge';
 import { COLORS, RELATIONSHIP_GOAL_LABELS } from '../../data/mockData';
-import { GLASS } from '../../theme';
+import { TYPOGRAPHY } from '../../theme';
+import type { ProfilePronoun } from '../../lib/profilePronouns';
 import type { PresenceState } from '../../types/database';
 import { PROFILE, PROFILE_TYPE } from './profileTokens';
 
 type Props = {
+  pronouns?: ProfilePronoun | '';
   bio: string;
   interests: string[];
   relationshipGoal: string;
@@ -39,6 +42,7 @@ function SectionBlock({
 }
 
 export default function ProfileViewSections({
+  pronouns = '',
   bio,
   interests,
   relationshipGoal,
@@ -55,9 +59,17 @@ export default function ProfileViewSections({
   const hasLifestyle = !!(drinkingStatus || smokingStatus || educationStatus || heightCm || religion);
   const showPresence =
     (presenceState && presenceState !== 'offline') || isNewMember;
-
   return (
     <View style={styles.wrap}>
+      <SectionBlock label="Identity" showDivider>
+        <View style={styles.identityRow}>
+          <Text style={styles.identityLabel}>Pronouns</Text>
+          <Text style={[styles.identityValue, !pronouns && styles.placeholder]}>
+            {pronouns || 'Not set'}
+          </Text>
+        </View>
+      </SectionBlock>
+
       {showPresence ? (
         <SectionBlock label="Status" showDivider>
           <PresenceBadge
@@ -81,19 +93,13 @@ export default function ProfileViewSections({
 
       <SectionBlock label="Bio" showDivider>
         <Text style={[styles.bioText, !bio && styles.placeholder]}>
-          {bio || 'Add a bio in Profile Studio to tell matches your story.'}
+          {bio || 'Add a bio to tell matches about yourself.'}
         </Text>
       </SectionBlock>
 
       <SectionBlock label="Interests" showDivider>
         {interests.length > 0 ? (
-          <View style={styles.chipRow}>
-            {interests.map((interest) => (
-              <View key={interest} style={styles.chip}>
-                <Text style={styles.chipText}>{interest}</Text>
-              </View>
-            ))}
-          </View>
+          <DiscoverInterestChips interests={interests} selectable />
         ) : (
           <Text style={styles.emptyHint}>No interests yet</Text>
         )}
@@ -111,56 +117,54 @@ export default function ProfileViewSections({
 const styles = StyleSheet.create({
   wrap: { gap: PROFILE.sectionGap },
   block: { gap: 8 },
+  identityRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+    paddingVertical: 4,
+  },
+  identityLabel: {
+    ...PROFILE_TYPE.bodyMedium,
+    color: COLORS.sage,
+  },
+  identityValue: {
+    ...PROFILE_TYPE.body,
+    color: COLORS.text,
+    flexShrink: 1,
+    textAlign: 'right',
+  },
   divider: {
     marginTop: 16,
     height: 1,
     backgroundColor: COLORS.border,
   },
   blockLabel: {
-    ...PROFILE_TYPE.blockLabel,
-    color: COLORS.sage,
+    ...TYPOGRAPHY.sectionLabelGold,
   },
   bioText: {
-    ...PROFILE_TYPE.body,
-    color: COLORS.forestDeep,
+    ...TYPOGRAPHY.editorialBio,
+    color: COLORS.text,
   },
   placeholder: {
+    ...TYPOGRAPHY.editorialBio,
     color: COLORS.textMuted,
-    fontStyle: 'italic',
-    fontFamily: PROFILE_TYPE.body.fontFamily,
   },
-  chipRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  chip: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 999,
-    backgroundColor: GLASS.insetFill,
+  goalPill: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    borderRadius: 14,
+    backgroundColor: COLORS.chipFill,
     borderWidth: 1,
-    borderColor: GLASS.insetBorder,
-  },
-  chipText: {
-    ...PROFILE_TYPE.chip,
-    color: COLORS.forestDeep,
+    borderColor: 'rgba(212, 175, 55, 0.35)',
   },
   emptyHint: {
     ...PROFILE_TYPE.bodyMedium,
     color: COLORS.textMuted,
   },
-  goalPill: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: 16,
-    paddingVertical: 11,
-    borderRadius: 12,
-    backgroundColor: GLASS.insetFill,
-    borderWidth: 1,
-    borderColor: GLASS.insetBorder,
-  },
   goalText: {
     ...PROFILE_TYPE.goal,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
   },
 });

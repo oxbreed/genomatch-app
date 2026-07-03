@@ -1,7 +1,12 @@
+import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import {
+  GenoHelixField,
+  GenoMirrorMetallicIcon,
+  GenoMirrorRimFrame,
+  GenoMirrorSteelFill,
+} from '../../brand/graphics';
 import { Ionicons } from '@expo/vector-icons';
-import { GenoHelixField } from '../../brand/graphics';
 import {
   EDUCATION_OPTIONS,
   HABIT_OPTIONS,
@@ -9,8 +14,9 @@ import {
   RELIGION_OPTIONS,
   formatHeightCm,
 } from '../../lib/profileDetails';
-import { FONT_FAMILY, COLORS } from '../../theme';
-import { PROFILE, PROFILE_TYPE } from './profileTokens';
+import { FONT_FAMILY, COLORS, GLASS, TYPOGRAPHY } from '../../theme';
+import { PROFILE_TYPE } from './profileTokens';
+import ProfileMirrorChip from './ProfileMirrorChip';
 
 type Props = {
   heightCm: number | null;
@@ -24,6 +30,16 @@ type Props = {
   onSelectSmoking: (id: string) => void;
   onSelectEducation: (id: string) => void;
 };
+
+function MirrorFieldIcon({ name }: { name: keyof typeof Ionicons.glyphMap }) {
+  return (
+    <GenoMirrorRimFrame kind="gold" borderRadius={18} padding={1.5}>
+      <GenoMirrorSteelFill style={styles.iconRing}>
+        <GenoMirrorMetallicIcon name={name} size={16} tone="gold" />
+      </GenoMirrorSteelFill>
+    </GenoMirrorRimFrame>
+  );
+}
 
 function HabitSection({
   icon,
@@ -41,35 +57,22 @@ function HabitSection({
   return (
     <>
       <View style={[styles.fieldHeader, styles.fieldHeaderSpaced]}>
-        <View style={styles.iconRing}>
-          <Ionicons name={icon} size={16} color={COLORS.gold} />
-        </View>
+        <MirrorFieldIcon name={icon} />
         <View style={styles.fieldCopy}>
           <Text style={styles.label}>{label}</Text>
           <Text style={styles.hint}>{hint}</Text>
         </View>
       </View>
       <View style={styles.religionGrid}>
-        {HABIT_OPTIONS.map((opt) => {
-          const active = value === opt.id;
-          return (
-            <Pressable
-              key={opt.id}
-              style={styles.religionCell}
-              onPress={() => onSelect(active ? '' : opt.id)}
-            >
-              {active ? (
-                <LinearGradient colors={[COLORS.gold, '#C49A3A']} style={styles.religionChipActive}>
-                  <Text style={styles.religionTextActive}>{opt.label}</Text>
-                </LinearGradient>
-              ) : (
-                <View style={styles.religionChip}>
-                  <Text style={styles.religionText}>{opt.label}</Text>
-                </View>
-              )}
-            </Pressable>
-          );
-        })}
+        {HABIT_OPTIONS.map((opt) => (
+          <ProfileMirrorChip
+            key={opt.id}
+            label={opt.label}
+            selected={value === opt.id}
+            onPress={() => onSelect(value === opt.id ? '' : opt.id)}
+            style={styles.religionCell}
+          />
+        ))}
       </View>
     </>
   );
@@ -87,6 +90,7 @@ export default function ProfileDetailsFields({
   onSelectSmoking,
   onSelectEducation,
 }: Props) {
+  const [customFocused, setCustomFocused] = useState(false);
   const heightLabel = formatHeightCm(heightCm);
 
   return (
@@ -96,17 +100,15 @@ export default function ProfileDetailsFields({
       </View>
 
       <View style={styles.fieldHeader}>
-        <View style={styles.iconRing}>
-          <Ionicons name="resize-outline" size={16} color={COLORS.gold} />
-        </View>
+        <MirrorFieldIcon name="resize-outline" />
         <View style={styles.fieldCopy}>
           <Text style={styles.label}>Height</Text>
-          <Text style={styles.hint}>Shown on your bond profile & Discover card</Text>
+          <Text style={styles.hint}>Shown on your profile and Discover card.</Text>
         </View>
         {heightLabel ? (
-          <View style={styles.valuePill}>
+          <GenoMirrorRimFrame kind="gold" borderRadius={20}>
             <Text style={styles.valuePillText}>{heightLabel}</Text>
-          </View>
+          </GenoMirrorRimFrame>
         ) : null}
       </View>
 
@@ -119,46 +121,47 @@ export default function ProfileDetailsFields({
           const active = heightCm === cm;
           const label = formatHeightCm(cm)?.split(' · ')[0] ?? `${cm} cm`;
           return (
-            <Pressable key={cm} onPress={() => onSelectHeight(active ? null : cm)}>
-              {active ? (
-                <LinearGradient colors={[COLORS.gold, '#C49A3A']} style={styles.heightChipActive}>
-                  <Text style={styles.heightChipTextActive}>{label}</Text>
-                </LinearGradient>
-              ) : (
-                <View style={styles.heightChip}>
-                  <Text style={styles.heightChipText}>{label}</Text>
-                </View>
-              )}
-            </Pressable>
+            <ProfileMirrorChip
+              key={cm}
+              label={label}
+              selected={active}
+              onPress={() => onSelectHeight(active ? null : cm)}
+            />
           );
         })}
       </ScrollView>
 
       <View style={styles.customRow}>
-        <TextInput
-          style={styles.customInput}
-          value={heightCm != null ? String(heightCm) : ''}
-          onChangeText={(t) => {
-            const digits = t.replace(/[^0-9]/g, '');
-            if (!digits) {
-              onSelectHeight(null);
-              return;
-            }
-            const n = parseInt(digits, 10);
-            if (!Number.isNaN(n)) onSelectHeight(Math.min(230, n));
-          }}
-          placeholder="Custom cm"
-          placeholderTextColor={COLORS.textSubtle}
-          keyboardType="number-pad"
-          maxLength={3}
-        />
+        <GenoMirrorRimFrame
+          kind={customFocused ? 'gold' : 'steel'}
+          borderRadius={12}
+          style={styles.customInputRim}
+        >
+          <TextInput
+            style={styles.customInput}
+            value={heightCm != null ? String(heightCm) : ''}
+            onChangeText={(t) => {
+              const digits = t.replace(/[^0-9]/g, '');
+              if (!digits) {
+                onSelectHeight(null);
+                return;
+              }
+              const n = parseInt(digits, 10);
+              if (!Number.isNaN(n)) onSelectHeight(Math.min(230, n));
+            }}
+            placeholder="Custom cm"
+            placeholderTextColor={COLORS.textSubtle}
+            keyboardType="number-pad"
+            maxLength={3}
+            onFocus={() => setCustomFocused(true)}
+            onBlur={() => setCustomFocused(false)}
+          />
+        </GenoMirrorRimFrame>
         <Text style={styles.customHint}>120–230 cm</Text>
       </View>
 
       <View style={[styles.fieldHeader, styles.fieldHeaderSpaced]}>
-        <View style={styles.iconRing}>
-          <Ionicons name="sparkles-outline" size={16} color={COLORS.gold} />
-        </View>
+        <MirrorFieldIcon name="sparkles-outline" />
         <View style={styles.fieldCopy}>
           <Text style={styles.label}>Religion</Text>
           <Text style={styles.hint}>Optional — helps align values on Discover</Text>
@@ -166,26 +169,15 @@ export default function ProfileDetailsFields({
       </View>
 
       <View style={styles.religionGrid}>
-        {RELIGION_OPTIONS.map((opt) => {
-          const active = religion === opt.id;
-          return (
-            <Pressable
-              key={opt.id}
-              style={styles.religionCell}
-              onPress={() => onSelectReligion(active ? '' : opt.id)}
-            >
-              {active ? (
-                <LinearGradient colors={[COLORS.gold, '#C49A3A']} style={styles.religionChipActive}>
-                  <Text style={styles.religionTextActive}>{opt.label}</Text>
-                </LinearGradient>
-              ) : (
-                <View style={styles.religionChip}>
-                  <Text style={styles.religionText}>{opt.label}</Text>
-                </View>
-              )}
-            </Pressable>
-          );
-        })}
+        {RELIGION_OPTIONS.map((opt) => (
+          <ProfileMirrorChip
+            key={opt.id}
+            label={opt.label}
+            selected={religion === opt.id}
+            onPress={() => onSelectReligion(religion === opt.id ? '' : opt.id)}
+            style={styles.religionCell}
+          />
+        ))}
       </View>
 
       <HabitSection
@@ -205,9 +197,7 @@ export default function ProfileDetailsFields({
       />
 
       <View style={[styles.fieldHeader, styles.fieldHeaderSpaced]}>
-        <View style={styles.iconRing}>
-          <Ionicons name="school-outline" size={16} color={COLORS.gold} />
-        </View>
+        <MirrorFieldIcon name="school-outline" />
         <View style={styles.fieldCopy}>
           <Text style={styles.label}>Education</Text>
           <Text style={styles.hint}>Optional — helps matches know your background</Text>
@@ -215,26 +205,15 @@ export default function ProfileDetailsFields({
       </View>
 
       <View style={styles.religionGrid}>
-        {EDUCATION_OPTIONS.map((opt) => {
-          const active = educationStatus === opt.id;
-          return (
-            <Pressable
-              key={opt.id}
-              style={styles.religionCell}
-              onPress={() => onSelectEducation(active ? '' : opt.id)}
-            >
-              {active ? (
-                <LinearGradient colors={[COLORS.gold, '#C49A3A']} style={styles.religionChipActive}>
-                  <Text style={styles.religionTextActive}>{opt.label}</Text>
-                </LinearGradient>
-              ) : (
-                <View style={styles.religionChip}>
-                  <Text style={styles.religionText}>{opt.label}</Text>
-                </View>
-              )}
-            </Pressable>
-          );
-        })}
+        {EDUCATION_OPTIONS.map((opt) => (
+          <ProfileMirrorChip
+            key={opt.id}
+            label={opt.label}
+            selected={educationStatus === opt.id}
+            onPress={() => onSelectEducation(educationStatus === opt.id ? '' : opt.id)}
+            style={styles.religionCell}
+          />
+        ))}
       </View>
     </View>
   );
@@ -259,62 +238,32 @@ const styles = StyleSheet.create({
   iconRing: {
     width: 36,
     height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(212, 168, 67, 0.14)',
-    borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.35)',
+    borderRadius: 16.5,
     alignItems: 'center',
     justifyContent: 'center',
   },
   fieldCopy: { flex: 1, gap: 2 },
   label: {
     ...PROFILE_TYPE.sectionTitle,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
   },
   hint: {
     ...PROFILE_TYPE.sectionHint,
-    color: COLORS.sage,
-  },
-  valuePill: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 20,
-    backgroundColor: COLORS.mint,
-    borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.28)',
+    color: COLORS.textMuted,
   },
   valuePillText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 11,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    backgroundColor: GLASS.insetFill,
+    borderRadius: 18.5,
   },
   heightScroll: {
     gap: 8,
     paddingRight: 8,
     paddingBottom: 4,
-  },
-  heightChip: {
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 12,
-    backgroundColor: COLORS.white,
-    borderWidth: 1.5,
-    borderColor: COLORS.border,
-  },
-  heightChipActive: {
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 12,
-  },
-  heightChipText: {
-    fontFamily: FONT_FAMILY.gothamBold,
-    fontSize: 13,
-    color: COLORS.forest,
-  },
-  heightChipTextActive: {
-    fontFamily: FONT_FAMILY.gothamBold,
-    fontSize: 13,
-    color: COLORS.forestDeep,
   },
   customRow: {
     flexDirection: 'row',
@@ -322,22 +271,22 @@ const styles = StyleSheet.create({
     gap: 10,
     marginTop: 8,
   },
-  customInput: {
+  customInputRim: {
     flex: 1,
+  },
+  customInput: {
     height: 48,
-    borderRadius: 12,
-    borderWidth: 1.5,
-    borderColor: 'rgba(212, 168, 67, 0.35)',
-    backgroundColor: COLORS.white,
+    borderRadius: 10.5,
+    backgroundColor: GLASS.insetFill,
     paddingHorizontal: 14,
-    fontFamily: FONT_FAMILY.gothamMedium,
+    ...TYPOGRAPHY.bodyStrong,
     fontSize: 15,
-    color: COLORS.forest,
+    color: COLORS.text,
   },
   customHint: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: COLORS.sage,
+    color: COLORS.textMuted,
   },
   religionGrid: {
     flexDirection: 'row',
@@ -347,32 +296,5 @@ const styles = StyleSheet.create({
   religionCell: {
     width: '48%',
     flexGrow: 1,
-  },
-  religionChip: {
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    borderRadius: 12,
-    backgroundColor: COLORS.white,
-    borderWidth: 1.5,
-    borderColor: COLORS.border,
-    alignItems: 'center',
-  },
-  religionChipActive: {
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  religionText: {
-    fontFamily: FONT_FAMILY.gothamBold,
-    fontSize: 13,
-    color: COLORS.textMuted,
-    textAlign: 'center',
-  },
-  religionTextActive: {
-    fontFamily: FONT_FAMILY.gothamBold,
-    fontSize: 13,
-    color: COLORS.forestDeep,
-    textAlign: 'center',
   },
 });

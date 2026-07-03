@@ -25,6 +25,10 @@ function resolveSpec(variant: GenoGlassVariant) {
   return GENO_VISUAL.glass.variants[variant];
 }
 
+function defaultSheen(_variant: GenoGlassVariant): boolean {
+  return true;
+}
+
 export default function GenoGlassSurface({
   children,
   style,
@@ -32,13 +36,14 @@ export default function GenoGlassSurface({
   variant = 'light',
   intensity,
   borderRadius = RADIUS.lg,
-  showSheen = true,
+  showSheen,
   showTopRule = false,
   showBorder = true,
   shadow = 'glass',
   overflow = 'hidden',
 }: Props) {
   const spec = resolveSpec(variant);
+  const sheenOn = showSheen ?? defaultSheen(variant);
   const blurIntensity = intensity ?? spec.intensity;
   const shadowStyle =
     shadow === 'none'
@@ -73,7 +78,7 @@ export default function GenoGlassSurface({
         ]}
         pointerEvents="none"
       />
-      {showSheen ? (
+      {sheenOn ? (
         <LinearGradient
           colors={spec.sheen}
           start={{ x: 0.5, y: 0 }}
@@ -82,19 +87,27 @@ export default function GenoGlassSurface({
           pointerEvents="none"
         />
       ) : null}
-      <LinearGradient
-        colors={GLASS.rimHighlight}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 0, y: 1 }}
-        style={[styles.rim, { borderTopLeftRadius: borderRadius, borderTopRightRadius: borderRadius }]}
-        pointerEvents="none"
-      />
+      {sheenOn ? (
+        <LinearGradient
+          colors={GLASS.mirrorStreak}
+          start={{ x: 0, y: 0.35 }}
+          end={{ x: 1, y: 0.55 }}
+          style={[styles.mirrorStreak, { borderRadius }]}
+          pointerEvents="none"
+        />
+      ) : null}
       {showTopRule ? (
         <LinearGradient
           colors={GENO_VISUAL.glass.topRule}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}
           style={styles.topRule}
+          pointerEvents="none"
+        />
+      ) : null}
+      {sheenOn ? (
+        <View
+          style={[styles.rim, { backgroundColor: GLASS.edgeHighlight, borderRadius }]}
           pointerEvents="none"
         />
       ) : null}
@@ -139,6 +152,15 @@ const styles = StyleSheet.create({
     right: 0,
     height: '55%',
     opacity: 0.95,
+  },
+  mirrorStreak: {
+    position: 'absolute',
+    top: '18%',
+    left: '-8%',
+    right: '-8%',
+    height: '38%',
+    opacity: 0.55,
+    transform: [{ rotate: '-8deg' }],
   },
   rim: {
     position: 'absolute',

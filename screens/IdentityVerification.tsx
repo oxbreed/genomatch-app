@@ -15,7 +15,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { GenoPremiumChrome } from '../src/brand/graphics';
 import { submitIdentitySelfie } from '../src/lib/identityVerification';
-import { COLORS, GLASS, RADIUS, SHADOWS } from '../src/theme';
+import {COLORS, GLASS, RADIUS, SHADOWS, MIRROR_RED_TEXT} from '../src/theme';
+import { GenoMirrorRedFill } from '../src/brand/graphics';
 
 type ScreenPhase = 'camera' | 'preview' | 'success';
 
@@ -130,9 +131,9 @@ export default function IdentityVerification({
             style={({ pressed }) => [styles.primaryBtnWrap, pressed && styles.pressed]}
             onPress={() => void requestPermission()}
           >
-            <LinearGradient colors={[COLORS.gold, '#C49A38']} style={styles.primaryBtn}>
+            <GenoMirrorRedFill style={styles.primaryBtn}>
               <Text style={styles.primaryBtnText}>Allow camera access</Text>
-            </LinearGradient>
+            </GenoMirrorRedFill>
           </Pressable>
         </View>
       </View>
@@ -190,7 +191,7 @@ export default function IdentityVerification({
             onPress={() => void handleSubmit()}
             disabled={submitting}
           >
-            <LinearGradient colors={[COLORS.gold, '#C49A38']} style={styles.primaryBtn}>
+            <GenoMirrorRedFill style={styles.primaryBtn}>
               {submitting ? (
                 <View style={styles.submittingRow}>
                   <ActivityIndicator color={COLORS.forest} size="small" />
@@ -199,7 +200,7 @@ export default function IdentityVerification({
               ) : (
                 <Text style={styles.primaryBtnText}>Submit</Text>
               )}
-            </LinearGradient>
+            </GenoMirrorRedFill>
           </Pressable>
         </View>
       </View>
@@ -266,7 +267,7 @@ export default function IdentityVerification({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.linen,
+    backgroundColor: COLORS.background,
   },
   centered: {
     flex: 1,
@@ -289,11 +290,11 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.92)',
+    backgroundColor: COLORS.chipSolid,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(7, 77, 46, 0.12)',
+    borderColor: 'rgba(10, 10, 10, 0.12)',
   },
   permissionCard: {
     width: '100%',
@@ -309,25 +310,25 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: 'rgba(168, 213, 186, 0.3)',
+    backgroundColor: COLORS.chipSolid,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 4,
   },
   successIconWrap: {
-    backgroundColor: 'rgba(168, 213, 186, 0.45)',
+    backgroundColor: COLORS.chipSolid,
   },
   title: {
     fontSize: 26,
     fontWeight: '800',
-    color: COLORS.forest,
+    ...MIRROR_RED_TEXT,
     letterSpacing: -0.5,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 15,
     lineHeight: 22,
-    color: 'rgba(7, 77, 46, 0.65)',
+    color: COLORS.textMuted,
     fontWeight: '500',
     textAlign: 'center',
     marginBottom: 20,
@@ -337,7 +338,7 @@ const styles = StyleSheet.create({
     minHeight: 360,
     borderRadius: RADIUS.lg,
     overflow: 'hidden',
-    backgroundColor: '#0D2818',
+    backgroundColor: '#0A0A0A',
     marginBottom: 24,
   },
   camera: {
@@ -361,7 +362,7 @@ const styles = StyleSheet.create({
     minHeight: 360,
     borderRadius: RADIUS.lg,
     overflow: 'hidden',
-    backgroundColor: '#0D2818',
+    backgroundColor: '#0A0A0A',
     marginBottom: 20,
   },
   previewImage: {
@@ -377,7 +378,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.forest,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.surfaceElevated,
     ...SHADOWS.button,
   },
   captureBtnInner: {
@@ -396,15 +397,15 @@ const styles = StyleSheet.create({
     height: 56,
     borderRadius: RADIUS.md,
     borderWidth: 1.5,
-    borderColor: 'rgba(7, 77, 46, 0.2)',
+    borderColor: 'rgba(10, 10, 10, 0.2)',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.surfaceElevated,
   },
   secondaryBtnText: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.forest,
+    ...MIRROR_RED_TEXT,
   },
   primaryBtnWrap: {
     borderRadius: RADIUS.md,
@@ -423,7 +424,7 @@ const styles = StyleSheet.create({
   primaryBtnText: {
     fontSize: 16,
     fontWeight: '800',
-    color: COLORS.forest,
+    ...MIRROR_RED_TEXT,
   },
   submittingRow: {
     flexDirection: 'row',

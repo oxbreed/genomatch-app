@@ -1,9 +1,12 @@
 import type { DiscoveryProfile, DistanceBand } from '../types/database';
+import type { DiscoveryInterest } from '../lib/discoveryInterest';
+import { orderDiscoveryInterests } from '../lib/discoveryInterest';
 
 export const HIGH_COMPATIBILITY_MIN = 75;
 
 export type DiscoveryFilters = {
   compatibilityMode: 'all' | 'high';
+  interestedIn: DiscoveryInterest[];
   city: string;
   distanceBand: 'any' | DistanceBand;
   minAge: string;
@@ -14,6 +17,7 @@ export type DiscoveryFilters = {
 
 export const DEFAULT_DISCOVERY_FILTERS: DiscoveryFilters = {
   compatibilityMode: 'all',
+  interestedIn: [],
   city: '',
   distanceBand: 'any',
   minAge: '',
@@ -87,6 +91,7 @@ export function normalizeDiscoveryFilters(draft: DiscoveryFilters): DiscoveryFil
 
   return {
     compatibilityMode: draft.compatibilityMode,
+    interestedIn: orderDiscoveryInterests(draft.interestedIn),
     city: draft.city.trim(),
     distanceBand: draft.distanceBand,
     minAge,

@@ -1,9 +1,9 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import {
   GenoInboxAvatar,
   GenoInboxCardShell,
   GenoInboxIconButton,
+  GenoInboxMirrorPill,
   INBOX,
 } from '../inbox';
 import { FONT_FAMILY, COLORS } from '../../theme';
@@ -59,31 +59,21 @@ export default function MatchListCard({
               {profile.name}
             </Text>
             {isNew ? (
-              <View style={styles.newPill}>
-                <Text style={styles.newPillText}>New</Text>
-              </View>
+              <GenoInboxMirrorPill label="New" kind="gold" />
             ) : null}
-            <View style={styles.genotypePill}>
-              <Text style={styles.genotypeText}>{profile.genotype}</Text>
-            </View>
+            <GenoInboxMirrorPill label={profile.genotype} kind="steel" />
             {profile.genotypeVerified ? <VerifiedBadge compact /> : null}
             <PresenceBadge
               presenceState={profile.presenceState}
               isNewMember={profile.isNewMember}
               compact
             />
-            <LinearGradient
-              colors={
-                compatHigh
-                  ? ['rgba(212, 168, 67, 0.35)', 'rgba(212, 168, 67, 0.12)']
-                  : ['rgba(255, 255, 255, 0.65)', 'rgba(255, 255, 255, 0.35)']
-              }
+            <GenoInboxMirrorPill
+              label={`${profile.compatibility}%`}
+              kind={compatHigh ? 'gold' : 'steel'}
               style={styles.compatPill}
-            >
-              <Text style={[styles.pct, compatHigh && styles.pctHigh]}>
-                {profile.compatibility}%
-              </Text>
-            </LinearGradient>
+              textStyle={compatHigh ? styles.pctHigh : styles.pct}
+            />
           </View>
           <Text style={styles.summary} numberOfLines={1}>
             {riskShort}
@@ -103,7 +93,7 @@ export default function MatchListCard({
           />
           <GenoInboxIconButton
             icon="heart-dislike-outline"
-            variant="danger"
+            variant="unmatch"
             onPress={onUnmatch}
             accessibilityLabel={`Unmatch ${profile.name}`}
           />
@@ -124,51 +114,19 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: INBOX.nameSize + 1,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
     letterSpacing: -0.3,
   },
-  newPill: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 999,
-    backgroundColor: COLORS.gold,
-  },
-  newPillText: {
-    fontFamily: FONT_FAMILY.gothamBold,
-    fontSize: 9,
-    letterSpacing: 0.8,
-    textTransform: 'uppercase',
-    color: COLORS.forestDeep,
-  },
-  genotypePill: {
-    paddingHorizontal: 7,
-    paddingVertical: 3,
-    borderRadius: 999,
-    backgroundColor: 'rgba(255, 255, 255, 0.55)',
-    borderWidth: 1,
-    borderColor: 'rgba(61, 122, 82, 0.14)',
-  },
-  genotypeText: {
-    fontFamily: FONT_FAMILY.gothamBold,
-    fontSize: INBOX.badgeSize,
-    letterSpacing: 0.4,
-    color: COLORS.forestDeep,
-  },
   compatPill: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.7)',
     marginLeft: 'auto',
   },
   pct: {
-    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: INBOX.pctSize,
-    color: COLORS.sage,
+    color: COLORS.textMuted,
   },
   pctHigh: {
-    color: COLORS.forestDeep,
+    fontSize: INBOX.pctSize,
+    color: COLORS.text,
   },
   summary: {
     fontFamily: FONT_FAMILY.gothamMedium,

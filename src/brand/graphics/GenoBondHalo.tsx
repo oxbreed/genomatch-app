@@ -66,7 +66,7 @@ export default function GenoBondHalo({ size, opacity = 1, animated = true }: Pro
               cx={nx}
               cy={ny}
               r={i % 2 === 0 ? 3.5 : 2.5}
-              fill={i % 2 === 0 ? COLORS.gold : COLORS.verified}
+              fill={COLORS.sage}
               fillOpacity={0.65}
             />
           );

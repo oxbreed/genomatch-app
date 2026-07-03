@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS } from '../theme';
+import {COLORS, MIRROR_RED_TEXT} from '../theme';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const COLS = 3;
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     height: CELL_SIZE,
     borderRadius: 14,
     overflow: 'hidden',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.surfaceElevated,
     borderWidth: 1,
     borderColor: COLORS.border,
   },
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
   mainBadgeText: {
     fontSize: 10,
     fontWeight: '700',
-    color: COLORS.forest,
+    ...MIRROR_RED_TEXT,
   },
   deleteBtn: {
     position: 'absolute',
@@ -154,9 +154,9 @@ const styles = StyleSheet.create({
   addCell: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(143, 175, 149, 0.25)',
+    backgroundColor: COLORS.chipSolid,
     borderStyle: 'dashed',
-    borderColor: 'rgba(13, 40, 24, 0.25)',
+    borderColor: 'rgba(10, 10, 10, 0.25)',
   },
   addPressed: {
     opacity: 0.88,
@@ -165,6 +165,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
     fontSize: 11,
     fontWeight: '600',
-    color: COLORS.forest,
+    ...MIRROR_RED_TEXT,
   },
 });

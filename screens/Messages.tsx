@@ -10,7 +10,7 @@ import {
 import { StatusBar } from 'expo-status-bar';
 import * as Haptics from 'expo-haptics';
 import EmptyState from '../src/components/EmptyState';
-import { GenoPremiumChrome, GenoLogoCeremony } from '../src/brand/graphics';
+import { GenoPremiumChrome, GenoLogoCeremony, GenoMirrorRimFrame, GenoMirrorSteelFill } from '../src/brand/graphics';
 import {
   GenoInboxCountBadge,
   GenoInboxHeader,
@@ -24,7 +24,7 @@ import { getOpenChatMatchId } from '../src/lib/activeChat';
 import { logAuthState, getAuthenticatedUserId, peekUserId } from '../src/lib/auth';
 import { sendLocalNotification } from '../src/lib/notifications';
 import { TAB_SCENE_BOTTOM_PADDING } from '../src/components/navigation/tabBarLayout';
-import { FONT_FAMILY, COLORS, MOTION } from '../src/theme';
+import { FONT_FAMILY, COLORS, LOGO_GOLD, MOTION } from '../src/theme';
 import {
   applyInboxMessageToConversations,
   fetchConversations,
@@ -244,11 +244,11 @@ export default function Messages({
   return (
     <View style={styles.container}>
       <GenoPremiumChrome variant="discover" />
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
 
       <GenoInboxHeader
         title="Messages"
-        subtitle="Chat with your genotype-aligned matches"
+        subtitle="Chat with your matches."
         ceremonyMark={conversations.length > 0}
         glass
         right={
@@ -262,7 +262,11 @@ export default function Messages({
 
       {loading ? (
         <View style={styles.centered}>
-          <GenoLogoCeremony variant="compact" tone="dark" />
+          <GenoMirrorRimFrame kind="gold" borderRadius={24} padding={2}>
+            <GenoMirrorSteelFill style={styles.loadingLogo}>
+              <GenoLogoCeremony variant="compact" tone="dark" />
+            </GenoMirrorSteelFill>
+          </GenoMirrorRimFrame>
           <Text style={styles.loadingText}>Loading conversations…</Text>
         </View>
       ) : error ? (
@@ -282,7 +286,7 @@ export default function Messages({
                 setRefreshing(true);
                 loadConversations(true);
               }}
-              tintColor={COLORS.forest}
+              tintColor={LOGO_GOLD}
             />
           }
           ListHeaderComponent={
@@ -321,12 +325,17 @@ export default function Messages({
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.linen },
+  container: { flex: 1, backgroundColor: COLORS.background },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, gap: 12 },
+  loadingLogo: {
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 22,
+  },
   loadingText: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
-    color: COLORS.sage,
+    color: LOGO_GOLD,
   },
   listWrap: { flex: 1 },
   list: { paddingTop: 4, paddingBottom: TAB_SCENE_BOTTOM_PADDING },

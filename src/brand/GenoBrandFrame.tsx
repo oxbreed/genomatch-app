@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { COLORS } from '../theme';
-import { GenoBondMark, GenoSignaturePattern } from './GenoSignaturePattern';
+import { COLORS, MIRROR_GRADIENTS } from '../theme';
+import { GenoBondMark } from './GenoBondMark';
+import { GenoSignaturePattern } from './GenoSignaturePattern';
 
 type Props = {
   children: ReactNode;
@@ -54,7 +55,7 @@ export default function GenoBrandFrame({
         colors={
           isForest
             ? [COLORS.gold, COLORS.verified, 'transparent']
-            : [COLORS.gold, 'rgba(61, 122, 82, 0.55)', 'transparent']
+            : [...MIRROR_GRADIENTS.ribbonBlend, 'transparent']
         }
         start={{ x: 0, y: 0.5 }}
         end={{ x: 1, y: 0.5 }}

@@ -2,74 +2,60 @@ import { useEffect, useRef } from 'react';
 import { Animated, Easing, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import GenoMatchLogo from '../../components/GenoMatchLogo';
 import { FONT_FAMILY, COLORS } from '../../theme';
-import GenoBondHalo from './GenoBondHalo';
 
 export type GenoLogoCeremonySize = 'splash' | 'auth' | 'hero' | 'studio' | 'compact' | 'mark';
 
-const PRESETS: Record<
-  GenoLogoCeremonySize,
-  { logo: number; halo: number; haloOpacity: number; float: number }
-> = {
-  splash: { logo: 140, halo: 200, haloOpacity: 0.45, float: 8 },
-  auth: { logo: 72, halo: 104, haloOpacity: 0.5, float: 6 },
-  hero: { logo: 88, halo: 128, haloOpacity: 0.55, float: 7 },
-  studio: { logo: 44, halo: 64, haloOpacity: 0.65, float: 4 },
-  compact: { logo: 36, halo: 52, haloOpacity: 0.5, float: 3 },
-  mark: { logo: 28, halo: 44, haloOpacity: 0.55, float: 2 },
+const PRESETS: Record<GenoLogoCeremonySize, { logo: number; float: number }> = {
+  splash: { logo: 160, float: 6 },
+  auth: { logo: 88, float: 5 },
+  hero: { logo: 100, float: 5 },
+  studio: { logo: 48, float: 3 },
+  compact: { logo: 40, float: 2 },
+  mark: { logo: 32, float: 2 },
 };
 
 type Props = {
-  /** Preset sizing — splash, auth, hero, studio, compact, mark */
   variant?: GenoLogoCeremonySize;
-  /** Override logo SVG size */
   logoSize?: number;
-  /** Override rotating halo diameter */
-  haloSize?: number;
   showWordmark?: boolean;
   wordmark?: string;
   tagline?: string;
-  /** Light text on dark backgrounds vs dark on light */
+  /** light = logo on dark backdrop; dark = logo on light backdrop */
   tone?: 'light' | 'dark';
   style?: StyleProp<ViewStyle>;
-  /** Reduce motion for watermarks */
   subtle?: boolean;
 };
 
-/**
- * Signature GenoMatch logo moment — rotating bond halo, float & pulse.
- * Same motion language as splash / sign-in, reusable across profile & studio.
- */
+/** Logo presentation — gentle float; transparent vector mark */
 export default function GenoLogoCeremony({
   variant = 'auth',
   logoSize,
-  haloSize,
   showWordmark = false,
   wordmark = 'GenoMatch',
   tagline,
-  tone = 'light',
+  tone = 'dark',
   style,
   subtle = false,
 }: Props) {
   const preset = PRESETS[variant];
   const logo = logoSize ?? preset.logo;
-  const halo = haloSize ?? preset.halo;
   const floatRange = subtle ? preset.float * 0.5 : preset.float;
 
   const logoFloat = useRef(new Animated.Value(0)).current;
-  const logoPulse = useRef(new Animated.Value(subtle ? 0.97 : 0.94)).current;
+  const logoPulse = useRef(new Animated.Value(subtle ? 0.98 : 0.96)).current;
 
   useEffect(() => {
     const floatingLoop = Animated.loop(
       Animated.sequence([
         Animated.timing(logoFloat, {
           toValue: -floatRange,
-          duration: subtle ? 1800 : 1400,
+          duration: subtle ? 2200 : 1800,
           easing: Easing.inOut(Easing.sin),
           useNativeDriver: true,
         }),
         Animated.timing(logoFloat, {
           toValue: floatRange,
-          duration: subtle ? 1800 : 1400,
+          duration: subtle ? 2200 : 1800,
           easing: Easing.inOut(Easing.sin),
           useNativeDriver: true,
         }),
@@ -79,13 +65,13 @@ export default function GenoLogoCeremony({
       Animated.sequence([
         Animated.timing(logoPulse, {
           toValue: 1,
-          duration: subtle ? 1800 : 1400,
+          duration: subtle ? 2200 : 1800,
           easing: Easing.inOut(Easing.sin),
           useNativeDriver: true,
         }),
         Animated.timing(logoPulse, {
-          toValue: subtle ? 0.97 : 0.94,
-          duration: subtle ? 1800 : 1400,
+          toValue: subtle ? 0.98 : 0.96,
+          duration: subtle ? 2200 : 1800,
           easing: Easing.inOut(Easing.sin),
           useNativeDriver: true,
         }),
@@ -99,22 +85,20 @@ export default function GenoLogoCeremony({
     };
   }, [floatRange, logoFloat, logoPulse, subtle]);
 
-  const textColor = tone === 'light' ? COLORS.linen : COLORS.forestDeep;
-  const subColor = tone === 'light' ? COLORS.sage : COLORS.sage;
+  const textColor = tone === 'light' ? COLORS.textOnDark : COLORS.text;
+  const subColor = tone === 'light' ? 'rgba(247, 245, 242, 0.72)' : COLORS.textMuted;
 
   return (
-    <View style={[styles.wrap, { width: halo, height: halo }, style]}>
-      <GenoBondHalo size={halo} opacity={preset.haloOpacity} animated />
+    <View style={[styles.wrap, style]}>
       <Animated.View
-        style={[
-          styles.logoOrb,
-          { transform: [{ translateY: logoFloat }, { scale: logoPulse }] },
-        ]}
+        style={{
+          transform: [{ translateY: logoFloat }, { scale: logoPulse }],
+        }}
       >
-        <GenoMatchLogo size={logo} />
+        <GenoMatchLogo size={logo} render="vector" />
       </Animated.View>
       {showWordmark ? (
-        <View style={[styles.wordmarkBlock, { top: halo + 12 }]}>
+        <View style={styles.wordmarkBlock}>
           <Text style={[styles.wordmark, { color: textColor }]}>{wordmark}</Text>
           {tagline ? (
             <Text style={[styles.tagline, { color: subColor }]}>{tagline}</Text>
@@ -129,18 +113,11 @@ const styles = StyleSheet.create({
   wrap: {
     alignItems: 'center',
     justifyContent: 'center',
-    position: 'relative',
-  },
-  logoOrb: {
-    position: 'absolute',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   wordmarkBlock: {
-    position: 'absolute',
-    left: -80,
-    right: -80,
+    marginTop: 16,
     alignItems: 'center',
+    paddingHorizontal: 12,
   },
   wordmark: {
     fontFamily: FONT_FAMILY.gothamBold,

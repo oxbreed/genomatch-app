@@ -1,13 +1,20 @@
 import type { DiscoveryProfile, DistanceBand, Genotype, ProfileRow } from '../types/database';
 import { computeCompatibility } from './compatibility';
 import { isNewMember, resolvePresenceState } from './presence';
+import {
+  BRAND_BLACK,
+  BRAND_CHARCOAL,
+  COLORS,
+  GOLD,
+  GOLD_BRIGHT,
+} from '../theme';
 
 const GRADIENTS: [string, string][] = [
-  ['#2A5C40', '#0D2818'],
-  ['#3D7A52', '#1A3D28'],
-  ['#185FA5', '#0D47A1'],
-  ['#6A4C93', '#4A2C6A'],
-  ['#D4A843', '#8B6914'],
+  [COLORS.brandRed, BRAND_BLACK],
+  [GOLD, BRAND_CHARCOAL],
+  [COLORS.brandRedSoft, COLORS.brandRedDeep],
+  [BRAND_CHARCOAL, BRAND_BLACK],
+  [GOLD_BRIGHT, COLORS.brandRedDeep],
 ];
 
 export function ageFromDateOfBirth(dob: string | null): number | null {

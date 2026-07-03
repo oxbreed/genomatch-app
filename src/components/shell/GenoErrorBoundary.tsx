@@ -61,7 +61,7 @@ export default class GenoErrorBoundary extends Component<Props, State> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.linen,
+    backgroundColor: COLORS.background,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 32,
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 22,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
     marginBottom: 12,
     textAlign: 'center',
   },

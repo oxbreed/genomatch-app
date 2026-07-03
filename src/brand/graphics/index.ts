@@ -8,3 +8,13 @@ export { default as GenoCardFrame } from './GenoCardFrame';
 export { default as GenoGlassSurface, GenoGlassBackdrop } from './GenoGlassSurface';
 export type { GenoGlassVariant } from './GenoGlassSurface';
 export { default as GenoLogoCeremony, type GenoLogoCeremonySize } from './GenoLogoCeremony';
+export { GenoOrbitBall } from './GenoOrbitBall';
+export { GenoMirrorRedFill, GenoMirrorGoldFill, GenoMirrorSteelFill, GenoMirrorBrandCtaFill, GenoOnboardingCtaFill, GenoMirrorRedText } from './GenoMirrorRed';
+export type { MirrorIconTone } from '../../theme/mirrorActions';
+export {
+  GenoMirrorMetallicIcon,
+  GenoMirrorStrike,
+  GenoMirrorHeartDislike,
+} from './GenoMirrorMetallicIcon';
+export { default as GenoMirrorRimFrame } from './GenoMirrorRimFrame';
+export { default as GenoMirrorActionButton } from './GenoMirrorActionButton';

@@ -10,11 +10,27 @@ import {
   View,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
+import {
+  GenoGlassSurface,
+  GenoMirrorBrandCtaFill,
+  GenoMirrorMetallicIcon,
+  GenoMirrorRimFrame,
+  GenoMirrorSteelFill,
+} from '../../brand/graphics';
 import * as Haptics from 'expo-haptics';
 import { GenoBondMark, GenoSignaturePattern } from '../../brand';
 import ProfileAvatar from '../ProfileAvatar';
-import { FONT_FAMILY, COLORS } from '../../theme';
+import {
+  FONT_FAMILY,
+  COLORS,
+  LOGO_GOLD,
+  RADIUS,
+  METALLIC_CHROME,
+  METALLIC_SILVER,
+  METALLIC_STEEL,
+  chromeAlpha,
+  goldAlpha,
+} from '../../theme';
 import type { DiscoveryProfile } from '../../types/database';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -34,7 +50,8 @@ function ConfettiBurst({ progress }: { progress: Animated.Value }) {
         angle: (i / CONFETTI_COUNT) * Math.PI * 2,
         dist: 72 + (i % 4) * 18,
         size: 5 + (i % 3) * 2,
-        color: i % 3 === 0 ? COLORS.gold : i % 3 === 1 ? COLORS.sage : COLORS.linen,
+        color:
+          i % 3 === 0 ? LOGO_GOLD : i % 3 === 1 ? METALLIC_SILVER : METALLIC_CHROME,
       })),
     []
   );
@@ -241,24 +258,20 @@ export default function DiscoverMatchCelebration({
     <Modal visible={visible} transparent animationType="none" statusBarTranslucent>
       <Animated.View style={[styles.backdrop, { opacity: backdrop }]}>
         <LinearGradient
-          colors={['#061810', 'rgba(13, 40, 24, 0.96)', '#0D2818']}
+          colors={['#0A0A0A', 'rgba(10, 10, 10, 0.96)', '#0A0A0A']}
           locations={[0, 0.45, 1]}
           style={StyleSheet.absoluteFillObject}
         />
 
         <View style={styles.ambientTop} pointerEvents="none">
           <LinearGradient
-            colors={['rgba(212, 168, 67, 0.22)', 'transparent']}
+            colors={['rgba(212, 175, 55, 0.18)', 'transparent']}
             style={styles.ambientGlow}
           />
         </View>
 
         <View style={styles.patternWrap} pointerEvents="none">
           <GenoSignaturePattern width={SCREEN_WIDTH} height={220} opacity={0.28} />
-        </View>
-
-        <View style={styles.patternWrapBottom} pointerEvents="none">
-          <GenoSignaturePattern width={SCREEN_WIDTH * 0.85} height={160} opacity={0.18} />
         </View>
 
         <Animated.View
@@ -270,154 +283,160 @@ export default function DiscoverMatchCelebration({
             },
           ]}
         >
-          <LinearGradient
-            colors={['rgba(212, 168, 67, 0.65)', 'rgba(61, 122, 82, 0.4)', 'rgba(212, 168, 67, 0.5)']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.cardBorder}
-          >
-            <View style={styles.cardInner}>
+          <GenoMirrorRimFrame kind="gold" borderRadius={30} style={styles.cardRim}>
+            <GenoGlassSurface
+              variant="dark"
+              borderRadius={28.5}
+              shadow="glassElevated"
+              showTopRule
+              showSheen
+              showBorder={false}
+              intensity={52}
+              style={styles.cardInner}
+              contentStyle={styles.cardFill}
+            >
+              <View style={styles.crownRow}>
+                <View style={styles.crownLine} />
+                <GenoMirrorMetallicIcon name="heart" size={12} tone="gold" />
+                <Text style={styles.crownKicker}>MUTUAL MATCH</Text>
+                <GenoMirrorMetallicIcon name="heart" size={12} tone="gold" />
+                <View style={styles.crownLine} />
+              </View>
+
               <LinearGradient
-                colors={['#1F4A32', '#153D28', '#0D2818']}
-                start={{ x: 0.2, y: 0 }}
-                end={{ x: 0.8, y: 1 }}
-                style={styles.cardGradient}
-              >
-                <View style={styles.cardPattern} pointerEvents="none">
-                  <GenoSignaturePattern width={300} height={140} opacity={0.22} />
-                </View>
+                colors={['transparent', chromeAlpha(0.35), LOGO_GOLD, goldAlpha(0.35), 'transparent']}
+                start={{ x: 0, y: 0.5 }}
+                end={{ x: 1, y: 0.5 }}
+                style={styles.rule}
+                pointerEvents="none"
+              />
 
-                <View style={styles.crownRow}>
-                  <View style={styles.crownLine} />
-                  <Ionicons name="heart" size={14} color={COLORS.gold} />
-                  <Text style={styles.crownKicker}>MUTUAL MATCH</Text>
-                  <Ionicons name="heart" size={14} color={COLORS.gold} />
-                  <View style={styles.crownLine} />
-                </View>
+              <Animated.View style={{ opacity: titleShine }}>
+                <Text style={styles.title}>{"It's a Match!"}</Text>
+              </Animated.View>
 
-                <Animated.View style={{ opacity: titleShine }}>
-                  <Text style={styles.title}>{"It's a Match!"}</Text>
+              <View style={styles.shimmerTrack} pointerEvents="none">
+                <Animated.View
+                  style={[styles.shimmerBar, { transform: [{ translateX: shimmerX }] }]}
+                >
+                  <LinearGradient
+                    colors={['transparent', 'rgba(255, 255, 255, 0.55)', 'transparent']}
+                    start={{ x: 0, y: 0.5 }}
+                    end={{ x: 1, y: 0.5 }}
+                    style={StyleSheet.absoluteFillObject}
+                  />
+                </Animated.View>
+              </View>
+
+              <Text style={styles.subtitleMatch}>
+                You matched with{' '}
+                <Text style={styles.nameHighlight}>{firstName}</Text>!
+              </Text>
+              <Text style={styles.subtitleHint}>
+                You both liked each other. Start a conversation or keep browsing Discover.
+              </Text>
+
+              <View style={styles.avatarStage}>
+                <ConfettiBurst progress={confetti} />
+
+                <Animated.View
+                  style={[styles.orbitRing, { transform: [{ rotate: ringRotate }] }]}
+                  pointerEvents="none"
+                >
+                  <View style={styles.orbitDot} />
+                  <View style={[styles.orbitDot, styles.orbitDotAlt]} />
                 </Animated.View>
 
-                <View style={styles.shimmerTrack} pointerEvents="none">
+                <View style={styles.avatarRow}>
                   <Animated.View
-                    style={[styles.shimmerBar, { transform: [{ translateX: shimmerX }] }]}
+                    style={[styles.avatarSlot, { transform: [{ translateX: leftAvatarX }] }]}
                   >
-                    <LinearGradient
-                      colors={['transparent', 'rgba(212, 168, 67, 0.55)', 'transparent']}
-                      start={{ x: 0, y: 0.5 }}
-                      end={{ x: 1, y: 0.5 }}
-                      style={StyleSheet.absoluteFillObject}
-                    />
-                  </Animated.View>
-                </View>
-
-                <Text style={styles.subtitleMatch}>
-                  You matched with{' '}
-                  <Text style={styles.nameHighlight}>{firstName}</Text>!
-                </Text>
-                <Text style={styles.subtitleHint}>
-                  A mutual like — start a conversation or keep exploring your stack.
-                </Text>
-
-                <View style={styles.avatarStage}>
-                  <ConfettiBurst progress={confetti} />
-
-                  <Animated.View
-                    style={[styles.orbitRing, { transform: [{ rotate: ringRotate }] }]}
-                    pointerEvents="none"
-                  >
-                    <View style={styles.orbitDot} />
-                    <View style={[styles.orbitDot, styles.orbitDotAlt]} />
+                    <GenoMirrorRimFrame kind="gold" borderRadius={999} padding={1.5}>
+                      <GenoMirrorSteelFill style={styles.youRing}>
+                        <GenoMirrorMetallicIcon name="person" size={28} tone="gold" />
+                      </GenoMirrorSteelFill>
+                    </GenoMirrorRimFrame>
+                    <Text style={styles.avatarLabel}>You</Text>
                   </Animated.View>
 
-                  <View style={styles.avatarRow}>
-                    <Animated.View
-                      style={[styles.avatarSlot, { transform: [{ translateX: leftAvatarX }] }]}
-                    >
-                      <View style={styles.avatarHalo}>
-                        <View style={styles.youRing}>
-                          <Ionicons name="person" size={30} color={COLORS.linen} />
-                        </View>
-                      </View>
-                      <Text style={styles.avatarLabel}>You</Text>
-                    </Animated.View>
-
-                    <Animated.View style={[styles.bondCenter, { transform: [{ scale: bondPulse }] }]}>
-                      <LinearGradient
-                        colors={['rgba(212, 168, 67, 0.35)', 'rgba(13, 40, 24, 0.2)']}
-                        style={styles.bondGlow}
-                      >
+                  <Animated.View style={[styles.bondCenter, { transform: [{ scale: bondPulse }] }]}>
+                    <GenoMirrorRimFrame kind="gold" borderRadius={40} padding={1.5}>
+                      <GenoMirrorSteelFill style={styles.bondGlow}>
                         <GenoBondMark size={56} opacity={1} />
-                      </LinearGradient>
-                    </Animated.View>
+                      </GenoMirrorSteelFill>
+                    </GenoMirrorRimFrame>
+                  </Animated.View>
 
-                    <Animated.View
-                      style={[styles.avatarSlot, { transform: [{ translateX: rightAvatarX }] }]}
-                    >
-                      <View style={styles.avatarHalo}>
+                  <Animated.View
+                    style={[styles.avatarSlot, { transform: [{ translateX: rightAvatarX }] }]}
+                  >
+                    <GenoMirrorRimFrame kind="gold" borderRadius={999} padding={1.5}>
+                      <GenoMirrorSteelFill style={styles.youRing}>
                         {profile ? (
                           <ProfileAvatar
                             name={profile.name}
                             gradient={profile.gradient}
                             avatarUrl={profile.avatarUrl ?? profile.photos[0]}
-                            size={68}
+                            size={64}
                             noPhotoBackground={COLORS.forestDeep}
                             noPhotoInitialColor={COLORS.linen}
                           />
                         ) : (
-                          <View style={styles.youRing}>
-                            <Text style={styles.initials}>{firstName.slice(0, 2).toUpperCase()}</Text>
-                          </View>
+                          <Text style={styles.initials}>{firstName.slice(0, 2).toUpperCase()}</Text>
                         )}
-                      </View>
-                      <Text style={styles.avatarLabel} numberOfLines={1}>
-                        {firstName}
-                      </Text>
-                    </Animated.View>
-                  </View>
+                      </GenoMirrorSteelFill>
+                    </GenoMirrorRimFrame>
+                    <Text style={styles.avatarLabel} numberOfLines={1}>
+                      {firstName}
+                    </Text>
+                  </Animated.View>
                 </View>
+              </View>
 
-                {profile ? (
-                  <View style={styles.compatRow}>
-                    <View style={styles.compatRing}>
-                      <Text style={styles.compatPercent}>{profile.compatibility}%</Text>
-                    </View>
+              {profile ? (
+                <GenoMirrorRimFrame kind="steel" borderRadius={16} style={styles.compatRim}>
+                  <GenoMirrorSteelFill style={styles.compatRow}>
+                    <GenoMirrorRimFrame kind="gold" borderRadius={26} padding={1.5}>
+                      <GenoMirrorSteelFill style={styles.compatRing}>
+                        <Text style={styles.compatPercent}>{profile.compatibility}%</Text>
+                      </GenoMirrorSteelFill>
+                    </GenoMirrorRimFrame>
                     <View style={styles.compatCopy}>
                       <Text style={styles.compatTitle}>Genotype compatibility</Text>
                       <Text style={styles.compatSub}>Aligned for a safer connection</Text>
                     </View>
-                  </View>
-                ) : null}
+                  </GenoMirrorSteelFill>
+                </GenoMirrorRimFrame>
+              ) : null}
 
-                <Pressable
-                  style={({ pressed }) => [styles.cta, pressed && styles.ctaPressed]}
-                  onPress={() => {
-                    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    onContinue();
-                  }}
-                >
-                  <LinearGradient
-                    colors={[COLORS.gold, '#E8C56A', '#C49A3A']}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                    style={styles.ctaGradient}
-                  >
+              <Pressable
+                style={({ pressed }) => [pressed && styles.ctaPressed]}
+                onPress={() => {
+                  void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  onContinue();
+                }}
+              >
+                <GenoMirrorRimFrame kind="red" borderRadius={RADIUS.pill} style={styles.ctaRim}>
+                  <GenoMirrorBrandCtaFill style={styles.ctaGradient}>
                     <Text style={styles.ctaText}>Continue</Text>
-                    <Ionicons name="arrow-forward" size={20} color={COLORS.forestDeep} />
-                  </LinearGradient>
-                </Pressable>
+                    <GenoMirrorMetallicIcon name="arrow-forward" size={20} tone="chrome" />
+                  </GenoMirrorBrandCtaFill>
+                </GenoMirrorRimFrame>
+              </Pressable>
 
-                <Pressable
-                  style={({ pressed }) => [styles.skipBtn, pressed && styles.skipBtnPressed]}
-                  onPress={onContinue}
-                >
-                  <Ionicons name="chatbubble-outline" size={16} color={COLORS.gold} />
-                  <Text style={styles.skipText}>Send a message</Text>
-                </Pressable>
-              </LinearGradient>
-            </View>
-          </LinearGradient>
+              <Pressable
+                style={({ pressed }) => [pressed && styles.skipBtnPressed]}
+                onPress={onContinue}
+              >
+                <GenoMirrorRimFrame kind="steel" borderRadius={RADIUS.pill} style={styles.skipRim}>
+                  <GenoMirrorSteelFill style={styles.skipInner}>
+                    <GenoMirrorMetallicIcon name="chatbubble-outline" size={16} tone="gold" />
+                    <Text style={styles.skipText}>Send a message</Text>
+                  </GenoMirrorSteelFill>
+                </GenoMirrorRimFrame>
+              </Pressable>
+            </GenoGlassSurface>
+          </GenoMirrorRimFrame>
         </Animated.View>
       </Animated.View>
     </Modal>
@@ -449,64 +468,53 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     opacity: 0.7,
   },
-  patternWrapBottom: {
-    position: 'absolute',
-    bottom: '8%',
-    alignSelf: 'center',
-    opacity: 0.5,
-  },
   cardOuter: {
     width: '100%',
     maxWidth: 360,
     zIndex: 2,
   },
-  cardBorder: {
-    borderRadius: 30,
-    padding: 2,
-    shadowColor: COLORS.gold,
-    shadowOffset: { width: 0, height: 16 },
-    shadowOpacity: 0.45,
-    shadowRadius: 32,
-    elevation: 20,
+  cardRim: {
+    alignSelf: 'stretch',
+    width: '100%',
   },
   cardInner: {
-    borderRadius: 28,
     overflow: 'hidden',
   },
-  cardGradient: {
+  cardFill: {
     paddingHorizontal: 26,
     paddingTop: 26,
     paddingBottom: 24,
     alignItems: 'center',
   },
-  cardPattern: {
-    position: 'absolute',
-    top: -16,
-    right: -28,
-  },
   crownRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    marginBottom: 14,
+    marginBottom: 12,
     width: '100%',
   },
   crownLine: {
     flex: 1,
     height: 1,
-    backgroundColor: 'rgba(212, 168, 67, 0.35)',
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
   },
   crownKicker: {
-    fontFamily: FONT_FAMILY.gothamBold,
+    fontFamily: FONT_FAMILY.marketingExtrabold,
     fontSize: 10,
     letterSpacing: 2.8,
-    color: COLORS.gold,
+    color: LOGO_GOLD,
+  },
+  rule: {
+    width: '100%',
+    height: 1,
+    borderRadius: 1,
+    marginBottom: 14,
   },
   title: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 40,
     letterSpacing: -1,
-    color: COLORS.linen,
+    color: COLORS.text,
     textAlign: 'center',
     marginBottom: 6,
   },
@@ -516,7 +524,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     marginBottom: 14,
     borderRadius: 1,
-    backgroundColor: 'rgba(212, 168, 67, 0.12)',
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
   },
   shimmerBar: {
     width: 120,
@@ -526,7 +534,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 18,
     lineHeight: 26,
-    color: COLORS.linen,
+    color: COLORS.text,
     textAlign: 'center',
     marginBottom: 8,
     paddingHorizontal: 4,
@@ -535,14 +543,14 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamBook,
     fontSize: 14,
     lineHeight: 20,
-    color: 'rgba(245, 239, 230, 0.62)',
+    color: COLORS.textMuted,
     textAlign: 'center',
     marginBottom: 22,
     paddingHorizontal: 8,
   },
   nameHighlight: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.gold,
+    color: LOGO_GOLD,
   },
   avatarStage: {
     width: '100%',
@@ -565,7 +573,7 @@ const styles = StyleSheet.create({
     height: 200,
     borderRadius: 100,
     borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.25)',
+    borderColor: 'rgba(212, 175, 55, 0.28)',
     borderStyle: 'dashed',
     alignItems: 'center',
     justifyContent: 'center',
@@ -576,12 +584,12 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: COLORS.gold,
+    backgroundColor: LOGO_GOLD,
   },
   orbitDotAlt: {
     top: undefined,
     bottom: -4,
-    backgroundColor: COLORS.sage,
+    backgroundColor: METALLIC_STEEL,
   },
   avatarRow: {
     flexDirection: 'row',
@@ -595,27 +603,17 @@ const styles = StyleSheet.create({
     gap: 10,
     width: 88,
   },
-  avatarHalo: {
-    padding: 3,
-    borderRadius: 40,
-    borderWidth: 2,
-    borderColor: 'rgba(212, 168, 67, 0.5)',
-    backgroundColor: 'rgba(13, 40, 24, 0.6)',
-  },
   youRing: {
     width: 68,
     height: 68,
     borderRadius: 34,
-    backgroundColor: COLORS.forest,
-    borderWidth: 2,
-    borderColor: COLORS.gold,
     alignItems: 'center',
     justifyContent: 'center',
   },
   initials: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 24,
-    color: COLORS.gold,
+    color: LOGO_GOLD,
   },
   bondCenter: {
     marginTop: -6,
@@ -627,15 +625,17 @@ const styles = StyleSheet.create({
     borderRadius: 38,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1.5,
-    borderColor: 'rgba(212, 168, 67, 0.4)',
   },
   avatarLabel: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 12,
-    color: COLORS.sage,
+    color: COLORS.textMuted,
     maxWidth: 88,
     textAlign: 'center',
+  },
+  compatRim: {
+    width: '100%',
+    marginBottom: 20,
   },
   compatRow: {
     flexDirection: 'row',
@@ -644,26 +644,19 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingVertical: 12,
     paddingHorizontal: 14,
-    borderRadius: 16,
-    backgroundColor: 'rgba(212, 168, 67, 0.1)',
-    borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.28)',
-    marginBottom: 20,
+    borderRadius: 14.5,
   },
   compatRing: {
     width: 52,
     height: 52,
-    borderRadius: 26,
-    borderWidth: 2,
-    borderColor: COLORS.gold,
+    borderRadius: 25,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(13, 40, 24, 0.5)',
   },
   compatPercent: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 15,
-    color: COLORS.gold,
+    color: LOGO_GOLD,
   },
   compatCopy: {
     flex: 1,
@@ -672,17 +665,15 @@ const styles = StyleSheet.create({
   compatTitle: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 14,
-    color: COLORS.linen,
+    color: COLORS.text,
   },
   compatSub: {
     fontFamily: FONT_FAMILY.gothamBook,
     fontSize: 12,
-    color: 'rgba(245, 239, 230, 0.6)',
+    color: COLORS.textMuted,
   },
-  cta: {
+  ctaRim: {
     width: '100%',
-    borderRadius: 18,
-    overflow: 'hidden',
     marginBottom: 12,
   },
   ctaPressed: {
@@ -695,24 +686,30 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 10,
     paddingVertical: 17,
+    borderRadius: RADIUS.pill - 1.5,
   },
   ctaText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 17,
-    color: COLORS.forestDeep,
+    color: COLORS.white,
   },
-  skipBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingVertical: 8,
+  skipRim: {
+    width: '100%',
   },
   skipBtnPressed: {
     opacity: 0.75,
   },
+  skipInner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 12,
+    borderRadius: RADIUS.pill - 1.5,
+  },
   skipText: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
-    color: 'rgba(245, 239, 230, 0.55)',
+    color: COLORS.text,
   },
 });

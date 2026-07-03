@@ -6,10 +6,10 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "description": "GenoMatch is the world's first genotype-aware dating app. Find compatible partners based on AA, AS, SS, AC genotype matching.",
-    "primaryColor": "#0D2818",
+    "primaryColor": "#0B0C0E",
     "fonts": [
       "./assets/fonts/ClashDisplay-Semibold.otf",
       "./assets/fonts/ClashDisplay-Medium.otf",
@@ -19,9 +19,9 @@
       "./assets/fonts/Satoshi-Bold.otf"
     ],
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/genomatch-ribbon-logo.png",
       "resizeMode": "contain",
-      "backgroundColor": "#0D2818"
+      "backgroundColor": "#0B0C0E"
     },
     "runtimeVersion": {
       "policy": "appVersion"
@@ -40,14 +40,16 @@
         "NSCameraUsageDescription": "GenoMatch uses your camera to verify your identity with a live selfie.",
         "NSPhotoLibraryUsageDescription": "GenoMatch needs access to your photos so you can upload a profile picture.",
         "NSLocationWhenInUseUsageDescription": "GenoMatch uses your location to set your city on your profile and improve nearby matching.",
-        "UIBackgroundModes": ["remote-notification"]
+        "UIBackgroundModes": [
+          "remote-notification"
+        ]
       }
     },
     "android": {
       "package": "ng.genomatch.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#0D2818"
+        "backgroundColor": "#0B0C0E"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
@@ -86,7 +88,7 @@
         "expo-notifications",
         {
           "icon": "./assets/icon.png",
-          "color": "#0D2818",
+          "color": "#C8102E",
           "defaultChannel": "messages",
           "sounds": []
         }
@@ -104,7 +106,8 @@
           ]
         }
       ],
-      "expo-camera"
+      "expo-camera",
+      "expo-video"
     ]
   }
 }

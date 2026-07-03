@@ -30,4 +30,10 @@ describe('formatSecurityError', () => {
   it('falls back for unknown errors', () => {
     expect(formatSecurityError(new Error('Something else'), 'Failed')).toBe('Failed');
   });
+
+  it('returns a friendly message for network failures', () => {
+    expect(formatSecurityError(new Error('Network request failed'), 'Failed')).toContain(
+      'Mobile data'
+    );
+  });
 });

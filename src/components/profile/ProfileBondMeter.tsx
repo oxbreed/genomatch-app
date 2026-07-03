@@ -1,7 +1,7 @@
 import { Animated, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GenoHelixField } from '../../brand/graphics';
-import { FONT_FAMILY, COLORS } from '../../theme';
+import {FONT_FAMILY, COLORS, MIRROR_RED_TEXT} from '../../theme';
 
 type Props = {
   percent: number;
@@ -53,17 +53,17 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 16,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
   },
   percent: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 18,
-    color: COLORS.gold,
+    ...MIRROR_RED_TEXT,
   },
   track: {
     height: 10,
     borderRadius: 999,
-    backgroundColor: 'rgba(143, 175, 149, 0.25)',
+    backgroundColor: COLORS.chipSolid,
     overflow: 'hidden',
     marginBottom: 8,
   },

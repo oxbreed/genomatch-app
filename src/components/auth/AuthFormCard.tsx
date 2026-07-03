@@ -3,16 +3,46 @@ import { Animated, StyleSheet, type StyleProp, type ViewStyle } from 'react-nati
 import { LinearGradient } from 'expo-linear-gradient';
 import { GenoGlassSurface } from '../../brand/graphics';
 import { GENO_VISUAL } from '../../brand/graphics/genoVisualTokens';
-import { RADIUS, SHADOWS } from '../../theme';
+import { COLORS, MIRROR_ACTION, RADIUS, SHADOWS, LOGO_GOLD, mirrorActionShadow } from '../../theme';
 
 type Props = {
   children: ReactNode;
   style?: StyleProp<ViewStyle>;
   outerStyle?: StyleProp<ViewStyle>;
+  /** Stronger chrome rim + dark mirror glass (sign-in welcome) */
+  mirror?: boolean;
 };
 
 /** Frosted form panel for sign-in, register, and reset flows */
-export default function AuthFormCard({ children, style, outerStyle }: Props) {
+export default function AuthFormCard({ children, style, outerStyle, mirror = false }: Props) {
+  if (mirror) {
+    const rim = MIRROR_ACTION.gold.rim;
+    return (
+      <Animated.View style={[styles.outer, outerStyle, style]}>
+        <LinearGradient
+          colors={[...rim]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={[styles.mirrorBorder, mirrorActionShadow('gold')]}
+        >
+          <GenoGlassSurface
+            variant="dark"
+            borderRadius={RADIUS.xl - 1.5}
+            shadow="none"
+            showTopRule
+            showSheen
+            showBorder={false}
+            intensity={40}
+            style={styles.glass}
+            contentStyle={styles.inner}
+          >
+            {children}
+          </GenoGlassSurface>
+        </LinearGradient>
+      </Animated.View>
+    );
+  }
+
   return (
     <Animated.View style={[styles.outer, outerStyle, style]}>
       <LinearGradient
@@ -25,7 +55,7 @@ export default function AuthFormCard({ children, style, outerStyle }: Props) {
           variant="linen"
           borderRadius={RADIUS.xl - 1.5}
           shadow="glassElevated"
-          showTopRule
+          showTopRule={false}
           showBorder={false}
           style={styles.glass}
           contentStyle={styles.inner}
@@ -43,8 +73,13 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.xl,
     padding: 1.5,
     ...SHADOWS.glassElevated,
-    shadowColor: '#D4A843',
-    shadowOpacity: 0.16,
+    shadowColor: LOGO_GOLD,
+    shadowOpacity: 0.12,
+  },
+  mirrorBorder: {
+    borderRadius: RADIUS.xl,
+    padding: 1.5,
+    ...SHADOWS.glassElevated,
   },
   glass: {
     overflow: 'hidden',

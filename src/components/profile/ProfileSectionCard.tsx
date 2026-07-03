@@ -22,8 +22,8 @@ export default function ProfileSectionCard({
   style,
 }: Props) {
   return (
-    <GenoCardFrame style={[styles.wrap, style]} showWatermark={false}>
-      <View style={[styles.inner, editing && styles.innerEditing]}>
+    <GenoCardFrame mirror showWatermark={false} style={[styles.wrap, style]}>
+      <View style={styles.inner}>
         {label ? (
           <ProfileSectionHeader kicker={kicker} title={label} hint={hint} />
         ) : null}
@@ -40,8 +40,5 @@ const styles = StyleSheet.create({
   inner: {
     padding: PROFILE.cardPadding,
     paddingTop: PROFILE.cardPadding + 2,
-  },
-  innerEditing: {
-    backgroundColor: 'rgba(237, 243, 238, 0.45)',
   },
 });

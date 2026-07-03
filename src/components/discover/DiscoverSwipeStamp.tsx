@@ -1,7 +1,7 @@
 import { Animated, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GenoBondMark } from '../../brand';
-import { FONT_FAMILY, COLORS } from '../../theme';
+import {FONT_FAMILY, COLORS, MIRROR_RED_TEXT} from '../../theme';
 
 type Props = {
   side: 'bond' | 'pass';
@@ -24,8 +24,8 @@ export default function DiscoverSwipeStamp({ side, opacity }: Props) {
       <LinearGradient
         colors={
           isBond
-            ? ['rgba(212, 168, 67, 0.42)', 'rgba(212, 168, 67, 0.1)']
-            : ['rgba(143, 175, 149, 0.38)', 'rgba(143, 175, 149, 0.08)']
+            ? ['rgba(255, 255, 255, 0.42)', 'rgba(255, 255, 255, 0.1)']
+            : ['rgba(255, 255, 255, 0.38)', 'rgba(255, 255, 255, 0.08)']
         }
         style={styles.stampFill}
       >
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     letterSpacing: 2.5,
   },
   stampTextBond: {
-    color: COLORS.gold,
+    ...MIRROR_RED_TEXT,
   },
   stampTextPass: {
     color: COLORS.sage,

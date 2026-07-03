@@ -1,70 +1,194 @@
-import { useEffect, useRef, useState } from 'react';
-import { Linking, View, StyleSheet } from 'react-native';
+import { useCallback, useEffect, useRef, useState, type ComponentType, type ReactNode } from 'react';
+import { Animated, Linking, StyleSheet, Text, View, ActivityIndicator } from 'react-native';
 import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
-import type { ComponentProps } from 'react';
-import { Ionicons } from '@expo/vector-icons';
-import { FONTS_TO_LOAD } from './src/theme';
-import { GenoOnboardingFlow, GenoSplashScreen } from './src/components/onboarding';
-import type { GenoOnboardingSlide } from './src/components/onboarding';
-import Register from './screens/Register';
-import SignIn from './screens/SignIn';
-import ResetPassword from './screens/ResetPassword';
-import ProfileSetup from './screens/ProfileSetup';
-import MainTabs from './screens/MainTabs';
-import { resolveInitialScreen } from './src/lib/profiles';
+import { FONTS_TO_LOAD, MOTION } from './src/theme';
+import GenoSplashScreen from './src/components/onboarding/GenoSplashScreen';
+import GenoErrorBoundary from './src/components/shell/GenoErrorBoundary';
 import { getAuthenticatedUserId, logAuthState } from './src/lib/auth';
 import { enforceAccountAccess } from './src/lib/security';
 import { syncPushTokenToProfile } from './src/lib/pushRegistration';
-import { startInboxRealtime } from './src/lib/messages';
-import {
-  establishSessionFromResetUrl,
-  isResetPasswordDeepLink,
-} from './src/lib/resetPassword';
+import { establishSessionFromResetUrl, isResetPasswordDeepLink } from './src/lib/resetPassword';
 import { supabase } from './src/lib/supabase';
 
-type IonName = ComponentProps<typeof Ionicons>['name'];
+/** Expo Go: always land on onboarding after splash — signed-in cold route loads MainTabs and OOMs */
+const FORCE_ONBOARDING_AFTER_SPLASH = __DEV__;
 
-const ONBOARDING_SLIDES: GenoOnboardingSlide[] = [
-  {
-    icon: 'git-network-outline' as IonName,
-    title: 'Science-led compatibility',
-    subtitle: 'GENOTYPE-AWARE MATCHING',
-    body:
-      'Meet people with confidence through thoughtful genotype compatibility — built for intentional singles across Nigeria and West Africa.',
-  },
-  {
-    icon: 'heart-outline' as IonName,
-    title: 'Profiles that feel human',
-    subtitle: 'DEEPER SIGNALS, BETTER DATES',
-    body:
-      'Every profile blends emotional style, communication rhythm, and long-term intent so connections feel meaningful from day one.',
-  },
-  {
-    icon: 'sparkles-outline' as IonName,
-    title: 'Premium journey to forever',
-    subtitle: 'TRUSTED BY INTENTIONAL SINGLES',
-    body:
-      'From first match to first message, guided prompts and shared milestones help you build chemistry with clarity.',
-  },
-];
+type AppScreen =
+  | 'onboarding'
+  | 'register'
+  | 'signIn'
+  | 'resetPassword'
+  | 'profileSetup'
+  | 'interestedInGate'
+  | 'main';
+
+function bootLog(message: string, extra?: Record<string, unknown>) {
+  if (__DEV__) {
+    console.log(`[App:boot] ${message}`, extra ?? '');
+  }
+}
+
+/** Heavy post-onboarding screens — never load at cold start */
+function LazyScreen({
+  screen,
+  resetPasswordEmail,
+  onScreen,
+  onResetPasswordEmail,
+}: {
+  screen: Exclude<AppScreen, 'onboarding'>;
+  resetPasswordEmail: string | null;
+  onScreen: (next: AppScreen) => void;
+  onResetPasswordEmail: (email: string | null) => void;
+}) {
+  const [content, setContent] = useState<ReactNode>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setContent(null);
+    setError(null);
+    bootLog('lazy load start', { screen });
+
+    (async () => {
+      try {
+        let node: ReactNode = null;
+
+        switch (screen) {
+          case 'register': {
+            const { default: Register } = await import('./screens/Register');
+            node = (
+              <Register
+                onBack={() => onScreen('onboarding')}
+                onSignIn={() => onScreen('signIn')}
+                onSuccess={() => onScreen('profileSetup')}
+              />
+            );
+            break;
+          }
+          case 'signIn': {
+            const { default: SignIn } = await import('./screens/SignIn');
+            node = (
+              <SignIn
+                onBack={() => onScreen('register')}
+                onCreateAccount={() => onScreen('register')}
+                onSignedIn={(destination) => onScreen(destination)}
+                onNavigateResetPassword={(resetEmail) => {
+                  onResetPasswordEmail(resetEmail);
+                  onScreen('resetPassword');
+                }}
+              />
+            );
+            break;
+          }
+          case 'resetPassword': {
+            const { default: ResetPassword } = await import('./screens/ResetPassword');
+            node = (
+              <ResetPassword
+                email={resetPasswordEmail ?? undefined}
+                onBack={() => onScreen('signIn')}
+                onCreateAccount={() => onScreen('register')}
+                onSuccess={() => onScreen('signIn')}
+              />
+            );
+            break;
+          }
+          case 'profileSetup': {
+            const { default: ProfileSetup } = await import('./screens/ProfileSetup');
+            node = <ProfileSetup onComplete={() => onScreen('main')} />;
+            break;
+          }
+          case 'interestedInGate': {
+            const { default: InterestedInGate } = await import('./screens/InterestedInGate');
+            node = <InterestedInGate onComplete={() => onScreen('main')} />;
+            break;
+          }
+          case 'main': {
+            const { default: MainTabs } = await import('./screens/MainTabs');
+            node = <MainTabs onSignOut={() => onScreen('onboarding')} />;
+            break;
+          }
+          default:
+            break;
+        }
+
+        if (!cancelled) {
+          bootLog('lazy load done', { screen });
+          setContent(node);
+        }
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        console.error('[App] lazy load failed', screen, err);
+        if (!cancelled) setError(message);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [onResetPasswordEmail, onScreen, resetPasswordEmail, screen]);
+
+  if (error) {
+    return (
+      <View style={styles.boot}>
+        <StatusBar style="light" />
+        <Text style={styles.bootError}>Failed to load {screen}</Text>
+        <Text style={styles.bootLabel}>{error}</Text>
+      </View>
+    );
+  }
+
+  if (!content) {
+    return (
+      <View style={styles.boot}>
+        <StatusBar style="light" />
+        <Text style={styles.bootLabel}>Loading {screen}…</Text>
+      </View>
+    );
+  }
+
+  return <>{content}</>;
+}
 
 export default function App() {
   const [fontsLoaded, fontError] = useFonts(FONTS_TO_LOAD);
   const [bootstrapping, setBootstrapping] = useState(true);
-  const [screen, setScreen] = useState<
-    'onboarding' | 'register' | 'signIn' | 'resetPassword' | 'profileSetup' | 'main'
-  >('onboarding');
+  const [screen, setScreen] = useState<AppScreen>('onboarding');
   const [splashDone, setSplashDone] = useState(false);
   const [resetPasswordEmail, setResetPasswordEmail] = useState<string | null>(null);
+
   const screenRef = useRef(screen);
+  const splashDoneRef = useRef(false);
+  const pendingScreenRef = useRef<AppScreen | null>(null);
+  const deferredAuthRouteRef = useRef<AppScreen | null>(null);
+  const [OnboardingFlow, setOnboardingFlow] = useState<ComponentType<{
+    onFinish: () => void;
+    onSignIn?: () => void;
+  }> | null>(null);
+  const onboardingOpacity = useRef(new Animated.Value(0)).current;
 
   const fontsReady = fontsLoaded || !!fontError;
+  const appReady = fontsReady && !bootstrapping;
 
   useEffect(() => {
     screenRef.current = screen;
   }, [screen]);
-  const appReady = fontsReady && !bootstrapping;
+
+  useEffect(() => {
+    splashDoneRef.current = splashDone;
+  }, [splashDone]);
+
+  useEffect(() => {
+    if (OnboardingFlow) return;
+    void import('./src/components/onboarding/GenoOnboardingFlow')
+      .then((mod) => {
+        bootLog('onboarding module preloaded');
+        setOnboardingFlow(() => mod.default);
+      })
+      .catch((err) => {
+        console.error('[App] onboarding preload failed', err);
+      });
+  }, [OnboardingFlow]);
 
   useEffect(() => {
     if (fontError) {
@@ -87,7 +211,8 @@ export default function App() {
 
       if (mounted) {
         setResetPasswordEmail(null);
-        setScreen('resetPassword');
+        pendingScreenRef.current = 'resetPassword';
+        if (splashDoneRef.current) setScreen('resetPassword');
       }
       return true;
     };
@@ -104,7 +229,7 @@ export default function App() {
           error: sessionError,
         } = await supabase.auth.getSession();
 
-        console.log('[App] startup session', {
+        bootLog('session', {
           hasSession: !!session,
           userId: session?.user?.id ?? null,
           sessionError: sessionError?.message ?? null,
@@ -114,17 +239,26 @@ export default function App() {
           void getAuthenticatedUserId();
           const allowed = await enforceAccountAccess();
           if (!allowed) {
-            if (mounted) setScreen('onboarding');
+            pendingScreenRef.current = 'onboarding';
             return;
           }
-          startInboxRealtime();
         }
 
         await logAuthState('App.startup');
 
+        const { resolveInitialScreen } = await import('./src/lib/profiles');
         const initial = await resolveInitialScreen();
-        if (mounted && initial !== 'onboarding') {
-          setScreen(initial);
+        bootLog('resolved initial screen (applied after splash)', { initial });
+
+        if (mounted) {
+          if (initial === 'onboarding') {
+            pendingScreenRef.current = null;
+          } else {
+            pendingScreenRef.current = initial;
+            if (FORCE_ONBOARDING_AFTER_SPLASH) {
+              deferredAuthRouteRef.current = initial;
+            }
+          }
         }
 
         void syncPushTokenToProfile().catch((err) => {
@@ -151,10 +285,10 @@ export default function App() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('[App] auth state change', { event, hasSession: !!session });
+      bootLog('auth state change', { event, hasSession: !!session });
       if (!session) {
         const current = screenRef.current;
-        if (current === 'main' || current === 'profileSetup') {
+        if (current === 'main' || current === 'profileSetup' || current === 'interestedInGate') {
           setScreen('onboarding');
         }
       } else if (event === 'TOKEN_REFRESHED') {
@@ -174,80 +308,113 @@ export default function App() {
     };
   }, []);
 
+  const finishSplash = useCallback(() => {
+    const pending = pendingScreenRef.current;
+    const nextScreen =
+      FORCE_ONBOARDING_AFTER_SPLASH || !pending ? 'onboarding' : pending;
+    bootLog('splash finished', {
+      nextScreen,
+      pending,
+      forceOnboarding: FORCE_ONBOARDING_AFTER_SPLASH,
+      deferredAuthRoute: deferredAuthRouteRef.current,
+      fontsReady,
+      bootstrapping,
+    });
+
+    setSplashDone(true);
+
+    if (!FORCE_ONBOARDING_AFTER_SPLASH && pending) {
+      pendingScreenRef.current = null;
+      setScreen(pending);
+    }
+  }, [bootstrapping, fontsReady]);
+
+  useEffect(() => {
+    if (!splashDone || !OnboardingFlow) return;
+    onboardingOpacity.setValue(0);
+    Animated.timing(onboardingOpacity, {
+      toValue: 1,
+      duration: 260,
+      easing: MOTION.easing.out,
+      useNativeDriver: true,
+    }).start();
+  }, [OnboardingFlow, onboardingOpacity, splashDone]);
+
+  useEffect(() => {
+    bootLog('route', { splashDone, screen, bootstrapping, fontsReady });
+  }, [bootstrapping, fontsReady, screen, splashDone]);
+
   if (!splashDone) {
     return (
       <View style={styles.boot}>
         <StatusBar style="light" />
-        <GenoSplashScreen
-          bootstrapping={!appReady}
-          readyToExit={appReady}
-          onFinish={() => setSplashDone(true)}
-        />
+        <GenoSplashScreen bootstrapping={!appReady} onFinish={finishSplash} />
       </View>
     );
   }
 
-  if (screen === 'register') {
+  if (screen === 'onboarding') {
     return (
-      <Register
-        onBack={() => setScreen('onboarding')}
-        onSignIn={() => setScreen('signIn')}
-        onSuccess={() => setScreen('profileSetup')}
-      />
+      <GenoErrorBoundary onReset={() => setScreen('onboarding')}>
+        <View style={styles.boot}>
+          <StatusBar style="light" />
+          {OnboardingFlow ? (
+            <Animated.View style={[styles.onboardingEnter, { opacity: onboardingOpacity }]}>
+              <OnboardingFlow
+                onFinish={() => setScreen('register')}
+                onSignIn={() => {
+                  const deferred = deferredAuthRouteRef.current;
+                  if (deferred && deferred !== 'onboarding') {
+                    deferredAuthRouteRef.current = null;
+                    setScreen(deferred);
+                  } else {
+                    setScreen('signIn');
+                  }
+                }}
+              />
+            </Animated.View>
+          ) : (
+            <ActivityIndicator size="small" color="#D4A843" />
+          )}
+        </View>
+      </GenoErrorBoundary>
     );
-  }
-
-  if (screen === 'signIn') {
-    return (
-      <SignIn
-        onBack={() => setScreen('register')}
-        onCreateAccount={() => setScreen('register')}
-        onSignedIn={(destination) => setScreen(destination)}
-        onNavigateResetPassword={(resetEmail) => {
-          setResetPasswordEmail(resetEmail);
-          setScreen('resetPassword');
-        }}
-      />
-    );
-  }
-
-  if (screen === 'resetPassword') {
-    return (
-      <ResetPassword
-        email={resetPasswordEmail ?? undefined}
-        onBack={() => {
-          setResetPasswordEmail(null);
-          setScreen('signIn');
-        }}
-        onCreateAccount={() => {
-          setResetPasswordEmail(null);
-          setScreen('register');
-        }}
-        onSuccess={() => {
-          setResetPasswordEmail(null);
-          setScreen('signIn');
-        }}
-      />
-    );
-  }
-
-  if (screen === 'profileSetup') {
-    return <ProfileSetup onComplete={() => setScreen('main')} />;
-  }
-
-  if (screen === 'main') {
-    return <MainTabs onSignOut={() => setScreen('onboarding')} />;
   }
 
   return (
-    <GenoOnboardingFlow
-      slides={ONBOARDING_SLIDES}
-      lastCtaLabel="Create your profile"
-      onFinish={() => setScreen('register')}
-    />
+    <GenoErrorBoundary onReset={() => setScreen('onboarding')}>
+      <LazyScreen
+        screen={screen}
+        resetPasswordEmail={resetPasswordEmail}
+        onScreen={setScreen}
+        onResetPasswordEmail={setResetPasswordEmail}
+      />
+    </GenoErrorBoundary>
   );
 }
 
 const styles = StyleSheet.create({
-  boot: { flex: 1 },
+  boot: {
+    flex: 1,
+    backgroundColor: '#0B0C0E',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+  },
+  bootLabel: {
+    color: '#9CA3AF',
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  bootError: {
+    color: '#F87171',
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  onboardingEnter: {
+    flex: 1,
+    width: '100%',
+  },
 });

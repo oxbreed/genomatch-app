@@ -16,10 +16,10 @@ import FamilyPlanningCard from '../src/components/FamilyPlanningCard';
 import ProfileAvatar from '../src/components/ProfileAvatar';
 import ReportBlockSheet from '../src/components/ReportBlockSheet';
 import ChatMessageBubble from '../src/components/messages/ChatMessageBubble';
-import { GenoGlassSurface, GenoPremiumChrome } from '../src/brand/graphics';
+import { GenoGlassSurface, GenoMirrorRedFill, GenoPremiumChrome } from '../src/brand/graphics';
 import { GenoGlassIconButton } from '../src/components/inbox';
 import { getInitials } from '../src/data/mockData';
-import { FONT_FAMILY, COLORS, RADIUS, SHADOWS } from '../src/theme';
+import {FONT_FAMILY, COLORS, RADIUS, SHADOWS, MIRROR_RED_TEXT} from '../src/theme';
 import { getAuthenticatedUserId, peekUserId } from '../src/lib/auth';
 import { setOpenChatMatchId } from '../src/lib/activeChat';
 import { subscribeToLiveMatch } from '../src/lib/chatLive';
@@ -267,7 +267,7 @@ export default function ChatScreen({ matchId, profile, userId: userIdProp, onBac
       keyboardVerticalOffset={Platform.OS === 'ios' ? 4 : 0}
     >
       <GenoPremiumChrome variant="discover" />
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
 
       <GenoGlassSurface
         variant="linen"
@@ -398,9 +398,9 @@ export default function ChatScreen({ matchId, profile, userId: userIdProp, onBac
           onPress={handleSend}
           disabled={!draft.trim()}
         >
-          <View style={styles.sendBtn}>
+          <GenoMirrorRedFill horizontal style={styles.sendBtn}>
             <Text style={styles.sendBtnText}>Send</Text>
-          </View>
+          </GenoMirrorRedFill>
         </Pressable>
       </GenoGlassSurface>
     </KeyboardAvoidingView>
@@ -410,7 +410,7 @@ export default function ChatScreen({ matchId, profile, userId: userIdProp, onBac
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.linen,
+    backgroundColor: COLORS.background,
   },
   headerGlass: {
     zIndex: 2,
@@ -441,9 +441,9 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(212, 168, 67, 0.15)',
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
     borderWidth: 1.5,
-    borderColor: 'rgba(212, 168, 67, 0.4)',
+    borderColor: 'rgba(255, 255, 255, 0.4)',
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
@@ -451,14 +451,14 @@ const styles = StyleSheet.create({
   chatHeaderAvatarInitials: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 16,
-    color: COLORS.gold,
+    ...MIRROR_RED_TEXT,
     textAlign: 'center',
   },
   chatName: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 17,
     letterSpacing: -0.2,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
   },
   chatMeta: {
     fontFamily: FONT_FAMILY.gothamMedium,
@@ -506,7 +506,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 13,
-    color: COLORS.forest,
+    ...MIRROR_RED_TEXT,
     textAlign: 'center',
     lineHeight: 19,
     backgroundColor: COLORS.chipFill,
@@ -535,13 +535,13 @@ const styles = StyleSheet.create({
     maxHeight: 120,
     borderRadius: 25,
     borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.35)',
-    backgroundColor: 'rgba(255, 255, 255, 0.55)',
+    borderColor: 'rgba(255, 255, 255, 0.35)',
+    backgroundColor: COLORS.chipSolid,
     paddingHorizontal: 14,
     paddingVertical: 10,
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 16,
-    color: COLORS.forest,
+    ...MIRROR_RED_TEXT,
   },
   sendBtnWrap: {
     borderRadius: RADIUS.md,
@@ -561,11 +561,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 18,
     paddingVertical: 10,
-    backgroundColor: '#D4A843',
   },
   sendBtnText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 15,
-    color: '#0D2818',
+    color: '#0A0A0A',
   },
 });

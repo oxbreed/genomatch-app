@@ -1,5 +1,5 @@
 import { ViewStyle } from 'react-native';
-import { COLORS } from './colors';
+import { METALLIC_GRAPHITE } from './colors';
 
 export const RADIUS = {
   sm: 12,
@@ -11,45 +11,45 @@ export const RADIUS = {
 
 export const SHADOWS = {
   card: {
-    shadowColor: COLORS.forest,
-    shadowOpacity: 0.1,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 4,
+    shadowColor: METALLIC_GRAPHITE,
+    shadowOpacity: 0.22,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 3,
   } satisfies ViewStyle,
   cardElevated: {
-    shadowColor: COLORS.forest,
-    shadowOpacity: 0.14,
-    shadowRadius: 20,
-    shadowOffset: { width: 0, height: 10 },
-    elevation: 6,
+    shadowColor: METALLIC_GRAPHITE,
+    shadowOpacity: 0.28,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 7 },
+    elevation: 4,
   } satisfies ViewStyle,
   button: {
-    shadowColor: COLORS.forest,
-    shadowOpacity: 0.18,
+    shadowColor: METALLIC_GRAPHITE,
+    shadowOpacity: 0.2,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },
     elevation: 3,
   } satisfies ViewStyle,
   glass: {
-    shadowColor: COLORS.forestDeep,
-    shadowOpacity: 0.14,
-    shadowRadius: 24,
-    shadowOffset: { width: 0, height: 10 },
-    elevation: 8,
+    shadowColor: METALLIC_GRAPHITE,
+    shadowOpacity: 0.18,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 3,
   } satisfies ViewStyle,
   glassElevated: {
-    shadowColor: '#0B1F13',
-    shadowOpacity: 0.22,
-    shadowRadius: 28,
-    shadowOffset: { width: 0, height: 14 },
-    elevation: 14,
+    shadowColor: METALLIC_GRAPHITE,
+    shadowOpacity: 0.24,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 4,
   } satisfies ViewStyle,
   glassFloat: {
-    shadowColor: COLORS.gold,
-    shadowOpacity: 0.12,
-    shadowRadius: 20,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 10,
+    shadowColor: METALLIC_GRAPHITE,
+    shadowOpacity: 0.26,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 4,
   } satisfies ViewStyle,
 } as const;

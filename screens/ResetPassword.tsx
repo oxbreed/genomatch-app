@@ -16,8 +16,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { GenoLogoCeremony, GenoPremiumChrome } from '../src/brand/graphics';
 import { AuthFormCard } from '../src/components/auth';
-import { COLORS, RADIUS, SHADOWS } from '../src/theme';
-import { FONT_FAMILY, GLASS } from '../src/theme';
+import { COLORS, FONT_FAMILY, GLASS, MIRROR_RED_TEXT, RADIUS, SHADOWS } from '../src/theme';
 import {
   isRecoveryTokenExpiredMessage,
   sendPasswordResetEmail,
@@ -260,7 +259,7 @@ export default function ResetPassword({
                 value={otpCode}
                 onChangeText={(text) => setOtpCode(text.replace(/\D/g, '').slice(0, 6))}
                 placeholder="000000"
-                placeholderTextColor="rgba(27, 122, 110, 0.35)"
+                placeholderTextColor="rgba(212, 175, 55, 0.35)"
                 keyboardType="number-pad"
                 autoComplete="one-time-code"
                 textContentType="oneTimeCode"
@@ -304,7 +303,7 @@ export default function ResetPassword({
             value={password}
             onChangeText={setPassword}
             placeholder="At least 8 characters"
-            placeholderTextColor="rgba(27, 122, 110, 0.35)"
+            placeholderTextColor="rgba(212, 175, 55, 0.35)"
             secureTextEntry={!showPass}
             autoComplete="new-password"
             textContentType="newPassword"
@@ -323,7 +322,7 @@ export default function ResetPassword({
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             placeholder="Re-enter your password"
-            placeholderTextColor="rgba(27, 122, 110, 0.35)"
+            placeholderTextColor="rgba(212, 175, 55, 0.35)"
             secureTextEntry={!showConfirmPass}
             autoComplete="new-password"
             textContentType="newPassword"
@@ -365,7 +364,7 @@ export default function ResetPassword({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.linen,
+    backgroundColor: COLORS.background,
   },
   scroll: {
     paddingHorizontal: 20,
@@ -398,7 +397,7 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.98 }],
   },
   backText: {
-    color: COLORS.forestDeep,
+    color: COLORS.text,
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 14,
     letterSpacing: 0.1,
@@ -409,7 +408,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
     fontSize: 34,
     lineHeight: 39,
     letterSpacing: -0.7,
@@ -417,14 +416,14 @@ const styles = StyleSheet.create({
     maxWidth: '95%',
   },
   subtitle: {
-    color: 'rgba(27, 122, 110, 0.72)',
+    color: 'rgba(212, 175, 55, 0.72)',
     fontSize: 15,
     lineHeight: 24,
     fontWeight: '500',
     maxWidth: '96%',
   },
   hint: {
-    color: 'rgba(27, 122, 110, 0.65)',
+    color: 'rgba(212, 175, 55, 0.65)',
     fontSize: 13,
     lineHeight: 18,
     fontWeight: '500',
@@ -432,7 +431,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   label: {
-    color: COLORS.forest,
+    ...MIRROR_RED_TEXT,
     fontSize: 14,
     fontWeight: '700',
     marginBottom: 8,
@@ -443,10 +442,10 @@ const styles = StyleSheet.create({
     height: 54,
     borderRadius: 14,
     borderWidth: 1.5,
-    borderColor: 'rgba(27, 122, 110, 0.18)',
+    borderColor: 'rgba(212, 175, 55, 0.18)',
     backgroundColor: GLASS.insetFill,
     paddingHorizontal: 14,
-    color: '#1D2B23',
+    color: COLORS.text,
     fontSize: 22,
     fontWeight: '600',
     letterSpacing: 8,
@@ -460,21 +459,21 @@ const styles = StyleSheet.create({
   },
   resendText: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: '#8C6A00',
+    color: '#D4AF37',
     fontSize: 13,
     letterSpacing: 0.1,
   },
   resendTextDisabled: {
-    color: 'rgba(27, 122, 110, 0.45)',
+    color: 'rgba(212, 175, 55, 0.45)',
   },
   input: {
     height: 54,
     borderRadius: 14,
     borderWidth: 1.5,
-    borderColor: 'rgba(27, 122, 110, 0.18)',
+    borderColor: 'rgba(212, 175, 55, 0.18)',
     backgroundColor: GLASS.insetFill,
     paddingHorizontal: 14,
-    color: '#1D2B23',
+    color: COLORS.text,
     fontSize: 16,
     fontWeight: '500',
   },
@@ -488,7 +487,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   togglePassText: {
-    color: COLORS.forest,
+    ...MIRROR_RED_TEXT,
     fontSize: 13,
     fontWeight: '700',
     marginBottom: 8,
@@ -517,7 +516,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   submitText: {
-    color: COLORS.forest,
+    ...MIRROR_RED_TEXT,
     fontSize: 17,
     fontWeight: '700',
     letterSpacing: 0.1,
@@ -528,11 +527,11 @@ const styles = StyleSheet.create({
   },
   createText: {
     fontFamily: FONT_FAMILY.gothamMedium,
-    color: 'rgba(27, 122, 110, 0.65)',
+    color: 'rgba(212, 175, 55, 0.65)',
     fontSize: 14,
   },
   createBold: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.forest,
+    ...MIRROR_RED_TEXT,
   },
 });

@@ -90,7 +90,7 @@ export default function ProfileVitalityRing({ percent, size = 76 }: Props) {
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke="rgba(13, 40, 24, 0.08)"
+          stroke="rgba(10, 10, 10, 0.08)"
           strokeWidth={stroke}
           fill="none"
         />
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
   },
   percent: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
     letterSpacing: -0.5,
   },
 });

@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { FONT_FAMILY, COLORS } from '../theme';
+import {FONT_FAMILY, COLORS, MIRROR_RED_TEXT} from '../theme';
 import type { PresenceState } from '../types/database';
 
 type Props = {
@@ -25,8 +25,8 @@ const PRESENCE_CONFIG: Record<
     label: 'Recently online',
     icon: 'time-outline',
     color: COLORS.sage,
-    bg: 'rgba(143, 175, 149, 0.18)',
-    border: 'rgba(143, 175, 149, 0.35)',
+    bg: 'rgba(255, 255, 255, 0.18)',
+    border: 'rgba(255, 255, 255, 0.35)',
   },
 };
 
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
   dotRing: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.surfaceElevated,
     borderWidth: 2,
     borderColor: COLORS.white,
   },
@@ -179,35 +179,35 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 999,
-    backgroundColor: 'rgba(212, 168, 67, 0.2)',
+    backgroundColor: COLORS.chipSolid,
     borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.4)',
+    borderColor: 'rgba(255, 255, 255, 0.4)',
   },
   newBadgeDark: {
-    backgroundColor: 'rgba(212, 168, 67, 0.28)',
-    borderColor: 'rgba(212, 168, 67, 0.5)',
+    backgroundColor: COLORS.chipSolid,
+    borderColor: 'rgba(255, 255, 255, 0.5)',
   },
   newText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 10,
     letterSpacing: 0.3,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
   },
   newTextDark: {
-    color: COLORS.gold,
+    ...MIRROR_RED_TEXT,
   },
   newCompact: {
     width: 18,
     height: 18,
     borderRadius: 9,
-    backgroundColor: 'rgba(212, 168, 67, 0.2)',
+    backgroundColor: COLORS.chipSolid,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.35)',
+    borderColor: 'rgba(255, 255, 255, 0.35)',
   },
   newCompactDark: {
-    backgroundColor: 'rgba(212, 168, 67, 0.28)',
-    borderColor: 'rgba(212, 168, 67, 0.45)',
+    backgroundColor: COLORS.chipSolid,
+    borderColor: 'rgba(255, 255, 255, 0.45)',
   },
 });

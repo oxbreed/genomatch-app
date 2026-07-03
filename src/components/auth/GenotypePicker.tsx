@@ -62,7 +62,7 @@ export default function GenotypePicker({
                   <Ionicons
                     name={item.icon}
                     size={22}
-                    color={isSelected ? item.accent : COLORS.forest}
+                    color={isSelected ? item.accent : COLORS.textMuted}
                   />
                 </View>
                 <Text style={[styles.genoId, isSelected && { color: item.accent }]}>{item.id}</Text>
@@ -94,24 +94,24 @@ const styles = StyleSheet.create({
   label: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 13,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
   },
   required: {
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 999,
-    backgroundColor: 'rgba(212, 168, 67, 0.2)',
+    backgroundColor: COLORS.chipSolid,
   },
   requiredText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 10,
-    color: '#8C6A00',
+    color: '#D4AF37',
     letterSpacing: 0.3,
   },
   hint: {
     fontFamily: FONT_FAMILY.gothamBook,
     fontSize: 12,
-    color: COLORS.sage,
+    color: COLORS.textMuted,
     marginTop: 6,
     marginBottom: 12,
     lineHeight: 17,
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1.5,
     borderColor: COLORS.border,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.surfaceElevated,
     paddingVertical: 12,
     paddingHorizontal: 10,
     alignItems: 'center',
@@ -156,13 +156,13 @@ const styles = StyleSheet.create({
   genoId: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 22,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
     marginBottom: 2,
   },
   genoName: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 11,
-    color: COLORS.sage,
+    color: COLORS.textMuted,
     textAlign: 'center',
   },
   badge: {

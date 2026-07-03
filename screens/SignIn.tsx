@@ -15,12 +15,9 @@ import {
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
-import { GenoLogoCeremony, GenoPremiumChrome } from '../src/brand/graphics';
+import { GenoLogoCeremony, GenoMirrorBrandCtaFill, GenoMirrorGoldFill, GenoMirrorMetallicIcon, GenoMirrorRimFrame, GenoMirrorSteelFill, GenoGlassSurface, GenoPremiumChrome } from '../src/brand/graphics';
 import { AuthFormCard } from '../src/components/auth';
-import { COLORS, RADIUS, SHADOWS } from '../src/theme'
-import { FONT_FAMILY, GLASS } from '../src/theme';
+import {COLORS, FONT_FAMILY, GLASS, LOGO_GOLD, RADIUS, chromeAlpha, goldAlpha} from '../src/theme';
 import { resolvePostSignInScreen } from '../src/lib/profiles';
 import { sendPasswordResetEmail } from '../src/lib/resetPassword';
 import { enforceAccountAccess, formatSecurityError } from '../src/lib/security';
@@ -29,7 +26,7 @@ import { supabase } from '../src/lib/supabase';
 type SignInProps = {
   onBack: () => void;
   onCreateAccount: () => void;
-  onSignedIn: (destination: 'main' | 'profileSetup') => void;
+  onSignedIn: (destination: 'main' | 'profileSetup' | 'interestedInGate') => void;
   onNavigateResetPassword: (email: string) => void;
 };
 
@@ -159,8 +156,8 @@ export default function SignIn({
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <GenoPremiumChrome variant="linen" />
-      <StatusBar style="dark" />
+      <GenoPremiumChrome variant="forest" />
+      <StatusBar style="light" />
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
@@ -176,50 +173,67 @@ export default function SignIn({
           ]}
         >
           <Pressable
-            style={({ pressed }) => [styles.back, pressed && styles.backPressed]}
             onPress={onBack}
             accessibilityRole="button"
             accessibilityLabel="Go back"
+            style={({ pressed }) => [pressed && styles.backPressed]}
           >
-            <Ionicons name="chevron-back" size={18} color={COLORS.forestDeep} />
-            <Text style={styles.backText}>Back</Text>
+            <GenoMirrorRimFrame kind="steel" borderRadius={RADIUS.pill} style={styles.back}>
+              <GenoMirrorSteelFill style={styles.backInner}>
+                <GenoMirrorMetallicIcon name="chevron-back" size={18} tone="steel" />
+                <Text style={styles.backText}>Back</Text>
+              </GenoMirrorSteelFill>
+            </GenoMirrorRimFrame>
           </Pressable>
 
-          <View style={styles.brandChip}>
-            <Ionicons name="sparkles-outline" size={11} color={COLORS.gold} />
-            <Text style={styles.brandChipText}>WELCOME BACK</Text>
-          </View>
+          <GenoMirrorRimFrame kind="gold" borderRadius={RADIUS.pill} style={styles.brandChip}>
+            <GenoMirrorGoldFill style={styles.brandChipInner}>
+              <GenoMirrorMetallicIcon name="sparkles" size={12} tone="gold" />
+              <Text style={styles.brandChipText}>WELCOME BACK</Text>
+            </GenoMirrorGoldFill>
+          </GenoMirrorRimFrame>
 
-          <View style={styles.logoWrap}>
-            <GenoLogoCeremony variant="auth" tone="dark" />
-          </View>
+          <GenoMirrorRimFrame kind="gold" borderRadius={28} padding={2} style={styles.logoMirror}>
+            <GenoMirrorSteelFill style={styles.logoDisc}>
+              <GenoLogoCeremony variant="auth" tone="dark" />
+            </GenoMirrorSteelFill>
+          </GenoMirrorRimFrame>
 
-          <Text style={styles.title}>Sign In to GenoMatch</Text>
+          <Text style={styles.title}>Sign in to GenoMatch</Text>
           <Text style={styles.subtitle}>
             Pick up where you left off — your matches and conversations are waiting.
           </Text>
         </Animated.View>
 
         <AuthFormCard
+          mirror
           outerStyle={{
             opacity: introOpacity,
             transform: [{ translateY: introTranslateY }],
           }}
         >
               <Text style={[styles.label, styles.labelFirst]}>Email Address</Text>
-              <TextInput
-                style={[styles.input, focusedField === 'email' && styles.inputFocused]}
-                value={email}
-                onChangeText={setEmail}
-                placeholder="you@example.com"
-                placeholderTextColor="rgba(27, 122, 110, 0.35)"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoComplete="email"
-                textContentType="emailAddress"
-                onFocus={() => setFocusedField('email')}
-                onBlur={() => setFocusedField(null)}
-              />
+              <GenoMirrorRimFrame
+                kind={focusedField === 'email' ? 'gold' : 'steel'}
+                borderRadius={RADIUS.md}
+                style={styles.inputRim}
+              >
+                <View style={styles.inputShell}>
+                  <TextInput
+                    style={styles.input}
+                    value={email}
+                    onChangeText={setEmail}
+                    placeholder="you@example.com"
+                    placeholderTextColor={goldAlpha(0.35)}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    autoComplete="email"
+                    textContentType="emailAddress"
+                    onFocus={() => setFocusedField('email')}
+                    onBlur={() => setFocusedField(null)}
+                  />
+                </View>
+              </GenoMirrorRimFrame>
 
               <View style={styles.passwordRow}>
                 <Text style={styles.label}>Password</Text>
@@ -227,18 +241,26 @@ export default function SignIn({
                   <Text style={styles.togglePassText}>{showPass ? 'Hide' : 'Show'}</Text>
                 </Pressable>
               </View>
-              <TextInput
-                style={[styles.input, focusedField === 'password' && styles.inputFocused]}
-                value={password}
-                onChangeText={setPassword}
-                placeholder="Your password"
-                placeholderTextColor="rgba(27, 122, 110, 0.35)"
-                secureTextEntry={!showPass}
-                autoComplete="password"
-                textContentType="password"
-                onFocus={() => setFocusedField('password')}
-                onBlur={() => setFocusedField(null)}
-              />
+              <GenoMirrorRimFrame
+                kind={focusedField === 'password' ? 'gold' : 'steel'}
+                borderRadius={RADIUS.md}
+                style={styles.inputRim}
+              >
+                <View style={styles.inputShell}>
+                  <TextInput
+                    style={styles.input}
+                    value={password}
+                    onChangeText={setPassword}
+                    placeholder="Your password"
+                    placeholderTextColor={goldAlpha(0.35)}
+                    secureTextEntry={!showPass}
+                    autoComplete="password"
+                    textContentType="password"
+                    onFocus={() => setFocusedField('password')}
+                    onBlur={() => setFocusedField(null)}
+                  />
+                </View>
+              </GenoMirrorRimFrame>
 
               <Pressable
                 style={styles.forgotPasswordRow}
@@ -248,14 +270,22 @@ export default function SignIn({
                 <Text style={styles.forgotPasswordText}>Forgot password?</Text>
               </Pressable>
 
-              <View style={styles.trustBox}>
-                <View style={styles.trustIcon}>
-                  <Ionicons name="lock-closed" size={16} color={COLORS.verified} />
-                </View>
-                <Text style={styles.trustText}>
-                  Secure sign-in with encrypted genotype-aware matching.
-                </Text>
-              </View>
+              <GenoMirrorRimFrame kind="steel" borderRadius={RADIUS.md} style={styles.trustBox}>
+                <GenoGlassSurface
+                  variant="dark"
+                  borderRadius={RADIUS.md - 1.5}
+                  showBorder={false}
+                  showSheen
+                  shadow="none"
+                  intensity={28}
+                  contentStyle={styles.trustInner}
+                >
+                  <GenoMirrorMetallicIcon name="lock-closed" size={16} tone="gold" />
+                  <Text style={styles.trustText}>
+                    Secure sign-in with encrypted genotype-aware matching.
+                  </Text>
+                </GenoGlassSurface>
+              </GenoMirrorRimFrame>
 
               {error ? <Text style={styles.error}>{error}</Text> : null}
 
@@ -267,21 +297,18 @@ export default function SignIn({
                   onPress={handleSignIn}
                   disabled={loading}
                 >
-                  <LinearGradient
-                    colors={[COLORS.gold, '#E8C56A', '#C49A3A']}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                    style={styles.submitGradient}
-                  >
-                    {loading ? (
-                      <View style={styles.submitContent}>
-                        <ActivityIndicator color={COLORS.forestDeep} size="small" />
-                        <Text style={styles.submitText}>Signing in…</Text>
-                      </View>
-                    ) : (
-                      <Text style={styles.submitText}>Sign In</Text>
-                    )}
-                  </LinearGradient>
+                  <GenoMirrorRimFrame kind="red" borderRadius={RADIUS.pill} style={styles.submitRim}>
+                    <GenoMirrorBrandCtaFill style={styles.submitGradient}>
+                      {loading ? (
+                        <View style={styles.submitContent}>
+                          <ActivityIndicator color={COLORS.white} size="small" />
+                          <Text style={styles.submitText}>Signing in…</Text>
+                        </View>
+                      ) : (
+                        <Text style={styles.submitText}>Sign In</Text>
+                      )}
+                    </GenoMirrorBrandCtaFill>
+                  </GenoMirrorRimFrame>
                 </Pressable>
               </Animated.View>
 
@@ -316,7 +343,7 @@ export default function SignIn({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.linen,
+    backgroundColor: COLORS.background,
   },
   scroll: {
     paddingHorizontal: 20,
@@ -327,59 +354,56 @@ const styles = StyleSheet.create({
     marginBottom: 22,
   },
   back: {
-    alignSelf: 'flex-start',
+    marginBottom: 18,
+  },
+  backInner: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
     minHeight: 44,
-    justifyContent: 'center',
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: RADIUS.pill,
-    borderWidth: 1,
-    borderColor: GLASS.insetBorder,
-    backgroundColor: GLASS.insetFill,
-    marginBottom: 18,
-    ...SHADOWS.card,
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
   },
   backPressed: {
     opacity: 0.88,
     transform: [{ scale: 0.98 }],
   },
   backText: {
-    color: COLORS.forestDeep,
+    color: COLORS.text,
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 14,
     letterSpacing: 0.1,
   },
   brandChip: {
-    alignSelf: 'flex-start',
+    marginBottom: 14,
+  },
+  brandChipInner: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: RADIUS.pill,
-    backgroundColor: 'rgba(212, 168, 67, 0.14)',
-    borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.35)',
-    marginBottom: 14,
   },
   brandChipText: {
-    color: '#8C6A00',
+    color: COLORS.text,
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 10,
     letterSpacing: 1.6,
   },
-  logoWrap: {
+  logoMirror: {
     marginBottom: 16,
+  },
+  logoDisc: {
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderRadius: 26,
     alignItems: 'flex-start',
   },
   title: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
     fontSize: 32,
     lineHeight: 38,
     letterSpacing: -0.8,
@@ -388,14 +412,14 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontFamily: FONT_FAMILY.gothamMedium,
-    color: 'rgba(13, 40, 24, 0.62)',
+    color: COLORS.textMuted,
     fontSize: 15,
     lineHeight: 24,
     maxWidth: '96%',
   },
   label: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.forest,
+    color: LOGO_GOLD,
     fontSize: 14,
     marginBottom: 8,
     marginTop: 14,
@@ -404,22 +428,21 @@ const styles = StyleSheet.create({
   labelFirst: {
     marginTop: 8,
   },
-  input: {
-    height: 54,
-    borderRadius: RADIUS.md,
-    borderWidth: 1.5,
-    borderColor: 'rgba(27, 122, 110, 0.16)',
+  inputRim: {
+    alignSelf: 'stretch',
+    width: '100%',
+  },
+  inputShell: {
     backgroundColor: GLASS.insetFill,
+    borderRadius: RADIUS.md - 1.5,
+    overflow: 'hidden',
+  },
+  input: {
+    height: 52,
     paddingHorizontal: 14,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 16,
-  },
-  inputFocused: {
-    borderColor: 'rgba(212, 168, 67, 0.65)',
-    ...SHADOWS.card,
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
   },
   passwordRow: {
     marginTop: 2,
@@ -429,10 +452,10 @@ const styles = StyleSheet.create({
   },
   togglePassText: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.forest,
+    color: LOGO_GOLD,
     fontSize: 13,
     marginBottom: 8,
-    opacity: 0.8,
+    opacity: 0.9,
   },
   forgotPasswordRow: {
     alignSelf: 'flex-end',
@@ -441,34 +464,26 @@ const styles = StyleSheet.create({
   },
   forgotPasswordText: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: '#8C6A00',
+    color: LOGO_GOLD,
     fontSize: 13,
     letterSpacing: 0.1,
   },
   trustBox: {
     marginTop: 16,
-    borderRadius: RADIUS.md,
-    backgroundColor: 'rgba(61, 122, 82, 0.08)',
-    borderWidth: 1,
-    borderColor: 'rgba(61, 122, 82, 0.14)',
+    alignSelf: 'stretch',
+    width: '100%',
+  },
+  trustInner: {
     paddingVertical: 12,
     paddingHorizontal: 12,
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 10,
   },
-  trustIcon: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: 'rgba(61, 122, 82, 0.12)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   trustText: {
     flex: 1,
     fontFamily: FONT_FAMILY.gothamMedium,
-    color: COLORS.forest,
+    color: COLORS.textMuted,
     fontSize: 12,
     lineHeight: 18,
   },
@@ -480,11 +495,10 @@ const styles = StyleSheet.create({
   },
   submitBtn: {
     marginTop: 20,
-    borderRadius: RADIUS.pill,
-    overflow: 'hidden',
-    ...SHADOWS.button,
-    shadowColor: COLORS.gold,
-    shadowOpacity: 0.28,
+  },
+  submitRim: {
+    alignSelf: 'stretch',
+    width: '100%',
   },
   submitBtnDisabled: {
     opacity: 0.72,
@@ -494,6 +508,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 24,
+    borderRadius: RADIUS.pill,
   },
   submitContent: {
     flexDirection: 'row',
@@ -502,7 +517,7 @@ const styles = StyleSheet.create({
   },
   submitText: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.forestDeep,
+    color: COLORS.white,
     fontSize: 17,
     letterSpacing: 0.1,
   },
@@ -512,24 +527,24 @@ const styles = StyleSheet.create({
   },
   createText: {
     fontFamily: FONT_FAMILY.gothamMedium,
-    color: 'rgba(27, 122, 110, 0.65)',
+    color: chromeAlpha(0.65),
     fontSize: 14,
   },
   createBold: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.forest,
+    color: LOGO_GOLD,
   },
   legalText: {
     textAlign: 'center',
     fontFamily: FONT_FAMILY.gothamMedium,
-    color: 'rgba(27, 122, 110, 0.55)',
+    color: goldAlpha(0.55),
     fontSize: 12,
     lineHeight: 18,
     paddingBottom: 4,
   },
   legalLink: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.forest,
+    color: LOGO_GOLD,
     textDecorationLine: 'underline',
   },
 });

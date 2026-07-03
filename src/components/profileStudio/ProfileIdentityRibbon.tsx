@@ -1,8 +1,12 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
-import { GenoCardFrame } from '../../brand/graphics';
-import { FONT_FAMILY, COLORS } from '../../theme';
+import {
+  GenoCardFrame,
+  GenoMirrorBrandCtaFill,
+  GenoMirrorMetallicIcon,
+  GenoMirrorRimFrame,
+  GenoMirrorSteelFill,
+} from '../../brand/graphics';
+import { FONT_FAMILY, COLORS, LOGO_GOLD } from '../../theme';
 import { PROFILE, PROFILE_TYPE } from '../profile/profileTokens';
 
 export type SelfieIdentityStatus = 'unverified' | 'pending' | 'verified' | 'rejected';
@@ -16,6 +20,43 @@ type Props = {
   onGenotypeVerify: () => void;
 };
 
+function VerifyCta({
+  icon,
+  label,
+  onPress,
+}: {
+  icon: 'camera' | 'finger-print';
+  label: string;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable style={({ pressed }) => [pressed && styles.pressed]} onPress={onPress}>
+      <GenoMirrorRimFrame kind="red" borderRadius={12}>
+        <GenoMirrorBrandCtaFill style={styles.verifyGradient}>
+          <GenoMirrorMetallicIcon name={icon} size={16} tone="chrome" />
+          <Text style={styles.verifyText}>{label}</Text>
+        </GenoMirrorBrandCtaFill>
+      </GenoMirrorRimFrame>
+    </Pressable>
+  );
+}
+
+function StatusIcon({
+  name,
+  tone,
+}: {
+  name: 'shield-checkmark' | 'time-outline' | 'checkmark-circle' | 'alert-circle-outline' | 'camera-outline';
+  tone: 'gold' | 'steel' | 'chrome';
+}) {
+  return (
+    <GenoMirrorRimFrame kind="gold" borderRadius={22} padding={1.5}>
+      <GenoMirrorSteelFill style={styles.iconBubble}>
+        <GenoMirrorMetallicIcon name={name} size={22} tone={tone} />
+      </GenoMirrorSteelFill>
+    </GenoMirrorRimFrame>
+  );
+}
+
 /** Trust strip — selfie review first, then genotype self-verify. */
 export default function ProfileIdentityRibbon({
   genotypeVerified,
@@ -27,11 +68,9 @@ export default function ProfileIdentityRibbon({
 }: Props) {
   if (genotypeVerified) {
     return (
-      <GenoCardFrame showWatermark={false} style={styles.frame}>
+      <GenoCardFrame mirror showWatermark={false} style={styles.frame}>
         <View style={styles.verifiedInner}>
-          <View style={styles.iconVerified}>
-            <Ionicons name="shield-checkmark" size={20} color={COLORS.verified} />
-          </View>
+          <StatusIcon name="shield-checkmark" tone="chrome" />
           <View style={styles.copy}>
             <Text style={styles.title}>Verified member</Text>
             <Text style={styles.sub}>
@@ -45,12 +84,10 @@ export default function ProfileIdentityRibbon({
 
   if (identityStatus === 'pending') {
     return (
-      <GenoCardFrame showWatermark={false} style={styles.frame}>
+      <GenoCardFrame mirror showWatermark={false} style={styles.frame}>
         <View style={[styles.accentBar, styles.accentPending]} />
         <View style={styles.unverifiedInner}>
-          <View style={styles.iconPending}>
-            <Ionicons name="time-outline" size={24} color={COLORS.gold} />
-          </View>
+          <StatusIcon name="time-outline" tone="chrome" />
           <View style={styles.copy}>
             <Text style={styles.kicker}>SELFIE REVIEW</Text>
             <Text style={styles.title}>Verification in progress</Text>
@@ -66,12 +103,10 @@ export default function ProfileIdentityRibbon({
 
   if (identityStatus === 'verified') {
     return (
-      <GenoCardFrame showWatermark={false} style={styles.frame}>
+      <GenoCardFrame mirror showWatermark={false} style={styles.frame}>
         <View style={[styles.accentBar, styles.accentVerified]} />
         <View style={styles.unverifiedInner}>
-          <View style={styles.iconVerified}>
-            <Ionicons name="checkmark-circle" size={24} color={COLORS.verified} />
-          </View>
+          <StatusIcon name="checkmark-circle" tone="chrome" />
           <View style={styles.copy}>
             <Text style={styles.kicker}>IDENTITY APPROVED</Text>
             <Text style={styles.title}>Confirm your genotype</Text>
@@ -79,15 +114,7 @@ export default function ProfileIdentityRibbon({
               Your selfie was approved. Complete the final step to show a verified badge on your
               profile.
             </Text>
-            <Pressable
-              style={({ pressed }) => [styles.verifyBtn, pressed && styles.pressed]}
-              onPress={onGenotypeVerify}
-            >
-              <LinearGradient colors={[COLORS.gold, '#C49A3A']} style={styles.verifyGradient}>
-                <Ionicons name="finger-print" size={16} color={COLORS.forestDeep} />
-                <Text style={styles.verifyText}>Verify genotype</Text>
-              </LinearGradient>
-            </Pressable>
+            <VerifyCta icon="finger-print" label="Verify genotype" onPress={onGenotypeVerify} />
           </View>
         </View>
       </GenoCardFrame>
@@ -97,16 +124,13 @@ export default function ProfileIdentityRibbon({
   const isRejected = identityStatus === 'rejected';
 
   return (
-    <GenoCardFrame showWatermark={false} style={styles.frame}>
+    <GenoCardFrame mirror showWatermark={false} style={styles.frame}>
       <View style={[styles.accentBar, isRejected ? styles.accentRejected : styles.accentPending]} />
       <View style={styles.unverifiedInner}>
-        <View style={styles.iconPending}>
-          <Ionicons
-            name={isRejected ? 'alert-circle-outline' : 'camera-outline'}
-            size={24}
-            color={isRejected ? '#A32D2D' : COLORS.gold}
-          />
-        </View>
+        <StatusIcon
+          name={isRejected ? 'alert-circle-outline' : 'camera-outline'}
+          tone={isRejected ? 'chrome' : 'gold'}
+        />
         <View style={styles.copy}>
           <Text style={styles.kicker}>STEP 1 · SELFIE</Text>
           <Text style={styles.title}>
@@ -118,17 +142,11 @@ export default function ProfileIdentityRibbon({
                 'Please submit a new live selfie with your face clearly visible.'
               : 'Take a quick front-camera selfie so our team can confirm you match your profile photos.'}
           </Text>
-          <Pressable
-            style={({ pressed }) => [styles.verifyBtn, pressed && styles.pressed]}
+          <VerifyCta
+            icon="camera"
+            label={isRejected ? 'Retake selfie' : 'Take selfie'}
             onPress={onSelfieVerify}
-          >
-            <LinearGradient colors={[COLORS.gold, '#C49A3A']} style={styles.verifyGradient}>
-              <Ionicons name="camera" size={16} color={COLORS.forestDeep} />
-              <Text style={styles.verifyText}>
-                {isRejected ? 'Retake selfie' : 'Take selfie'}
-              </Text>
-            </LinearGradient>
-          </Pressable>
+          />
         </View>
       </View>
     </GenoCardFrame>
@@ -145,19 +163,19 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     width: 3,
-    backgroundColor: COLORS.verified,
+    backgroundColor: LOGO_GOLD,
     borderTopLeftRadius: 14,
     borderBottomLeftRadius: 14,
     zIndex: 1,
   },
   accentPending: {
-    backgroundColor: COLORS.gold,
+    backgroundColor: LOGO_GOLD,
   },
   accentVerified: {
-    backgroundColor: COLORS.verified,
+    backgroundColor: LOGO_GOLD,
   },
   accentRejected: {
-    backgroundColor: '#A32D2D',
+    backgroundColor: COLORS.error,
   },
   verifiedInner: {
     flexDirection: 'row',
@@ -165,7 +183,6 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: PROFILE.cardPadding,
     alignItems: 'center',
-    backgroundColor: 'rgba(237, 243, 238, 0.35)',
   },
   unverifiedInner: {
     flexDirection: 'row',
@@ -173,19 +190,10 @@ const styles = StyleSheet.create({
     padding: 16,
     alignItems: 'flex-start',
   },
-  iconVerified: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(61, 122, 82, 0.14)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconPending: {
+  iconBubble: {
     width: 44,
     height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(212, 168, 67, 0.2)',
+    borderRadius: 20.5,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -193,22 +201,16 @@ const styles = StyleSheet.create({
   kicker: {
     ...PROFILE_TYPE.sectionKicker,
     letterSpacing: 1.6,
-    color: COLORS.gold,
+    color: LOGO_GOLD,
   },
   title: {
     ...PROFILE_TYPE.ribbonTitle,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
   },
   sub: {
     ...PROFILE_TYPE.ribbonSub,
-    color: COLORS.sage,
+    color: COLORS.textMuted,
     marginTop: 2,
-  },
-  verifyBtn: {
-    marginTop: 10,
-    borderRadius: 12,
-    overflow: 'hidden',
-    alignSelf: 'flex-start',
   },
   verifyGradient: {
     flexDirection: 'row',
@@ -216,11 +218,12 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingHorizontal: 14,
     paddingVertical: 10,
+    borderRadius: 10.5,
   },
   verifyText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 13,
-    color: COLORS.forestDeep,
+    color: COLORS.white,
   },
   pressed: { opacity: 0.9 },
 });

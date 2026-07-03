@@ -59,7 +59,28 @@ export function securityBlockMessage(block: SecurityBlock): string {
 
 export function formatSecurityError(error: unknown, fallback: string): string {
   const block = parseSecurityBlock(error);
-  return block ? securityBlockMessage(block) : fallback;
+  if (block) return securityBlockMessage(block);
+
+  const message = extractErrorMessage(error);
+  if (message && isNetworkError(message)) {
+    return 'Connection failed. Mobile data can be slow — check your signal, try Wi‑Fi, or wait a moment and retry.';
+  }
+
+  return fallback;
+}
+
+function isNetworkError(message: string): boolean {
+  const lower = message.toLowerCase();
+  return (
+    lower.includes('network request failed') ||
+    lower.includes('failed to fetch') ||
+    lower.includes('fetch failed') ||
+    lower.includes('network error') ||
+    lower.includes('timeout') ||
+    lower.includes('econnreset') ||
+    lower.includes('enotfound') ||
+    lower.includes('socket')
+  );
 }
 
 function extractErrorMessage(error: unknown): string | null {

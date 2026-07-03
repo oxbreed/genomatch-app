@@ -1,33 +1,26 @@
-import { COLORS, GLASS } from '../../theme';
+import { COLORS, GLASS, LOGO_GOLD, LOGO_RED, silverAlpha, chromeAlpha } from '../../theme';
 
-/** GenoMatch-exclusive visual language — helix, bond, gold ceremony */
 export const GENO_VISUAL = {
   helix: {
-    goldStroke: COLORS.gold,
-    forestStroke: COLORS.forest,
-    nodeGold: COLORS.gold,
-    nodeForest: COLORS.verified,
-    opacity: { subtle: 0.14, medium: 0.22, rich: 0.32 },
+    goldStroke: COLORS.metallicSilver,
+    forestStroke: COLORS.metallicSteel,
+    nodeGold: COLORS.metallicSilver,
+    nodeForest: COLORS.metallicSteel,
+    opacity: { subtle: 0.04, medium: 0.05, rich: 0.06 },
   },
   chrome: {
-    topRule: [COLORS.gold, 'rgba(61, 122, 82, 0.45)', 'transparent'] as [string, string, string],
-    topRuleForest: [COLORS.gold, COLORS.verified, 'transparent'] as [string, string, string],
-    washLinen: ['rgba(212, 168, 67, 0.12)', 'transparent', COLORS.linen] as [string, string, string],
-    washMint: ['rgba(237, 243, 238, 0.92)', 'rgba(212, 168, 67, 0.06)', COLORS.linen] as [
+    topRule: GLASS.topRule,
+    topRuleForest: GLASS.topRule,
+    washLinen: [COLORS.background, COLORS.surface, COLORS.background] as [string, string, string],
+    washMint: [COLORS.background, COLORS.surface, COLORS.background] as [string, string, string],
+    washDiscover: [COLORS.background, COLORS.surface, COLORS.background] as [string, string, string],
+    cardBorder: [silverAlpha(0.45), chromeAlpha(0.35), LOGO_GOLD, LOGO_RED, silverAlpha(0.4)] as [
+      string,
+      string,
       string,
       string,
       string,
     ],
-    washDiscover: [
-      'rgba(212, 168, 67, 0.14)',
-      'transparent',
-      'rgba(237, 243, 238, 0.35)',
-    ] as [string, string, string],
-    cardBorder: [
-      'rgba(212, 168, 67, 0.5)',
-      'rgba(61, 122, 82, 0.32)',
-      'rgba(212, 168, 67, 0.38)',
-    ] as [string, string, string],
   },
   motion: {
     driftMs: 14000,
@@ -49,55 +42,55 @@ export const GENO_VISUAL = {
         tint: GLASS.lightTint,
         border: GLASS.lightBorder,
         sheen: GLASS.lightSheen,
-        intensity: 64,
-        blurTint: 'light' as const,
+        intensity: 24,
+        blurTint: 'dark' as const,
       },
       dark: {
         tint: GLASS.darkTint,
         border: GLASS.darkBorder,
         sheen: GLASS.darkSheen,
-        intensity: 72,
+        intensity: 32,
         blurTint: 'dark' as const,
       },
       linen: {
         tint: GLASS.linenTint,
         border: GLASS.linenBorder,
         sheen: GLASS.linenSheen,
-        intensity: 58,
-        blurTint: 'light' as const,
+        intensity: 20,
+        blurTint: 'dark' as const,
       },
       sheet: {
         tint: GLASS.sheetTint,
         border: GLASS.sheetBorder,
         sheen: GLASS.linenSheen,
-        intensity: 68,
-        blurTint: 'light' as const,
+        intensity: 28,
+        blurTint: 'dark' as const,
       },
       tabBar: {
         tint: GLASS.tabBarTint,
         border: GLASS.tabBarBorder,
         sheen: GLASS.tabBarSheen,
-        intensity: 78,
-        blurTint: 'light' as const,
+        intensity: 36,
+        blurTint: 'dark' as const,
       },
     },
     backdrop: {
       dark: {
         tint: GLASS.backdropDark,
-        intensity: 48,
+        intensity: 40,
         blurTint: 'dark' as const,
       },
       light: {
         tint: GLASS.backdropLight,
-        intensity: 36,
-        blurTint: 'light' as const,
+        intensity: 24,
+        blurTint: 'dark' as const,
       },
     },
     motion: {
       springFriction: 8,
       springTension: 200,
-      pressScale: 0.96,
-      tabScale: 1.06,
+      pressScale: 0.98,
+      tabScale: 1.02,
     },
   },
 } as const;

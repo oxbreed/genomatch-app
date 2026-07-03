@@ -10,8 +10,9 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { GenoGlassBackdrop, GenoGlassSurface } from '../brand/graphics';
-import { COLORS, GLASS } from '../theme';
+import {COLORS, GLASS, MIRROR_RED_TEXT} from '../theme';
 import { blockUser, reportUser, REPORT_REASONS } from '../lib/moderation';
+import { GenoMirrorRedFill } from '../brand/graphics';
 
 type ReportBlockSheetProps = {
   visible: boolean;
@@ -172,9 +173,9 @@ export default function ReportBlockSheet({
               </View>
               <Text style={styles.successText}>{successMessage}</Text>
               <Pressable style={styles.doneBtnWrap} onPress={handleDone}>
-                <LinearGradient colors={[COLORS.gold, '#C49A3A']} style={styles.doneBtn}>
+                <GenoMirrorRedFill style={styles.doneBtn}>
                   <Text style={styles.doneBtnText}>Done</Text>
-                </LinearGradient>
+                </GenoMirrorRedFill>
               </Pressable>
             </>
           )}
@@ -210,13 +211,13 @@ const styles = StyleSheet.create({
     width: 40,
     height: 4,
     borderRadius: 2,
-    backgroundColor: 'rgba(13, 40, 24, 0.2)',
+    backgroundColor: 'rgba(10, 10, 10, 0.2)',
     marginBottom: 16,
   },
   sheetTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: COLORS.forest,
+    ...MIRROR_RED_TEXT,
     letterSpacing: -0.3,
     marginBottom: 16,
   },
@@ -246,7 +247,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.forest,
+    ...MIRROR_RED_TEXT,
   },
   optionDanger: {
     color: COLORS.error,
@@ -263,7 +264,7 @@ const styles = StyleSheet.create({
   reasonText: {
     fontSize: 15,
     fontWeight: '500',
-    color: COLORS.forest,
+    ...MIRROR_RED_TEXT,
   },
   backRow: {
     flexDirection: 'row',
@@ -274,7 +275,7 @@ const styles = StyleSheet.create({
   backLabel: {
     fontSize: 15,
     fontWeight: '600',
-    color: COLORS.forest,
+    ...MIRROR_RED_TEXT,
   },
   cancelBtn: {
     marginTop: 8,
@@ -305,7 +306,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     lineHeight: 24,
-    color: COLORS.forest,
+    ...MIRROR_RED_TEXT,
     textAlign: 'center',
     marginBottom: 20,
   },
@@ -321,6 +322,6 @@ const styles = StyleSheet.create({
   doneBtnText: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.forest,
+    ...MIRROR_RED_TEXT,
   },
 });

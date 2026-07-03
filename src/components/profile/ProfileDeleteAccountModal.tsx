@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { GENOMATCH_COMPANY } from '../../constants/company';
-import { FONT_FAMILY, COLORS, RADIUS } from '../../theme';
+import {FONT_FAMILY, COLORS, RADIUS, MIRROR_RED_TEXT} from '../../theme';
 
 type Props = {
   visible: boolean;
@@ -84,7 +84,7 @@ export default function ProfileDeleteAccountModal({
             value={password}
             onChangeText={setPassword}
             placeholder="Your account password"
-            placeholderTextColor="rgba(27, 122, 110, 0.35)"
+            placeholderTextColor="rgba(212, 175, 55, 0.35)"
             secureTextEntry={!showPass}
             autoComplete="password"
             textContentType="password"
@@ -124,15 +124,17 @@ export default function ProfileDeleteAccountModal({
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(13, 40, 24, 0.55)',
+    backgroundColor: 'rgba(10, 10, 10, 0.55)',
     justifyContent: 'center',
     paddingHorizontal: 24,
   },
   card: {
-    backgroundColor: COLORS.linen,
+    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.lg,
     paddingHorizontal: 22,
     paddingVertical: 24,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
   iconWrap: {
     width: 52,
@@ -146,21 +148,21 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 22,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
     marginBottom: 10,
   },
   body: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
     lineHeight: 22,
-    color: 'rgba(13, 40, 24, 0.72)',
+    color: COLORS.textMuted,
     marginBottom: 8,
   },
   bodySecondary: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 13,
     lineHeight: 20,
-    color: 'rgba(13, 40, 24, 0.58)',
+    color: COLORS.textSubtle,
     marginBottom: 16,
   },
   checkRow: {
@@ -175,7 +177,7 @@ const styles = StyleSheet.create({
     height: 22,
     borderRadius: 6,
     borderWidth: 1.5,
-    borderColor: 'rgba(27, 122, 110, 0.28)',
+    borderColor: 'rgba(212, 175, 55, 0.28)',
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 1,
@@ -189,12 +191,12 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 13,
     lineHeight: 20,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
   },
   label: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 14,
-    color: COLORS.forest,
+    ...MIRROR_RED_TEXT,
     marginBottom: 8,
   },
   passwordRow: {
@@ -206,7 +208,7 @@ const styles = StyleSheet.create({
   togglePassText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 13,
-    color: COLORS.forest,
+    ...MIRROR_RED_TEXT,
     marginBottom: 8,
     opacity: 0.8,
   },
@@ -214,10 +216,10 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: RADIUS.md,
     borderWidth: 1.5,
-    borderColor: 'rgba(27, 122, 110, 0.18)',
-    backgroundColor: 'rgba(255, 255, 255, 0.72)',
+    borderColor: 'rgba(212, 175, 55, 0.18)',
+    backgroundColor: COLORS.chipSolid,
     paddingHorizontal: 14,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 16,
     marginBottom: 20,
@@ -231,14 +233,14 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: RADIUS.pill,
     borderWidth: 1,
-    borderColor: 'rgba(27, 122, 110, 0.2)',
+    borderColor: 'rgba(212, 175, 55, 0.2)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   cancelText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 15,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
   },
   deleteBtn: {
     flex: 1.2,

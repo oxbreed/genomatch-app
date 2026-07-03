@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { GenoCardFrame } from '../../brand/graphics';
-import { COLORS } from '../../theme';
+import { GenoCardFrame, GenoMirrorMetallicIcon } from '../../brand/graphics';
+import { COLORS, LOGO_GOLD } from '../../theme';
 import { PROFILE, PROFILE_TYPE } from '../profile/profileTokens';
 import ProfileVitalityRing from './ProfileVitalityRing';
 
@@ -12,7 +12,7 @@ type Props = {
 
 export default function ProfileStrengthPanel({ percent, hint }: Props) {
   return (
-    <GenoCardFrame showWatermark={false} style={styles.frame}>
+    <GenoCardFrame mirror showWatermark={false} style={styles.frame}>
       <View style={styles.inner}>
         <ProfileVitalityRing percent={percent} size={68} />
         <View style={styles.copy}>
@@ -20,7 +20,7 @@ export default function ProfileStrengthPanel({ percent, hint }: Props) {
           <Text style={styles.title}>{hint}</Text>
           <View style={styles.barTrack}>
             <LinearGradient
-              colors={[COLORS.gold, COLORS.verified]}
+              colors={[LOGO_GOLD, COLORS.metallicChrome]}
               start={{ x: 0, y: 0.5 }}
               end={{ x: 1, y: 0.5 }}
               style={[styles.barFill, { width: `${percent}%` }]}
@@ -49,16 +49,16 @@ const styles = StyleSheet.create({
   },
   kicker: {
     ...PROFILE_TYPE.sectionKicker,
-    color: COLORS.sage,
+    color: LOGO_GOLD,
   },
   title: {
     ...PROFILE_TYPE.sectionTitle,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
   },
   barTrack: {
     height: 3,
     borderRadius: 2,
-    backgroundColor: 'rgba(13, 40, 24, 0.06)',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
     overflow: 'hidden',
     marginTop: 4,
   },

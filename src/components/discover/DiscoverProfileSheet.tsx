@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Animated,
   Dimensions,
@@ -13,10 +13,19 @@ import {
   View,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
 import { GenoBondMark } from '../../brand';
+import {
+  GenoCardFrame,
+  GenoGlassSurface,
+  GenoMirrorMetallicIcon,
+  GenoMirrorRimFrame,
+  GenoMirrorSteelFill,
+} from '../../brand/graphics';
 import GenoCompatRing from '../genomatch/GenoCompatRing';
 import DiscoverActionDock from './DiscoverActionDock';
+import DiscoverDetailRows from './DiscoverDetailRows';
+import DiscoverInterestChips from './DiscoverInterestChips';
+import DiscoverPremiumSection from './DiscoverPremiumSection';
 import VerifiedBadge from '../VerifiedBadge';
 import GenotypeBadge from '../GenotypeBadge';
 import FamilyPlanningCard from '../FamilyPlanningCard';
@@ -30,8 +39,8 @@ import {
 } from '../../lib/profileDetails';
 import { getGenotypeRiskShort } from '../../lib/compatibility';
 import { GENO_TAB_BAR_HEIGHT } from '../navigation/tabBarLayout';
-import { COLORS, getInitials, RELATIONSHIP_GOAL_LABELS } from '../../data/mockData';
-import { FONT_FAMILY, MOTION, RADIUS, SHADOWS } from '../../theme';
+import { getInitials, RELATIONSHIP_GOAL_LABELS } from '../../data/mockData';
+import { FONT_FAMILY, COLORS, LOGO_GOLD, MOTION, RADIUS, SHADOWS, TYPOGRAPHY } from '../../theme';
 import type { DiscoveryProfile, Genotype } from '../../types/database';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -60,36 +69,8 @@ function formatGoal(goal?: string | null): string {
   return RELATIONSHIP_GOAL_LABELS[goal] ?? goal;
 }
 
-function InfoSection({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <View style={styles.infoSection}>
-      <Text style={styles.infoTitle}>{title}</Text>
-      <View style={styles.infoPanel}>{children}</View>
-    </View>
-  );
-}
-
-function DetailRow({
-  icon,
-  label,
-  isLast,
-}: {
-  icon: keyof typeof Ionicons.glyphMap;
-  label: string;
-  isLast?: boolean;
-}) {
-  return (
-    <View style={[styles.detailRow, !isLast && styles.detailRowBorder]}>
-      <View style={styles.detailIconWrap}>
-        <Ionicons name={icon} size={15} color={COLORS.gold} />
-      </View>
-      <Text style={styles.detailText}>{label}</Text>
-    </View>
-  );
-}
-
-function buildDetailRows(profile: DiscoveryProfile): { icon: keyof typeof Ionicons.glyphMap; label: string }[] {
-  const rows: { icon: keyof typeof Ionicons.glyphMap; label: string }[] = [];
+function buildDetailRows(profile: DiscoveryProfile): { icon: 'resize-outline' | 'sparkles-outline' | 'wine-outline' | 'cloud-outline' | 'school-outline'; label: string }[] {
+  const rows: { icon: 'resize-outline' | 'sparkles-outline' | 'wine-outline' | 'cloud-outline' | 'school-outline'; label: string }[] = [];
   const height = formatHeightCm(profile.heightCm);
   if (height) rows.push({ icon: 'resize-outline', label: height });
   if (profile.religion) {
@@ -250,7 +231,7 @@ export default function DiscoverProfileSheet({
                         pointerEvents="none"
                       />
                       <LinearGradient
-                        colors={['transparent', 'rgba(13, 40, 24, 0.15)', 'rgba(13, 40, 24, 0.72)']}
+                        colors={['transparent', 'rgba(10, 10, 10, 0.15)', 'rgba(10, 10, 10, 0.72)']}
                         locations={[0.35, 0.65, 1]}
                         style={styles.heroGlossBottom}
                         pointerEvents="none"
@@ -260,7 +241,7 @@ export default function DiscoverProfileSheet({
                 </ScrollView>
               ) : (
                 <LinearGradient
-                  colors={[COLORS.forestDeep, COLORS.forest, '#2A5A3E']}
+                  colors={[COLORS.forestDeep, COLORS.forest, COLORS.brandRedDeep]}
                   style={styles.heroPhoto}
                 >
                   <View style={styles.noPhotoCircle}>
@@ -286,7 +267,11 @@ export default function DiscoverProfileSheet({
                 accessibilityLabel="Close profile"
                 hitSlop={8}
               >
-                <Ionicons name="chevron-down" size={22} color={COLORS.linen} />
+                <GenoMirrorRimFrame kind="steel" borderRadius={19} padding={1.5}>
+                  <GenoMirrorSteelFill style={styles.closeBtnInner}>
+                    <GenoMirrorMetallicIcon name="chevron-down" size={20} tone="chrome" />
+                  </GenoMirrorSteelFill>
+                </GenoMirrorRimFrame>
               </Pressable>
 
               <View style={styles.heroIdentity} pointerEvents="none">
@@ -309,71 +294,81 @@ export default function DiscoverProfileSheet({
             </View>
 
             <View style={styles.infoBody}>
-              <View style={styles.bondPanel}>
-                <View style={styles.bondHeader}>
-                  <GenoBondMark size={18} opacity={0.75} />
-                  <Text style={styles.bondKicker}>Genotype bond</Text>
+              <GenoCardFrame mirror showWatermark={false} style={styles.bondFrame}>
+                <View style={styles.bondPanel}>
+                  <View style={styles.bondHeader}>
+                    <GenoMirrorRimFrame kind="gold" borderRadius={18} padding={1.5}>
+                      <GenoMirrorSteelFill style={styles.bondMark}>
+                        <GenoBondMark size={20} opacity={0.95} />
+                      </GenoMirrorSteelFill>
+                    </GenoMirrorRimFrame>
+                    <Text style={styles.bondKicker}>Compatibility Profile</Text>
+                  </View>
+                  <Text style={styles.bondScoreLabel}>Compatibility score</Text>
+                  <GenoCompatRing percent={profile.compatibility} size={96} glow />
+                  <Text style={styles.bondRisk}>
+                    {profile.compatibility}% compatible · {getGenotypeRiskShort(viewerGenotype, profile.genotype)}
+                  </Text>
+                  <Text style={styles.bondDisclaimer}>
+                    Educational information only. Not medical advice.
+                  </Text>
                 </View>
-                <GenoCompatRing percent={profile.compatibility} size={88} />
-                <Text style={styles.bondRisk}>
-                  {getGenotypeRiskShort(viewerGenotype, profile.genotype)}
-                </Text>
-                <Text style={styles.bondDisclaimer}>Informational only — not medical advice.</Text>
-              </View>
+              </GenoCardFrame>
 
               {profile.bio?.trim() ? (
-                <InfoSection title="About">
+                <DiscoverPremiumSection title="About">
                   <Text style={styles.bio}>{profile.bio.trim()}</Text>
-                </InfoSection>
+                </DiscoverPremiumSection>
               ) : null}
 
               <FamilyPlanningCard
                 viewerGenotype={viewerGenotype}
                 candidateGenotype={profile.genotype}
                 locked={hideGenotype}
+                mirror
               />
 
               {detailRows.length > 0 ? (
-                <InfoSection title="Details">
-                  {detailRows.map((row, index) => (
-                    <DetailRow
-                      key={`${row.icon}-${row.label}`}
-                      icon={row.icon}
-                      label={row.label}
-                      isLast={index === detailRows.length - 1}
-                    />
-                  ))}
-                </InfoSection>
+                <DiscoverPremiumSection title="Details">
+                  <DiscoverDetailRows rows={detailRows} />
+                </DiscoverPremiumSection>
               ) : null}
 
               {profile.interests.length > 0 ? (
-                <InfoSection title="Interests">
-                  <View style={styles.chipRow}>
-                    {profile.interests.map((interest) => (
-                      <View key={interest} style={styles.chip}>
-                        <Text style={styles.chipText}>{interest}</Text>
-                      </View>
-                    ))}
-                  </View>
-                </InfoSection>
+                <DiscoverPremiumSection title="Interests">
+                  <DiscoverInterestChips interests={profile.interests} selectable />
+                </DiscoverPremiumSection>
               ) : null}
 
-              <InfoSection title="Looking for">
+              <DiscoverPremiumSection title="Looking for" accent>
                 <Text style={styles.goalValue}>{formatGoal(profile.relationshipGoal)}</Text>
-              </InfoSection>
+              </DiscoverPremiumSection>
 
               <View style={styles.scrollSpacer} />
             </View>
           </ScrollView>
 
           <View style={styles.floatingActions} pointerEvents="box-none">
-            <DiscoverActionDock
-              variant="glass"
-              onPass={onPass}
-              onLike={onLike}
-              onSuperLike={onSuperLike}
-              likePulseScale={likePulseScale}
-            />
+            <GenoMirrorRimFrame kind="steel" borderRadius={RADIUS.xl} style={styles.dockRim}>
+              <GenoGlassSurface
+                variant="dark"
+                borderRadius={RADIUS.xl - 1.5}
+                showBorder={false}
+                showSheen
+                showTopRule
+                shadow="none"
+                intensity={42}
+                contentStyle={styles.dockInner}
+              >
+                <DiscoverActionDock
+                  variant="glass"
+                  onPass={onPass}
+                  onLike={onLike}
+                  onSuperLike={onSuperLike}
+                  likePulseScale={likePulseScale}
+                />
+              </GenoGlassSurface>
+            </GenoMirrorRimFrame>
           </View>
         </Animated.View>
     </View>
@@ -391,11 +386,11 @@ const styles = StyleSheet.create({
   },
   backdropWash: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: COLORS.linen,
+    backgroundColor: COLORS.background,
   },
   sheet: {
     height: SHEET_HEIGHT,
-    backgroundColor: COLORS.linen,
+    backgroundColor: COLORS.background,
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,
     overflow: 'hidden',
@@ -412,7 +407,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 5,
     borderRadius: 999,
-    backgroundColor: 'rgba(22, 53, 34, 0.14)',
+    backgroundColor: 'rgba(255, 255, 255, 0.28)',
   },
   mainScroll: {
     flex: 1,
@@ -454,21 +449,20 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.35)',
   },
   photoBarActive: {
-    backgroundColor: COLORS.linen,
+    backgroundColor: LOGO_GOLD,
   },
   closeBtn: {
     position: 'absolute',
     top: 12,
     right: 14,
+    zIndex: 14,
+  },
+  closeBtnInner: {
     width: 38,
     height: 38,
-    borderRadius: 19,
-    backgroundColor: 'rgba(13, 40, 24, 0.42)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.22)',
+    borderRadius: 17.5,
     alignItems: 'center',
     justifyContent: 'center',
-    zIndex: 14,
   },
   closeBtnPressed: {
     opacity: 0.88,
@@ -483,11 +477,10 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   heroName: {
-    fontFamily: FONT_FAMILY.gothamBold,
+    ...TYPOGRAPHY.displayName,
     fontSize: 32,
     color: COLORS.linen,
-    letterSpacing: -0.6,
-    textShadowColor: 'rgba(13, 40, 24, 0.55)',
+    textShadowColor: 'rgba(10, 10, 10, 0.55)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 6,
   },
@@ -506,7 +499,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: 'rgba(212, 168, 67, 0.35)',
+    borderColor: 'rgba(255, 255, 255, 0.35)',
   },
   noPhotoInitials: {
     fontFamily: FONT_FAMILY.gothamBold,
@@ -515,122 +508,67 @@ const styles = StyleSheet.create({
   },
   infoBody: {
     paddingHorizontal: 20,
-    paddingTop: 20,
-    gap: 18,
+    paddingTop: 22,
+    gap: 20,
+    backgroundColor: COLORS.background,
+  },
+  bondFrame: {
+    marginHorizontal: 0,
+    marginBottom: 0,
   },
   bondPanel: {
     alignItems: 'center',
-    gap: 10,
-    paddingVertical: 20,
-    paddingHorizontal: 18,
-    borderRadius: RADIUS.xl,
-    backgroundColor: COLORS.white,
-    borderWidth: 1,
-    borderColor: 'rgba(13, 40, 24, 0.08)',
-    ...SHADOWS.card,
-    shadowOpacity: 0.06,
+    gap: 12,
+    paddingVertical: 24,
+    paddingHorizontal: 20,
+  },
+  bondMark: {
+    width: 36,
+    height: 36,
+    borderRadius: 16.5,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   bondHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 10,
   },
   bondKicker: {
-    fontFamily: FONT_FAMILY.gothamBold,
-    fontSize: 12,
-    letterSpacing: 1.4,
-    textTransform: 'uppercase',
-    color: COLORS.forest,
+    ...TYPOGRAPHY.sectionLabel,
+    fontFamily: FONT_FAMILY.marketingExtrabold,
+    color: LOGO_GOLD,
+    letterSpacing: 2,
+  },
+  bondScoreLabel: {
+    ...TYPOGRAPHY.serifTitle,
+    fontSize: 18,
+    textAlign: 'center',
+    marginBottom: 4,
   },
   bondRisk: {
-    fontFamily: FONT_FAMILY.gothamMedium,
-    fontSize: 15,
-    lineHeight: 22,
-    color: COLORS.forestDeep,
+    ...TYPOGRAPHY.bodyStrong,
+    fontSize: 16,
     textAlign: 'center',
     maxWidth: '92%',
   },
   bondDisclaimer: {
-    fontFamily: FONT_FAMILY.gothamBook,
-    fontSize: 11,
-    lineHeight: 15,
-    color: COLORS.textSubtle,
+    ...TYPOGRAPHY.disclaimer,
     textAlign: 'center',
-  },
-  infoSection: {
-    gap: 10,
-  },
-  infoTitle: {
-    fontFamily: FONT_FAMILY.gothamBold,
-    fontSize: 12,
-    letterSpacing: 1.2,
-    textTransform: 'uppercase',
-    color: COLORS.forest,
-    opacity: 0.8,
-  },
-  infoPanel: {
-    padding: 16,
-    borderRadius: RADIUS.lg,
-    backgroundColor: COLORS.white,
-    borderWidth: 1,
-    borderColor: 'rgba(13, 40, 24, 0.08)',
-    ...SHADOWS.card,
-    shadowOpacity: 0.05,
+    maxWidth: '92%',
+    alignSelf: 'center',
   },
   bio: {
-    fontFamily: FONT_FAMILY.gothamMedium,
+    ...TYPOGRAPHY.editorialBio,
     fontSize: 16,
-    lineHeight: 25,
-    color: COLORS.forestDeep,
-  },
-  detailRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingVertical: 10,
-  },
-  detailRowBorder: {
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: 'rgba(13, 40, 24, 0.08)',
-  },
-  detailIconWrap: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: 'rgba(212, 168, 67, 0.12)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  detailText: {
-    flex: 1,
-    fontFamily: FONT_FAMILY.gothamMedium,
-    fontSize: 15,
-    lineHeight: 22,
-    color: COLORS.forestDeep,
-  },
-  chipRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  chip: {
-    paddingHorizontal: 14,
-    paddingVertical: 9,
-    borderRadius: RADIUS.pill,
-    backgroundColor: COLORS.mint,
-    borderWidth: 1,
-    borderColor: 'rgba(13, 40, 24, 0.1)',
-  },
-  chipText: {
-    fontFamily: FONT_FAMILY.gothamMedium,
-    fontSize: 14,
-    color: COLORS.forestDeep,
+    lineHeight: 26,
+    color: COLORS.text,
   },
   goalValue: {
     fontFamily: FONT_FAMILY.gothamSemiBold,
     fontSize: 18,
-    color: COLORS.forestDeep,
-    letterSpacing: -0.2,
+    color: COLORS.text,
+    letterSpacing: -0.15,
   },
   scrollSpacer: {
     height: 8,
@@ -642,8 +580,16 @@ const styles = StyleSheet.create({
     bottom: 0,
     paddingBottom: GENO_TAB_BAR_HEIGHT + 6,
     paddingTop: 12,
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     alignItems: 'center',
-    gap: 8,
+  },
+  dockRim: {
+    alignSelf: 'stretch',
+    width: '100%',
+  },
+  dockInner: {
+    paddingVertical: 14,
+    paddingHorizontal: 12,
+    alignItems: 'center',
   },
 });

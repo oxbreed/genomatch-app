@@ -1,6 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { COLORS } from '../../theme';
+import { COLORS, MIRROR_GRADIENTS } from '../../theme';
 
 type Props = {
   percent: number;
@@ -12,11 +12,11 @@ export default function DiscoverBondEdge({ percent }: Props) {
   const high = clamped >= 80;
   const mid = clamped >= 60;
 
-  const fillColors: [string, string] = high
-    ? [COLORS.gold, '#C49A3A']
+  const fillColors: readonly [string, string, ...string[]] = high
+    ? MIRROR_GRADIENTS.cta
     : mid
-      ? [COLORS.sage, '#5E9470']
-      : ['rgba(245, 239, 230, 0.85)', 'rgba(245, 239, 230, 0.45)'];
+      ? ([COLORS.sage, COLORS.sage] as const)
+      : (['rgba(247, 245, 242, 0.9)', 'rgba(247, 245, 242, 0.5)'] as const);
 
   return (
     <View style={styles.track} pointerEvents="none">

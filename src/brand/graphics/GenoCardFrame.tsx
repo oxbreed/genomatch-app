@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { GenoBondMark } from '../GenoSignaturePattern';
+import { GenoBondMark } from '../GenoBondMark';
 import GenoGlassSurface from './GenoGlassSurface';
 import { GENO_VISUAL } from './genoVisualTokens';
-import { RADIUS, SHADOWS } from '../../theme';
+import { COLORS, MIRROR_ACTION, RADIUS, SHADOWS, mirrorActionShadow } from '../../theme';
 
 type Props = {
   children: ReactNode;
@@ -12,25 +12,40 @@ type Props = {
   showWatermark?: boolean;
   /** Use translucent glass inner (default) or solid white */
   glass?: boolean;
+  /** Gold chrome rim + dark mirror glass */
+  mirror?: boolean;
 };
 
 /** Signature gradient card frame — lists, panels, modals */
-export default function GenoCardFrame({ children, style, showWatermark = false, glass = true }: Props) {
+export default function GenoCardFrame({
+  children,
+  style,
+  showWatermark = false,
+  glass = true,
+  mirror = false,
+}: Props) {
+  const borderStyle = mirror
+    ? [styles.border, styles.mirrorBorder, mirrorActionShadow('gold')]
+    : styles.border;
+  const borderColors = mirror ? [...MIRROR_ACTION.gold.rim] : GENO_VISUAL.chrome.cardBorder;
+
   return (
     <View style={[styles.outer, style]}>
       <LinearGradient
-        colors={GENO_VISUAL.chrome.cardBorder}
+        colors={borderColors as [string, string, ...string[]]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
-        style={styles.border}
+        style={borderStyle}
       >
         {glass ? (
           <GenoGlassSurface
-            variant="light"
+            variant="dark"
             borderRadius={RADIUS.lg - 1}
             shadow="none"
             showBorder={false}
-            intensity={52}
+            showSheen
+            showTopRule={mirror}
+            intensity={mirror ? 40 : 52}
             style={styles.glassInner}
           >
             {showWatermark ? (
@@ -66,11 +81,14 @@ const styles = StyleSheet.create({
     ...SHADOWS.glassFloat,
     shadowOpacity: 0.14,
   },
+  mirrorBorder: {
+    ...SHADOWS.glassElevated,
+  },
   glassInner: {
     overflow: 'hidden',
   },
   solidInner: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.lg - 1,
     overflow: 'hidden',
   },

@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { formatLocationLine } from '../lib/distanceBands';
 import type { DistanceBand } from '../lib/distanceBands';
-import { FONT_FAMILY, COLORS } from '../theme';
+import {FONT_FAMILY, COLORS, MIRROR_RED_TEXT} from '../theme';
 
 type Props = {
   city: string;
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
   text: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
-    color: COLORS.forest,
+    ...MIRROR_RED_TEXT,
     flexShrink: 1,
   },
   textDark: {

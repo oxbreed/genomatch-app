@@ -1,8 +1,8 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps } from 'react';
-import { GenoCardFrame } from '../../brand/graphics';
-import { COLORS } from '../../theme';
+import { Ionicons } from '@expo/vector-icons';
+import { GenoCardFrame, GenoMirrorMetallicIcon } from '../../brand/graphics';
+import { COLORS, LOGO_GOLD } from '../../theme';
 import { PROFILE, PROFILE_TYPE } from '../profile/profileTokens';
 
 type IonName = ComponentProps<typeof Ionicons>['name'];
@@ -22,18 +22,18 @@ type Props = {
 export default function ProfileStatGems({ matches, likesReceived, profileViews }: Props) {
   const stats: Stat[] = [
     { value: matches, label: 'Matches', icon: 'heart' },
-    { value: likesReceived, label: 'Likes', icon: 'sparkles-outline' },
-    { value: profileViews, label: 'Views', icon: 'eye-outline' },
+    { value: likesReceived, label: 'Likes', icon: 'sparkles' },
+    { value: profileViews, label: 'Views', icon: 'eye' },
   ];
 
   return (
-    <GenoCardFrame showWatermark={false}>
+    <GenoCardFrame mirror showWatermark={false}>
       <View style={styles.row}>
         {stats.map((stat, index) => (
           <View key={stat.label} style={styles.gemWrap}>
             {index > 0 ? <View style={styles.divider} /> : null}
             <View style={styles.gem}>
-              <Ionicons name={stat.icon} size={15} color={COLORS.sage} />
+              <GenoMirrorMetallicIcon name={stat.icon} size={15} tone="gold" />
               <Text style={styles.value}>{stat.value}</Text>
               <Text style={styles.label}>{stat.label}</Text>
             </View>
@@ -45,9 +45,6 @@ export default function ProfileStatGems({ matches, likesReceived, profileViews }
 }
 
 const styles = StyleSheet.create({
-  frame: {
-    marginBottom: PROFILE.cardGap,
-  },
   row: {
     flexDirection: 'row',
     paddingVertical: 20,
@@ -60,7 +57,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     width: 1,
-    backgroundColor: COLORS.border,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     marginVertical: 2,
   },
   gem: {
@@ -70,11 +67,11 @@ const styles = StyleSheet.create({
   },
   value: {
     ...PROFILE_TYPE.statValue,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
   },
   label: {
     ...PROFILE_TYPE.statLabel,
-    color: COLORS.sage,
+    color: LOGO_GOLD,
     textAlign: 'center',
   },
 });

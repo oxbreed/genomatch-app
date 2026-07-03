@@ -11,6 +11,7 @@ import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import { GenoBondMark } from '../src/brand';
 import { GenoPremiumChrome, GenoCardFrame, GenoGlassSurface } from '../src/brand/graphics';
 import { GenoBackHeader } from '../src/components/genoExperience';
 import { GenoGlassIconButton } from '../src/components/inbox';
@@ -20,10 +21,13 @@ import FamilyPlanningCard from '../src/components/FamilyPlanningCard';
 import LifestyleBadges from '../src/components/LifestyleBadges';
 import PresenceBadge from '../src/components/PresenceBadge';
 import { ProfileViewSections } from '../src/components/profile';
-import { ProfileVitalityRing } from '../src/components/profileStudio';
+import DiscoverPremiumSection from '../src/components/discover/DiscoverPremiumSection';
+import { premiumCard } from '../src/components/discover/discoverPremium';
+import GenoCompatRing from '../src/components/genomatch/GenoCompatRing';
 import ReportBlockSheet from '../src/components/ReportBlockSheet';
 import LocationLine from '../src/components/LocationLine';
-import { FONT_FAMILY, COLORS, MOTION, RADIUS, SHADOWS } from '../src/theme';
+import { getGenotypeRiskShort } from '../src/lib/compatibility';
+import { COLORS, LOGO_GOLD, LOGO_RED, MOTION, RADIUS, SHADOWS, TYPOGRAPHY, goldAlpha, redAlpha } from '../src/theme';
 import { getCurrentProfile } from '../src/lib/profiles';
 import type { Genotype, MatchWithProfile } from '../src/types/database';
 
@@ -88,14 +92,16 @@ export default function MatchProfile({ match, onBack, onSendMessage }: MatchProf
       accessibilityLabel="Report or block"
       size={40}
     >
-      <Ionicons name="ellipsis-vertical" size={18} color={COLORS.forestDeep} />
+      <Ionicons name="ellipsis-vertical" size={18} color={COLORS.text} />
     </GenoGlassIconButton>
   );
+
+  const riskShort = getGenotypeRiskShort(viewerGenotype, profile.genotype);
 
   return (
     <View style={styles.container}>
       <GenoPremiumChrome variant="discover" />
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
 
       <GenoBackHeader title="Match profile" onBack={onBack} right={menuBtn} />
 
@@ -113,17 +119,23 @@ export default function MatchProfile({ match, onBack, onSendMessage }: MatchProf
         showsVerticalScrollIndicator={false}
       >
         <GenoCardFrame style={styles.heroFrame}>
-          <View style={styles.heroInner}>
+          <View style={[premiumCard, styles.heroInner]}>
             <View style={styles.heroTop}>
-              <ProfileAvatar
-                name={profile.name}
-                gradient={profile.gradient}
-                avatarUrl={profile.avatarUrl}
-                size={108}
-              />
-              <View style={styles.ringCol}>
-                <ProfileVitalityRing percent={profile.compatibility} size={88} />
-                <Text style={styles.ringLabel}>Compatible</Text>
+              <View style={styles.avatarWrap}>
+                <ProfileAvatar
+                  name={profile.name}
+                  gradient={profile.gradient}
+                  avatarUrl={profile.avatarUrl}
+                  size={112}
+                />
+                {(profile.presenceState !== 'offline' || profile.isNewMember) ? (
+                  <View style={styles.badgeOverlay}>
+                    <PresenceBadge
+                      presenceState={profile.presenceState}
+                      isNewMember={profile.isNewMember}
+                    />
+                  </View>
+                ) : null}
               </View>
             </View>
 
@@ -137,14 +149,17 @@ export default function MatchProfile({ match, onBack, onSendMessage }: MatchProf
               <LocationLine city={profile.city} distanceBand={profile.distanceBand} />
             </View>
 
-            {(profile.presenceState !== 'offline' || profile.isNewMember) ? (
-              <View style={styles.presenceRow}>
-                <PresenceBadge
-                  presenceState={profile.presenceState}
-                  isNewMember={profile.isNewMember}
-                />
-              </View>
-            ) : null}
+            <View style={styles.matchBadge}>
+              <LinearGradient
+                colors={[redAlpha(0.14), goldAlpha(0.1)]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.matchBadgeGrad}
+              >
+                <Ionicons name="heart" size={12} color={LOGO_RED} />
+                <Text style={styles.matchBadgeText}>Mutual match</Text>
+              </LinearGradient>
+            </View>
 
             <View style={styles.lifestyleRow}>
               <LifestyleBadges
@@ -155,13 +170,23 @@ export default function MatchProfile({ match, onBack, onSendMessage }: MatchProf
                 religion={profile.religion}
               />
             </View>
-
-            <View style={styles.matchBadge}>
-              <Ionicons name="heart" size={12} color={COLORS.forestDeep} />
-              <Text style={styles.matchBadgeText}>Mutual match</Text>
-            </View>
           </View>
         </GenoCardFrame>
+
+        <View style={styles.harmonyWrap}>
+          <DiscoverPremiumSection title="Compatibility score" accent serif>
+            <View style={styles.harmonyBody}>
+              <GenoBondMark size={20} opacity={0.85} />
+              <GenoCompatRing percent={profile.compatibility} size={100} glow />
+              <Text style={styles.harmonyLine}>
+                {profile.compatibility}% compatible · {riskShort}
+              </Text>
+              <Text style={styles.harmonyDisclaimer}>
+                Educational information only. Not medical advice.
+              </Text>
+            </View>
+          </DiscoverPremiumSection>
+        </View>
 
         <GenoCardFrame style={styles.familyFrame}>
           <View style={styles.familyInner}>
@@ -185,7 +210,7 @@ export default function MatchProfile({ match, onBack, onSendMessage }: MatchProf
 
       <View style={styles.footer}>
         <LinearGradient
-          colors={['rgba(245, 239, 230, 0)', 'rgba(245, 239, 230, 0.95)', COLORS.linen]}
+          colors={['rgba(10, 10, 10, 0)', 'rgba(10, 10, 10, 0.96)', COLORS.background]}
           style={styles.footerFade}
           pointerEvents="none"
         />
@@ -205,12 +230,19 @@ export default function MatchProfile({ match, onBack, onSendMessage }: MatchProf
               onPress={handleSend}
             >
               <LinearGradient
-                colors={[COLORS.forest, COLORS.forestDeep]}
-                start={{ x: 0, y: 0.5 }}
-                end={{ x: 1, y: 0.5 }}
+                colors={[LOGO_RED, '#A30C24']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
                 style={styles.messageBtn}
               >
-                <Ionicons name="chatbubble-ellipses-outline" size={18} color={COLORS.linen} />
+                <LinearGradient
+                  colors={['rgba(255,255,255,0.22)', 'transparent']}
+                  start={{ x: 0.5, y: 0 }}
+                  end={{ x: 0.5, y: 0.45 }}
+                  style={StyleSheet.absoluteFill}
+                  pointerEvents="none"
+                />
+                <Ionicons name="chatbubble-ellipses-outline" size={18} color={COLORS.white} />
                 <Text style={styles.messageBtnText}>Send message</Text>
               </LinearGradient>
             </Pressable>
@@ -224,43 +256,36 @@ export default function MatchProfile({ match, onBack, onSendMessage }: MatchProf
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.linen,
+    backgroundColor: COLORS.background,
   },
   scroll: {
     paddingBottom: 120,
+    paddingHorizontal: 4,
   },
   heroFrame: {
     marginTop: 4,
   },
   heroInner: {
-    paddingVertical: 24,
-    paddingHorizontal: 18,
+    paddingVertical: 26,
+    paddingHorizontal: 20,
     alignItems: 'center',
+    marginHorizontal: 12,
   },
   heroTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 18,
     marginBottom: 14,
   },
-  ringCol: {
+  avatarWrap: {
+    position: 'relative',
     alignItems: 'center',
-    gap: 4,
   },
-  ringLabel: {
-    fontFamily: FONT_FAMILY.gothamBold,
-    fontSize: 10,
-    letterSpacing: 1.2,
-    textTransform: 'uppercase',
-    color: COLORS.sage,
+  badgeOverlay: {
+    position: 'absolute',
+    bottom: -6,
+    alignSelf: 'center',
   },
   displayName: {
-    fontFamily: FONT_FAMILY.gothamBold,
-    fontSize: 26,
-    color: COLORS.forestDeep,
+    ...TYPOGRAPHY.displayName,
     textAlign: 'center',
-    letterSpacing: -0.5,
   },
   heroMeta: {
     flexDirection: 'row',
@@ -270,42 +295,46 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'center',
   },
-  presenceRow: {
-    marginTop: 10,
-  },
-  lifestyleRow: {
-    marginTop: 10,
-    paddingHorizontal: 8,
-  },
-  cityRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  city: {
-    fontFamily: FONT_FAMILY.gothamMedium,
-    fontSize: 14,
-    lineHeight: 20,
-    color: COLORS.textMuted,
-  },
   matchBadge: {
     marginTop: 14,
-    paddingHorizontal: 14,
-    paddingVertical: 7,
     borderRadius: RADIUS.pill,
-    backgroundColor: 'rgba(212, 168, 67, 0.22)',
+    overflow: 'hidden',
     borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.35)',
+    borderColor: 'rgba(212, 175, 55, 0.35)',
+  },
+  matchBadgeGrad: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
   },
   matchBadgeText: {
-    fontFamily: FONT_FAMILY.gothamBold,
+    ...TYPOGRAPHY.sectionLabel,
     fontSize: 11,
     letterSpacing: 1,
-    textTransform: 'uppercase',
-    color: COLORS.forestDeep,
+  },
+  lifestyleRow: {
+    marginTop: 14,
+    paddingHorizontal: 4,
+  },
+  harmonyWrap: {
+    paddingHorizontal: 16,
+    marginTop: 4,
+  },
+  harmonyBody: {
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 8,
+  },
+  harmonyLine: {
+    ...TYPOGRAPHY.bodyStrong,
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  harmonyDisclaimer: {
+    ...TYPOGRAPHY.disclaimer,
+    textAlign: 'center',
   },
   familyFrame: {
     marginTop: 2,
@@ -344,6 +373,8 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.pill,
     overflow: 'hidden',
     ...SHADOWS.button,
+    shadowColor: LOGO_RED,
+    shadowOpacity: 0.28,
   },
   messageBtnPressed: {
     opacity: 0.92,
@@ -357,9 +388,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   messageBtnText: {
-    fontFamily: FONT_FAMILY.gothamBold,
-    fontSize: 16,
-    color: COLORS.linen,
+    ...TYPOGRAPHY.cta,
     letterSpacing: 0.1,
   },
 });

@@ -1,9 +1,12 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { GenoGlassSurface } from '../../brand/graphics';
+import {
+  GenoGlassSurface,
+  GenoMirrorGoldFill,
+  GenoMirrorRimFrame,
+} from '../../brand/graphics';
 import GenoInboxAvatar from './GenoInboxAvatar';
 import { isRecentMatch } from '../matches/MatchListCard';
-import { FONT_FAMILY, COLORS, RADIUS } from '../../theme';
+import { FONT_FAMILY, COLORS, LOGO_GOLD, RADIUS } from '../../theme';
 import type { MatchWithProfile } from '../../types/database';
 
 type Props = {
@@ -15,49 +18,55 @@ export default function GenoInboxMatchStrip({ matches, onOpenMatch }: Props) {
   if (matches.length === 0) return null;
 
   return (
-    <GenoGlassSurface
-      variant="light"
-      borderRadius={RADIUS.lg}
-      shadow="glass"
-      showTopRule
-      style={styles.wrap}
-      contentStyle={styles.inner}
-    >
-      <Text style={styles.label}>New matches</Text>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.scroll}
+    <GenoMirrorRimFrame kind="gold" borderRadius={RADIUS.lg} style={styles.wrap}>
+      <GenoGlassSurface
+        variant="dark"
+        borderRadius={RADIUS.lg - 1.5}
+        showBorder={false}
+        showSheen
+        showTopRule
+        shadow="none"
+        intensity={32}
+        contentStyle={styles.inner}
       >
-        {matches.map((item) => {
-          const isNew = isRecentMatch(item.matchedAt);
-          return (
-            <Pressable
-              key={item.matchId}
-              style={({ pressed }) => [styles.chip, pressed && styles.chipPressed]}
-              onPress={() => onOpenMatch(item)}
-              accessibilityLabel={`Open ${item.profile.name}`}
-            >
-              <GenoInboxAvatar
-                name={item.profile.name}
-                avatarUrl={item.profile.avatarUrl}
-                photoUrl={item.profile.photos[0]}
-                gradient={item.profile.gradient}
-                presenceState={item.profile.presenceState}
-              />
-              <Text style={styles.name} numberOfLines={1}>
-                {item.profile.name.split(' ')[0]}
-              </Text>
-              {isNew ? (
-                <LinearGradient colors={[COLORS.gold, '#C49A3A']} style={styles.newDot}>
-                  <View style={styles.newDotInner} />
-                </LinearGradient>
-              ) : null}
-            </Pressable>
-          );
-        })}
-      </ScrollView>
-    </GenoGlassSurface>
+        <Text style={styles.label}>New matches</Text>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.scroll}
+        >
+          {matches.map((item) => {
+            const isNew = isRecentMatch(item.matchedAt);
+            return (
+              <Pressable
+                key={item.matchId}
+                style={({ pressed }) => [styles.chip, pressed && styles.chipPressed]}
+                onPress={() => onOpenMatch(item)}
+                accessibilityLabel={`Open ${item.profile.name}`}
+              >
+                <GenoInboxAvatar
+                  name={item.profile.name}
+                  avatarUrl={item.profile.avatarUrl}
+                  photoUrl={item.profile.photos[0]}
+                  gradient={item.profile.gradient}
+                  presenceState={item.profile.presenceState}
+                />
+                <Text style={styles.name} numberOfLines={1}>
+                  {item.profile.name.split(' ')[0]}
+                </Text>
+                {isNew ? (
+                  <GenoMirrorRimFrame kind="gold" borderRadius={6} padding={1} style={styles.newDot}>
+                    <GenoMirrorGoldFill style={styles.newDotFill}>
+                      <View style={styles.newDotInner} />
+                    </GenoMirrorGoldFill>
+                  </GenoMirrorRimFrame>
+                ) : null}
+              </Pressable>
+            );
+          })}
+        </ScrollView>
+      </GenoGlassSurface>
+    </GenoMirrorRimFrame>
   );
 }
 
@@ -65,7 +74,8 @@ const styles = StyleSheet.create({
   wrap: {
     marginHorizontal: 16,
     marginBottom: 12,
-    overflow: 'hidden',
+    alignSelf: 'stretch',
+    width: 'auto',
   },
   inner: {
     paddingTop: 12,
@@ -78,7 +88,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     letterSpacing: 1.4,
     textTransform: 'uppercase',
-    color: COLORS.sage,
+    color: LOGO_GOLD,
   },
   scroll: {
     paddingHorizontal: 10,
@@ -97,7 +107,7 @@ const styles = StyleSheet.create({
   name: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 11,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
     textAlign: 'center',
     maxWidth: 68,
   },
@@ -105,18 +115,20 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     right: 6,
+  },
+  newDotFill: {
     width: 12,
     height: 12,
-    borderRadius: 6,
+    borderRadius: 5,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: COLORS.linen,
+    borderColor: COLORS.background,
   },
   newDotInner: {
     width: 4,
     height: 4,
     borderRadius: 2,
-    backgroundColor: COLORS.forestDeep,
+    backgroundColor: COLORS.text,
   },
 });

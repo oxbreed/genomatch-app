@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { FONT_FAMILY, COLORS, RADIUS } from '../../theme';
+import {FONT_FAMILY, COLORS, RADIUS, MIRROR_RED_TEXT} from '../../theme';
 
 type Props = {
   activeStep: number;
@@ -39,7 +39,7 @@ export default function StudioProgressHeader({
 
       <View style={styles.track}>
         <LinearGradient
-          colors={['rgba(13, 40, 24, 0.08)', 'rgba(212, 168, 67, 0.25)']}
+          colors={['rgba(10, 10, 10, 0.08)', 'rgba(255, 255, 255, 0.25)']}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}
           style={StyleSheet.absoluteFill}
@@ -62,9 +62,9 @@ const styles = StyleSheet.create({
     marginTop: 10,
     padding: 14,
     borderRadius: RADIUS.lg,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: 'rgba(13, 40, 24, 0.08)',
+    borderColor: COLORS.border,
     gap: 10,
   },
   topRow: {
@@ -81,12 +81,12 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 10,
     letterSpacing: 1.6,
-    color: COLORS.gold,
+    ...MIRROR_RED_TEXT,
   },
   title: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 16,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
     letterSpacing: -0.2,
   },
   badge: {
@@ -94,21 +94,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: RADIUS.pill,
-    backgroundColor: 'rgba(212, 168, 67, 0.14)',
+    backgroundColor: COLORS.chip,
     borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.35)',
+    borderColor: COLORS.border,
     alignItems: 'center',
   },
   badgeText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 12,
-    color: '#8C6A00',
+    color: '#D4AF37',
   },
   track: {
     height: 6,
     borderRadius: 3,
     overflow: 'hidden',
-    backgroundColor: 'rgba(13, 40, 24, 0.06)',
+    backgroundColor: 'rgba(10, 10, 10, 0.06)',
   },
   trackFill: {
     height: 6,
@@ -119,6 +119,6 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
     lineHeight: 17,
-    color: COLORS.sage,
+    color: COLORS.textMuted,
   },
 });

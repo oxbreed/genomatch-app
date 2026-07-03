@@ -9,14 +9,28 @@ import {
   View,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { GenoBondMark } from '../../brand';
-import { GenoGlassBackdrop, GenoGlassSurface } from '../../brand/graphics';
+import {
+  GenoGlassBackdrop,
+  GenoGlassSurface,
+  GenoMirrorBrandCtaFill,
+  GenoMirrorMetallicIcon,
+  GenoMirrorRimFrame,
+  GenoMirrorSteelFill,
+} from '../../brand/graphics';
 import ProfileAvatar from '../ProfileAvatar';
 import VerifiedBadge from '../VerifiedBadge';
 import { getPrimaryPhotoUri } from '../../lib/profilePhotos';
-import { FONT_FAMILY, COLORS, RADIUS, SHADOWS } from '../../theme';
+import {
+  FONT_FAMILY,
+  COLORS,
+  LOGO_GOLD,
+  RADIUS,
+  TYPOGRAPHY,
+  chromeAlpha,
+  goldAlpha,
+} from '../../theme';
 import type { DiscoveryProfile } from '../../types/database';
 
 type ViewerSnapshot = {
@@ -53,16 +67,18 @@ function MatchPhoto({
 
   return (
     <View style={styles.photoWrap}>
-      <View style={styles.photoRing}>
-        <ProfileAvatar
-          name={name}
-          gradient={gradient}
-          avatarUrl={uri}
-          size={72}
-          noPhotoBackground={COLORS.forestDeep}
-          noPhotoInitialColor={COLORS.linen}
-        />
-      </View>
+      <GenoMirrorRimFrame kind="gold" borderRadius={999} padding={1.5}>
+        <GenoMirrorSteelFill style={styles.photoRing}>
+          <ProfileAvatar
+            name={name}
+            gradient={gradient}
+            avatarUrl={uri}
+            size={68}
+            noPhotoBackground={COLORS.forestDeep}
+            noPhotoInitialColor={COLORS.linen}
+          />
+        </GenoMirrorSteelFill>
+      </GenoMirrorRimFrame>
       {verified ? (
         <View style={styles.verifiedDot}>
           <VerifiedBadge compact />
@@ -138,123 +154,138 @@ export default function DiscoverMatchModal({
             },
           ]}
         >
-          <LinearGradient
-            colors={['rgba(212, 168, 67, 0.65)', 'rgba(61, 122, 82, 0.42)', 'rgba(212, 168, 67, 0.55)']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.cardBorder}
-          >
+          <GenoMirrorRimFrame kind="gold" borderRadius={RADIUS.xl} style={styles.cardRim}>
             <GenoGlassSurface
               variant="dark"
               borderRadius={RADIUS.xl - 1.5}
-              shadow="none"
+              shadow="glassElevated"
               showTopRule
+              showSheen
               showBorder={false}
+              intensity={52}
               style={styles.card}
               contentStyle={styles.cardFill}
             >
-                <View style={styles.kickerRow}>
-                  <View style={styles.kickerLine} />
-                  <Text style={styles.kicker}>Mutual match</Text>
-                  <View style={styles.kickerLine} />
+              <View style={styles.kickerRow}>
+                <View style={styles.kickerLine} />
+                <GenoMirrorMetallicIcon name="heart" size={12} tone="gold" />
+                <Text style={styles.kicker}>Mutual match</Text>
+                <GenoMirrorMetallicIcon name="heart" size={12} tone="gold" />
+                <View style={styles.kickerLine} />
+              </View>
+
+              <LinearGradient
+                colors={['transparent', chromeAlpha(0.35), LOGO_GOLD, goldAlpha(0.35), 'transparent']}
+                start={{ x: 0, y: 0.5 }}
+                end={{ x: 1, y: 0.5 }}
+                style={styles.rule}
+                pointerEvents="none"
+              />
+
+              <Text style={styles.title}>{"It's a Match!"}</Text>
+              <Text style={styles.subtitle}>
+                You and <Text style={styles.name}>{firstName}</Text> liked each other.
+              </Text>
+
+              <View style={styles.bondRow}>
+                <View style={styles.avatarCol}>
+                  <MatchPhoto
+                    name={viewer?.name ?? 'You'}
+                    avatarUrl={viewer?.avatarUrl}
+                    photos={viewer?.photos}
+                    gradient={viewerGradient}
+                    verified={viewer?.genotypeVerified}
+                  />
+                  <Text style={styles.avatarLabel}>{viewerFirstName}</Text>
                 </View>
 
-                <Text style={styles.title}>{"It's a Match!"}</Text>
-                <Text style={styles.subtitle}>
-                  You and <Text style={styles.name}>{firstName}</Text> liked each other
-                </Text>
-
-                <View style={styles.bondRow}>
-                  <View style={styles.avatarCol}>
-                    <MatchPhoto
-                      name={viewer?.name ?? 'You'}
-                      avatarUrl={viewer?.avatarUrl}
-                      photos={viewer?.photos}
-                      gradient={viewerGradient}
-                      verified={viewer?.genotypeVerified}
-                    />
-                    <Text style={styles.avatarLabel}>{viewerFirstName}</Text>
-                  </View>
-
-                  <View style={styles.bondMark}>
+                <GenoMirrorRimFrame kind="gold" borderRadius={30} padding={1.5} style={styles.bondRim}>
+                  <GenoMirrorSteelFill style={styles.bondMark}>
                     <GenoBondMark size={44} opacity={0.95} />
-                  </View>
+                  </GenoMirrorSteelFill>
+                </GenoMirrorRimFrame>
 
-                  <View style={styles.avatarCol}>
-                    {profile ? (
-                      <MatchPhoto
-                        name={profile.name}
-                        avatarUrl={matchPhotoUri ?? profile.avatarUrl}
-                        photos={profile.photos}
-                        gradient={profile.gradient}
-                        verified={profile.genotypeVerified}
-                      />
-                    ) : (
-                      <View style={styles.photoRing}>
+                <View style={styles.avatarCol}>
+                  {profile ? (
+                    <MatchPhoto
+                      name={profile.name}
+                      avatarUrl={matchPhotoUri ?? profile.avatarUrl}
+                      photos={profile.photos}
+                      gradient={profile.gradient}
+                      verified={profile.genotypeVerified}
+                    />
+                  ) : (
+                    <GenoMirrorRimFrame kind="gold" borderRadius={999} padding={1.5}>
+                      <GenoMirrorSteelFill style={styles.photoRing}>
                         <ProfileAvatar
                           name={matchName}
                           gradient={[COLORS.forest, COLORS.forestDeep]}
                           avatarUrl={null}
-                          size={72}
+                          size={68}
                         />
-                      </View>
-                    )}
-                    <Text style={styles.avatarLabel} numberOfLines={1}>
-                      {firstName}
-                    </Text>
-                  </View>
+                      </GenoMirrorSteelFill>
+                    </GenoMirrorRimFrame>
+                  )}
+                  <Text style={styles.avatarLabel} numberOfLines={1}>
+                    {firstName}
+                  </Text>
                 </View>
+              </View>
 
-                {profile ? (
-                  <>
-                    <View style={styles.compatPill}>
-                      <Ionicons name="sparkles" size={14} color={COLORS.gold} />
-                      <Text style={styles.compatText}>{profile.compatibility}% genotype match</Text>
+              {profile ? (
+                <>
+                  <GenoMirrorRimFrame kind="steel" borderRadius={RADIUS.pill} style={styles.compatRim}>
+                    <GenoMirrorSteelFill style={styles.compatPill}>
+                      <GenoMirrorMetallicIcon name="sparkles" size={14} tone="gold" />
+                      <Text style={styles.compatText}>{profile.compatibility}% compatible</Text>
                       {profile.genotypeVerified ? (
                         <>
                           <View style={styles.compatDivider} />
-                          <Ionicons name="shield-checkmark" size={13} color={COLORS.verified} />
+                          <GenoMirrorMetallicIcon name="shield-checkmark" size={13} tone="chrome" />
                           <Text style={styles.verifiedText}>Verified</Text>
                         </>
                       ) : null}
-                    </View>
-                    <Text style={styles.compatDisclaimer} numberOfLines={2}>
-                      Informational only — not medical advice.
-                    </Text>
-                  </>
-                ) : null}
+                    </GenoMirrorSteelFill>
+                  </GenoMirrorRimFrame>
+                  <Text style={styles.compatDisclaimer} numberOfLines={3}>
+                    Educational information only. Not medical advice.
+                  </Text>
+                </>
+              ) : null}
 
+              <Pressable
+                style={({ pressed }) => [pressed && styles.ctaPressed]}
+                onPress={() => {
+                  void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  onContinue();
+                }}
+              >
+                <GenoMirrorRimFrame kind="red" borderRadius={RADIUS.pill} style={styles.ctaRim}>
+                  <GenoMirrorBrandCtaFill horizontal style={styles.cta}>
+                    <Text style={styles.ctaText}>Continue</Text>
+                    <GenoMirrorMetallicIcon name="arrow-forward" size={18} tone="chrome" />
+                  </GenoMirrorBrandCtaFill>
+                </GenoMirrorRimFrame>
+              </Pressable>
+
+              {onSendMessage ? (
                 <Pressable
-                  style={({ pressed }) => [styles.ctaWrap, pressed && styles.ctaPressed]}
+                  style={({ pressed }) => [pressed && styles.ctaPressed]}
                   onPress={() => {
-                    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    onContinue();
+                    void Haptics.selectionAsync();
+                    onSendMessage();
                   }}
                 >
-                  <LinearGradient
-                    colors={[COLORS.gold, '#C49A38']}
-                    start={{ x: 0, y: 0.5 }}
-                    end={{ x: 1, y: 0.5 }}
-                    style={styles.cta}
-                  >
-                    <Text style={styles.ctaText}>Continue</Text>
-                  </LinearGradient>
+                  <GenoMirrorRimFrame kind="steel" borderRadius={RADIUS.pill} style={styles.secondaryRim}>
+                    <GenoMirrorSteelFill style={styles.secondaryBtn}>
+                      <GenoMirrorMetallicIcon name="chatbubble-outline" size={16} tone="gold" />
+                      <Text style={styles.secondaryText}>Send a message</Text>
+                    </GenoMirrorSteelFill>
+                  </GenoMirrorRimFrame>
                 </Pressable>
-
-                {onSendMessage ? (
-                  <Pressable
-                    style={({ pressed }) => [styles.secondaryBtn, pressed && styles.ctaPressed]}
-                    onPress={() => {
-                      void Haptics.selectionAsync();
-                      onSendMessage();
-                    }}
-                  >
-                    <Ionicons name="chatbubble-outline" size={16} color={COLORS.gold} />
-                    <Text style={styles.secondaryText}>Send a message</Text>
-                  </Pressable>
-                ) : null}
+              ) : null}
             </GenoGlassSurface>
-          </LinearGradient>
+          </GenoMirrorRimFrame>
         </Animated.View>
       </Animated.View>
     </Modal>
@@ -273,15 +304,11 @@ const styles = StyleSheet.create({
     maxWidth: 340,
     zIndex: 2,
   },
-  cardBorder: {
-    borderRadius: RADIUS.xl,
-    padding: 1.5,
-    ...SHADOWS.glassElevated,
-    shadowColor: COLORS.gold,
-    shadowOpacity: 0.28,
+  cardRim: {
+    alignSelf: 'stretch',
+    width: '100%',
   },
   card: {
-    borderRadius: RADIUS.xl - 1.5,
     overflow: 'hidden',
   },
   cardFill: {
@@ -293,27 +320,33 @@ const styles = StyleSheet.create({
   kickerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 8,
     width: '100%',
-    marginBottom: 16,
+    marginBottom: 12,
   },
   kickerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: 'rgba(212, 168, 67, 0.35)',
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
   },
   kicker: {
-    fontFamily: FONT_FAMILY.gothamBold,
+    fontFamily: FONT_FAMILY.marketingExtrabold,
     fontSize: 10,
     letterSpacing: 2,
     textTransform: 'uppercase',
-    color: COLORS.gold,
+    color: LOGO_GOLD,
+  },
+  rule: {
+    width: '100%',
+    height: 1,
+    borderRadius: 1,
+    marginBottom: 18,
   },
   title: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 32,
     letterSpacing: -0.6,
-    color: COLORS.linen,
+    color: COLORS.text,
     textAlign: 'center',
     marginBottom: 8,
   },
@@ -321,14 +354,14 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 16,
     lineHeight: 22,
-    color: 'rgba(245, 239, 230, 0.82)',
+    color: COLORS.textMuted,
     textAlign: 'center',
     marginBottom: 24,
     paddingHorizontal: 4,
   },
   name: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.gold,
+    color: LOGO_GOLD,
   },
   bondRow: {
     flexDirection: 'row',
@@ -347,11 +380,11 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   photoRing: {
-    padding: 3,
-    borderRadius: 999,
-    borderWidth: 2,
-    borderColor: 'rgba(212, 168, 67, 0.55)',
-    backgroundColor: 'rgba(13, 40, 24, 0.35)',
+    width: 74,
+    height: 74,
+    borderRadius: 37,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   verifiedDot: {
     position: 'absolute',
@@ -360,55 +393,55 @@ const styles = StyleSheet.create({
     width: 22,
     height: 22,
     borderRadius: 11,
-    backgroundColor: COLORS.linen,
+    backgroundColor: COLORS.background,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: COLORS.forestDeep,
+    borderColor: LOGO_GOLD,
+  },
+  bondRim: {
+    marginTop: 10,
   },
   bondMark: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: 'rgba(212, 168, 67, 0.12)',
-    borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.3)',
+    width: 58,
+    height: 58,
+    borderRadius: 28.5,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 10,
   },
   avatarLabel: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: COLORS.sage,
+    color: COLORS.textMuted,
     textAlign: 'center',
     maxWidth: 88,
+  },
+  compatRim: {
+    marginBottom: 8,
+    alignSelf: 'stretch',
+    width: '100%',
   },
   compatPill: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: 6,
     paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: RADIUS.pill,
-    backgroundColor: 'rgba(212, 168, 67, 0.12)',
-    borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.28)',
-    marginBottom: 20,
+    paddingVertical: 10,
+    borderRadius: RADIUS.pill - 1.5,
     flexWrap: 'wrap',
-    justifyContent: 'center',
   },
   compatDivider: {
     width: 1,
     height: 12,
-    backgroundColor: 'rgba(212, 168, 67, 0.35)',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     marginHorizontal: 2,
   },
   compatText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 12,
     letterSpacing: 0.2,
-    color: COLORS.linen,
+    color: COLORS.text,
   },
   verifiedText: {
     fontFamily: FONT_FAMILY.gothamBold,
@@ -416,19 +449,15 @@ const styles = StyleSheet.create({
     color: COLORS.verified,
   },
   compatDisclaimer: {
-    fontSize: 10,
-    lineHeight: 13,
-    color: COLORS.sage,
+    ...TYPOGRAPHY.disclaimer,
     textAlign: 'center',
-    marginTop: 6,
-    opacity: 0.8,
+    marginBottom: 20,
     paddingHorizontal: 16,
+    color: COLORS.textSubtle,
   },
-  ctaWrap: {
+  ctaRim: {
     width: '100%',
-    borderRadius: RADIUS.pill,
-    overflow: 'hidden',
-    ...SHADOWS.button,
+    alignSelf: 'stretch',
   },
   ctaPressed: {
     opacity: 0.92,
@@ -438,24 +467,31 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 8,
+    borderRadius: RADIUS.pill - 1.5,
   },
   ctaText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 16,
-    color: COLORS.forestDeep,
+    color: COLORS.white,
     letterSpacing: 0.1,
+  },
+  secondaryRim: {
+    marginTop: 12,
+    alignSelf: 'stretch',
+    width: '100%',
   },
   secondaryBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 6,
-    marginTop: 10,
-    paddingVertical: 8,
+    gap: 8,
+    paddingVertical: 12,
+    borderRadius: RADIUS.pill - 1.5,
   },
   secondaryText: {
-    fontFamily: FONT_FAMILY.gothamMedium,
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 14,
-    color: COLORS.gold,
+    color: COLORS.text,
   },
 });

@@ -1,7 +1,11 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
-import { GenoGlassSurface } from '../../brand/graphics';
+import {
+  GenoGlassSurface,
+  GenoMirrorBrandCtaFill,
+  GenoMirrorMetallicIcon,
+  GenoMirrorRimFrame,
+  GenoMirrorSteelFill,
+} from '../../brand/graphics';
 import { FONT_FAMILY, COLORS, RADIUS } from '../../theme';
 
 type Props = {
@@ -11,34 +15,39 @@ type Props = {
 
 export default function GenoInboxRetryPanel({ message, onRetry }: Props) {
   return (
-    <GenoGlassSurface
-      variant="light"
-      borderRadius={RADIUS.lg}
-      shadow="glassFloat"
-      showTopRule
-      style={styles.panel}
-      contentStyle={styles.content}
-    >
-      <View style={styles.iconWrap}>
-        <Ionicons name="cloud-offline-outline" size={22} color={COLORS.forest} />
-      </View>
-      <Text style={styles.message}>{message}</Text>
-      <Pressable
-        style={({ pressed }) => [styles.retryWrap, pressed && styles.pressed]}
-        onPress={onRetry}
+    <GenoMirrorRimFrame kind="steel" borderRadius={RADIUS.lg} style={styles.panelRim}>
+      <GenoGlassSurface
+        variant="dark"
+        borderRadius={RADIUS.lg - 1.5}
+        showBorder={false}
+        showSheen
+        shadow="none"
+        intensity={32}
+        contentStyle={styles.content}
       >
-        <LinearGradient colors={[COLORS.gold, '#C49A3A']} style={styles.retry}>
-          <Text style={styles.retryText}>Try again</Text>
-        </LinearGradient>
-      </Pressable>
-    </GenoGlassSurface>
+        <GenoMirrorRimFrame kind="gold" borderRadius={22} padding={1.5}>
+          <GenoMirrorSteelFill style={styles.iconWrap}>
+            <GenoMirrorMetallicIcon name="cloud-offline-outline" size={22} tone="steel" />
+          </GenoMirrorSteelFill>
+        </GenoMirrorRimFrame>
+        <Text style={styles.message}>{message}</Text>
+        <Pressable style={({ pressed }) => [pressed && styles.pressed]} onPress={onRetry}>
+          <GenoMirrorRimFrame kind="red" borderRadius={RADIUS.pill}>
+            <GenoMirrorBrandCtaFill style={styles.retry}>
+              <Text style={styles.retryText}>Try again</Text>
+            </GenoMirrorBrandCtaFill>
+          </GenoMirrorRimFrame>
+        </Pressable>
+      </GenoGlassSurface>
+    </GenoMirrorRimFrame>
   );
 }
 
 const styles = StyleSheet.create({
-  panel: {
+  panelRim: {
     marginHorizontal: 20,
-    overflow: 'hidden',
+    alignSelf: 'stretch',
+    width: 'auto',
   },
   content: {
     padding: 22,
@@ -48,33 +57,26 @@ const styles = StyleSheet.create({
   iconWrap: {
     width: 44,
     height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(255, 255, 255, 0.55)',
+    borderRadius: 20.5,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.75)',
   },
   message: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 15,
     lineHeight: 22,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
     textAlign: 'center',
-  },
-  retryWrap: {
-    borderRadius: RADIUS.pill,
-    overflow: 'hidden',
-    marginTop: 4,
   },
   retry: {
     paddingHorizontal: 24,
     paddingVertical: 12,
+    borderRadius: RADIUS.pill - 1.5,
   },
   retryText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 15,
-    color: COLORS.forestDeep,
+    color: COLORS.white,
   },
   pressed: {
     opacity: 0.9,

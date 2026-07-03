@@ -11,7 +11,7 @@ import {
 import { StatusBar } from 'expo-status-bar';
 import * as Haptics from 'expo-haptics';
 import EmptyState from '../src/components/EmptyState';
-import { GenoPremiumChrome, GenoLogoCeremony } from '../src/brand/graphics';
+import { GenoPremiumChrome, GenoLogoCeremony, GenoMirrorRimFrame, GenoMirrorSteelFill } from '../src/brand/graphics';
 import {
   GenoInboxCountBadge,
   GenoInboxHeader,
@@ -23,7 +23,7 @@ import { logAuthState } from '../src/lib/auth';
 import { pickNewMatches } from '../src/lib/inboxMatches';
 import { fetchConversations } from '../src/lib/messages';
 import { TAB_SCENE_BOTTOM_PADDING } from '../src/components/navigation/tabBarLayout';
-import { FONT_FAMILY, COLORS, MOTION } from '../src/theme';
+import { FONT_FAMILY, COLORS, LOGO_GOLD, MOTION } from '../src/theme';
 import type {
   ConversationPreview,
   DiscoveryProfile,
@@ -154,11 +154,11 @@ export default function Matches({ isActive, onStartChat, onImmersiveChange }: Ma
   return (
     <View style={styles.container}>
       <GenoPremiumChrome variant="discover" />
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
 
       <GenoInboxHeader
         title="Your matches"
-        subtitle="Mutual likes — bond score and chat in one place"
+        subtitle="People who liked you back. See compatibility and start chatting."
         ceremonyMark={matches.length > 0}
         glass
         right={<GenoInboxCountBadge count={newMatchCount} />}
@@ -166,7 +166,11 @@ export default function Matches({ isActive, onStartChat, onImmersiveChange }: Ma
 
       {loading ? (
         <View style={styles.centered}>
-          <GenoLogoCeremony variant="compact" tone="dark" />
+          <GenoMirrorRimFrame kind="gold" borderRadius={24} padding={2}>
+            <GenoMirrorSteelFill style={styles.loadingLogo}>
+              <GenoLogoCeremony variant="compact" tone="dark" />
+            </GenoMirrorSteelFill>
+          </GenoMirrorRimFrame>
           <Text style={styles.loadingText}>Loading matches…</Text>
         </View>
       ) : error ? (
@@ -186,7 +190,7 @@ export default function Matches({ isActive, onStartChat, onImmersiveChange }: Ma
                   setRefreshing(true);
                   loadMatches(true);
                 }}
-                tintColor={COLORS.forest}
+                tintColor={LOGO_GOLD}
               />
             }
             ListHeaderComponent={
@@ -208,7 +212,7 @@ export default function Matches({ isActive, onStartChat, onImmersiveChange }: Ma
               <EmptyState
                 type="no-matches"
                 title="No matches yet"
-                subtitle="Keep discovering — when you both like each other, they'll appear here."
+                subtitle="Keep discovering. When you both like each other, they will appear here."
               />
             }
           />
@@ -219,12 +223,17 @@ export default function Matches({ isActive, onStartChat, onImmersiveChange }: Ma
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.linen },
+  container: { flex: 1, backgroundColor: COLORS.background },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, gap: 12 },
+  loadingLogo: {
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 22,
+  },
   loadingText: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
-    color: COLORS.sage,
+    color: LOGO_GOLD,
   },
   listWrap: { flex: 1 },
   list: { paddingTop: 4, paddingBottom: TAB_SCENE_BOTTOM_PADDING },

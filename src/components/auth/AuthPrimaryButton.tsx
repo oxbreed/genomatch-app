@@ -1,6 +1,6 @@
 import { ActivityIndicator, Animated, Pressable, StyleSheet, Text, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { FONT_FAMILY, COLORS } from '../../theme';
+import { GenoMirrorRedFill } from '../../brand/graphics';
+import { COLORS, TYPOGRAPHY } from '../../theme';
 
 type Props = {
   label: string;
@@ -26,27 +26,22 @@ export default function AuthPrimaryButton({
   return (
     <Animated.View style={[styles.wrap, { transform: [{ scale }] }]}>
       <Pressable
-        style={[styles.btn, (loading || disabled) && styles.btnDisabled]}
+        style={[ (loading || disabled) && styles.btnDisabled]}
         onPressIn={onPressIn}
         onPressOut={onPressOut}
         onPress={onPress}
         disabled={loading || disabled}
       >
-        <LinearGradient
-          colors={[COLORS.gold, '#E8C56A', '#C49A3A']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.gradient}
-        >
+        <GenoMirrorRedFill style={styles.btn}>
           {loading ? (
             <View style={styles.loadingRow}>
-              <ActivityIndicator color={COLORS.forestDeep} size="small" />
+              <ActivityIndicator color={COLORS.white} size="small" />
               <Text style={styles.text}>{loadingLabel}</Text>
             </View>
           ) : (
             <Text style={styles.text}>{label}</Text>
           )}
-        </LinearGradient>
+        </GenoMirrorRedFill>
       </Pressable>
     </Animated.View>
   );
@@ -57,22 +52,14 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   btn: {
-    borderRadius: 16,
-    overflow: 'hidden',
-    shadowColor: COLORS.gold,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 6,
-  },
-  btnDisabled: {
-    opacity: 0.72,
-  },
-  gradient: {
     height: 56,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 20,
+  },
+  btnDisabled: {
+    opacity: 0.65,
   },
   loadingRow: {
     flexDirection: 'row',
@@ -80,9 +67,8 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   text: {
-    fontFamily: FONT_FAMILY.gothamBold,
+    ...TYPOGRAPHY.cta,
     fontSize: 17,
-    color: COLORS.forestDeep,
-    letterSpacing: 0.2,
+    letterSpacing: 0.1,
   },
 });

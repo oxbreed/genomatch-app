@@ -3,7 +3,7 @@ import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { GenoBondMark } from '../../brand';
-import { FONT_FAMILY, COLORS } from '../../theme';
+import {FONT_FAMILY, COLORS, MIRROR_RED_TEXT} from '../../theme';
 
 export default function ProfileEditBanner() {
   const pulse = useRef(new Animated.Value(0)).current;
@@ -37,7 +37,7 @@ export default function ProfileEditBanner() {
   return (
     <Animated.View style={{ opacity }}>
       <LinearGradient
-        colors={['rgba(212, 168, 67, 0.35)', 'rgba(61, 122, 82, 0.2)']}
+        colors={['rgba(255, 255, 255, 0.35)', 'rgba(200, 16, 46, 0.2)']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={styles.banner}
@@ -45,7 +45,7 @@ export default function ProfileEditBanner() {
         <GenoBondMark size={28} opacity={0.9} />
         <View style={styles.copy}>
           <Text style={styles.kicker}>GENOMATCH</Text>
-          <Text style={styles.title}>Editing your bond profile</Text>
+          <Text style={styles.title}>Editing your profile</Text>
           <Text style={styles.sub}>Changes apply when you tap Save</Text>
         </View>
         <Ionicons name="create-outline" size={22} color={COLORS.forestDeep} />
@@ -64,19 +64,19 @@ const styles = StyleSheet.create({
     padding: 14,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.45)',
+    borderColor: 'rgba(255, 255, 255, 0.45)',
   },
   copy: { flex: 1, gap: 2 },
   kicker: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 9,
     letterSpacing: 2,
-    color: COLORS.gold,
+    ...MIRROR_RED_TEXT,
   },
   title: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 16,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
   },
   sub: {
     fontFamily: FONT_FAMILY.gothamMedium,

@@ -2,7 +2,7 @@ import { StyleSheet, Text, TextInput, View, type TextInputProps } from 'react-na
 import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps } from 'react';
 import { GenoGlassSurface } from '../../brand/graphics';
-import { FONT_FAMILY, COLORS, RADIUS } from '../../theme';
+import {FONT_FAMILY, COLORS, RADIUS, MIRROR_RED_TEXT} from '../../theme';
 
 type IonName = ComponentProps<typeof Ionicons>['name'];
 
@@ -59,13 +59,13 @@ const styles = StyleSheet.create({
   label: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 13,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
     letterSpacing: 0.2,
   },
   rightAction: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 13,
-    color: COLORS.forest,
+    ...MIRROR_RED_TEXT,
   },
   glass: {
     overflow: 'hidden',
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 16,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
   },
   inputWithIcon: {
     paddingLeft: 8,

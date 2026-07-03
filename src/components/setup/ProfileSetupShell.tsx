@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GenoBondMark } from '../../brand';
-import { FONT_FAMILY, COLORS } from '../../theme';
+import {FONT_FAMILY, COLORS, MIRROR_RED_TEXT} from '../../theme';
 
 type Props = {
   stepLabel: string;
@@ -22,7 +22,7 @@ export default function ProfileSetupShell({ stepLabel, title, subtitle, children
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.subtitle}>{subtitle}</Text>
       <LinearGradient
-        colors={['transparent', COLORS.gold, 'rgba(61, 122, 82, 0.35)', 'transparent']}
+        colors={['transparent', COLORS.gold, 'rgba(200, 16, 46, 0.35)', 'transparent']}
         start={{ x: 0, y: 0.5 }}
         end={{ x: 1, y: 0.5 }}
         style={styles.rule}
@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 10,
     letterSpacing: 1.8,
-    color: COLORS.gold,
+    ...MIRROR_RED_TEXT,
   },
   stepLabel: {
     fontFamily: FONT_FAMILY.gothamBold,
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 26,
     letterSpacing: -0.4,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
   },
   subtitle: {
     fontFamily: FONT_FAMILY.gothamMedium,

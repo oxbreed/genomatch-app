@@ -1,8 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
-
-const BADGE_BG = '#EDF3EE';
-const BADGE_TEXT = '#0D2818';
-const BADGE_BORDER = 'rgba(13, 40, 24, 0.12)';
+import { COLORS } from '../theme';
 
 export default function GenotypeBadge({ genotype }: { genotype: string }) {
   return (
@@ -18,13 +15,13 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderRadius: 999,
     borderWidth: 1,
-    backgroundColor: BADGE_BG,
-    borderColor: BADGE_BORDER,
+    backgroundColor: COLORS.blush,
+    borderColor: COLORS.border,
   },
   text: {
     fontSize: 12,
     fontWeight: '700',
     letterSpacing: 0.6,
-    color: BADGE_TEXT,
+    color: COLORS.text,
   },
 });

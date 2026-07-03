@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { COLORS } from '../../theme';
+import {COLORS, LOGO_GOLD} from '../../theme';
 import { PROFILE_TYPE } from './profileTokens';
 
 type Props = {
@@ -26,11 +26,12 @@ const styles = StyleSheet.create({
   },
   kicker: {
     ...PROFILE_TYPE.sectionKicker,
-    color: COLORS.gold,
+    color: LOGO_GOLD,
+    letterSpacing: 1.4,
   },
   title: {
     ...PROFILE_TYPE.sectionTitle,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
   },
   hint: {
     ...PROFILE_TYPE.sectionHint,
@@ -40,7 +41,7 @@ const styles = StyleSheet.create({
   rule: {
     marginTop: 12,
     height: 1,
-    backgroundColor: 'rgba(143, 175, 149, 0.35)',
+    backgroundColor: COLORS.chipSolid,
     borderRadius: 1,
   },
 });

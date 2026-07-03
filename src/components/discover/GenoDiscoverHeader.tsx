@@ -1,51 +1,62 @@
 import type { ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { GenoGlassSurface, GenoLogoCeremony } from '../../brand/graphics';
-import { FONT_FAMILY, COLORS, RADIUS } from '../../theme';
+import {
+  GenoGlassSurface,
+  GenoLogoCeremony,
+  GenoMirrorRimFrame,
+  GenoMirrorSteelFill,
+} from '../../brand/graphics';
+import { FONT_FAMILY, COLORS, LOGO_GOLD, RADIUS, TYPOGRAPHY, chromeAlpha, goldAlpha } from '../../theme';
 
 type Props = {
   subtitle: string;
   right?: ReactNode;
 };
 
-/** Compact liquid-glass Discover chrome — frees vertical space for the swipe card. */
+/** Compact mirror-gloss Discover chrome — frees vertical space for the swipe card. */
 export default function GenoDiscoverHeader({ subtitle, right }: Props) {
   return (
     <View style={styles.wrap}>
-      <GenoGlassSurface
-        variant="light"
-        borderRadius={RADIUS.xl}
-        shadow="glassFloat"
-        showTopRule
-        showSheen
-        intensity={60}
-        style={styles.glass}
-        contentStyle={styles.glassInner}
-      >
-        <View style={styles.row}>
-          <GenoLogoCeremony variant="mark" tone="dark" style={styles.mark} />
-          <View style={styles.copy}>
-            <View style={styles.titleRow}>
-              <View style={styles.titleBlock}>
-                <Text style={styles.kicker}>GENOMATCH</Text>
-                <Text style={styles.title}>Discover</Text>
+      <GenoMirrorRimFrame kind="gold" borderRadius={RADIUS.xl} style={styles.glassRim}>
+        <GenoGlassSurface
+          variant="dark"
+          borderRadius={RADIUS.xl - 1.5}
+          shadow="glassFloat"
+          showTopRule
+          showSheen
+          intensity={58}
+          style={styles.glass}
+          contentStyle={styles.glassInner}
+        >
+          <View style={styles.row}>
+            <GenoMirrorRimFrame kind="gold" borderRadius={20} padding={1.5} style={styles.markRim}>
+              <GenoMirrorSteelFill style={styles.markWrap}>
+                <GenoLogoCeremony variant="mark" tone="dark" />
+              </GenoMirrorSteelFill>
+            </GenoMirrorRimFrame>
+            <View style={styles.copy}>
+              <View style={styles.titleRow}>
+                <View style={styles.titleBlock}>
+                  <Text style={styles.kicker}>GENOMATCH</Text>
+                  <Text style={styles.title}>Discover</Text>
+                </View>
+                {right}
               </View>
-              {right}
+              <Text style={styles.subtitle} numberOfLines={3}>
+                {subtitle}
+              </Text>
             </View>
-            <Text style={styles.subtitle} numberOfLines={2}>
-              {subtitle}
-            </Text>
           </View>
-        </View>
-        <LinearGradient
-          colors={['transparent', COLORS.gold, 'rgba(61, 122, 82, 0.35)', 'transparent']}
-          start={{ x: 0, y: 0.5 }}
-          end={{ x: 1, y: 0.5 }}
-          style={styles.rule}
-          pointerEvents="none"
-        />
-      </GenoGlassSurface>
+          <LinearGradient
+            colors={['transparent', chromeAlpha(0.35), LOGO_GOLD, goldAlpha(0.35), 'transparent']}
+            start={{ x: 0, y: 0.5 }}
+            end={{ x: 1, y: 0.5 }}
+            style={styles.rule}
+            pointerEvents="none"
+          />
+        </GenoGlassSurface>
+      </GenoMirrorRimFrame>
     </View>
   );
 }
@@ -56,6 +67,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingBottom: 0,
     zIndex: 4,
+  },
+  glassRim: {
+    alignSelf: 'stretch',
+    width: '100%',
   },
   glass: {
     overflow: 'hidden',
@@ -71,10 +86,15 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     gap: 8,
   },
-  mark: {
-    width: 28,
-    height: 28,
+  markRim: {
     marginTop: 1,
+  },
+  markWrap: {
+    width: 34,
+    height: 34,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 17,
   },
   copy: {
     flex: 1,
@@ -93,23 +113,18 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   kicker: {
-    fontFamily: FONT_FAMILY.marketingExtrabold,
-    fontSize: 8,
-    letterSpacing: 2.2,
-    color: COLORS.gold,
+    ...TYPOGRAPHY.marketingKicker,
+    fontSize: 10,
+    letterSpacing: 2,
+    color: LOGO_GOLD,
   },
   title: {
-    fontFamily: FONT_FAMILY.gothamSemiBold,
-    fontSize: 19,
-    letterSpacing: -0.35,
-    color: COLORS.forestDeep,
+    ...TYPOGRAPHY.headingSm,
+    fontSize: 20,
+    letterSpacing: -0.4,
   },
   subtitle: {
-    fontFamily: FONT_FAMILY.gothamMedium,
-    fontSize: 10,
-    lineHeight: 12,
-    letterSpacing: 0.05,
-    color: COLORS.sage,
+    ...TYPOGRAPHY.caption,
     minWidth: 0,
     flexShrink: 1,
   },

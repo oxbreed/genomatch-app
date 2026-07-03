@@ -11,7 +11,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { GenoBondMark, GenoSignaturePattern } from '../../brand';
-import { FONT_FAMILY, COLORS, RADIUS, SHADOWS } from '../../theme';
+import {FONT_FAMILY, COLORS, RADIUS, SHADOWS, MIRROR_RED_TEXT} from '../../theme';
 
 type Props = {
   reviewedCount: number;
@@ -100,14 +100,14 @@ export default function DiscoverSeenAllState({
       ]}
     >
       <LinearGradient
-        colors={['rgba(212, 168, 67, 0.4)', 'rgba(61, 122, 82, 0.25)', 'rgba(212, 168, 67, 0.35)']}
+        colors={['rgba(255, 255, 255, 0.4)', 'rgba(200, 16, 46, 0.25)', 'rgba(255, 255, 255, 0.35)']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.cardBorder}
       >
         <View style={styles.card}>
           <LinearGradient
-            colors={[COLORS.white, COLORS.mint, 'rgba(237, 243, 238, 0.95)']}
+            colors={[COLORS.white, COLORS.mint, 'rgba(243, 235, 227, 0.95)']}
             start={{ x: 0.5, y: 0 }}
             end={{ x: 0.5, y: 1 }}
             style={styles.cardGradient}
@@ -120,7 +120,7 @@ export default function DiscoverSeenAllState({
               <Animated.View style={[styles.outerRing, { opacity: ringOpacity }]} />
               <Animated.View style={[styles.markWrap, { transform: [{ scale: markPulse }] }]}>
                 <LinearGradient
-                  colors={['rgba(237, 243, 238, 0.95)', COLORS.white]}
+                  colors={['rgba(243, 235, 227, 0.95)', COLORS.white]}
                   style={styles.markCircle}
                 >
                   <GenoBondMark size={52} opacity={0.95} />
@@ -133,13 +133,13 @@ export default function DiscoverSeenAllState({
 
             <View style={styles.statusPill}>
               <Ionicons name="checkmark-done" size={14} color={COLORS.forestDeep} />
-              <Text style={styles.statusText}>Stack complete</Text>
+              <Text style={styles.statusText}>You are caught up</Text>
             </View>
 
             <Text style={styles.title}>{"You've seen everyone nearby"}</Text>
             <Text style={styles.subtitle}>
-              You reviewed {countLabel} in this stack. Fresh genotype-aware profiles arrive as new
-              members join — check back tomorrow.
+              You reviewed {countLabel} in Discover. New profiles arrive as members join. Check back
+              tomorrow.
             </Text>
 
             <View style={styles.tomorrowCard}>
@@ -167,7 +167,7 @@ export default function DiscoverSeenAllState({
                   style={styles.primaryGradient}
                 >
                   <Ionicons name="refresh" size={18} color={COLORS.linen} />
-                  <Text style={styles.primaryText}>Browse stack again</Text>
+                  <Text style={styles.primaryText}>Browse again</Text>
                 </LinearGradient>
               </Pressable>
             ) : null}
@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
     height: 132,
     borderRadius: 66,
     borderWidth: 2,
-    borderColor: 'rgba(212, 168, 67, 0.45)',
+    borderColor: 'rgba(255, 255, 255, 0.45)',
   },
   markWrap: {
     zIndex: 2,
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1.5,
-    borderColor: 'rgba(212, 168, 67, 0.35)',
+    borderColor: 'rgba(255, 255, 255, 0.35)',
     shadowColor: COLORS.gold,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.2,
@@ -271,9 +271,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 999,
-    backgroundColor: 'rgba(61, 122, 82, 0.12)',
+    backgroundColor: 'rgba(200, 16, 46, 0.12)',
     borderWidth: 1,
-    borderColor: 'rgba(61, 122, 82, 0.2)',
+    borderColor: 'rgba(200, 16, 46, 0.2)',
     marginBottom: 14,
   },
   statusText: {
@@ -281,13 +281,13 @@ const styles = StyleSheet.create({
     fontSize: 11,
     letterSpacing: 1.2,
     textTransform: 'uppercase',
-    color: COLORS.forestDeep,
+    color: COLORS.text,
   },
   title: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 26,
     letterSpacing: -0.5,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
     textAlign: 'center',
     marginBottom: 10,
   },
@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
     width: '100%',
     padding: 14,
     borderRadius: RADIUS.md,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.surfaceElevated,
     borderWidth: 1,
     borderColor: COLORS.border,
     marginBottom: 20,
@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(212, 168, 67, 0.18)',
+    backgroundColor: 'rgba(255, 255, 255, 0.18)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
   tomorrowValue: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 15,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
   },
   primaryBtn: {
     width: '100%',
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
   secondaryText: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 15,
-    color: COLORS.forest,
+    ...MIRROR_RED_TEXT,
   },
   btnPressed: {
     opacity: 0.9,

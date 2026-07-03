@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
   label: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
     maxWidth: 140,
   },
   labelCompact: {

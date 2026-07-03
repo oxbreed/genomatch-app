@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { FONT_FAMILY, COLORS } from '../../theme';
+import {FONT_FAMILY, COLORS, MIRROR_RED_TEXT} from '../../theme';
 
 type Stats = {
   matches: number;
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
   value: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 26,
-    color: COLORS.gold,
+    ...MIRROR_RED_TEXT,
   },
   label: {
     fontFamily: FONT_FAMILY.gothamBold,

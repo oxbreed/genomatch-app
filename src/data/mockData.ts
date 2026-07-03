@@ -1,20 +1,20 @@
 import { resolveDistanceBandFromCities } from '../lib/distanceBands';
 import type { DiscoveryProfile } from '../types/database';
+import { BRAND_BLACK, BRAND_CHARCOAL, COLORS } from '../theme';
 
 export { COLORS, TYPOGRAPHY, RADIUS, SHADOWS } from '../theme';
-import { COLORS } from '../theme';
 
 const GENOTYPE_BADGE_STYLE = {
-  bg: '#EDF3EE',
-  text: '#0D2818',
-  border: 'rgba(13, 40, 24, 0.12)',
+  bg: COLORS.blush,
+  text: COLORS.text,
+  border: COLORS.border,
 } as const;
 
 export const GENOTYPE_STYLES: Record<
   string,
   { bg: string; text: string; border: string }
 > = {
-  AA: { ...GENOTYPE_BADGE_STYLE },
+  AA: { bg: COLORS.blush, text: COLORS.text, border: COLORS.border },
   AS: { ...GENOTYPE_BADGE_STYLE },
   SS: { ...GENOTYPE_BADGE_STYLE },
   AC: { ...GENOTYPE_BADGE_STYLE },
@@ -46,7 +46,7 @@ export const MOCK_MATCHES: MockProfile[] = [
     compatibility: 94,
     bio: 'Architect who loves live music and long walks. Looking for someone intentional, kind, and ready for something real.',
     interests: ['Music', 'Travel', 'Art', 'Food'],
-    gradient: ['#2A5C40', '#1A3D28'],
+    gradient: [COLORS.brandRed, BRAND_BLACK],
     photoUrl: 'https://genomatch.app/demo/demo-amara.png',
     lastMessageAt: '2h ago',
   },
@@ -59,7 +59,7 @@ export const MOCK_MATCHES: MockProfile[] = [
     compatibility: 87,
     bio: 'Fitness coach and foodie. I value honesty, good conversation, and building a future with the right person.',
     interests: ['Fitness', 'Food', 'Sports', 'Movies'],
-    gradient: ['#2E7D32', '#1B5E20'],
+    gradient: ['#6B6B6B', BRAND_BLACK],
     photoUrl: 'https://genomatch.app/demo/demo-kwame.png',
     lastMessageAt: 'Yesterday',
   },
@@ -72,7 +72,7 @@ export const MOCK_MATCHES: MockProfile[] = [
     compatibility: 78,
     bio: 'Medical student and book lover. Building a life filled with purpose, laughter, and deep connection.',
     interests: ['Reading', 'Movies', 'Nature', 'Food'],
-    gradient: ['#A32D2D', '#7B1F1F'],
+    gradient: [COLORS.brandRedSoft, COLORS.brandRedDeep],
     photoUrl: 'https://genomatch.app/demo/demo-zainab.png',
     lastMessageAt: 'Mon',
   },
@@ -85,16 +85,17 @@ export const MOCK_MATCHES: MockProfile[] = [
     compatibility: 82,
     bio: 'Software engineer who enjoys hiking and photography. Looking for an honest connection built on shared values and laughter.',
     interests: ['Hiking', 'Photography', 'Tech', 'Music'],
-    gradient: ['#1B5E20', '#0D2818'],
+    gradient: [COLORS.brandRedDeep, BRAND_BLACK],
     photoUrl: 'https://genomatch.app/demo/demo-amani.png',
     lastMessageAt: '3d ago',
   },
 ];
 
 export const RELATIONSHIP_GOAL_LABELS: Record<string, string> = {
-  serious: 'Serious Relationship',
+  serious: 'Serious relationship',
   marriage: 'Marriage',
   friendship: 'Friendship',
+  casual: 'Casual dating',
 };
 
 export type CurrentUserProfile = {
@@ -116,7 +117,7 @@ export const MOCK_CURRENT_USER: CurrentUserProfile = {
   bio: 'Passionate about meaningful connections, good food, and building a future with the right person. Genotype-aware and intentional about love.',
   interests: ['Music', 'Travel', 'Tech', 'Food'],
   relationshipGoal: 'serious',
-  gradient: ['#1A3D28', '#2A5C40'],
+  gradient: [BRAND_CHARCOAL, COLORS.brandRed],
 };
 
 export function getInitials(name: string) {

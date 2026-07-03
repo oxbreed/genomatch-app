@@ -2,7 +2,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { GenoBondMark } from '../../brand';
-import { FONT_FAMILY, COLORS } from '../../theme';
+import {FONT_FAMILY, COLORS, MIRROR_RED_TEXT} from '../../theme';
 
 type Props = {
   kicker?: string;
@@ -54,7 +54,7 @@ export default function GenoAuthHeader({
       </View>
 
       <LinearGradient
-        colors={['transparent', COLORS.gold, 'rgba(61, 122, 82, 0.35)', 'transparent']}
+        colors={['transparent', COLORS.gold, 'rgba(200, 16, 46, 0.35)', 'transparent']}
         start={{ x: 0, y: 0.5 }}
         end={{ x: 1, y: 0.5 }}
         style={styles.rule}
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.marketingExtrabold,
     fontSize: 10,
     letterSpacing: 2.4,
-    color: COLORS.gold,
+    ...MIRROR_RED_TEXT,
   },
   title: {
     fontFamily: FONT_FAMILY.gothamSemiBold,

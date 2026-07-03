@@ -1,90 +1,74 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
+import { ActivityIndicator, Animated, Easing, Image, StyleSheet, View } from 'react-native';
+import { BRAND_BLACK, LOGO_GOLD, MOTION } from '../../theme';
 import {
-  ActivityIndicator,
-  Animated,
-  Easing,
-  StyleSheet,
-  View,
-} from 'react-native';
-import { GenoPremiumChrome, GenoLogoCeremony } from '../../brand/graphics';
-import { COLORS } from '../../theme';
+  ONBOARDING_LOGO_HEIGHT,
+  ONBOARDING_LOGO_WIDTH,
+} from './onboardingLayout';
+import GenoPremiumOnboardingBackdrop from './GenoPremiumOnboardingBackdrop';
 
-const MIN_DISPLAY_MS = 2200;
-const FADE_MS = 550;
+/** Splash poster only — do not import ribbonLogo.ts (pulls animated GIF into cold start) */
+const SPLASH_LOGO = require('../../../assets/genomatch-ribbon-logo.png');
+
+const MIN_DISPLAY_MS = 1100;
+const HARD_CAP_MS = 2800;
+const FADE_OUT_MS = 220;
 
 type Props = {
-  /** Still loading fonts or session — keep logo visible with spinner */
   bootstrapping?: boolean;
-  /** When false, splash waits after min display before fading out */
-  readyToExit?: boolean;
   onFinish: () => void;
 };
 
-export default function GenoSplashScreen({
-  bootstrapping,
-  readyToExit = true,
-  onFinish,
-}: Props) {
-  const splashOpacity = useRef(new Animated.Value(1)).current;
-  const splashScale = useRef(new Animated.Value(0.88)).current;
-  const [minDisplayElapsed, setMinDisplayElapsed] = useState(false);
-  const exitStarted = useRef(false);
+/** Cold open — static logo, quick fade handoff */
+export default function GenoSplashScreen({ bootstrapping, onFinish }: Props) {
+  const finished = useRef(false);
+  const onFinishRef = useRef(onFinish);
+  const opacity = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    Animated.timing(splashScale, {
-      toValue: 1,
-      duration: 900,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: true,
-    }).start();
-  }, [splashScale]);
+    onFinishRef.current = onFinish;
+  }, [onFinish]);
 
   useEffect(() => {
-    const timer = setTimeout(() => setMinDisplayElapsed(true), MIN_DISPLAY_MS);
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    if (!minDisplayElapsed || !readyToExit || exitStarted.current) return;
-    exitStarted.current = true;
-
-    Animated.parallel([
-      Animated.timing(splashOpacity, {
+    const done = () => {
+      if (finished.current) return;
+      finished.current = true;
+      Animated.timing(opacity, {
         toValue: 0,
-        duration: FADE_MS,
-        easing: Easing.inOut(Easing.quad),
+        duration: FADE_OUT_MS,
+        easing: MOTION.easing.out,
         useNativeDriver: true,
-      }),
-      Animated.timing(splashScale, {
-        toValue: 1.05,
-        duration: FADE_MS,
-        easing: Easing.in(Easing.cubic),
-        useNativeDriver: true,
-      }),
-    ]).start(({ finished }) => {
-      if (finished) onFinish();
-    });
-  }, [minDisplayElapsed, onFinish, readyToExit, splashOpacity, splashScale]);
+      }).start(({ finished: animDone }) => {
+        if (animDone) onFinishRef.current();
+      });
+    };
+
+    const minTimer = setTimeout(done, MIN_DISPLAY_MS);
+    const capTimer = setTimeout(done, HARD_CAP_MS);
+    return () => {
+      clearTimeout(minTimer);
+      clearTimeout(capTimer);
+    };
+  }, [opacity]);
 
   return (
     <View style={styles.root}>
-      <GenoPremiumChrome variant="forest" />
-      <Animated.View
-        style={[
-          styles.layer,
-          { opacity: splashOpacity, transform: [{ scale: splashScale }] },
-        ]}
-      >
-        <GenoLogoCeremony
-          variant="splash"
-          showWordmark
-          tagline="Connecting hearts. Aligning genes."
-          tone="light"
-          style={styles.ceremony}
+      <GenoPremiumOnboardingBackdrop />
+
+      <Animated.View style={[styles.layer, { opacity }]}>
+        <Image
+          source={SPLASH_LOGO}
+          style={{
+            width: ONBOARDING_LOGO_WIDTH,
+            height: ONBOARDING_LOGO_HEIGHT,
+          }}
+          resizeMode="contain"
+          accessibilityLabel="GenoMatch logo"
+          accessibilityIgnoresInvertColors
         />
 
         {bootstrapping ? (
-          <ActivityIndicator style={styles.spinner} size="small" color={COLORS.gold} />
+          <ActivityIndicator style={styles.spinner} size="small" color={LOGO_GOLD} />
         ) : null}
       </Animated.View>
     </View>
@@ -94,16 +78,16 @@ export default function GenoSplashScreen({
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: COLORS.splash,
+    backgroundColor: BRAND_BLACK,
   },
   layer: {
-    ...StyleSheet.absoluteFillObject,
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    zIndex: 2,
+    paddingHorizontal: 24,
   },
-  ceremony: {
-    marginBottom: 72,
+  spinner: {
+    position: 'absolute',
+    bottom: '14%',
   },
-  spinner: { marginTop: -48 },
 });

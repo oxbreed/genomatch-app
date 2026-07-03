@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { GenoGlassSurface } from '../../brand/graphics';
-import { FONT_FAMILY, COLORS, RADIUS } from '../../theme';
+import {FONT_FAMILY, COLORS, RADIUS, MIRROR_RED_TEXT} from '../../theme';
 
 type Props = {
   icon: 'lock-closed' | 'shield-checkmark' | 'eye-off';
@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: 'rgba(255, 255, 255, 0.55)',
+    backgroundColor: COLORS.chipSolid,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
@@ -53,6 +53,6 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 13,
     lineHeight: 19,
-    color: COLORS.forest,
+    ...MIRROR_RED_TEXT,
   },
 });

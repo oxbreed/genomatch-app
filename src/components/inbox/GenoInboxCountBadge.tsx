@@ -1,5 +1,5 @@
 import { StyleSheet, Text } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { GenoMirrorGoldFill, GenoMirrorRedFill, GenoMirrorRimFrame } from '../../brand/graphics';
 import { FONT_FAMILY, COLORS } from '../../theme';
 import { INBOX } from './inboxTokens';
 
@@ -11,15 +11,22 @@ type Props = {
 export default function GenoInboxCountBadge({ count, variant = 'gold' }: Props) {
   if (count <= 0) return null;
 
-  const colors =
-    variant === 'alert'
-      ? ([COLORS.error, '#E85A4F'] as [string, string])
-      : INBOX.colors.goldBtn;
+  if (variant === 'alert') {
+    return (
+      <GenoMirrorRimFrame kind="red" borderRadius={INBOX.countBadgeH / 2}>
+        <GenoMirrorRedFill style={styles.badge}>
+          <Text style={styles.textAlert}>{count}</Text>
+        </GenoMirrorRedFill>
+      </GenoMirrorRimFrame>
+    );
+  }
 
   return (
-    <LinearGradient colors={colors} style={styles.badge}>
-      <Text style={styles.text}>{count}</Text>
-    </LinearGradient>
+    <GenoMirrorRimFrame kind="gold" borderRadius={INBOX.countBadgeH / 2}>
+      <GenoMirrorGoldFill style={styles.badge}>
+        <Text style={styles.text}>{count}</Text>
+      </GenoMirrorGoldFill>
+    </GenoMirrorRimFrame>
   );
 }
 
@@ -27,7 +34,7 @@ const styles = StyleSheet.create({
   badge: {
     minWidth: INBOX.countBadgeH,
     height: INBOX.countBadgeH,
-    borderRadius: INBOX.countBadgeH / 2,
+    borderRadius: INBOX.countBadgeH / 2 - 1.5,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 8,
@@ -35,6 +42,11 @@ const styles = StyleSheet.create({
   text: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 13,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
+  },
+  textAlert: {
+    fontFamily: FONT_FAMILY.gothamBold,
+    fontSize: 13,
+    color: COLORS.white,
   },
 });

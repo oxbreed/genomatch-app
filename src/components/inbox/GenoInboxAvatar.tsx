@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { GenoMirrorGoldFill, GenoMirrorRimFrame } from '../../brand/graphics';
 import ProfileAvatar from '../ProfileAvatar';
 import { PresenceDot } from '../PresenceBadge';
 import { FONT_FAMILY, COLORS } from '../../theme';
@@ -10,7 +10,8 @@ import { INBOX } from './inboxTokens';
 function brandGradient(name: string): [string, string] {
   const pairs: [string, string][] = [
     [COLORS.forest, COLORS.forestDeep],
-    [COLORS.forestDeep, '#0A1F12'],
+    [COLORS.brandRedDeep, COLORS.forestDeep],
+    [COLORS.brandCharcoal, COLORS.forestDeep],
   ];
   return pairs[name.charCodeAt(0) % pairs.length]!;
 }
@@ -37,10 +38,7 @@ export default function GenoInboxAvatar({
 
   return (
     <View style={styles.wrap}>
-      <LinearGradient
-        colors={INBOX.colors.borderGradient}
-        style={[styles.ring, { width: size + 4, height: size + 4, borderRadius: (size + 4) / 2 }]}
-      >
+      <GenoMirrorRimFrame kind="gold" borderRadius={(size + 4) / 2} padding={2}>
         <View style={[styles.inner, { width: size, height: size, borderRadius: size / 2 }]}>
           {url ? (
             <ProfileAvatar
@@ -57,16 +55,18 @@ export default function GenoInboxAvatar({
             </View>
           )}
         </View>
-      </LinearGradient>
+      </GenoMirrorRimFrame>
       {presenceState && presenceState !== 'offline' ? (
         <View style={styles.presence}>
           <PresenceDot presenceState={presenceState} size={14} />
         </View>
       ) : null}
       {showUnread ? (
-        <LinearGradient colors={INBOX.colors.goldBtn} style={styles.unread}>
-          <View style={styles.unreadDot} />
-        </LinearGradient>
+        <GenoMirrorRimFrame kind="red" borderRadius={7} padding={1} style={styles.unread}>
+          <GenoMirrorGoldFill style={styles.unreadFill}>
+            <View style={styles.unreadDot} />
+          </GenoMirrorGoldFill>
+        </GenoMirrorRimFrame>
       ) : null}
     </View>
   );
@@ -76,24 +76,19 @@ const styles = StyleSheet.create({
   wrap: {
     position: 'relative',
   },
-  ring: {
-    padding: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   inner: {
     overflow: 'hidden',
-    backgroundColor: COLORS.mint,
+    backgroundColor: COLORS.surfaceElevated,
   },
   fallback: {
-    backgroundColor: COLORS.mint,
+    backgroundColor: COLORS.surfaceElevated,
     alignItems: 'center',
     justifyContent: 'center',
   },
   initials: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 17,
-    color: COLORS.gold,
+    color: COLORS.text,
   },
   presence: {
     position: 'absolute',
@@ -104,18 +99,20 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -1,
     right: -1,
+  },
+  unreadFill: {
     width: 14,
     height: 14,
-    borderRadius: 7,
+    borderRadius: 6,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: COLORS.white,
+    borderColor: COLORS.background,
   },
   unreadDot: {
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: COLORS.forestDeep,
+    backgroundColor: COLORS.text,
   },
 });

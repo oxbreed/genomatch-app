@@ -16,11 +16,12 @@ import About from './About';
 import CommunityGuidelines from './CommunityGuidelines';
 import PrivacyPolicy from './PrivacyPolicy';
 import IdentityVerification from './IdentityVerification';
-import { GenoPremiumChrome, GenoLogoCeremony } from '../src/brand/graphics';
+import { GenoLogoCeremony, GenoMirrorRimFrame, GenoMirrorSteelFill, GenoPremiumChrome } from '../src/brand/graphics';
 import EmptyState from '../src/components/EmptyState';
 import { GenoInboxHeader, GenoInboxIconButton, GenoInboxRetryPanel } from '../src/components/inbox';
 import {
   ProfileDetailsFields,
+  ProfileIdentityFields,
   ProfileEditFields,
   ProfileFooterCard,
   ProfileDeleteAccountModal,
@@ -45,7 +46,7 @@ import {
   type StudioSaveState,
 } from '../src/components/profileStudio';
 import { GENO_TAB_BAR_HEIGHT } from '../src/components/navigation/tabBarLayout';
-import { FONT_FAMILY, COLORS, MOTION } from '../src/theme';
+import {FONT_FAMILY, COLORS, LOGO_GOLD, MOTION} from '../src/theme';
 import { uploadAdditionalPhoto } from '../src/lib/photoUpload';
 import { mapProfileRow } from '../src/lib/profileMapper';
 import { logAuthState } from '../src/lib/auth';
@@ -53,6 +54,7 @@ import { deleteUserAccount } from '../src/lib/accountDeletion';
 import { GENOMATCH_COMPANY } from '../src/constants/company';
 import { detectDeviceCity, syncProfileCityFromDevice } from '../src/lib/location';
 import { dateOfBirthFromAge, isMinimumAge } from '../src/lib/validation';
+import { parseProfilePronoun, type ProfilePronoun } from '../src/lib/profilePronouns';
 import {
   fetchCityUpdateEligibility,
   updateVerifiedCityFromDevice,
@@ -87,6 +89,7 @@ type EditableProfile = {
   bio: string;
   age: string;
   genotype: Genotype;
+  pronouns: ProfilePronoun | '';
   interests: string[];
   relationshipGoal: string;
   avatarUrl: string | null;
@@ -111,7 +114,7 @@ function calculateProfileCompletion(data: EditableProfile): number {
 }
 
 function getStrengthLabel(percent: number): string {
-  return percent >= 80 ? 'Strong bond profile' : 'Complete your profile for better matches';
+  return percent >= 80 ? 'Strong profile' : 'Complete your profile for better matches';
 }
 
 function countStudioEssentials(data: EditableProfile): number {
@@ -130,6 +133,7 @@ function profilesEqual(a: EditableProfile, b: EditableProfile): boolean {
     a.displayName === b.displayName &&
     a.city === b.city &&
     a.bio === b.bio &&
+    a.pronouns === b.pronouns &&
     a.relationshipGoal === b.relationshipGoal &&
     a.heightCm === b.heightCm &&
     a.religion === b.religion &&
@@ -219,6 +223,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
         bio: mapped.bio,
         age: mapped.age != null ? String(mapped.age) : '',
         genotype: mapped.genotype,
+        pronouns: parseProfilePronoun(row.gender) ?? '',
         interests: mapped.interests,
         relationshipGoal: row.relationship_goal ?? 'serious',
         avatarUrl: mapped.avatarUrl,
@@ -336,6 +341,10 @@ export default function Profile({ onSignOut }: ProfileProps) {
       smoking_status: target.smokingStatus || null,
       education_status: target.educationStatus || null,
     };
+
+    if (target.pronouns) {
+      fields.gender = target.pronouns;
+    }
 
     if (!target.genotypeVerified) {
       fields.city = target.city.trim();
@@ -654,8 +663,12 @@ export default function Profile({ onSignOut }: ProfileProps) {
     return (
       <View style={[styles.root, styles.centered]}>
         <GenoMeshBackdrop />
-        <GenoPremiumChrome variant="linen" />
-        <GenoLogoCeremony variant="auth" tone="dark" />
+        <GenoPremiumChrome variant="forest" />
+        <GenoMirrorRimFrame kind="gold" borderRadius={28} padding={2}>
+          <GenoMirrorSteelFill style={styles.loadingLogo}>
+            <GenoLogoCeremony variant="auth" tone="dark" />
+          </GenoMirrorSteelFill>
+        </GenoMirrorRimFrame>
         <Text style={styles.loadingText}>Loading your profile…</Text>
       </View>
     );
@@ -665,7 +678,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
     return (
       <View style={[styles.root, styles.centered]}>
         <GenoMeshBackdrop />
-        <GenoPremiumChrome variant="linen" />
+        <GenoPremiumChrome variant="forest" />
         {authUserId ? (
           <GenoInboxRetryPanel
             message="Complete profile setup to continue."
@@ -698,8 +711,8 @@ export default function Profile({ onSignOut }: ProfileProps) {
     <View style={styles.root}>
       <GenoMeshBackdrop studio={editing} />
       <ProfileBondAura active={editing} verified={data.genotypeVerified && editing} />
-      <GenoPremiumChrome variant="linen" />
-      <StatusBar style="dark" />
+      <GenoPremiumChrome variant="forest" />
+      <StatusBar style="light" />
 
       <KeyboardAvoidingView
         style={styles.flex}
@@ -709,8 +722,8 @@ export default function Profile({ onSignOut }: ProfileProps) {
           title={editing ? 'Edit profile' : 'Profile'}
           subtitle={
             editing
-              ? 'Scroll to update · changes save automatically'
-              : `${completionPercent}% complete · live on Discover`
+              ? 'Edits save automatically as you scroll.'
+              : `${completionPercent}% complete — visible in Discover`
           }
           ceremonyMark={editing}
           glass
@@ -795,6 +808,20 @@ export default function Profile({ onSignOut }: ProfileProps) {
               </ProfileSectionCard>
 
               <ProfileSectionCard
+                kicker="IDENTITY"
+                label="Pronouns"
+                hint="How you appear on your profile and to matches"
+                editing
+              >
+                <ProfileIdentityFields
+                  pronouns={draft.pronouns}
+                  onSelectPronouns={(value) =>
+                    setDraft((p) => (p ? { ...p, pronouns: value } : p))
+                  }
+                />
+              </ProfileSectionCard>
+
+              <ProfileSectionCard
                 kicker="YOUR STORY"
                 label="About you"
                 hint="Bio, interests, and what you are looking for"
@@ -873,7 +900,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
                 hint={
                   data.photos.length > 0
                     ? `${data.photos.length} photo${data.photos.length === 1 ? '' : 's'} on your profile`
-                    : 'Add photos in Profile Studio'
+                    : 'Add photos when you edit your profile'
                 }
               >
                 <ProfilePhotosGrid
@@ -892,6 +919,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
                 hint="How matches see your bond on Discover"
               >
                 <ProfileViewSections
+                  pronouns={data.pronouns}
                   bio={data.bio}
                   interests={data.interests}
                   relationshipGoal={data.relationshipGoal}
@@ -979,7 +1007,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: COLORS.linen },
+  root: { flex: 1, backgroundColor: COLORS.background },
   flex: { flex: 1 },
   centered: { alignItems: 'center', justifyContent: 'center', padding: 24 },
   scroll: { paddingBottom: GENO_TAB_BAR_HEIGHT + 20, paddingTop: 2 },
@@ -999,12 +1027,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(220, 80, 60, 0.1)',
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
-    color: COLORS.forest,
+    color: COLORS.error,
   },
   emptyText: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 16,
-    color: COLORS.forest,
+    color: COLORS.textMuted,
     textAlign: 'center',
   },
   retryBtn: {
@@ -1012,13 +1040,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 12,
-    backgroundColor: COLORS.gold,
+    backgroundColor: LOGO_GOLD,
   },
-  retryText: { fontFamily: FONT_FAMILY.gothamBold, fontSize: 15, color: COLORS.forest },
+  retryText: { fontFamily: FONT_FAMILY.gothamBold, fontSize: 15, color: COLORS.text },
+  loadingLogo: {
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderRadius: 26,
+  },
   loadingText: {
     marginTop: 16,
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
-    color: COLORS.sage,
+    color: LOGO_GOLD,
   },
 });

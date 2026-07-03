@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  ActivityIndicator,
   Animated,
   Dimensions,
   Easing,
@@ -14,7 +13,6 @@ import {
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
-import { Ionicons } from '@expo/vector-icons';
 import EmptyState from '../src/components/EmptyState';
 import FilterSheet, {
   DEFAULT_DISCOVERY_FILTERS,
@@ -31,7 +29,7 @@ import {
   DiscoverSwipeStamp,
   GenoDiscoverHeader,
 } from '../src/components/discover';
-import { GenoInboxIconButton } from '../src/components/inbox';
+import { GenoInboxIconButton, GenoInboxRetryPanel } from '../src/components/inbox';
 import {
   DISCOVERY_CARD_ACTIONS_LIFT,
   DISCOVERY_CARD_ACTIONS_OVERLAY,
@@ -42,20 +40,30 @@ import {
   getDiscoveryCardHeight,
   getDiscoveryCardHeightFromDeck,
 } from '../src/components/navigation/tabBarLayout';
-import { GenoPremiumChrome } from '../src/brand/graphics';
+import {
+  GenoLogoCeremony,
+  GenoMirrorBrandCtaFill,
+  GenoMirrorMetallicIcon,
+  GenoMirrorRimFrame,
+  GenoMirrorSteelFill,
+  GenoPremiumChrome,
+} from '../src/brand/graphics';
 import GenotypeBadge from '../src/components/GenotypeBadge';
 import ReportBlockSheet from '../src/components/ReportBlockSheet';
 import { COLORS, RADIUS, SHADOWS, TYPOGRAPHY, getMockDiscoveryProfiles } from '../src/data/mockData';
 import {
   fetchDiscoveryProfiles,
+  getCurrentProfile,
   getViewerProfileSnapshot,
+  saveInterestedIn,
   type DiscoveryDeckStats,
   type ViewerProfileSnapshot,
 } from '../src/lib/profiles';
+import { parseDiscoveryInterests } from '../src/lib/discoveryInterest';
 import { clearMyPasses, recordLike, recordPass } from '../src/lib/likes';
 import { formatSecurityError } from '../src/lib/security';
 import { getMatchIdForProfile } from '../src/lib/matches';
-import { MOTION } from '../src/theme';
+import { FONT_FAMILY, LOGO_GOLD, MOTION, MIRROR_RED_TEXT } from '../src/theme';
 import type { DiscoveryProfile, Genotype } from '../src/types/database';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -74,10 +82,10 @@ function discoveryDeckHint(stats: DiscoveryDeckStats | null): string {
     return 'No completed profiles yet. Check back as more members join.';
   }
   if (stats.passed > 0 && stats.liked > 0) {
-    return `You passed on ${stats.passed} and liked ${stats.liked}. Passed profiles stay hidden until you reset them.`;
+    return `You passed on ${stats.passed} and liked ${stats.liked}. Tap below to show passed profiles again.`;
   }
   if (stats.passed > 0) {
-    return `You passed on ${stats.passed} profile${stats.passed === 1 ? '' : 's'}. Reset passes below to see them again.`;
+    return `You passed on ${stats.passed} profile${stats.passed === 1 ? '' : 's'}. Tap below to show them again.`;
   }
   if (stats.liked > 0) {
     return `You liked ${stats.liked} profile${stats.liked === 1 ? '' : 's'}. They stay hidden here until there is a mutual match.`;
@@ -140,11 +148,16 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
     setLoadError('');
     setLoading(true);
     try {
-      const [{ profiles: rows, viewerGenotype: loadedViewerGenotype, deckStats: stats }, viewer] =
+      const [{ profiles: rows, viewerGenotype: loadedViewerGenotype, deckStats: stats }, viewer, profile] =
         await Promise.all([
           fetchDiscoveryProfiles(),
           getViewerProfileSnapshot(),
+          getCurrentProfile(),
         ]);
+      const interestedIn = parseDiscoveryInterests(profile?.interested_in);
+      if (interestedIn.length > 0) {
+        setFilters((current) => ({ ...current, interestedIn }));
+      }
       setViewerGenotype(loadedViewerGenotype);
       setViewerSnapshot(viewer);
       setDeckStats(stats);
@@ -172,6 +185,23 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
       setLoading(false);
     }
   }, []);
+
+  const handleApplyFilters = useCallback(
+    async (next: DiscoveryFilters) => {
+      setFilters(next);
+      if (next.interestedIn.length > 0) {
+        try {
+          await saveInterestedIn(next.interestedIn);
+          await loadProfiles();
+        } catch (err) {
+          setActionError(
+            err instanceof Error ? err.message : 'Could not save your discovery preferences.'
+          );
+        }
+      }
+    },
+    [loadProfiles]
+  );
 
   useEffect(() => {
     if (isActive) {
@@ -694,7 +724,7 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
   const canResetPasses = !usingMockFallback && (deckStats?.passed ?? 0) > 0;
   const deckEmptyHint = discoveryDeckHint(deckStats);
   const discoverSubtitle = usingMockFallback
-    ? 'Preview profiles · real matches\nas members join'
+    ? 'Preview profiles while we grow. Real matches arrive as new members join.'
     : 'Genotype-aware matches near you';
 
 
@@ -744,7 +774,7 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
   return (
     <View style={styles.container}>
       <GenoPremiumChrome variant="discover" />
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
 
       <View style={styles.screenRoot}>
         {superLikeToast ? (
@@ -767,6 +797,7 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
             <View style={styles.filterBtnWrap}>
               <GenoInboxIconButton
                 icon="options-outline"
+                variant="muted"
                 onPress={() => setShowFilterSheet(true)}
                 accessibilityLabel="Filter discovery profiles"
               />
@@ -786,49 +817,70 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
           filters={filters}
           previewProfiles={allProfiles}
           onClose={() => setShowFilterSheet(false)}
-          onApply={setFilters}
+          onApply={handleApplyFilters}
         />
 
         <View style={styles.deckArea}>
           {loading ? (
-            <View style={styles.loadingState}>
-              <ActivityIndicator size="large" color={COLORS.forest} />
+            <View style={styles.centered}>
+              <GenoMirrorRimFrame kind="gold" borderRadius={24} padding={2}>
+                <GenoMirrorSteelFill style={styles.loadingLogo}>
+                  <GenoLogoCeremony variant="compact" tone="dark" />
+                </GenoMirrorSteelFill>
+              </GenoMirrorRimFrame>
               <Text style={styles.loadingText}>Finding compatible profiles...</Text>
             </View>
           ) : loadError ? (
-            <View style={styles.emptyState}>
-              <View style={styles.emptyIconWrap}>
-                <Ionicons name="alert-circle-outline" size={28} color={COLORS.forest} />
-              </View>
-              <Text style={styles.emptyTitle}>{loadError}</Text>
-              <Pressable style={styles.retryBtn} onPress={loadProfiles}>
-                <Text style={styles.retryText}>Try again</Text>
-              </Pressable>
+            <View style={styles.centered}>
+              <GenoInboxRetryPanel message={loadError} onRetry={loadProfiles} />
             </View>
           ) : isEmpty ? (
-            <View style={styles.emptyState}>
+            <View style={styles.seenAllWrap}>
               <EmptyState
                 type="no-profiles"
                 title="No profiles to show"
                 subtitle={deckEmptyHint}
+                footer={
+                  <>
+                    {canResetPasses ? (
+                      <Pressable
+                        style={({ pressed }) => [pressed && styles.btnPressed, clearingPasses && styles.btnDisabled]}
+                        disabled={clearingPasses}
+                        onPress={() => {
+                          void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                          void handleClearPasses();
+                        }}
+                      >
+                        <GenoMirrorRimFrame kind="steel" borderRadius={RADIUS.xl} style={styles.seenAllBtnRim}>
+                          <GenoMirrorSteelFill style={styles.seenAllSecondaryBtn}>
+                            <GenoMirrorMetallicIcon name="return-up-back-outline" size={18} tone="steel" />
+                            <Text style={styles.seenAllBtnText}>
+                              {clearingPasses ? 'Resetting…' : 'Show passed profiles again'}
+                            </Text>
+                          </GenoMirrorSteelFill>
+                        </GenoMirrorRimFrame>
+                      </Pressable>
+                    ) : null}
+                    <Pressable
+                      style={({ pressed }) => [pressed && styles.btnPressed]}
+                      onPress={() => {
+                        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        loadProfiles();
+                      }}
+                    >
+                      <GenoMirrorRimFrame kind="red" borderRadius={RADIUS.xl} style={styles.seenAllBtnRim}>
+                        <GenoMirrorBrandCtaFill style={styles.seenAllPrimaryBtn}>
+                          <GenoMirrorMetallicIcon name="refresh" size={18} tone="chrome" />
+                          <Text style={styles.seenAllPrimaryText}>Refresh</Text>
+                        </GenoMirrorBrandCtaFill>
+                      </GenoMirrorRimFrame>
+                    </Pressable>
+                  </>
+                }
               />
-              {canResetPasses ? (
-                <Pressable
-                  style={[styles.retryBtn, clearingPasses && styles.btnDisabled]}
-                  disabled={clearingPasses}
-                  onPress={() => void handleClearPasses()}
-                >
-                  <Text style={styles.retryText}>
-                    {clearingPasses ? 'Resetting…' : 'Show passed profiles again'}
-                  </Text>
-                </Pressable>
-              ) : null}
-              <Pressable style={styles.retryBtn} onPress={loadProfiles}>
-                <Text style={styles.retryText}>Refresh</Text>
-              </Pressable>
             </View>
           ) : isFilteredEmpty ? (
-            <View style={styles.emptyState}>
+            <View style={styles.seenAllWrap}>
               <EmptyState
                 type="no-results"
                 title="No profiles match your filters"
@@ -839,59 +891,48 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
             </View>
           ) : seenAll ? (
             <View style={styles.seenAllWrap}>
-              <LinearGradient
-                colors={['rgba(212, 168, 67, 0.42)', 'rgba(61, 122, 82, 0.22)', 'rgba(212, 168, 67, 0.38)']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.seenAllBorder}
-              >
-                <View style={styles.seenAllCard}>
-                  <View style={styles.seenAllIconWrap}>
-                    <Ionicons name="checkmark-done-outline" size={28} color={COLORS.forestDeep} />
-                  </View>
-                  <Text style={styles.seenAllTitle}>You're all caught up!</Text>
-                  <Text style={styles.seenAllSubtext}>{deckEmptyHint}</Text>
-                  {canResetPasses ? (
+              <EmptyState
+                type="seen-all"
+                title="You're all caught up!"
+                subtitle={deckEmptyHint}
+                footer={
+                  <>
+                    {canResetPasses ? (
+                      <Pressable
+                        style={({ pressed }) => [pressed && styles.btnPressed, clearingPasses && styles.btnDisabled]}
+                        disabled={clearingPasses}
+                        onPress={() => {
+                          void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                          void handleClearPasses();
+                        }}
+                      >
+                        <GenoMirrorRimFrame kind="steel" borderRadius={RADIUS.xl} style={styles.seenAllBtnRim}>
+                          <GenoMirrorSteelFill style={styles.seenAllSecondaryBtn}>
+                            <GenoMirrorMetallicIcon name="return-up-back-outline" size={18} tone="steel" />
+                            <Text style={styles.seenAllBtnText}>
+                              {clearingPasses ? 'Resetting…' : 'Show passed profiles again'}
+                            </Text>
+                          </GenoMirrorSteelFill>
+                        </GenoMirrorRimFrame>
+                      </Pressable>
+                    ) : null}
                     <Pressable
-                      style={({ pressed }) => [
-                        styles.refreshBtnWrap,
-                        styles.resetPassesBtnWrap,
-                        pressed && styles.btnPressed,
-                        clearingPasses && styles.btnDisabled,
-                      ]}
-                      disabled={clearingPasses}
+                      style={({ pressed }) => [pressed && styles.btnPressed]}
                       onPress={() => {
                         void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                        void handleClearPasses();
+                        void loadProfiles();
                       }}
                     >
-                      <View style={styles.resetPassesBtn}>
-                        <Ionicons name="return-up-back-outline" size={18} color={COLORS.forestDeep} />
-                        <Text style={styles.refreshBtnText}>
-                          {clearingPasses ? 'Resetting…' : 'Show passed profiles again'}
-                        </Text>
-                      </View>
+                      <GenoMirrorRimFrame kind="red" borderRadius={RADIUS.xl} style={styles.seenAllBtnRim}>
+                        <GenoMirrorBrandCtaFill horizontal style={styles.seenAllPrimaryBtn}>
+                          <GenoMirrorMetallicIcon name="refresh" size={18} tone="chrome" />
+                          <Text style={styles.seenAllPrimaryText}>Refresh</Text>
+                        </GenoMirrorBrandCtaFill>
+                      </GenoMirrorRimFrame>
                     </Pressable>
-                  ) : null}
-                  <Pressable
-                    style={({ pressed }) => [styles.refreshBtnWrap, pressed && styles.btnPressed]}
-                    onPress={() => {
-                      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                      void loadProfiles();
-                    }}
-                  >
-                    <LinearGradient
-                      colors={[COLORS.gold, '#C49A38']}
-                      start={{ x: 0, y: 0.5 }}
-                      end={{ x: 1, y: 0.5 }}
-                      style={styles.refreshBtn}
-                    >
-                      <Ionicons name="refresh" size={18} color={COLORS.forestDeep} />
-                      <Text style={styles.refreshBtnText}>Refresh</Text>
-                    </LinearGradient>
-                  </Pressable>
-                </View>
-              </LinearGradient>
+                  </>
+                }
+              />
             </View>
           ) : (
             <View
@@ -999,7 +1040,7 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
                 ) : null}
                 <View style={[styles.cardActionsOverlay, cardLayoutStyles.cardActionsOverlay]} pointerEvents="box-none">
                   <LinearGradient
-                    colors={['transparent', 'rgba(13, 40, 24, 0.22)', 'rgba(13, 40, 24, 0.48)']}
+                    colors={['transparent', 'rgba(10, 10, 10, 0.22)', 'rgba(10, 10, 10, 0.48)']}
                     locations={[0, 0.55, 1]}
                     style={styles.cardActionsFade}
                     pointerEvents="none"
@@ -1061,7 +1102,7 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.linen,
+    backgroundColor: COLORS.background,
   },
   screenRoot: {
     flex: 1,
@@ -1085,7 +1126,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: 'rgba(143, 175, 149, 0.35)',
+    backgroundColor: COLORS.chipSolid,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
@@ -1112,7 +1153,7 @@ const styles = StyleSheet.create({
   filterBadgeText: {
     fontFamily: 'Satoshi-Bold',
     fontSize: 10,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
   },
   filterDot: {
     position: 'absolute',
@@ -1245,7 +1286,7 @@ const styles = StyleSheet.create({
   superLikeToastText: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#0D2818',
+    color: '#0A0A0A',
     textAlign: 'center',
   },
   superLikeBtnWrap: {
@@ -1257,7 +1298,7 @@ const styles = StyleSheet.create({
   superLikeBurstStar: {
     position: 'absolute',
     fontSize: 14,
-    color: '#D4A843',
+    ...MIRROR_RED_TEXT,
   },
   btnDisabled: {
     opacity: 0.5,
@@ -1283,16 +1324,16 @@ const styles = StyleSheet.create({
     width: 108,
     height: 108,
     borderRadius: 54,
-    backgroundColor: 'rgba(212, 168, 67, 0.14)',
+    backgroundColor: COLORS.chipSolid,
     borderWidth: 1.5,
-    borderColor: 'rgba(212, 168, 67, 0.45)',
+    borderColor: 'rgba(255, 255, 255, 0.45)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   noPhotoInitials: {
     fontFamily: 'ClashDisplay-Semibold',
     fontSize: 40,
-    color: 'rgba(212, 168, 67, 0.75)',
+    color: 'rgba(255, 255, 255, 0.75)',
     textAlign: 'center',
     letterSpacing: 1,
   },
@@ -1359,7 +1400,7 @@ const styles = StyleSheet.create({
     letterSpacing: -0.4,
     flexShrink: 1,
     minWidth: 0,
-    textShadowColor: 'rgba(13, 40, 24, 0.45)',
+    textShadowColor: 'rgba(10, 10, 10, 0.45)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 4,
   },
@@ -1391,9 +1432,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 999,
-    backgroundColor: 'rgba(212, 168, 67, 0.22)',
+    backgroundColor: COLORS.chipSolid,
     borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.42)',
+    borderColor: 'rgba(255, 255, 255, 0.42)',
   },
   tagText: {
     fontFamily: 'Satoshi-Bold',
@@ -1414,7 +1455,7 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: 'rgba(255, 255, 255, 0.35)',
+    backgroundColor: COLORS.chipSolid,
   },
   photoDotActive: {
     width: 18,
@@ -1460,7 +1501,7 @@ const styles = StyleSheet.create({
     fontFamily: 'ClashDisplay-Semibold',
     fontSize: 15,
     fontWeight: '700',
-    color: COLORS.forestDeep,
+    color: COLORS.text,
     letterSpacing: -0.2,
   },
   matchPillLabel: {
@@ -1479,10 +1520,10 @@ const styles = StyleSheet.create({
     zIndex: 8,
   },
   cardDragTintLike: {
-    backgroundColor: 'rgba(13, 40, 24, 0.3)',
+    backgroundColor: 'rgba(10, 10, 10, 0.3)',
   },
   cardDragTintNope: {
-    backgroundColor: 'rgba(143, 175, 149, 0.3)',
+    backgroundColor: COLORS.chipSolid,
   },
   stamp: {
     position: 'absolute',
@@ -1494,29 +1535,29 @@ const styles = StyleSheet.create({
   },
   stampLike: {
     left: 24,
-    borderColor: '#D4A843',
+    borderColor: COLORS.logoRedBright,
     transform: [{ rotate: '-15deg' }],
   },
   stampNope: {
     right: 24,
-    borderColor: '#8FAF95',
+    borderColor: '#9A8B7E',
     transform: [{ rotate: '15deg' }],
   },
   stampLikeText: {
     fontSize: 32,
     fontWeight: '900',
-    color: '#D4A843',
+    ...MIRROR_RED_TEXT,
   },
   stampNopeText: {
     fontSize: 32,
     fontWeight: '900',
-    color: '#8FAF95',
+    color: '#9A8B7E',
   },
   superLikeBtn: {
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.surface,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: COLORS.forestDeep,
@@ -1527,13 +1568,13 @@ const styles = StyleSheet.create({
   },
   superLikeStar: {
     fontSize: 22,
-    color: '#D4A843',
+    ...MIRROR_RED_TEXT,
   },
   passBtn: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.surface,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: COLORS.forestDeep,
@@ -1571,148 +1612,59 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     maxWidth: '90%',
   },
-  loadingState: {
+  centered: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    padding: 24,
     gap: 12,
   },
+  loadingLogo: {
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 22,
+  },
   loadingText: {
-    fontFamily: 'Satoshi-Medium',
-    fontSize: 15,
-    color: 'rgba(13, 40, 24, 0.6)',
-    fontWeight: '600',
-  },
-  retryBtn: {
-    marginTop: 16,
-    backgroundColor: COLORS.forest,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 12,
-  },
-  retryText: {
-    color: COLORS.linen,
-    fontWeight: '800',
-    fontSize: 15,
+    fontFamily: FONT_FAMILY.gothamMedium,
+    fontSize: 14,
+    color: LOGO_GOLD,
   },
 
   seenAllWrap: {
     flex: 1,
     width: '100%',
     justifyContent: 'center',
-    paddingHorizontal: 8,
+    paddingHorizontal: 0,
   },
-  seenAllBorder: {
-    borderRadius: RADIUS.xl,
-    padding: 1.5,
-    ...SHADOWS.cardElevated,
-    shadowColor: COLORS.gold,
-    shadowOpacity: 0.16,
-  },
-  seenAllCard: {
-    backgroundColor: COLORS.white,
-    borderRadius: RADIUS.xl - 1.5,
-    paddingHorizontal: 28,
-    paddingVertical: 32,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.2)',
-  },
-  seenAllIconWrap: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: COLORS.mint,
-    borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.35)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 18,
-  },
-  seenAllTitle: {
-    fontFamily: 'ClashDisplay-Semibold',
-    fontSize: 24,
-    lineHeight: 30,
-    letterSpacing: -0.4,
-    color: COLORS.forestDeep,
-    textAlign: 'center',
-    marginBottom: 10,
-  },
-  seenAllSubtext: {
-    fontFamily: 'Satoshi-Medium',
-    fontSize: 15,
-    lineHeight: 22,
-    color: COLORS.sage,
-    textAlign: 'center',
-    marginBottom: 24,
-    maxWidth: 280,
-  },
-  refreshBtnWrap: {
+  seenAllBtnRim: {
     width: '100%',
-    borderRadius: RADIUS.xl,
-    overflow: 'hidden',
-    ...SHADOWS.button,
   },
-  resetPassesBtnWrap: {
-    marginBottom: 12,
-    ...SHADOWS.card,
-    shadowOpacity: 0.08,
-  },
-  resetPassesBtn: {
+  seenAllSecondaryBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
     height: 52,
     paddingHorizontal: 24,
-    backgroundColor: COLORS.white,
-    borderWidth: 1.5,
-    borderColor: 'rgba(7, 77, 46, 0.18)',
-    borderRadius: RADIUS.xl,
+    borderRadius: RADIUS.xl - 1.5,
   },
-  refreshBtn: {
+  seenAllPrimaryBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
     height: 52,
     paddingHorizontal: 24,
+    borderRadius: RADIUS.xl - 1.5,
   },
-  refreshBtnText: {
+  seenAllBtnText: {
     fontFamily: 'Satoshi-Bold',
     fontSize: 16,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
   },
-  emptyState: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 32,
-    backgroundColor: COLORS.white,
-    borderRadius: RADIUS.lg,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    marginBottom: 8,
-    ...SHADOWS.card,
-  },
-  emptyIconWrap: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: 'rgba(143, 175, 149, 0.35)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-  },
-  emptyTitle: {
-    ...TYPOGRAPHY.headingSm,
-    fontFamily: 'Satoshi-Medium',
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  emptyBody: {
-    ...TYPOGRAPHY.body,
-    fontFamily: 'Satoshi-Medium',
-    textAlign: 'center',
+  seenAllPrimaryText: {
+    fontFamily: 'Satoshi-Bold',
+    fontSize: 16,
+    color: COLORS.white,
   },
 });

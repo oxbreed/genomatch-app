@@ -7,10 +7,15 @@ import {
   Text,
   View,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { GenoLogoCeremony } from '../../brand/graphics';
+import {
+  GenoLogoCeremony,
+  GenoMirrorGoldFill,
+  GenoMirrorMetallicIcon,
+  GenoMirrorRimFrame,
+  GenoMirrorSteelFill,
+} from '../../brand/graphics';
 import { INBOX } from '../inbox/inboxTokens';
-import { FONT_FAMILY, COLORS, RADIUS, SHADOWS } from '../../theme';
+import { FONT_FAMILY, COLORS, GLASS, LOGO_GOLD, RADIUS } from '../../theme';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const COLS = 3;
@@ -37,32 +42,38 @@ export default function ProfilePhotosGrid({
 }: Props) {
   if (photos.length === 0 && !editing) {
     return (
-      <View style={styles.emptyView}>
-        <Text style={styles.emptyText}>No photos yet — open Profile Studio to add your gallery.</Text>
-      </View>
+      <GenoMirrorRimFrame kind="steel" borderRadius={RADIUS.md} style={styles.emptyRim}>
+        <View style={styles.emptyView}>
+          <Text style={styles.emptyText}>No photos yet. Open Edit profile to add your gallery.</Text>
+        </View>
+      </GenoMirrorRimFrame>
     );
   }
 
   if (photos.length === 0 && editing) {
     return (
-      <Pressable
-        style={({ pressed }) => [styles.emptyStudio, pressed && styles.pressed]}
-        onPress={onAdd}
-        disabled={uploading}
-      >
-        {uploading ? (
-          <ActivityIndicator color={COLORS.gold} size="large" />
-        ) : (
-          <>
-            <GenoLogoCeremony variant="compact" tone="dark" />
-            <Text style={styles.emptyStudioTitle}>Add your first photo</Text>
-            <Text style={styles.emptyStudioSub}>Your main photo appears on Discover & Matches</Text>
-            <View style={styles.emptyStudioBtn}>
-              <Ionicons name="camera-outline" size={18} color={COLORS.forestDeep} />
-              <Text style={styles.emptyStudioBtnText}>Choose photo</Text>
-            </View>
-          </>
-        )}
+      <Pressable onPress={onAdd} disabled={uploading} style={({ pressed }) => [pressed && styles.pressed]}>
+        <GenoMirrorRimFrame kind="gold" borderRadius={RADIUS.md} style={styles.emptyRim}>
+          <GenoMirrorSteelFill style={styles.emptyStudio}>
+            {uploading ? (
+              <ActivityIndicator color={LOGO_GOLD} size="large" />
+            ) : (
+              <>
+                <GenoLogoCeremony variant="compact" tone="dark" />
+                <Text style={styles.emptyStudioTitle}>Add your first photo</Text>
+                <Text style={styles.emptyStudioSub}>
+                  Your main photo appears on Discover & Matches
+                </Text>
+                <GenoMirrorRimFrame kind="gold" borderRadius={RADIUS.pill}>
+                  <GenoMirrorGoldFill style={styles.emptyStudioBtn}>
+                    <GenoMirrorMetallicIcon name="camera" size={18} tone="gold" />
+                    <Text style={styles.emptyStudioBtnText}>Choose photo</Text>
+                  </GenoMirrorGoldFill>
+                </GenoMirrorRimFrame>
+              </>
+            )}
+          </GenoMirrorSteelFill>
+        </GenoMirrorRimFrame>
       </Pressable>
     );
   }
@@ -74,34 +85,41 @@ export default function ProfilePhotosGrid({
       ) : null}
       <View style={styles.grid}>
         {photos.map((uri, index) => (
-          <View key={`${uri}-${index}`} style={styles.cell}>
-            <Image source={{ uri }} style={styles.thumb} resizeMode="cover" />
-            {index === 0 ? (
-              <View style={styles.mainBadge}>
-                <Text style={styles.mainText}>Main</Text>
-              </View>
-            ) : null}
-            {editing ? (
-              <Pressable style={styles.deleteBtn} onPress={() => onDelete(index)}>
-                <Ionicons name="close" size={14} color={COLORS.white} />
-              </Pressable>
-            ) : null}
-          </View>
+          <GenoMirrorRimFrame
+            key={`${uri}-${index}`}
+            kind={index === 0 ? 'gold' : 'steel'}
+            borderRadius={RADIUS.sm}
+            style={styles.cellRim}
+          >
+            <View style={styles.cell}>
+              <Image source={{ uri }} style={styles.thumb} resizeMode="cover" />
+              {index === 0 ? (
+                <View style={styles.mainBadge}>
+                  <Text style={styles.mainText}>Main</Text>
+                </View>
+              ) : null}
+              {editing ? (
+                <Pressable style={styles.deleteBtn} onPress={() => onDelete(index)}>
+                  <GenoMirrorMetallicIcon name="close" size={14} tone="chrome" />
+                </Pressable>
+              ) : null}
+            </View>
+          </GenoMirrorRimFrame>
         ))}
         {canAdd ? (
-          <Pressable
-            style={({ pressed }) => [styles.cell, styles.addCell, pressed && styles.pressed]}
-            onPress={onAdd}
-            disabled={uploading}
-          >
-            {uploading ? (
-              <ActivityIndicator color={COLORS.gold} />
-            ) : (
-              <>
-                <Ionicons name="add" size={28} color={COLORS.gold} />
-                <Text style={styles.addLabel}>Add</Text>
-              </>
-            )}
+          <Pressable onPress={onAdd} disabled={uploading} style={({ pressed }) => [pressed && styles.pressed]}>
+            <GenoMirrorRimFrame kind="gold" borderRadius={RADIUS.sm} style={styles.cellRim}>
+              <View style={[styles.cell, styles.addCell]}>
+                {uploading ? (
+                  <ActivityIndicator color={LOGO_GOLD} />
+                ) : (
+                  <>
+                    <GenoMirrorMetallicIcon name="add" size={28} tone="gold" />
+                    <Text style={styles.addLabel}>Add</Text>
+                  </>
+                )}
+              </View>
+            </GenoMirrorRimFrame>
           </Pressable>
         ) : null}
       </View>
@@ -113,7 +131,7 @@ const styles = StyleSheet.create({
   hint: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: COLORS.sage,
+    color: COLORS.textMuted,
     marginBottom: 12,
   },
   grid: {
@@ -121,17 +139,16 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: GAP,
   },
-  cell: {
+  cellRim: {
     width: CELL,
+  },
+  cell: {
+    width: '100%',
     height: CELL * 1.28,
     position: 'relative',
-    borderRadius: RADIUS.sm,
+    borderRadius: RADIUS.sm - 1.5,
     overflow: 'hidden',
-    backgroundColor: COLORS.mint,
-    ...SHADOWS.card,
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
+    backgroundColor: GLASS.insetFill,
   },
   thumb: {
     width: '100%',
@@ -141,12 +158,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 6,
     left: 6,
-    backgroundColor: 'rgba(13, 40, 24, 0.72)',
+    backgroundColor: 'rgba(10, 10, 10, 0.72)',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.35)',
+    borderColor: 'rgba(255, 255, 255, 0.35)',
   },
   mainText: {
     fontFamily: FONT_FAMILY.gothamBold,
@@ -162,62 +179,55 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: 'rgba(13, 40, 24, 0.65)',
+    backgroundColor: 'rgba(10, 10, 10, 0.65)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   addCell: {
-    borderWidth: 1.5,
-    borderStyle: 'dashed',
-    borderColor: 'rgba(143, 175, 149, 0.55)',
-    backgroundColor: COLORS.mint,
     alignItems: 'center',
     justifyContent: 'center',
     gap: 4,
-    shadowOpacity: 0,
-    elevation: 0,
+    backgroundColor: 'rgba(212, 175, 55, 0.06)',
   },
   addLabel: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 11,
-    color: COLORS.sage,
+    color: LOGO_GOLD,
+  },
+  emptyRim: {
+    alignSelf: 'stretch',
+    width: '100%',
   },
   emptyView: {
     paddingVertical: 22,
     paddingHorizontal: 12,
-    borderRadius: RADIUS.md,
-    backgroundColor: COLORS.mint,
-    borderWidth: 1,
-    borderColor: COLORS.border,
+    borderRadius: RADIUS.md - 1.5,
+    backgroundColor: GLASS.insetFill,
   },
   emptyText: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
     lineHeight: 21,
-    color: COLORS.sage,
+    color: COLORS.textMuted,
     textAlign: 'center',
   },
   emptyStudio: {
     alignItems: 'center',
     paddingVertical: 28,
     paddingHorizontal: 16,
-    borderRadius: RADIUS.md,
-    borderWidth: 1.5,
-    borderStyle: 'dashed',
-    borderColor: 'rgba(143, 175, 149, 0.45)',
-    backgroundColor: COLORS.mint,
+    borderRadius: RADIUS.md - 1.5,
     gap: 8,
   },
   emptyStudioTitle: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 17,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
     marginTop: 4,
   },
   emptyStudioSub: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: COLORS.sage,
+    color: COLORS.textMuted,
     textAlign: 'center',
     lineHeight: 17,
     marginBottom: 4,
@@ -229,13 +239,12 @@ const styles = StyleSheet.create({
     marginTop: 6,
     paddingHorizontal: 16,
     paddingVertical: 10,
-    borderRadius: 999,
-    backgroundColor: COLORS.gold,
+    borderRadius: RADIUS.pill,
   },
   emptyStudioBtnText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 13,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
   },
   pressed: { opacity: 0.88 },
 });

@@ -12,9 +12,9 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps } from 'react';
 import * as Haptics from 'expo-haptics';
-import { GenoGlassSurface } from '../../brand/graphics';
+import { GenoGlassSurface, GenoMirrorMetallicIcon } from '../../brand/graphics';
 import { GENO_VISUAL } from '../../brand/graphics/genoVisualTokens';
-import { FONT_FAMILY, COLORS, GLASS, MOTION, TYPOGRAPHY } from '../../theme';
+import { FONT_FAMILY, COLORS, LOGO_GOLD, MOTION, TYPOGRAPHY, goldAlpha } from '../../theme';
 import { GENO_TAB_BAR_BOTTOM_MARGIN, GENO_TAB_BAR_HEIGHT, GENO_TAB_BAR_PILL_HEIGHT } from './tabBarLayout';
 
 const TAB_BAR_H_MARGIN = 14;
@@ -56,6 +56,8 @@ function TabItem({
     }).start();
   }, [active, scale]);
 
+  const iconName = active ? tab.iconActive : tab.icon;
+
   return (
     <Pressable
       style={styles.tabItem}
@@ -64,10 +66,10 @@ function TabItem({
       accessibilityState={{ selected: active }}
     >
       <Animated.View style={[styles.iconWrap, { transform: [{ scale }] }]}>
-        <Ionicons
-          name={active ? tab.iconActive : tab.icon}
+        <GenoMirrorMetallicIcon
+          name={iconName}
           size={22}
-          color={active ? COLORS.forestDeep : 'rgba(22, 53, 34, 0.4)'}
+          tone={active ? 'gold' : 'steel'}
         />
         {tab.badge != null && tab.badge > 0 ? (
           <View style={styles.badge}>
@@ -75,7 +77,10 @@ function TabItem({
           </View>
         ) : null}
       </Animated.View>
-      <Text style={[styles.tabLabel, active && styles.tabLabelActive]} numberOfLines={1}>
+      <Text
+        style={[styles.tabLabel, active && styles.tabLabelActive]}
+        numberOfLines={1}
+      >
         {tab.label}
       </Text>
     </Pressable>
@@ -155,12 +160,12 @@ const styles = StyleSheet.create({
     borderRadius: TAB_BAR_RADIUS,
     ...Platform.select({
       ios: {
-        shadowColor: COLORS.forestDeep,
+        shadowColor: LOGO_GOLD,
         shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.1,
+        shadowOpacity: 0.14,
         shadowRadius: 24,
       },
-      android: { elevation: 10 },
+      android: { elevation: 12 },
       default: {},
     }),
   },
@@ -184,9 +189,13 @@ const styles = StyleSheet.create({
     bottom: 3,
     left: 0,
     borderRadius: TAB_BAR_RADIUS,
-    backgroundColor: GLASS.tabBarIndicator,
+    backgroundColor: goldAlpha(0.08),
     borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.22)',
+    borderColor: goldAlpha(0.35),
+    shadowColor: LOGO_GOLD,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
   },
   tabItem: {
     flex: 1,
@@ -210,22 +219,26 @@ const styles = StyleSheet.create({
     minWidth: 17,
     height: 17,
     borderRadius: 9,
-    backgroundColor: COLORS.gold,
+    backgroundColor: LOGO_GOLD,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 4,
     borderWidth: 2,
     borderColor: COLORS.white,
+    shadowColor: LOGO_GOLD,
+    shadowOpacity: 0.35,
+    shadowRadius: 4,
   },
   badgeText: {
-    fontFamily: FONT_FAMILY.gothamBold,
-    fontSize: 9,
-    color: COLORS.forestDeep,
+    ...TYPOGRAPHY.caption,
+    fontSize: 10,
+    color: COLORS.text,
   },
   tabLabel: {
     ...TYPOGRAPHY.navLabel,
   },
   tabLabelActive: {
     ...TYPOGRAPHY.navLabelActive,
+    color: LOGO_GOLD,
   },
 });

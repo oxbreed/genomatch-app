@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: PROFILE.sectionTitleSize,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
     letterSpacing: -0.2,
   },
   body: {

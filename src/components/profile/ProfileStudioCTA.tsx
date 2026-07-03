@@ -1,6 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { GenoCardFrame } from '../../brand/graphics';
+import { GenoCardFrame, GenoMirrorMetallicIcon, GenoMirrorRimFrame, GenoMirrorSteelFill } from '../../brand/graphics';
 import { COLORS, RADIUS } from '../../theme';
 import { PROFILE, PROFILE_TYPE } from './profileTokens';
 
@@ -19,11 +18,13 @@ export default function ProfileStudioCTA({ percent, onPress }: Props) {
       accessibilityRole="button"
       accessibilityLabel="Open profile studio"
     >
-      <GenoCardFrame showWatermark={false} style={styles.frame}>
+      <GenoCardFrame mirror showWatermark={false} style={styles.frame}>
         <View style={styles.inner}>
-          <View style={styles.icon}>
-            <Ionicons name="color-wand-outline" size={18} color={COLORS.forestDeep} />
-          </View>
+          <GenoMirrorRimFrame kind="steel" borderRadius={RADIUS.sm}>
+            <GenoMirrorSteelFill style={styles.icon}>
+              <GenoMirrorMetallicIcon name="sparkles" size={18} tone="gold" />
+            </GenoMirrorSteelFill>
+          </GenoMirrorRimFrame>
           <View style={styles.copy}>
             <Text style={styles.title}>
               {needsWork ? 'Complete your profile' : 'Edit your profile'}
@@ -34,9 +35,7 @@ export default function ProfileStudioCTA({ percent, onPress }: Props) {
                 : 'Refine how matches see you on Discover'}
             </Text>
           </View>
-          <View style={styles.chevron}>
-            <Ionicons name="chevron-forward" size={18} color={COLORS.sage} />
-          </View>
+          <GenoMirrorMetallicIcon name="chevron-forward" size={18} tone="steel" />
         </View>
       </GenoCardFrame>
     </Pressable>
@@ -58,11 +57,8 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: RADIUS.sm,
-    backgroundColor: COLORS.mint,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: COLORS.border,
   },
   copy: {
     flex: 1,
@@ -70,15 +66,11 @@ const styles = StyleSheet.create({
   },
   title: {
     ...PROFILE_TYPE.ctaTitle,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
   },
   sub: {
     ...PROFILE_TYPE.ctaSub,
     color: COLORS.textSubtle,
-  },
-  chevron: {
-    width: 28,
-    alignItems: 'flex-end',
   },
   pressed: { opacity: 0.92 },
 });

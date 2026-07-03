@@ -1,8 +1,12 @@
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { GenoGlassSurface } from '../../brand/graphics';
+import {
+  GenoGlassSurface,
+  GenoMirrorGoldFill,
+  GenoMirrorMetallicIcon,
+  GenoMirrorRimFrame,
+} from '../../brand/graphics';
 import { GENOMATCH_COMPANY } from '../../constants/company';
-import { FONT_FAMILY, COLORS, RADIUS } from '../../theme';
+import { FONT_FAMILY, COLORS, LOGO_GOLD, RADIUS } from '../../theme';
 
 type Props = {
   city: string;
@@ -29,48 +33,55 @@ export default function ProfileVerifiedCityCard({
   const nextDate = formatNextEligible(nextEligibleAt);
 
   return (
-    <GenoGlassSurface
-      variant="light"
-      borderRadius={RADIUS.lg}
-      shadow="glass"
-      showTopRule
-      style={styles.wrap}
-      contentStyle={styles.inner}
-    >
-      <View style={styles.header}>
-        <Ionicons name="location" size={18} color={COLORS.forest} />
-        <Text style={styles.title}>Verified location</Text>
-      </View>
-      <Text style={styles.body}>
-        Your city is locked to protect matches from misleading location changes. You are shown as{' '}
-        <Text style={styles.bold}>{city || 'your city'}</Text>.
-      </Text>
-      {canUpdate ? (
-        <Pressable
-          style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
-          onPress={onUpdate}
-          disabled={updating}
-        >
-          {updating ? (
-            <ActivityIndicator color={COLORS.forestDeep} />
-          ) : (
-            <>
-              <Ionicons name="locate" size={16} color={COLORS.forestDeep} />
-              <Text style={styles.buttonText}>Update my city (GPS)</Text>
-            </>
-          )}
-        </Pressable>
-      ) : (
-        <Text style={styles.hint}>
-          {nextDate
-            ? `You can update your city again on ${nextDate}.`
-            : 'City updates use GPS and are limited to once every 12 months.'}
+    <GenoMirrorRimFrame kind="steel" borderRadius={RADIUS.lg} style={styles.wrap}>
+      <GenoGlassSurface
+        variant="dark"
+        borderRadius={RADIUS.lg - 1.5}
+        showBorder={false}
+        showSheen
+        shadow="none"
+        intensity={32}
+        contentStyle={styles.inner}
+      >
+        <View style={styles.header}>
+          <GenoMirrorMetallicIcon name="location" size={18} tone="gold" />
+          <Text style={styles.title}>Verified location</Text>
+        </View>
+        <Text style={styles.body}>
+          Your city is locked to protect matches from misleading location changes. You are shown as{' '}
+          <Text style={styles.bold}>{city || 'your city'}</Text>.
         </Text>
-      )}
-      <Text style={styles.support}>
-        Moved recently and location is off? Contact {GENOMATCH_COMPANY.contactEmail} for help.
-      </Text>
-    </GenoGlassSurface>
+        {canUpdate ? (
+          <Pressable
+            style={({ pressed }) => [pressed && styles.buttonPressed]}
+            onPress={onUpdate}
+            disabled={updating}
+          >
+            <GenoMirrorRimFrame kind="gold" borderRadius={RADIUS.md} style={styles.buttonRim}>
+              <GenoMirrorGoldFill style={styles.button}>
+                {updating ? (
+                  <ActivityIndicator color={COLORS.text} />
+                ) : (
+                  <>
+                    <GenoMirrorMetallicIcon name="locate" size={16} tone="gold" />
+                    <Text style={styles.buttonText}>Update my city (GPS)</Text>
+                  </>
+                )}
+              </GenoMirrorGoldFill>
+            </GenoMirrorRimFrame>
+          </Pressable>
+        ) : (
+          <Text style={styles.hint}>
+            {nextDate
+              ? `You can update your city again on ${nextDate}.`
+              : 'City updates use GPS and are limited to once every 12 months.'}
+          </Text>
+        )}
+        <Text style={styles.support}>
+          Moved recently and location is off? Contact {GENOMATCH_COMPANY.contactEmail} for help.
+        </Text>
+      </GenoGlassSurface>
+    </GenoMirrorRimFrame>
   );
 }
 
@@ -78,7 +89,8 @@ const styles = StyleSheet.create({
   wrap: {
     marginHorizontal: 16,
     marginBottom: 12,
-    overflow: 'hidden',
+    alignSelf: 'stretch',
+    width: 'auto',
   },
   inner: {
     padding: 16,
@@ -92,17 +104,21 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 14,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
   },
   body: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 13,
     lineHeight: 19,
-    color: COLORS.sage,
+    color: COLORS.textMuted,
   },
   bold: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
+  },
+  buttonRim: {
+    alignSelf: 'stretch',
+    width: '100%',
   },
   button: {
     flexDirection: 'row',
@@ -110,16 +126,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     paddingVertical: 12,
-    borderRadius: RADIUS.md,
-    backgroundColor: COLORS.mint,
-    borderWidth: 1,
-    borderColor: 'rgba(143, 175, 149, 0.35)',
+    borderRadius: RADIUS.md - 1.5,
   },
   buttonPressed: { opacity: 0.9 },
   buttonText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 14,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
   },
   hint: {
     fontFamily: FONT_FAMILY.gothamMedium,

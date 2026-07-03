@@ -8,6 +8,7 @@ import {
   View,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { GenoMirrorRedFill } from '../../brand/graphics';
 import { Ionicons } from '@expo/vector-icons';
 import { GenoBondMark } from '../../brand';
 import { VERIFICATION_ATTESTATIONS, type VerificationAttestationId } from '../../lib/verification';
@@ -99,20 +100,22 @@ export default function ProfileGenotypeVerifyModal({
             onPress={onConfirm}
             disabled={!allChecked || verifying}
           >
-            <LinearGradient
-              colors={
-                !allChecked || verifying
-                  ? ['rgba(143, 175, 149, 0.45)', 'rgba(143, 175, 149, 0.3)']
-                  : [COLORS.gold, '#C49A38']
-              }
-              style={styles.confirm}
-            >
-              {verifying ? (
-                <ActivityIndicator color={COLORS.forestDeep} />
-              ) : (
+            {!allChecked || verifying ? (
+              <LinearGradient
+                colors={['rgba(255, 255, 255, 0.45)', 'rgba(255, 255, 255, 0.3)']}
+                style={styles.confirm}
+              >
+                {verifying ? (
+                  <ActivityIndicator color={COLORS.forestDeep} />
+                ) : (
+                  <Text style={styles.confirmText}>Confirm verification</Text>
+                )}
+              </LinearGradient>
+            ) : (
+              <GenoMirrorRedFill style={styles.confirm}>
                 <Text style={styles.confirmText}>Confirm verification</Text>
-              )}
-            </LinearGradient>
+              </GenoMirrorRedFill>
+            )}
           </Pressable>
           <Pressable onPress={onClose} disabled={verifying}>
             <Text style={styles.cancel}>Not now</Text>
@@ -131,11 +134,11 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   card: {
-    backgroundColor: COLORS.linen,
+    backgroundColor: COLORS.background,
     borderRadius: RADIUS.xl,
     padding: 24,
     borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.35)',
+    borderColor: 'rgba(255, 255, 255, 0.35)',
   },
   iconWrap: {
     alignSelf: 'center',
@@ -151,7 +154,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 22,
     letterSpacing: -0.3,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
     textAlign: 'center',
   },
   body: {
@@ -165,7 +168,7 @@ const styles = StyleSheet.create({
   },
   bold: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
   },
   checklist: {
     gap: 10,
@@ -182,9 +185,9 @@ const styles = StyleSheet.create({
     width: 22,
     height: 22,
     borderRadius: 6,
-    borderWidth: 1.5,
-    borderColor: 'rgba(143, 175, 149, 0.65)',
-    backgroundColor: COLORS.white,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    backgroundColor: COLORS.surfaceElevated,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 1,
@@ -198,7 +201,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
     lineHeight: 20,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
   },
   note: {
     fontFamily: FONT_FAMILY.gothamMedium,
@@ -220,7 +223,7 @@ const styles = StyleSheet.create({
   confirmText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 16,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
   },
   cancel: {
     fontFamily: FONT_FAMILY.gothamMedium,

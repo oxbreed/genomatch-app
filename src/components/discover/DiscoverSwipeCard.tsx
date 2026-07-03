@@ -18,8 +18,9 @@ import {
 } from '../../components/navigation/tabBarLayout';
 import GenotypeBadge from '../GenotypeBadge';
 import LocationLine from '../LocationLine';
+import PresenceBadge from '../PresenceBadge';
 import { COLORS, getInitials } from '../../data/mockData';
-import { FONT_FAMILY, SHADOWS } from '../../theme';
+import { FONT_FAMILY, SHADOWS, TYPOGRAPHY } from '../../theme';
 import { getGenotypeRiskShort } from '../../lib/compatibility';
 import type { DiscoveryProfile, Genotype } from '../../types/database';
 import DiscoverMatchPill from './DiscoverMatchPill';
@@ -118,13 +119,13 @@ export default function DiscoverSwipeCard({
       />
 
       <LinearGradient
-        colors={['rgba(13, 40, 24, 0.22)', 'transparent']}
+        colors={['rgba(10, 10, 10, 0.22)', 'transparent']}
         style={styles.cardTopShade}
         pointerEvents="none"
       />
 
       <LinearGradient
-        colors={['transparent', 'rgba(13, 40, 24, 0.5)', 'rgba(13, 40, 24, 0.88)']}
+        colors={['transparent', 'rgba(10, 10, 10, 0.5)', 'rgba(10, 10, 10, 0.88)']}
         locations={[0, 0.45, 1]}
         style={styles.cardBottomShade}
         pointerEvents="none"
@@ -156,6 +157,16 @@ export default function DiscoverSwipeCard({
 
         <LocationLine city={profile.city} distanceBand={profile.distanceBand} dark />
 
+        {(profile.presenceState !== 'offline' || profile.isNewMember) ? (
+          <View style={styles.presenceRow}>
+            <PresenceBadge
+              presenceState={profile.presenceState}
+              isNewMember={profile.isNewMember}
+              dark
+            />
+          </View>
+        ) : null}
+
         <View style={styles.compatRow}>
           <View
             style={[
@@ -163,7 +174,7 @@ export default function DiscoverSwipeCard({
               { backgroundColor: getCompatDotColor(profile.compatibility) },
             ]}
           />
-          <Text style={styles.compatText} numberOfLines={1}>
+          <Text style={styles.compatText} numberOfLines={2}>
             {profile.compatibility}% · {riskShort}
           </Text>
         </View>
@@ -252,7 +263,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: 'rgba(212, 168, 67, 0.35)',
+    borderColor: 'rgba(255, 255, 255, 0.35)',
   },
   noPhotoInitials: {
     fontFamily: FONT_FAMILY.gothamBold,
@@ -307,13 +318,12 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   cardName: {
-    fontFamily: FONT_FAMILY.gothamBold,
+    ...TYPOGRAPHY.displayName,
     fontSize: 25,
     color: COLORS.linen,
-    letterSpacing: -0.4,
     flexShrink: 1,
     minWidth: 0,
-    textShadowColor: 'rgba(13, 40, 24, 0.45)',
+    textShadowColor: 'rgba(10, 10, 10, 0.45)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 4,
   },
@@ -322,6 +332,9 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     gap: 8,
     marginTop: 4,
+  },
+  presenceRow: {
+    marginTop: 8,
   },
   compatDot: {
     width: 7,
@@ -359,10 +372,10 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 2,
     borderRadius: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    backgroundColor: COLORS.chipSolid,
   },
   photoBarActive: {
-    backgroundColor: COLORS.linen,
+    backgroundColor: COLORS.background,
   },
   photoTapLeft: {
     position: 'absolute',

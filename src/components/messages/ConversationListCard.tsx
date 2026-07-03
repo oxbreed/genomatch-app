@@ -1,12 +1,12 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import {
   GenoInboxAvatar,
   GenoInboxCardShell,
   GenoInboxIconButton,
+  GenoInboxMirrorPill,
   INBOX,
 } from '../inbox';
-import { FONT_FAMILY, COLORS } from '../../theme';
+import { FONT_FAMILY, COLORS, LOGO_GOLD } from '../../theme';
 import type { ConversationPreview } from '../../types/database';
 import VerifiedBadge from '../VerifiedBadge';
 import { formatMessageTime } from '../../lib/messages';
@@ -43,24 +43,13 @@ export default function ConversationListCard({ item, onOpenProfile, onOpenChat }
             <Text style={[styles.name, item.unread && styles.nameUnread]} numberOfLines={1}>
               {profile.name}
             </Text>
-            {isFresh ? (
-              <View style={styles.newPill}>
-                <Text style={styles.newPillText}>Say hi</Text>
-              </View>
-            ) : null}
+            {isFresh ? <GenoInboxMirrorPill label="Say hi" kind="gold" /> : null}
             {profile.genotypeVerified ? <VerifiedBadge compact /> : null}
-            <LinearGradient
-              colors={
-                compatHigh
-                  ? ['rgba(212, 168, 67, 0.35)', 'rgba(212, 168, 67, 0.12)']
-                  : ['rgba(255, 255, 255, 0.65)', 'rgba(255, 255, 255, 0.35)']
-              }
-              style={styles.compatPill}
-            >
-              <Text style={[styles.pct, compatHigh && styles.pctHigh]}>
-                {profile.compatibility}%
-              </Text>
-            </LinearGradient>
+            <GenoInboxMirrorPill
+              label={`${profile.compatibility}%`}
+              kind={compatHigh ? 'gold' : 'steel'}
+              textStyle={compatHigh ? styles.pctHigh : styles.pct}
+            />
             <Text style={styles.time}>{timeLabel}</Text>
           </View>
           <Text
@@ -94,40 +83,19 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: INBOX.nameSize + 1,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
     letterSpacing: -0.3,
   },
   nameUnread: {
-    fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.forestDeep,
-  },
-  newPill: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 999,
-    backgroundColor: COLORS.gold,
-  },
-  newPillText: {
-    fontFamily: FONT_FAMILY.gothamBold,
-    fontSize: 9,
-    letterSpacing: 0.8,
-    textTransform: 'uppercase',
-    color: COLORS.forestDeep,
-  },
-  compatPill: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.7)',
+    color: LOGO_GOLD,
   },
   pct: {
-    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: INBOX.pctSize,
-    color: COLORS.sage,
+    color: COLORS.textMuted,
   },
   pctHigh: {
-    color: COLORS.forestDeep,
+    fontSize: INBOX.pctSize,
+    color: COLORS.text,
   },
   time: {
     fontFamily: FONT_FAMILY.gothamMedium,
@@ -144,6 +112,6 @@ const styles = StyleSheet.create({
   },
   previewUnread: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.forest,
+    color: LOGO_GOLD,
   },
 });

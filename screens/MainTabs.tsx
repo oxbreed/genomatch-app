@@ -1,10 +1,6 @@
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type ComponentType, type ReactNode } from 'react';
 import { Animated, AppState, StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import Discovery from './Discovery';
-import Matches from './Matches';
-import Messages from './Messages';
-import Profile from './Profile';
 import GenoTabBar, { type GenoTabId } from '../src/components/navigation/GenoTabBar';
 import { COLORS, MOTION } from '../src/theme';
 import { fetchConversations, startInboxRealtime, subscribeToInboxRealtime } from '../src/lib/messages';
@@ -19,6 +15,64 @@ import { getAuthenticatedUserId } from '../src/lib/auth';
 import type { DiscoveryProfile } from '../src/types/database';
 
 const TAB_IDS: GenoTabId[] = ['discover', 'matches', 'messages', 'profile'];
+
+type TabModule = {
+  discover: ComponentType<{
+    isActive: boolean;
+    onMatchCreated: () => void;
+    onStartChat: (matchId: string, profile?: DiscoveryProfile) => void;
+  }>;
+  matches: ComponentType<{
+    isActive: boolean;
+    onStartChat: (matchId: string, profile?: DiscoveryProfile) => void;
+    onImmersiveChange: (immersive: boolean) => void;
+  }>;
+  messages: ComponentType<{
+    isActive: boolean;
+    initialChatMatchId: string | null;
+    initialChatProfile: DiscoveryProfile | null;
+    onChatOpened: () => void;
+    onImmersiveChange: (immersive: boolean) => void;
+  }>;
+  profile: ComponentType<{ onSignOut?: () => void }>;
+};
+
+const TAB_LOADERS: Record<GenoTabId, () => Promise<{ default: TabModule[GenoTabId] }>> = {
+  discover: () => import('./Discovery'),
+  matches: () => import('./Matches'),
+  messages: () => import('./Messages'),
+  profile: () => import('./Profile'),
+};
+
+function LazyTab<K extends GenoTabId>({
+  tab,
+  active,
+  loaded,
+  onLoaded,
+  children,
+}: {
+  tab: K;
+  active: boolean;
+  loaded: TabModule[K] | null;
+  onLoaded: (tab: K, component: TabModule[K]) => void;
+  children: (Screen: TabModule[K]) => ReactNode;
+}) {
+  useEffect(() => {
+    if (loaded) return;
+    if (!active && tab !== 'discover') return;
+
+    let cancelled = false;
+    void TAB_LOADERS[tab]().then((mod) => {
+      if (!cancelled) onLoaded(tab, mod.default as TabModule[K]);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [active, loaded, onLoaded, tab]);
+
+  if (!loaded) return null;
+  return <>{children(loaded)}</>;
+}
 
 type MainTabsProps = {
   onSignOut?: () => void;
@@ -47,12 +101,17 @@ function useTabSceneAnimation(activeTab: GenoTabId) {
 
 export default function MainTabs({ onSignOut }: MainTabsProps) {
   const [activeTab, setActiveTab] = useState<GenoTabId>('discover');
+  const [tabScreens, setTabScreens] = useState<Partial<TabModule>>({});
   const [openChatMatchId, setOpenChatMatchId] = useState<string | null>(null);
   const [openChatProfile, setOpenChatProfile] = useState<DiscoveryProfile | null>(null);
   const [matchCount, setMatchCount] = useState(0);
   const [unreadCount, setUnreadCount] = useState(0);
   const [immersiveOverlay, setImmersiveOverlay] = useState(false);
   const tabScenes = useTabSceneAnimation(activeTab);
+
+  const markTabLoaded = useCallback(<K extends GenoTabId>(tab: K, component: TabModule[K]) => {
+    setTabScreens((prev) => (prev[tab] ? prev : { ...prev, [tab]: component }));
+  }, []);
 
   const refreshBadges = useCallback(async () => {
     try {
@@ -194,38 +253,75 @@ export default function MainTabs({ onSignOut }: MainTabsProps) {
 
   return (
     <View style={styles.root}>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
       <View style={styles.content}>
         {tabPane(
           'discover',
-          <Discovery
-            isActive={activeTab === 'discover'}
-            onMatchCreated={refreshBadges}
-            onStartChat={handleStartChat}
-          />
+          <LazyTab
+            tab="discover"
+            active={activeTab === 'discover'}
+            loaded={tabScreens.discover ?? null}
+            onLoaded={markTabLoaded}
+          >
+            {(Discovery) => (
+              <Discovery
+                isActive={activeTab === 'discover'}
+                onMatchCreated={refreshBadges}
+                onStartChat={handleStartChat}
+              />
+            )}
+          </LazyTab>
         )}
         {tabPane(
           'matches',
-          <Matches
-            isActive={activeTab === 'matches'}
-            onStartChat={handleStartChat}
-            onImmersiveChange={setImmersiveOverlay}
-          />
+          <LazyTab
+            tab="matches"
+            active={activeTab === 'matches'}
+            loaded={tabScreens.matches ?? null}
+            onLoaded={markTabLoaded}
+          >
+            {(Matches) => (
+              <Matches
+                isActive={activeTab === 'matches'}
+                onStartChat={handleStartChat}
+                onImmersiveChange={setImmersiveOverlay}
+              />
+            )}
+          </LazyTab>
         )}
         {tabPane(
           'messages',
-          <Messages
-            isActive={activeTab === 'messages'}
-            initialChatMatchId={openChatMatchId}
-            initialChatProfile={openChatProfile}
-            onChatOpened={() => {
-              setOpenChatMatchId(null);
-              setOpenChatProfile(null);
-            }}
-            onImmersiveChange={setImmersiveOverlay}
-          />
+          <LazyTab
+            tab="messages"
+            active={activeTab === 'messages'}
+            loaded={tabScreens.messages ?? null}
+            onLoaded={markTabLoaded}
+          >
+            {(Messages) => (
+              <Messages
+                isActive={activeTab === 'messages'}
+                initialChatMatchId={openChatMatchId}
+                initialChatProfile={openChatProfile}
+                onChatOpened={() => {
+                  setOpenChatMatchId(null);
+                  setOpenChatProfile(null);
+                }}
+                onImmersiveChange={setImmersiveOverlay}
+              />
+            )}
+          </LazyTab>
         )}
-        {tabPane('profile', <Profile onSignOut={onSignOut} />)}
+        {tabPane(
+          'profile',
+          <LazyTab
+            tab="profile"
+            active={activeTab === 'profile'}
+            loaded={tabScreens.profile ?? null}
+            onLoaded={markTabLoaded}
+          >
+            {(Profile) => <Profile onSignOut={onSignOut} />}
+          </LazyTab>
+        )}
       </View>
       {!immersiveOverlay ? (
         <View style={styles.tabBarOverlay} pointerEvents="box-none">
@@ -260,7 +356,7 @@ function tabsFromCounts(matchCount: number, unreadCount: number) {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: COLORS.linen,
+    backgroundColor: COLORS.background,
   },
   content: {
     flex: 1,

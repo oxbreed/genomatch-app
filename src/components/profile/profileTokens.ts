@@ -1,5 +1,5 @@
 import { INBOX } from '../inbox/inboxTokens';
-import { FONT_FAMILY } from '../../theme';
+import { TYPOGRAPHY } from '../../theme';
 
 /** Profile typography scale & layout rhythm */
 export const PROFILE = {
@@ -7,7 +7,7 @@ export const PROFILE = {
   sectionLabelSize: 11,
   sectionTitleSize: 18,
   bodySize: 15,
-  bodyLineHeight: 23,
+  bodyLineHeight: 24,
   chipSize: 13,
   metaSize: 12,
   captionSize: 13,
@@ -19,95 +19,89 @@ export const PROFILE = {
   cardGap: 8,
 } as const;
 
-/** Shared text styles — Gotham Rounded primary stack */
+/** Shared text styles — Playfair + Satoshi pairing */
 export const PROFILE_TYPE = {
   heroName: {
-    fontFamily: FONT_FAMILY.gothamBold,
+    ...TYPOGRAPHY.displayName,
     fontSize: PROFILE.heroNameSize,
-    letterSpacing: -0.5,
   },
   heroMeta: {
-    fontFamily: FONT_FAMILY.gothamBook,
-    fontSize: 14,
-    letterSpacing: 0.1,
+    ...TYPOGRAPHY.profileMeta,
   },
   sectionKicker: {
-    fontFamily: FONT_FAMILY.marketingExtrabold,
+    ...TYPOGRAPHY.sectionLabel,
     fontSize: PROFILE.sectionLabelSize,
     letterSpacing: 1.4,
-    textTransform: 'uppercase' as const,
   },
   sectionTitle: {
-    fontFamily: FONT_FAMILY.gothamSemiBold,
+    ...TYPOGRAPHY.serifTitle,
     fontSize: PROFILE.sectionTitleSize,
-    letterSpacing: -0.3,
   },
   sectionHint: {
-    fontFamily: FONT_FAMILY.gothamBook,
+    ...TYPOGRAPHY.caption,
     fontSize: PROFILE.metaSize,
     lineHeight: 17,
   },
   blockLabel: {
-    fontFamily: FONT_FAMILY.gothamBold,
+    ...TYPOGRAPHY.sectionLabelGold,
     fontSize: PROFILE.sectionLabelSize,
     letterSpacing: 1,
-    textTransform: 'uppercase' as const,
   },
   body: {
-    fontFamily: FONT_FAMILY.gothamBook,
+    ...TYPOGRAPHY.body,
     fontSize: PROFILE.bodySize,
     lineHeight: PROFILE.bodyLineHeight,
   },
   bodyMedium: {
-    fontFamily: FONT_FAMILY.gothamMedium,
+    ...TYPOGRAPHY.bodyStrong,
     fontSize: PROFILE.bodySize,
     lineHeight: PROFILE.bodyLineHeight,
   },
   chip: {
-    fontFamily: FONT_FAMILY.gothamMedium,
+    ...TYPOGRAPHY.chip,
     fontSize: PROFILE.chipSize,
   },
   goal: {
-    fontFamily: FONT_FAMILY.gothamSemiBold,
+    ...TYPOGRAPHY.bodyStrong,
     fontSize: 16,
     letterSpacing: -0.15,
   },
   statValue: {
-    fontFamily: FONT_FAMILY.gothamBold,
+    ...TYPOGRAPHY.displayName,
     fontSize: PROFILE.statValueSize,
     letterSpacing: -0.35,
   },
   statLabel: {
-    fontFamily: FONT_FAMILY.gothamBook,
+    ...TYPOGRAPHY.caption,
     fontSize: PROFILE.metaSize,
     letterSpacing: 0.1,
   },
   ctaTitle: {
-    fontFamily: FONT_FAMILY.gothamSemiBold,
+    ...TYPOGRAPHY.bodyStrong,
     fontSize: 17,
     letterSpacing: -0.25,
   },
   ctaSub: {
-    fontFamily: FONT_FAMILY.gothamBook,
+    ...TYPOGRAPHY.body,
     fontSize: PROFILE.captionSize,
     lineHeight: 19,
   },
   ribbonTitle: {
-    fontFamily: FONT_FAMILY.gothamSemiBold,
+    ...TYPOGRAPHY.bodyStrong,
     fontSize: 16,
     letterSpacing: -0.2,
   },
   ribbonSub: {
-    fontFamily: FONT_FAMILY.gothamBook,
+    ...TYPOGRAPHY.body,
     fontSize: PROFILE.captionSize,
     lineHeight: 19,
   },
   footerLink: {
-    fontFamily: FONT_FAMILY.gothamMedium,
+    ...TYPOGRAPHY.bodyStrong,
     fontSize: PROFILE.bodySize,
   },
   footerAction: {
-    fontFamily: FONT_FAMILY.gothamBold,
+    ...TYPOGRAPHY.bodyStrong,
     fontSize: PROFILE.bodySize,
   },
 } as const;

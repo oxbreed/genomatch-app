@@ -1,6 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path } from 'react-native-svg';
+import { GenoMirrorRimFrame } from '../../brand/graphics';
 import { INBOX } from '../inbox/inboxTokens';
 import { COLORS, RADIUS, SHADOWS } from '../../theme';
 
@@ -13,38 +14,33 @@ type Props = {
 export default function ProfileHeroChrome({ studio, height, children }: Props) {
   if (!studio) {
     return (
-      <View style={styles.viewWrap}>
+      <GenoMirrorRimFrame kind="gold" borderRadius={RADIUS.xl} style={styles.viewWrap}>
         <View style={[styles.viewHero, { height }, SHADOWS.cardElevated]}>
           {children}
           <LinearGradient
-            colors={['transparent', 'rgba(13, 40, 24, 0.28)']}
+            colors={['transparent', 'rgba(10, 10, 10, 0.32)']}
             style={styles.viewVignette}
             pointerEvents="none"
           />
         </View>
-      </View>
+      </GenoMirrorRimFrame>
     );
   }
 
   return (
     <View style={styles.wrap}>
-      <LinearGradient
-        colors={INBOX.colors.borderGradient}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.border}
-      >
+      <GenoMirrorRimFrame kind="gold" borderRadius={RADIUS.xl}>
         <View style={[styles.hero, { height }]}>
           {children}
           <LinearGradient
-            colors={['rgba(212, 168, 67, 0.45)', 'transparent']}
+            colors={['rgba(255, 255, 255, 0.45)', 'transparent']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.topAccent}
             pointerEvents="none"
           />
           <LinearGradient
-            colors={['transparent', 'rgba(13, 40, 24, 0.35)']}
+            colors={['transparent', 'rgba(10, 10, 10, 0.35)']}
             style={styles.bottomVignette}
             pointerEvents="none"
           />
@@ -55,7 +51,7 @@ export default function ProfileHeroChrome({ studio, height, children }: Props) {
             <FrameCorner flip="tr" />
           </View>
         </View>
-      </LinearGradient>
+      </GenoMirrorRimFrame>
     </View>
   );
 }
@@ -80,13 +76,14 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginTop: 4,
     marginBottom: 12,
+    alignSelf: 'stretch',
   },
   viewHero: {
     width: '100%',
     position: 'relative',
     overflow: 'hidden',
-    borderRadius: RADIUS.xl,
-    backgroundColor: 'rgba(22, 53, 34, 0.82)',
+    borderRadius: RADIUS.xl - 1.5,
+    backgroundColor: 'rgba(26, 20, 18, 0.82)',
   },
   viewVignette: {
     position: 'absolute',
@@ -101,17 +98,12 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginBottom: 6,
   },
-  border: {
-    borderRadius: RADIUS.xl,
-    padding: 1.5,
-    ...SHADOWS.cardElevated,
-  },
   hero: {
     width: '100%',
     position: 'relative',
     overflow: 'hidden',
     borderRadius: RADIUS.xl - 1.5,
-    backgroundColor: 'rgba(22, 53, 34, 0.82)',
+    backgroundColor: 'rgba(26, 20, 18, 0.82)',
   },
   topAccent: {
     position: 'absolute',

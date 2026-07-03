@@ -16,7 +16,7 @@ import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GenoPremiumChrome, GenoGlassSurface } from '../src/brand/graphics';
 import GenoFormCard from '../src/components/shell/GenoFormCard';
-import { COLORS, GLASS, RADIUS, SHADOWS } from '../src/theme';
+import {COLORS, GLASS, RADIUS, SHADOWS, MIRROR_RED_TEXT} from '../src/theme';
 import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps } from 'react';
 import AvatarPhotoPicker from '../src/components/AvatarPhotoPicker';
@@ -39,11 +39,11 @@ const INTERESTS = [
   'Nature',
 ];
 
-const GENDERS = ['Male', 'Female', 'Other'] as const;
-
 import { gradientFromId } from '../src/lib/profileMapper';
+import { PROFILE_PRONOUNS, type ProfilePronoun } from '../src/lib/profilePronouns';
 import {
   detectDeviceCity,
+  geocodeCityLabel,
   getDeviceLocation,
   saveProfileLocation,
   type DeviceLocation,
@@ -52,6 +52,7 @@ import { pickAndUploadProfilePhoto } from '../src/lib/photoUpload';
 import { getCurrentProfile } from '../src/lib/profiles';
 import { supabase } from '../src/lib/supabase';
 import { dateOfBirthFromAge, isMinimumAge } from '../src/lib/validation';
+import { GenoMirrorRedFill } from '../src/brand/graphics';
 
 type IonName = ComponentProps<typeof Ionicons>['name'];
 
@@ -77,11 +78,11 @@ const RELATIONSHIP_GOALS: {
     id: 'friendship',
     title: 'Friendship',
     icon: 'people',
-    description: 'Open to meaningful connections that may grow into more over time.',
+    description: 'Platonic connections and community, not primarily dating.',
   },
 ];
 
-type Gender = (typeof GENDERS)[number];
+type Gender = ProfilePronoun;
 
 export default function ProfileSetup({ onComplete }: { onComplete: () => void }) {
   const [step, setStep] = useState(0);
@@ -96,7 +97,7 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
   const [interests, setInterests] = useState<string[]>([]);
   const [relationshipGoal, setRelationshipGoal] = useState('');
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const [avatarGradient, setAvatarGradient] = useState<[string, string]>(['#074D2E', '#1B7A6E']);
+  const [avatarGradient, setAvatarGradient] = useState<[string, string]>([COLORS.brandRedDeep, COLORS.brandRedDeep]);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
@@ -211,7 +212,7 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
       if (!age || !isMinimumAge(ageNum)) {
         return 'You must be at least 18 years old to use GenoMatch.';
       }
-      if (!gender) return 'Please select your gender.';
+      if (!gender) return 'Please select your pronouns.';
       if (!city.trim()) {
         return locationDenied
           ? 'Please enter your city or enable location access.'
@@ -219,7 +220,9 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
       }
     }
     if (step === 1) {
-      if (bio.trim().length < 20) return 'Tell us a bit more — bio must be at least 20 characters.';
+      if (bio.trim().length < 20) {
+        return 'Write at least 20 characters so matches can get to know you.';
+      }
       if (interests.length < 2) return 'Pick at least 2 interests.';
     }
     if (step === 2) {
@@ -307,7 +310,7 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
       const locationToSave =
         deviceLocation ??
         (await getDeviceLocation()) ??
-        null;
+        (await geocodeCityLabel(city.trim()).catch(() => null));
 
       if (locationToSave) {
         await saveProfileLocation({
@@ -378,7 +381,7 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
               value={displayName}
               onChangeText={setDisplayName}
               placeholder="How should we call you?"
-              placeholderTextColor="rgba(7, 77, 46, 0.35)"
+              placeholderTextColor="rgba(10, 10, 10, 0.35)"
               autoCapitalize="words"
             />
 
@@ -388,14 +391,15 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
               value={age}
               onChangeText={(text) => setAge(text.replace(/[^0-9]/g, ''))}
               placeholder="18+"
-              placeholderTextColor="rgba(7, 77, 46, 0.35)"
+              placeholderTextColor="rgba(10, 10, 10, 0.35)"
               keyboardType="number-pad"
               maxLength={3}
             />
 
-            <Text style={styles.label}>Gender</Text>
+            <Text style={styles.label}>Pronouns</Text>
+            <Text style={styles.hint}>How should we refer to you on your profile?</Text>
             <View style={styles.genderRow}>
-              {GENDERS.map((option) => {
+              {PROFILE_PRONOUNS.map((option) => {
                 const selected = gender === option;
                 return (
                   <Pressable
@@ -421,7 +425,7 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
                 value={city}
                 onChangeText={setCity}
                 placeholder={cityLoading ? 'Detecting your city…' : 'e.g. Lagos, Accra, Abuja'}
-                placeholderTextColor="rgba(7, 77, 46, 0.35)"
+                placeholderTextColor="rgba(10, 10, 10, 0.35)"
                 autoCapitalize="words"
               />
               <Pressable
@@ -454,7 +458,7 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
               value={bio}
               onChangeText={(text) => setBio(text.slice(0, 500))}
               placeholder="What are you passionate about? What kind of connection are you hoping for?"
-              placeholderTextColor="rgba(7, 77, 46, 0.35)"
+              placeholderTextColor="rgba(10, 10, 10, 0.35)"
               multiline
               textAlignVertical="top"
               maxLength={500}
@@ -522,12 +526,12 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
 
   return (
     <View style={styles.container}>
-      <GenoPremiumChrome variant="linen" />
+      <GenoPremiumChrome variant="forest" />
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
 
       <View style={styles.header}>
         <View style={styles.progressTrack}>
@@ -624,10 +628,7 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
               }}
               onPress={handleNext}
             >
-              <LinearGradient
-                colors={[COLORS.gold, '#C49A38']}
-                style={styles.ctaBtn}
-              >
+              <GenoMirrorRedFill style={styles.ctaBtn}>
                 {saving ? (
                   <View style={styles.ctaInner}>
                     <ActivityIndicator color={COLORS.forest} size="small" />
@@ -638,7 +639,7 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
                     {step === TOTAL_STEPS - 1 ? 'Complete Profile' : 'Continue'}
                   </Text>
                 )}
-              </LinearGradient>
+              </GenoMirrorRedFill>
             </Pressable>
           </Animated.View>
         </View>
@@ -651,7 +652,7 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.linen,
+    backgroundColor: COLORS.background,
   },
   flex: { flex: 1 },
   footerGlass: { overflow: 'hidden' },
@@ -659,14 +660,14 @@ const styles = StyleSheet.create({
     paddingTop: 58,
     paddingHorizontal: 24,
     paddingBottom: 16,
-    backgroundColor: COLORS.ivory,
+    backgroundColor: COLORS.background,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(7, 77, 46, 0.08)',
+    borderBottomColor: 'rgba(10, 10, 10, 0.08)',
   },
   progressTrack: {
     height: 6,
     borderRadius: 3,
-    backgroundColor: 'rgba(168, 213, 186, 0.35)',
+    backgroundColor: COLORS.chipSolid,
     overflow: 'hidden',
     marginBottom: 20,
   },
@@ -688,7 +689,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: 'rgba(168, 213, 186, 0.4)',
+    backgroundColor: COLORS.chipSolid,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -701,7 +702,7 @@ const styles = StyleSheet.create({
   stepDotText: {
     fontSize: 12,
     fontWeight: '800',
-    color: 'rgba(7, 77, 46, 0.5)',
+    color: COLORS.textSubtle,
   },
   stepDotTextActive: {
     color: COLORS.white,
@@ -709,11 +710,11 @@ const styles = StyleSheet.create({
   stepLabel: {
     fontSize: 10,
     fontWeight: '600',
-    color: 'rgba(7, 77, 46, 0.45)',
+    color: COLORS.textSubtle,
     textAlign: 'center',
   },
   stepLabelActive: {
-    color: COLORS.forest,
+    ...MIRROR_RED_TEXT,
     fontWeight: '800',
   },
   scroll: {
@@ -730,14 +731,14 @@ const styles = StyleSheet.create({
   stepHeading: {
     fontSize: 28,
     fontWeight: '800',
-    color: COLORS.forest,
+    ...MIRROR_RED_TEXT,
     letterSpacing: -0.6,
     marginBottom: 6,
   },
   stepSubheading: {
     fontSize: 15,
     lineHeight: 22,
-    color: 'rgba(7, 77, 46, 0.65)',
+    color: COLORS.textMuted,
     fontWeight: '500',
     marginBottom: 20,
   },
@@ -749,19 +750,19 @@ const styles = StyleSheet.create({
   photoHint: {
     fontSize: 12,
     fontWeight: '600',
-    color: 'rgba(7, 77, 46, 0.5)',
+    color: COLORS.textSubtle,
     textAlign: 'center',
   },
   label: {
     fontSize: 14,
     fontWeight: '700',
-    color: COLORS.forest,
+    ...MIRROR_RED_TEXT,
     marginTop: 14,
     marginBottom: 8,
   },
   hint: {
     fontSize: 12,
-    color: 'rgba(7, 77, 46, 0.55)',
+    color: COLORS.textMuted,
     marginTop: -4,
     marginBottom: 10,
     fontWeight: '500',
@@ -774,7 +775,7 @@ const styles = StyleSheet.create({
     backgroundColor: GLASS.insetFill,
     paddingHorizontal: 14,
     fontSize: 16,
-    color: '#1D2B23',
+    color: COLORS.text,
     fontWeight: '500',
   },
   cityRow: {
@@ -800,10 +801,12 @@ const styles = StyleSheet.create({
   },
   genderRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 10,
   },
   genderBtn: {
-    flex: 1,
+    minWidth: '30%',
+    flexGrow: 1,
     height: 48,
     borderRadius: 14,
     borderWidth: 1.5,
@@ -814,15 +817,15 @@ const styles = StyleSheet.create({
   },
   genderBtnSelected: {
     borderColor: COLORS.forest,
-    backgroundColor: 'rgba(168, 213, 186, 0.25)',
+    backgroundColor: COLORS.chipSolid,
   },
   genderBtnText: {
     fontSize: 14,
     fontWeight: '700',
-    color: 'rgba(7, 77, 46, 0.6)',
+    color: COLORS.textMuted,
   },
   genderBtnTextSelected: {
-    color: COLORS.forest,
+    ...MIRROR_RED_TEXT,
   },
   bioHeader: {
     flexDirection: 'row',
@@ -832,7 +835,7 @@ const styles = StyleSheet.create({
   charCounter: {
     fontSize: 12,
     fontWeight: '600',
-    color: 'rgba(7, 77, 46, 0.5)',
+    color: COLORS.textSubtle,
     marginBottom: 8,
   },
   bioInput: {
@@ -845,7 +848,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     fontSize: 16,
     lineHeight: 24,
-    color: '#1D2B23',
+    color: COLORS.text,
     fontWeight: '500',
   },
   chipGrid: {
@@ -869,7 +872,7 @@ const styles = StyleSheet.create({
   chipText: {
     fontSize: 14,
     fontWeight: '600',
-    color: 'rgba(7, 77, 46, 0.7)',
+    color: COLORS.textMuted,
   },
   chipTextSelected: {
     color: COLORS.ivory,
@@ -887,7 +890,7 @@ const styles = StyleSheet.create({
   },
   goalCardSelected: {
     borderColor: COLORS.forest,
-    backgroundColor: 'rgba(168, 213, 186, 0.2)',
+    backgroundColor: COLORS.chipSolid,
     shadowColor: COLORS.forest,
     shadowOpacity: 0.12,
     shadowRadius: 10,
@@ -898,7 +901,7 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 16,
-    backgroundColor: 'rgba(168, 213, 186, 0.3)',
+    backgroundColor: COLORS.chipSolid,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -911,16 +914,16 @@ const styles = StyleSheet.create({
   goalTitle: {
     fontSize: 17,
     fontWeight: '800',
-    color: COLORS.forest,
+    ...MIRROR_RED_TEXT,
     marginBottom: 4,
   },
   goalTitleSelected: {
-    color: COLORS.forest,
+    ...MIRROR_RED_TEXT,
   },
   goalDescription: {
     fontSize: 13,
     lineHeight: 19,
-    color: 'rgba(7, 77, 46, 0.62)',
+    color: COLORS.textMuted,
     fontWeight: '500',
   },
   goalCheck: {
@@ -952,14 +955,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 16,
     borderWidth: 1.5,
-    borderColor: 'rgba(7, 77, 46, 0.2)',
+    borderColor: 'rgba(10, 10, 10, 0.2)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   backBtnText: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.forest,
+    ...MIRROR_RED_TEXT,
   },
   ctaWrap: {
     flex: 1,
@@ -988,7 +991,7 @@ const styles = StyleSheet.create({
   ctaText: {
     fontSize: 17,
     fontWeight: '800',
-    color: COLORS.forest,
+    ...MIRROR_RED_TEXT,
   },
   error: {
     color: '#A32D2D',

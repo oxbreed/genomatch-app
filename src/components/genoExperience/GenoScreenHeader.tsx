@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { FONT_FAMILY, COLORS } from '../../theme';
+import {COLORS, TYPOGRAPHY} from '../../theme';
 
 type Props = {
   kicker?: string;
@@ -29,8 +29,8 @@ export default function GenoScreenHeader({
       <LinearGradient
         colors={
           isForest
-            ? ['rgba(13, 40, 24, 0.08)', 'transparent']
-            : ['rgba(212, 168, 67, 0.12)', 'transparent']
+            ? ['rgba(10, 10, 10, 0.08)', 'transparent']
+            : ['rgba(255, 255, 255, 0.12)', 'transparent']
         }
         style={styles.shimmer}
         pointerEvents="none"
@@ -95,28 +95,23 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   kicker: {
-    fontFamily: FONT_FAMILY.gothamBold,
-    fontSize: 10,
-    letterSpacing: 2.4,
-    color: COLORS.gold,
+    ...TYPOGRAPHY.marketingKicker,
   },
   kickerForest: {
-    color: 'rgba(212, 168, 67, 0.85)',
+    color: 'rgba(255, 255, 255, 0.85)',
   },
   title: {
-    fontFamily: FONT_FAMILY.gothamBold,
+    ...TYPOGRAPHY.screenTitle,
     fontSize: 30,
-    letterSpacing: -0.6,
-    color: COLORS.forestDeep,
+    letterSpacing: -0.1,
   },
   titleForest: {
     color: COLORS.linen,
   },
   subtitle: {
-    fontFamily: FONT_FAMILY.gothamMedium,
+    ...TYPOGRAPHY.body,
     fontSize: 14,
     lineHeight: 20,
-    color: COLORS.sage,
     marginTop: 2,
   },
   subtitleForest: {

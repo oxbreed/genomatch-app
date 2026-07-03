@@ -1,4 +1,4 @@
-import { COLORS } from '../../theme/colors';
+import { COLORS, MIRROR_GRADIENTS, silverAlpha, chromeAlpha } from '../../theme/colors';
 
 /** Shared typography & layout for Matches + Messages lists */
 export const INBOX = {
@@ -21,11 +21,11 @@ export const INBOX = {
   countBadgeH: 26,
   colors: {
     borderGradient: [
-      'rgba(212, 168, 67, 0.45)',
-      'rgba(61, 122, 82, 0.28)',
-      'rgba(212, 168, 67, 0.35)',
+      chromeAlpha(0.35),
+      silverAlpha(0.08),
+      chromeAlpha(0.28),
     ] as [string, string, string],
-    goldBtn: [COLORS.gold, '#C49A3A'] as [string, string],
-    forestBtn: [COLORS.forestDeep, COLORS.forest] as [string, string],
+    redBtn: [...MIRROR_GRADIENTS.cta] as [string, string, string],
+    forestBtn: [COLORS.surfaceElevated, COLORS.forest] as [string, string],
   },
 } as const;

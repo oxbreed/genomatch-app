@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 17,
     letterSpacing: -0.3,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
     textAlign: 'center',
   },
   right: {

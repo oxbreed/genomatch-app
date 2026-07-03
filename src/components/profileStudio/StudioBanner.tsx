@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { GenoLogoCeremony } from '../../brand/graphics';
-import { FONT_FAMILY, COLORS } from '../../theme';
+import {FONT_FAMILY, COLORS, MIRROR_RED_TEXT} from '../../theme';
 
 type Props = {
   doneCount: number;
@@ -13,7 +13,7 @@ export default function StudioBanner({ doneCount, totalCount }: Props) {
   return (
     <View style={styles.wrap}>
       <LinearGradient
-        colors={['rgba(22, 53, 34, 0.82)', 'rgba(22, 53, 34, 0.82)', 'rgba(22, 53, 34, 0.82)']}
+        colors={['rgba(26, 20, 18, 0.82)', 'rgba(26, 20, 18, 0.82)', 'rgba(26, 20, 18, 0.82)']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.card}
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     gap: 14,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.35)',
+    borderColor: 'rgba(255, 255, 255, 0.35)',
     shadowColor: COLORS.forestDeep,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.2,
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: 'rgba(212, 168, 67, 0.2)',
+    backgroundColor: COLORS.chipSolid,
   },
   logoSlot: {
     width: 64,
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 10,
     letterSpacing: 2.2,
-    color: COLORS.gold,
+    ...MIRROR_RED_TEXT,
   },
   title: {
     fontFamily: FONT_FAMILY.gothamBold,

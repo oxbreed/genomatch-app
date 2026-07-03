@@ -157,6 +157,30 @@ export async function syncProfileCityFromDevice(options?: {
   return { updated: true, city: deviceLocation.city, permissionDenied: false };
 }
 
+/** Best-effort country + coordinates from a city name when GPS is unavailable. */
+export async function geocodeCityLabel(city: string): Promise<DeviceLocation | null> {
+  const trimmed = city.trim();
+  if (!trimmed) return null;
+
+  const results = await Location.geocodeAsync(trimmed);
+  const coords = results[0];
+  if (!coords || coords.latitude == null || coords.longitude == null) return null;
+
+  const [place] = await Location.reverseGeocodeAsync({
+    latitude: coords.latitude,
+    longitude: coords.longitude,
+  });
+
+  const resolvedCity = place ? pickCityFromGeocode(place) : null;
+
+  return {
+    city: resolvedCity ?? normalizeCityLabel(trimmed),
+    country: place ? pickCountryFromGeocode(place) : null,
+    latitude: coords.latitude,
+    longitude: coords.longitude,
+  };
+}
+
 /** Read location for onboarding without writing to profile yet. */
 export async function detectDeviceCity(): Promise<{
   city: string | null;

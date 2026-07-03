@@ -8,11 +8,11 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { GenoLogoCeremony } from '../../brand/graphics';
+import { GenoLogoCeremony, GenoMirrorMetallicIcon, GenoMirrorRimFrame, GenoMirrorSteelFill } from '../../brand/graphics';
 import { GenoBondMark } from '../../brand';
 import GenotypeBadge from '../GenotypeBadge';
 import VerifiedBadge from '../VerifiedBadge';
-import { FONT_FAMILY, COLORS } from '../../theme';
+import {FONT_FAMILY, COLORS, LOGO_GOLD, RADIUS} from '../../theme';
 import { PROFILE_TYPE } from './profileTokens';
 import type { Genotype } from '../../types/database';
 
@@ -64,12 +64,12 @@ export default function ProfileHero({
         <Image source={{ uri: heroPhotoUri }} style={styles.heroImage} resizeMode="cover" />
       ) : (
         <LinearGradient
-          colors={['rgba(22, 53, 34, 0.82)', 'rgba(22, 53, 34, 0.82)']}
+          colors={['rgba(26, 20, 18, 0.82)', 'rgba(26, 20, 18, 0.82)']}
           style={styles.heroPlaceholder}
         >
           <GenoLogoCeremony variant="hero" tone="light" />
           {!studioMode ? (
-            <Text style={styles.placeholderHint}>Add a photo in Profile Studio</Text>
+            <Text style={styles.placeholderHint}>Add a photo when you edit your profile.</Text>
           ) : null}
         </LinearGradient>
       )}
@@ -87,19 +87,25 @@ export default function ProfileHero({
       />
 
       <View style={styles.topBar}>
-        <View style={[styles.brandPill, studioMode && styles.studioPill]}>
-          <GenoBondMark size={18} opacity={0.95} />
-          <Text style={[styles.brandText, studioMode && styles.studioPillText]}>
-            {studioMode ? 'Studio' : 'GenoMatch'}
-          </Text>
-        </View>
+        <GenoMirrorRimFrame kind="steel" borderRadius={RADIUS.pill} style={styles.brandPillWrap}>
+          <GenoMirrorSteelFill style={[styles.brandPill, studioMode && styles.studioPill]}>
+            <GenoBondMark size={18} opacity={0.95} surface="dark" />
+            <Text style={[styles.brandText, studioMode && styles.studioPillText]}>
+              {studioMode ? 'Studio' : 'GenoMatch'}
+            </Text>
+          </GenoMirrorSteelFill>
+        </GenoMirrorRimFrame>
         {!studioMode && !editing ? (
           <Pressable
-            style={({ pressed }) => [styles.editBtn, pressed && styles.pressed]}
+            style={({ pressed }) => [pressed && styles.pressed]}
             onPress={onEdit}
           >
-            <Ionicons name="color-wand-outline" size={15} color={COLORS.linen} />
-            <Text style={styles.editText}>Studio</Text>
+            <GenoMirrorRimFrame kind="steel" borderRadius={RADIUS.pill}>
+              <GenoMirrorSteelFill style={styles.editBtn}>
+                <GenoMirrorMetallicIcon name="sparkles" size={15} tone="gold" />
+                <Text style={styles.editText}>Studio</Text>
+              </GenoMirrorSteelFill>
+            </GenoMirrorRimFrame>
           </Pressable>
         ) : null}
       </View>
@@ -138,21 +144,25 @@ export default function ProfileHero({
                 value={draftCity}
                 onChangeText={onChangeCity}
                 placeholder="City"
-                placeholderTextColor="rgba(143, 175, 149, 0.6)"
+                placeholderTextColor="rgba(255, 255, 255, 0.6)"
               />
             )}
             {!cityLocked ? (
               <Pressable
-                style={({ pressed }) => [styles.locationRefresh, pressed && styles.pressed]}
+                style={({ pressed }) => [pressed && styles.pressed]}
                 onPress={onRefreshLocation}
                 disabled={locatingCity || !onRefreshLocation}
                 accessibilityLabel="Use current location"
               >
-                <Ionicons
-                  name={locatingCity ? 'hourglass-outline' : 'locate'}
-                  size={18}
-                  color={COLORS.linen}
-                />
+                <GenoMirrorRimFrame kind="steel" borderRadius={18} padding={1.5}>
+                  <GenoMirrorSteelFill style={styles.locationRefresh}>
+                    <GenoMirrorMetallicIcon
+                      name={locatingCity ? 'hourglass-outline' : 'locate'}
+                      size={18}
+                      tone="steel"
+                    />
+                  </GenoMirrorSteelFill>
+                </GenoMirrorRimFrame>
               </Pressable>
             ) : null}
           </View>
@@ -187,7 +197,7 @@ const styles = StyleSheet.create({
     bottom: 72,
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: 'rgba(143, 175, 149, 0.85)',
+    color: 'rgba(255, 255, 255, 0.85)',
   },
   photoSeal: {
     position: 'absolute',
@@ -220,21 +230,18 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     zIndex: 3,
   },
+  brandPillWrap: {
+    maxWidth: '58%',
+  },
   brandPill: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 7,
     paddingHorizontal: 11,
     paddingVertical: 6,
-    borderRadius: 999,
-    backgroundColor: 'rgba(13, 40, 24, 0.52)',
-    borderWidth: 1,
-    borderColor: 'rgba(245, 239, 230, 0.12)',
+    borderRadius: RADIUS.pill,
   },
-  studioPill: {
-    borderColor: 'rgba(212, 168, 67, 0.55)',
-    backgroundColor: 'rgba(13, 40, 24, 0.78)',
-  },
+  studioPill: {},
   brandText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 11,
@@ -242,7 +249,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
   },
   studioPillText: {
-    color: COLORS.gold,
+    color: LOGO_GOLD,
     letterSpacing: 0.8,
   },
   overlay: {
@@ -280,7 +287,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: COLORS.linen,
     borderBottomWidth: 2,
-    borderBottomColor: 'rgba(212, 168, 67, 0.6)',
+    borderBottomColor: 'rgba(255, 255, 255, 0.6)',
     minWidth: 120,
     flexShrink: 1,
     paddingVertical: 2,
@@ -300,7 +307,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.linen,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(212, 168, 67, 0.5)',
+    borderBottomColor: 'rgba(255, 255, 255, 0.5)',
     paddingVertical: 2,
   },
   locationLocked: {
@@ -318,12 +325,9 @@ const styles = StyleSheet.create({
   locationRefresh: {
     width: 36,
     height: 36,
-    borderRadius: 18,
+    borderRadius: 16.5,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(245, 239, 230, 0.14)',
-    borderWidth: 1,
-    borderColor: 'rgba(245, 239, 230, 0.28)',
   },
   editBtn: {
     flexDirection: 'row',
@@ -331,10 +335,7 @@ const styles = StyleSheet.create({
     gap: 5,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    borderRadius: 999,
-    backgroundColor: 'rgba(245, 239, 230, 0.14)',
-    borderWidth: 1,
-    borderColor: 'rgba(245, 239, 230, 0.28)',
+    borderRadius: RADIUS.pill,
   },
   editText: {
     fontFamily: FONT_FAMILY.gothamBold,

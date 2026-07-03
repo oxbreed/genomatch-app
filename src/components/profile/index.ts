@@ -13,4 +13,5 @@ export { default as ProfileFooterCard } from './ProfileFooterCard';
 export { default as ProfileSectionHeader } from './ProfileSectionHeader';
 export { default as ProfileStudioCTA } from './ProfileStudioCTA';
 export { default as ProfileDetailsFields } from './ProfileDetailsFields';
+export { default as ProfileIdentityFields } from './ProfileIdentityFields';
 export { default as ProfileVerifiedCityCard } from './ProfileVerifiedCityCard';

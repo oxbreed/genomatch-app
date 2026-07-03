@@ -38,7 +38,7 @@ export default function GenoInboxCardShell({
   );
 
   return (
-    <GenoCardFrame style={styles.cardFrame}>
+    <GenoCardFrame mirror style={styles.cardFrame}>
       <View style={styles.row}>
         {onPressBody ? (
           <Pressable

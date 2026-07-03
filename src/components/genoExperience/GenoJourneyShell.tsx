@@ -4,8 +4,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import { GenoPremiumChrome, GenoGlassSurface } from '../../brand/graphics';
 import GenoMatchLogo from '../GenoMatchLogo';
-import { GenoBondMark } from '../../brand';
-import { FONT_FAMILY, COLORS, RADIUS, SHADOWS } from '../../theme';
+import {FONT_FAMILY, COLORS, RADIUS, SHADOWS, MIRROR_RED_TEXT} from '../../theme';
+import { GenoMirrorRedFill } from '../../brand/graphics';
 
 type Props = {
   children: ReactNode;
@@ -58,8 +58,7 @@ export default function GenoJourneyShell({
             </GenoGlassSurface>
           ) : showBrand ? (
             <View style={styles.brandRow}>
-              <GenoMatchLogo size={34} />
-              <GenoBondMark size={22} opacity={0.88} />
+              <GenoMatchLogo size={34} surface="light" />
             </View>
           ) : (
             <View />
@@ -84,7 +83,7 @@ export function GenoJourneyCard({ children, style }: JourneyCardProps) {
   return (
     <View style={[styles.cardOuter, style]}>
       <LinearGradient
-        colors={['rgba(212, 168, 67, 0.48)', 'rgba(61, 122, 82, 0.3)', 'rgba(212, 168, 67, 0.42)']}
+        colors={['rgba(255, 255, 255, 0.48)', 'rgba(200, 16, 46, 0.3)', 'rgba(255, 255, 255, 0.42)']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.cardBorder}
@@ -158,14 +157,9 @@ export function GenoJourneyFooter({
           style={({ pressed }) => [styles.ctaWrap, pressed && styles.pressed]}
           onPress={onPress}
         >
-          <LinearGradient
-            colors={[COLORS.gold, '#C49A38']}
-            start={{ x: 0, y: 0.5 }}
-            end={{ x: 1, y: 0.5 }}
-            style={styles.cta}
-          >
+          <GenoMirrorRedFill horizontal style={styles.cta}>
             <Text style={styles.ctaText}>{ctaLabel}</Text>
-          </LinearGradient>
+          </GenoMirrorRedFill>
         </Pressable>
       )}
 
@@ -177,7 +171,7 @@ export function GenoJourneyFooter({
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: COLORS.linen,
+    backgroundColor: COLORS.background,
   },
   topBar: {
     flexDirection: 'row',
@@ -213,7 +207,7 @@ const styles = StyleSheet.create({
   backText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 14,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
   },
   pressed: { opacity: 0.88 },
   content: {
@@ -237,7 +231,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: 'rgba(13, 40, 24, 0.14)',
+    backgroundColor: 'rgba(10, 10, 10, 0.14)',
   },
   dotActive: {
     width: 28,
@@ -256,7 +250,7 @@ const styles = StyleSheet.create({
   ctaText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 17,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
   },
   helper: {
     fontFamily: FONT_FAMILY.gothamMedium,
@@ -289,22 +283,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: RADIUS.pill,
-    backgroundColor: 'rgba(212, 168, 67, 0.16)',
+    backgroundColor: COLORS.chipSolid,
     borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.35)',
+    borderColor: 'rgba(255, 255, 255, 0.35)',
   },
   kickerText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 10,
     letterSpacing: 1.6,
-    color: COLORS.gold,
+    ...MIRROR_RED_TEXT,
   },
   heroTitle: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 30,
     lineHeight: 36,
     letterSpacing: -0.6,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
   },
   heroSubtitle: {
     fontFamily: FONT_FAMILY.gothamMedium,

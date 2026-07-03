@@ -1,6 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 import { COLORS } from '../theme';
-import { GenoBondMark, GenoSignaturePattern } from './GenoSignaturePattern';
+import { GenoBondMark } from './GenoBondMark';
+import { GenoSignaturePattern } from './GenoSignaturePattern';
 import type { EmptyStateType } from './emptyStateTypes';
 
 type Props = {
@@ -51,8 +52,8 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     borderRadius: 999,
     borderWidth: 1.5,
-    borderColor: 'rgba(212, 168, 67, 0.35)',
-    backgroundColor: 'rgba(237, 243, 238, 0.65)',
+    borderColor: 'rgba(255, 255, 255, 0.35)',
+    backgroundColor: COLORS.chipSolid,
   },
   pattern: {
     ...StyleSheet.absoluteFillObject,

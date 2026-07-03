@@ -4,13 +4,20 @@ import type { Genotype } from '../types/database';
 
 type IonName = ComponentProps<typeof Ionicons>['name'];
 
-export type FamilyPlanningTier = 'favourable' | 'low_risk' | 'awareness' | 'counseling';
+export type FamilyPlanningTier = 'favourable' | 'low_risk' | 'awareness' | 'counselling';
 
 export type FamilyPlanningInsight = {
   tier: FamilyPlanningTier;
+  /** Short headline — plain English outcome */
   title: string;
+  /** One-line risk level for children (sickle cell context) */
+  riskLabel: string;
+  /** Key takeaway in one sentence */
   summary: string;
+  /** Extra context — what the pairing means in practice */
   detail: string;
+  /** Clear recommended action */
+  nextStep: string;
   pairLabel: string;
   icon: IonName;
 };
@@ -59,8 +66,8 @@ export function getGenotypeCompatibilityLine(
     ACCC: 'Moderate sickle cell risk',
     SSSS: 'Higher sickle cell risk',
   };
-  const risk = riskByPair[pairKey] ?? 'Genotype-compatible match';
-  return `${pairLabel} — ${risk}`;
+  const risk = riskByPair[pairKey] ?? 'Compatible pairing';
+  return `${pairLabel} — ${risk}.`;
 }
 
 /** Short risk label for swipe cards and match rows */
@@ -82,88 +89,108 @@ export function getGenotypeRiskShort(
     ACCC: 'Moderate risk',
     SSSS: 'Higher risk',
   };
-  return riskByPair[pairKey] ?? 'Compatible';
+  return riskByPair[pairKey] ?? 'Compatible pairing';
 }
 
 const FAMILY_PLANNING_BY_PAIR: Record<string, Omit<FamilyPlanningInsight, 'pairLabel'>> = {
   AAAA: {
     tier: 'favourable',
-    title: 'Favourable for family planning',
-    summary: 'Children from this pairing would not have sickle cell disease.',
+    title: 'Strong fit for family planning',
+    riskLabel: 'Very low — sickle cell disease unlikely',
+    summary: 'If you have children together, they would not have sickle cell disease.',
     detail:
-      'Both partners are AA. Offspring would inherit AA — no sickle cell trait or disease from this genetic match.',
+      'You are both AA (no sickle cell trait). Children from this pairing would also be AA.',
+    nextStep: 'No special screening needed for sickle cell before conceiving.',
     icon: 'shield-checkmark-outline',
   },
   AAAS: {
     tier: 'low_risk',
-    title: 'Low-risk pairing',
-    summary: 'Children may be carriers (AS) but sickle cell disease is very unlikely.',
+    title: 'Generally favourable for family planning',
+    riskLabel: 'Low — disease unlikely, some children may be carriers',
+    summary: 'Your children would not have sickle cell disease, but some may carry the trait (AS).',
     detail:
-      'An AA × AS pairing cannot produce SS children. Some children may carry the trait — worth discussing openly.',
+      'One partner is AA and one is AS. This pairing cannot produce a child with sickle cell disease (SS).',
+    nextStep: 'Optional: discuss carrier status with a doctor if you want extra reassurance.',
     icon: 'leaf-outline',
   },
   AAAC: {
     tier: 'low_risk',
-    title: 'Low-risk pairing',
-    summary: 'Children may carry hemoglobin variants; sickle cell disease is unlikely.',
+    title: 'Generally favourable for family planning',
+    riskLabel: 'Low — disease unlikely, variants possible',
+    summary: 'Sickle cell disease is unlikely; some children may inherit a hemoglobin variant.',
     detail:
-      'An AA × AC pairing has a low chance of affected children. A genetic counselor can offer personalised clarity.',
+      'One partner is AA and one is AC. Outcomes are usually mild, but a clinician can explain your specific case.',
+    nextStep: 'Consider a pre-conception chat with your doctor or a genetic counselor.',
     icon: 'leaf-outline',
   },
   AASS: {
     tier: 'awareness',
-    title: 'Carrier-aware pairing',
-    summary: 'Children would likely be carriers (AS), not affected by sickle cell disease.',
+    title: 'Children would be carriers (AS)',
+    riskLabel: 'Low for disease — children would likely be carriers (AS)',
+    summary: 'Children would not have sickle cell disease, but would likely carry the sickle cell trait.',
     detail:
-      'This AA × SS pairing produces AS carriers. Partner with a healthcare provider before family planning.',
+      'One partner is AA and one is SS. All children would be AS carriers — not affected by sickle cell disease.',
+    nextStep: 'Talk with a healthcare provider before trying to conceive so you know what to expect.',
     icon: 'information-circle-outline',
   },
   ASAS: {
-    tier: 'counseling',
-    title: 'Genetic counseling recommended',
-    summary: 'Each child has a 25% chance of sickle cell disease (SS).',
+    tier: 'counselling',
+    title: 'Genetic counselling recommended',
+    riskLabel: 'Moderate to higher — 1 in 4 children could have sickle cell disease',
+    summary: 'Each child has a 25% chance of sickle cell disease (SS) and a 50% chance of being a carrier (AS).',
     detail:
-      'Both partners carry the sickle cell trait (AS). Professional screening and counseling are advised before starting a family.',
+      'You are both AS (sickle cell carriers). This is the pairing where professional guidance matters most before family planning.',
+    nextStep: 'Book genetic counselling and pre-conception screening before starting a family.',
     icon: 'medical-outline',
   },
   ASAC: {
     tier: 'awareness',
-    title: 'Moderate awareness needed',
-    summary: 'Children may be carriers; some risk of sickle cell disease exists.',
+    title: 'Plan with professional guidance',
+    riskLabel: 'Moderate — some risk of sickle cell disease in children',
+    summary: 'Both of you carry hemoglobin variants (AS and AC). Some children could be affected.',
     detail:
-      'Both partners carry hemoglobin variants (AS × AC). Speak with a counselor to understand your options.',
+      'Outcomes depend on which genes each child inherits. A counselor can map the exact percentages for your pairing.',
+    nextStep: 'See a genetic counselor for pre-conception screening and a clear risk breakdown.',
     icon: 'information-circle-outline',
   },
   ASSS: {
-    tier: 'counseling',
-    title: 'Higher risk — seek counseling',
-    summary: 'Each child has a 50% chance of sickle cell disease (SS).',
+    tier: 'counselling',
+    title: 'Higher risk — specialist guidance needed',
+    riskLabel: 'Higher — about half of children could have sickle cell disease',
+    summary: 'Each child has a 50% chance of sickle cell disease (SS) and a 50% chance of being a carrier (AS).',
     detail:
-      'An AS × SS pairing carries significant risk for affected children. Genetic counseling is strongly recommended.',
+      'One partner is AS and one is SS. This pairing needs careful planning with medical support.',
+    nextStep: 'Speak with a genetic counselor and hematologist before making family planning decisions.',
     icon: 'medical-outline',
   },
   ACAC: {
     tier: 'awareness',
-    title: 'Moderate awareness needed',
-    summary: 'Children may inherit hemoglobin variants; counseling can clarify outcomes.',
+    title: 'Plan with professional guidance',
+    riskLabel: 'Moderate — hemoglobin variants on both sides',
+    summary: 'Both partners are AC. Children may inherit combinations that need medical follow-up.',
     detail:
-      'Both partners are AC carriers. A pre-marital or pre-conception screen helps you plan with confidence.',
+      'Carrier-on-carrier pairings benefit from screening so you understand possible outcomes before conceiving.',
+    nextStep: 'Arrange pre-conception genetic counselling for a personalised risk summary.',
     icon: 'information-circle-outline',
   },
   ACCC: {
     tier: 'awareness',
-    title: 'Awareness recommended',
-    summary: 'Hemoglobin variants on both sides — outcomes vary by exact genotype.',
+    title: 'Get personalised guidance',
+    riskLabel: 'Varies — depends on exact hemoglobin types',
+    summary: 'This pairing involves hemoglobin variants on both sides; outcomes are not one-size-fits-all.',
     detail:
-      'This pairing benefits from professional genetic guidance before family planning decisions.',
+      'GenoMatch shows educational signals only. A lab test and counselor can give numbers specific to you.',
+    nextStep: 'Ask your doctor for hemoglobin electrophoresis and a referral to genetic counselling.',
     icon: 'information-circle-outline',
   },
   SSSS: {
-    tier: 'counseling',
-    title: 'Specialist support advised',
-    summary: 'Both partners have sickle cell disease (SS) — specialist care is essential for family planning.',
+    tier: 'counselling',
+    title: 'Specialist care for family planning',
+    riskLabel: 'Specialist input required',
+    summary: 'Both partners have sickle cell disease (SS). Family planning should be led by your care team.',
     detail:
-      'A hematologist or genetic counselor should guide any family planning conversation for this pairing.',
+      'Pregnancy and conception need specialist support to protect your health and plan thoughtfully.',
+    nextStep: 'Work with your hematologist and a maternal–fetal specialist before trying to conceive.',
     icon: 'medical-outline',
   },
 };
@@ -178,10 +205,12 @@ export function getFamilyPlanningInsight(
   const pairLabel = `${viewer} × ${candidateGenotype}`;
   const fallback: Omit<FamilyPlanningInsight, 'pairLabel'> = {
     tier: 'awareness',
-    title: 'Discuss with a counselor',
-    summary: 'This genotype pairing benefits from professional guidance before family planning.',
+    title: 'Speak with a genetic counselor',
+    riskLabel: 'Personalised assessment needed',
+    summary: 'This pairing needs a clinician to explain outcomes for your situation.',
     detail:
-      'GenoMatch provides educational signals only. A healthcare provider can give advice for your situation.',
+      'GenoMatch shares educational information only — not a diagnosis or medical advice.',
+    nextStep: 'Book a pre-conception appointment with your doctor or a genetic counselor.',
     icon: 'information-circle-outline',
   };
 

@@ -43,7 +43,7 @@ export default function GenoLegalScreen({ title, subtitle, sections, onBack }: P
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.linen },
+  container: { flex: 1, backgroundColor: COLORS.background },
   topBar: {
     paddingTop: 52,
     paddingHorizontal: 12,
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 17,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
     marginBottom: 8,
   },
   sectionBody: {

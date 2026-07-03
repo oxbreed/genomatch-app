@@ -1,5 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import {
+  GenoMirrorGoldFill,
+  GenoMirrorMetallicIcon,
+  GenoMirrorRimFrame,
+  GenoMirrorSteelFill,
+} from '../brand/graphics';
 import { FONT_FAMILY, COLORS } from '../theme';
 
 type Props = {
@@ -11,17 +16,21 @@ type Props = {
 export default function VerifiedBadge({ compact, label = 'Verified' }: Props) {
   if (compact) {
     return (
-      <View style={styles.compact}>
-        <Ionicons name="shield-checkmark" size={11} color={COLORS.forestDeep} />
-      </View>
+      <GenoMirrorRimFrame kind="gold" borderRadius={9} padding={1}>
+        <GenoMirrorSteelFill style={styles.compact}>
+          <GenoMirrorMetallicIcon name="shield-checkmark" size={11} tone="chrome" />
+        </GenoMirrorSteelFill>
+      </GenoMirrorRimFrame>
     );
   }
 
   return (
-    <View style={styles.badge}>
-      <Ionicons name="shield-checkmark" size={12} color={COLORS.forestDeep} />
-      <Text style={styles.text}>{label}</Text>
-    </View>
+    <GenoMirrorRimFrame kind="gold" borderRadius={999} padding={1}>
+      <GenoMirrorGoldFill style={styles.badge}>
+        <GenoMirrorMetallicIcon name="shield-checkmark" size={12} tone="chrome" />
+        <Text style={styles.text}>{label}</Text>
+      </GenoMirrorGoldFill>
+    </GenoMirrorRimFrame>
   );
 }
 
@@ -33,24 +42,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 999,
-    backgroundColor: 'rgba(61, 122, 82, 0.15)',
-    borderWidth: 1,
-    borderColor: 'rgba(61, 122, 82, 0.25)',
   },
   text: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 10,
     letterSpacing: 0.3,
-    color: COLORS.forestDeep,
+    color: COLORS.text,
   },
   compact: {
     width: 18,
     height: 18,
-    borderRadius: 9,
-    backgroundColor: 'rgba(61, 122, 82, 0.15)',
+    borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(61, 122, 82, 0.2)',
   },
 });

@@ -1,6 +1,8 @@
 import type { PostgrestError } from '@supabase/supabase-js';
 import { getSeenProfileIds } from './likes';
 import { getBlockedUserIds } from './moderation';
+import type { DiscoveryInterest } from './discoveryInterest';
+import { orderDiscoveryInterests } from './discoveryInterest';
 import { parseDistanceBand } from './distanceBands';
 import type { DiscoveryProfile, DistanceBand, Genotype, ProfileRow } from '../types/database';
 import { getAuthenticatedUserId, logSupabaseResult } from './auth';
@@ -10,7 +12,7 @@ import { supabase } from './supabase';
 import { sanitizeText } from './validation';
 
 const CORE_PROFILE_FIELDS =
-  'id, email, genotype, display_name, avatar_url, photos, bio, date_of_birth, city, country, gender, interests, relationship_goal, onboarding_completed, verification_status, genotype_verified, created_at, updated_at';
+  'id, email, genotype, display_name, avatar_url, photos, bio, date_of_birth, city, country, gender, interested_in, interests, relationship_goal, onboarding_completed, verification_status, genotype_verified, created_at, updated_at';
 
 const EXTENDED_PROFILE_FIELDS =
   'height_cm, religion, drinking_status, smoking_status, education_status, last_active_at, city_updated_at';
@@ -233,6 +235,12 @@ export function isProfileComplete(profile: ProfileRow | null): boolean {
   return !!profile.display_name?.trim();
 }
 
+export function needsInterestedInPrompt(profile: ProfileRow | null): boolean {
+  if (!profile?.onboarding_completed) return false;
+  const interestedIn = profile.interested_in;
+  return !interestedIn || interestedIn.length === 0;
+}
+
 /** Backfill onboarding_completed for profiles that already have a display name. */
 export async function syncOnboardingIfNeeded(
   profile: ProfileRow | null
@@ -256,18 +264,26 @@ export async function syncOnboardingIfNeeded(
   return data;
 }
 
-/** Route after sign-in based on profile completion. */
-export async function resolvePostSignInScreen(): Promise<'profileSetup' | 'main'> {
+type AuthenticatedScreen = 'profileSetup' | 'interestedInGate' | 'main';
+
+async function resolveAuthenticatedScreen(): Promise<AuthenticatedScreen> {
   await ensureUserProfile();
+
   let profile = await getCurrentProfile();
   profile = await syncOnboardingIfNeeded(profile);
   if (!isProfileComplete(profile)) return 'profileSetup';
+  if (needsInterestedInPrompt(profile)) return 'interestedInGate';
   return 'main';
+}
+
+/** Route after sign-in based on profile completion. */
+export async function resolvePostSignInScreen(): Promise<AuthenticatedScreen> {
+  return resolveAuthenticatedScreen();
 }
 
 /** Where to send the user on app launch based on session + profile row. */
 export async function resolveInitialScreen(): Promise<
-  'onboarding' | 'profileSetup' | 'main'
+  'onboarding' | AuthenticatedScreen
 > {
   const {
     data: { session },
@@ -275,13 +291,20 @@ export async function resolveInitialScreen(): Promise<
 
   if (!session) return 'onboarding';
 
-  await ensureUserProfile();
+  return resolveAuthenticatedScreen();
+}
 
-  let profile = await getCurrentProfile();
-  profile = await syncOnboardingIfNeeded(profile);
-  if (!isProfileComplete(profile)) return 'profileSetup';
+export async function saveInterestedIn(values: DiscoveryInterest[]): Promise<void> {
+  const userId = await getCurrentUserId();
+  if (!userId) throw new Error('Not signed in');
+  if (values.length === 0) throw new Error('Pick at least one option.');
 
-  return 'main';
+  const { error } = await supabase
+    .from('profiles')
+    .update({ interested_in: orderDiscoveryInterests(values) })
+    .eq('id', userId);
+
+  if (error) throw error;
 }
 
 export type DiscoveryDeckStats = {
@@ -417,6 +440,7 @@ export async function updateProfileFields(
       | 'bio'
       | 'interests'
       | 'gender'
+      | 'interested_in'
       | 'relationship_goal'
       | 'date_of_birth'
       | 'avatar_url'
