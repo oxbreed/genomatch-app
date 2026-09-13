@@ -4,6 +4,7 @@
   "main": "index.ts",
   "scripts": {
     "start": "expo start",
+    "start:go": "bash scripts/start-expo-go.sh",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
