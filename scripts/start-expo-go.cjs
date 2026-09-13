@@ -3,7 +3,7 @@
  * Starts Expo Go and answers the "Log in / Proceed anonymously" menu
  * (down-arrow + Enter) whenever it appears.
  */
-const { spawn } = require('node:child_process');
+const { spawn, execSync } = require('node:child_process');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
@@ -15,6 +15,19 @@ const signDir = path.join(os.homedir(), '.expo', 'codesigning', PROJECT_ID);
 fs.rmSync(path.join(os.homedir(), '.expo', 'codesigning'), { recursive: true, force: true });
 fs.mkdirSync(signDir, { recursive: true });
 fs.rmSync(path.join(ROOT, '.expo'), { recursive: true, force: true });
+
+function freePort(port) {
+  try {
+    const pids = execSync(`lsof -ti tcp:${port}`, { encoding: 'utf8' }).trim();
+    if (!pids) return;
+    execSync(`kill ${pids.split('\n').join(' ')}`, { stdio: 'ignore' });
+  } catch {
+    // nothing listening
+  }
+}
+
+freePort(8081);
+freePort(8082);
 
 const env = { ...process.env };
 delete env.CI;
