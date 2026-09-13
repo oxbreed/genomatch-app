@@ -9,6 +9,7 @@
  */
 const { execFileSync, spawn, spawnSync } = require('child_process');
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 
 const ROOT = path.join(__dirname, '..');
@@ -59,6 +60,12 @@ function whoami() {
 }
 
 killPort(PORT);
+
+try {
+  fs.rmSync(path.join(os.homedir(), '.expo', 'codesigning'), { recursive: true, force: true });
+} catch {
+  /* ignore */
+}
 
 if (!fs.existsSync(expoCli)) {
   say(`Missing ${expoCli}. Run: npm install`);
