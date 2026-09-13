@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.splash,
   },
   layer: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 2,

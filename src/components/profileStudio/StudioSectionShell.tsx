@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   glow: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     borderRadius: 22,
     margin: -4,
   },

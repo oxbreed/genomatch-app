@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   pattern: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   patternDot: {
     position: 'absolute',

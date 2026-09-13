@@ -243,7 +243,7 @@ export default function DiscoverMatchCelebration({
         <LinearGradient
           colors={['#061810', 'rgba(13, 40, 24, 0.96)', '#0D2818']}
           locations={[0, 0.45, 1]}
-          style={StyleSheet.absoluteFillObject}
+          style={StyleSheet.absoluteFill}
         />
 
         <View style={styles.ambientTop} pointerEvents="none">
@@ -307,7 +307,7 @@ export default function DiscoverMatchCelebration({
                       colors={['transparent', 'rgba(212, 168, 67, 0.55)', 'transparent']}
                       start={{ x: 0, y: 0.5 }}
                       end={{ x: 1, y: 0.5 }}
-                      style={StyleSheet.absoluteFillObject}
+                      style={StyleSheet.absoluteFill}
                     />
                   </Animated.View>
                 </View>
@@ -552,7 +552,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   confettiLayer: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   pillGlow: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     borderRadius: 999,
     transform: [{ scale: 1.08 }],
   },

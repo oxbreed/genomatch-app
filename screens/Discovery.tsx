@@ -1263,7 +1263,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   cardMedia: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     width: '100%',
     height: '100%',
   },
@@ -1474,7 +1474,7 @@ const styles = StyleSheet.create({
     textShadowRadius: 3,
   },
   cardDragTint: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     borderRadius: 24,
     zIndex: 8,
   },

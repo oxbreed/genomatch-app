@@ -100,7 +100,7 @@ export default function ProfileAvatar({
         <View
           style={[
             styles.coverFallback,
-            StyleSheet.absoluteFillObject,
+            StyleSheet.absoluteFill,
             { borderRadius: outerRadius, backgroundColor: fallbackInnerBg },
           ]}
         >
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   coverInitialsTop: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     alignItems: 'center',
     paddingTop: 18,
     zIndex: 1,
