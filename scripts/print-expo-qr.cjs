@@ -1,31 +1,58 @@
 #!/usr/bin/env node
 /**
  * Print a scannable Expo Go QR for exp://<lan-ip>:8081 and write expo-qr.png.
- * Uses Expo's `toqr` encoder so the terminal QR matches what `expo start` would draw.
  */
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const zlib = require('zlib');
-const { toQR } = require('toqr');
 
 const ROOT = path.join(__dirname, '..');
 const PORT = process.env.EXPO_PORT || '8081';
 const PNG_PATH = path.join(ROOT, 'expo-qr.png');
 
-function lanIp() {
-  const fromEnv = (process.env.REACT_NATIVE_PACKAGER_HOSTNAME || '').trim();
-  if (fromEnv) return fromEnv;
+function loadToqr() {
+  const candidates = [
+    () => require('toqr'),
+    () => require(path.join(ROOT, 'node_modules/toqr/dist/toqr.js')),
+    () => require(path.join(ROOT, 'node_modules/expo/node_modules/toqr/dist/toqr.js')),
+    () =>
+      require(
+        require.resolve('toqr', {
+          paths: [path.join(ROOT, 'node_modules/expo/node_modules/@expo/cli')],
+        })
+      ),
+  ];
+  for (const load of candidates) {
+    try {
+      return load();
+    } catch {
+      /* try next */
+    }
+  }
+  return null;
+}
 
+function listLanIpv4() {
   const nets = os.networkInterfaces();
   const found = [];
   for (const [name, addrs] of Object.entries(nets)) {
+    if (/^(awdl|llw|utun|lo|bridge|anpi|ap|ipsec|vmnet|vnic|docker|br-)/i.test(name)) {
+      continue;
+    }
     for (const n of addrs || []) {
-      const family = n.family === 4 || n.family === 'IPv4';
-      if (!family || n.internal) continue;
+      const ipv4 = n.family === 4 || n.family === 'IPv4';
+      if (!ipv4 || n.internal) continue;
       found.push({ name, address: n.address });
     }
   }
+  return found;
+}
+
+function lanIp() {
+  const fromEnv = (process.env.REACT_NATIVE_PACKAGER_HOSTNAME || '').trim();
+  if (fromEnv) return fromEnv;
+  const found = listLanIpv4();
   const prefer = found.find((x) => /^(en0|en1|eth0|wlan0)$/i.test(x.name));
   return (prefer || found[0] || {}).address || '';
 }
@@ -58,11 +85,9 @@ function writePng(file, modules, scale = 8, quiet = 4) {
     const my = Math.floor(y / scale) - quiet;
     for (let x = 0; x < width; x++) {
       const mx = Math.floor(x / scale) - quiet;
-      let dark = 0;
+      let dark = 255;
       if (mx >= 0 && my >= 0 && mx < extent && my < extent) {
         dark = modules[my * extent + mx] ? 0 : 255;
-      } else {
-        dark = 255;
       }
       row.push(dark);
     }
@@ -106,18 +131,30 @@ function printHalfblock(modules) {
   process.stdout.write(output + '\n');
 }
 
-const ip = (process.argv[2] || lanIp()).trim();
+if (process.argv.includes('--ip-only')) {
+  const ip = lanIp();
+  if (!ip) process.exit(1);
+  process.stdout.write(ip);
+  process.exit(0);
+}
+
+const ip = (process.argv.find((a, i) => i > 1 && !a.startsWith('--')) || lanIp()).trim();
 if (!ip) {
-  console.error('No LAN IP. Connect Wi-Fi, then retry.');
+  console.error('No LAN IP. Connect this Mac to Wi-Fi, then retry.');
   process.exit(1);
 }
 
 const url = `exp://${ip}:${PORT}`;
-const modules = toQR(url);
-printHalfblock(modules);
-writePng(PNG_PATH, modules);
+const toqr = loadToqr();
+if (toqr && toqr.toQR) {
+  const modules = toqr.toQR(url);
+  printHalfblock(modules);
+  writePng(PNG_PATH, modules);
+} else {
+  console.warn('QR encoder not found; use Enter URL in Expo Go.');
+}
 
 console.log('');
 console.log(url);
 console.log(`QR image: ${PNG_PATH}`);
-console.log('iPhone: Camera app → Open in Expo Go. Same Wi-Fi as this computer.');
+console.log('iPhone Camera → Open in Expo Go. Same Wi-Fi as this Mac.');
