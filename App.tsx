@@ -4,7 +4,7 @@ import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
 import type { ComponentProps } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { FONTS_TO_LOAD } from './src/theme';
+import { COLORS, FONTS_TO_LOAD } from './src/theme';
 import { GenoOnboardingFlow, GenoSplashScreen } from './src/components/onboarding';
 import type { GenoOnboardingSlide } from './src/components/onboarding';
 import GenoErrorBoundary from './src/components/shell/GenoErrorBoundary';
@@ -54,7 +54,7 @@ const ONBOARDING_SLIDES: GenoOnboardingSlide[] = [
 function ScreenFallback() {
   return (
     <View style={styles.fallback}>
-      <ActivityIndicator size="large" color="#C49A3A" />
+      <ActivityIndicator size="large" color={COLORS.goldDeep} />
     </View>
   );
 }
@@ -286,6 +286,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#F4EFE4',
+    backgroundColor: COLORS.linen,
   },
 });

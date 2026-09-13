@@ -241,7 +241,7 @@ export default function DiscoverMatchCelebration({
     <Modal visible={visible} transparent animationType="none" statusBarTranslucent>
       <Animated.View style={[styles.backdrop, { opacity: backdrop }]}>
         <LinearGradient
-          colors={['#061810', 'rgba(13, 40, 24, 0.96)', '#0D2818']}
+          colors={['#061810', 'rgba(22, 53, 34, 0.96)', COLORS.forestDeep]}
           locations={[0, 0.45, 1]}
           style={StyleSheet.absoluteFill}
         />
@@ -278,7 +278,7 @@ export default function DiscoverMatchCelebration({
           >
             <View style={styles.cardInner}>
               <LinearGradient
-                colors={['#1F4A32', '#153D28', '#0D2818']}
+                colors={['#1F4A32', '#153D28', COLORS.forestDeep]}
                 start={{ x: 0.2, y: 0 }}
                 end={{ x: 0.8, y: 1 }}
                 style={styles.cardGradient}

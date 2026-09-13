@@ -1245,7 +1245,7 @@ const styles = StyleSheet.create({
   superLikeToastText: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#0D2818',
+    color: COLORS.forestDeep,
     textAlign: 'center',
   },
   superLikeBtnWrap: {
@@ -1257,7 +1257,7 @@ const styles = StyleSheet.create({
   superLikeBurstStar: {
     position: 'absolute',
     fontSize: 14,
-    color: '#D4A843',
+    color: COLORS.gold,
   },
   btnDisabled: {
     opacity: 0.5,
@@ -1494,29 +1494,29 @@ const styles = StyleSheet.create({
   },
   stampLike: {
     left: 24,
-    borderColor: '#D4A843',
+    borderColor: COLORS.gold,
     transform: [{ rotate: '-15deg' }],
   },
   stampNope: {
     right: 24,
-    borderColor: '#8FAF95',
+    borderColor: COLORS.sage,
     transform: [{ rotate: '15deg' }],
   },
   stampLikeText: {
     fontSize: 32,
     fontWeight: '900',
-    color: '#D4A843',
+    color: COLORS.gold,
   },
   stampNopeText: {
     fontSize: 32,
     fontWeight: '900',
-    color: '#8FAF95',
+    color: COLORS.sage,
   },
   superLikeBtn: {
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.white,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: COLORS.forestDeep,
@@ -1527,13 +1527,13 @@ const styles = StyleSheet.create({
   },
   superLikeStar: {
     fontSize: 22,
-    color: '#D4A843',
+    color: COLORS.gold,
   },
   passBtn: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.white,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: COLORS.forestDeep,
@@ -1565,7 +1565,7 @@ const styles = StyleSheet.create({
     left: 16,
     right: 16,
     zIndex: 41,
-    color: '#A32D2D',
+    color: COLORS.error,
     fontSize: 12,
     fontWeight: '600',
     textAlign: 'center',

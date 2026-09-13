@@ -5,7 +5,7 @@ import { COLORS, getInitials } from '../data/mockData';
 const BRAND_GRADIENTS: [string, string][] = [
   [COLORS.forest, COLORS.forestDeep],
   [COLORS.forestDeep, '#0A1F12'],
-  ['#1A3D28', '#0D2818'],
+  ['#1A3D28', '#163522'],
   ['#2A5438', '#1A3D28'],
 ];
 

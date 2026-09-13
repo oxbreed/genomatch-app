@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
     minHeight: 360,
     borderRadius: RADIUS.lg,
     overflow: 'hidden',
-    backgroundColor: '#0D2818',
+    backgroundColor: COLORS.forestDeep,
     marginBottom: 24,
   },
   camera: {
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
     minHeight: 360,
     borderRadius: RADIUS.lg,
     overflow: 'hidden',
-    backgroundColor: '#0D2818',
+    backgroundColor: COLORS.forestDeep,
     marginBottom: 20,
   },
   previewImage: {
@@ -381,7 +381,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   error: {
-    color: '#A32D2D',
+    color: COLORS.error,
     fontSize: 13,
     fontWeight: '600',
     textAlign: 'center',

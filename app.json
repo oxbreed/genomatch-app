@@ -8,7 +8,7 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "description": "GenoMatch is the world's first genotype-aware dating app. Find compatible partners based on AA, AS, SS, AC genotype matching.",
-    "primaryColor": "#0D2818",
+    "primaryColor": "#163522",
     "runtimeVersion": {
       "policy": "appVersion"
     },
@@ -38,7 +38,7 @@
       "package": "ng.genomatch.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#0D2818"
+        "backgroundColor": "#163522"
       },
       "predictiveBackGestureEnabled": false,
       "permissions": [
@@ -78,7 +78,7 @@
         "expo-notifications",
         {
           "icon": "./assets/icon.png",
-          "color": "#0D2818",
+          "color": "#163522",
           "defaultChannel": "messages",
           "sounds": []
         }
@@ -87,7 +87,7 @@
         "expo-splash-screen",
         {
           "image": "./assets/splash-icon.png",
-          "backgroundColor": "#0D2818",
+          "backgroundColor": "#163522",
           "resizeMode": "contain",
           "imageWidth": 200
         }
