@@ -28,6 +28,11 @@ function freePort(port) {
 
 freePort(8081);
 freePort(8082);
+try {
+  execSync('sleep 1');
+} catch {
+  // ignore
+}
 
 const env = { ...process.env };
 delete env.CI;
