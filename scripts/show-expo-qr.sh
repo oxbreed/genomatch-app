@@ -1,27 +1,16 @@
 #!/usr/bin/env bash
-# Print + save QR for the running Expo dev server (works when Cursor hides the terminal QR).
+# Re-print the Expo Go QR (Metro must already be running, or pass the LAN IP).
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-if ! curl -sf http://localhost:8081/status >/dev/null; then
-  echo "Metro is not running. Start it first:"
-  echo "  npm run start:go"
-  exit 1
+LAN="${REACT_NATIVE_PACKAGER_HOSTNAME:-}"
+if [ -z "${LAN}" ] && command -v ipconfig >/dev/null 2>&1; then
+  iface="$(route -n get default 2>/dev/null | awk '/interface:/{print $2}' || true)"
+  if [ -n "${iface}" ]; then
+    LAN="$(ipconfig getifaddr "$iface" 2>/dev/null || true)"
+  fi
+  LAN="${LAN:-$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null || true)}"
 fi
 
-URL=$(curl -s http://localhost:8081 | python3 -c "
-import sys, json, re
-d = json.load(sys.stdin)
-host = re.search(r'https?://([^/]+)', d['launchAsset']['url']).group(1)
-print('exp://' + host)
-")
-
-echo ""
-echo "Expo Go URL: $URL"
-echo ""
-echo "In Expo Go: Camera, or Enter URL, then paste the line above."
-echo "Same Wi-Fi as this Mac. Do not use --tunnel (ngrok is broken in this Expo CLI)."
-echo ""
-
-curl -sf "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${URL}" -o expo-qr.png
-open expo-qr.png 2>/dev/null || echo "QR saved to: $(pwd)/expo-qr.png"
+node scripts/print-expo-qr.cjs ${LAN:+"$LAN"}
+open expo-qr.png 2>/dev/null || true
