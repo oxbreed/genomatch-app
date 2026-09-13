@@ -214,7 +214,7 @@ export default function DiscoverMatchModal({
                         <>
                           <View style={styles.compatDivider} />
                           <Ionicons name="shield-checkmark" size={13} color={COLORS.verified} />
-                          <Text style={styles.verifiedText}>Verified</Text>
+                          <Text style={styles.verifiedText}>Self-verified</Text>
                         </>
                       ) : null}
                     </View>

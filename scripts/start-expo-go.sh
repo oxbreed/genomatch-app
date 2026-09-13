@@ -1,39 +1,38 @@
 #!/usr/bin/env bash
-# Open GenoMatch in Expo Go: LAN only, no ngrok, no login menu.
-set -u
-
+# Start Metro for Expo Go. Run this IN Terminal.app / iTerm (not piped, not CI).
+set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
-PROJECT_ID="11f7d939-f2b9-4c0c-a1bf-bd7411c45ec6"
 
-LAN_IP="$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null || true)"
+export CI=0
+export EXPO_NO_TELEMETRY=1
+export EXPO_NO_GIT_STATUS=1
+unset EXPO_TOKEN || true
 
-echo "==> GenoMatch Expo Go"
-echo "    folder: $ROOT"
-if [[ -n "${LAN_IP}" ]]; then
-  echo
-  echo "    If no QR appears, open Expo Go → Enter URL and type:"
-  echo "        exp://${LAN_IP}:8081"
-  echo
-fi
-
-for port in 8081 8082; do
-  pids="$(lsof -ti tcp:${port} 2>/dev/null || true)"
-  if [[ -n "${pids}" ]]; then
-    echo "    stopping process on port ${port}: ${pids}"
-    kill -9 ${pids} 2>/dev/null || true
+for p in 8081 8082; do
+  if command -v lsof >/dev/null 2>&1; then
+    lsof -ti tcp:"$p" | xargs kill -9 2>/dev/null || true
   fi
 done
-sleep 1
 
-rm -rf "${HOME}/.expo/codesigning"
-mkdir -p "${HOME}/.expo/codesigning/${PROJECT_ID}"
-rm -rf "${ROOT}/.expo"
+rm -rf "${HOME}/.expo/codesigning" "${ROOT}/.expo"
 
 npx expo logout >/dev/null 2>&1 || true
 
-echo "    starting Metro on Wi-Fi (this can take a minute)..."
-echo "    same Wi-Fi on iPhone and Mac. Camera app scans the QR."
-echo
+LAN=""
+if command -v ipconfig >/dev/null 2>&1; then
+  LAN="$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null || true)"
+elif command -v hostname >/dev/null 2>&1; then
+  LAN="$(hostname -I 2>/dev/null | awk '{print $1}' || true)"
+fi
 
-exec python3 "${ROOT}/scripts/start-expo-go.py"
+echo ""
+echo "GenoMatch — Expo Go (same Wi-Fi as this Mac)"
+echo "1) Open Expo Go → Camera, or Enter URL"
+if [ -n "${LAN}" ]; then
+  echo "   exp://${LAN}:8081"
+fi
+echo "2) Metro QR appears below this line (need a real terminal, width ≥ 80)."
+echo ""
+
+exec npx expo start --go --lan --port 8081 --clear

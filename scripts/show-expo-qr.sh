@@ -5,7 +5,7 @@ cd "$(dirname "$0")/.."
 
 if ! curl -sf http://localhost:8081/status >/dev/null; then
   echo "Metro is not running. Start it first:"
-  echo "  npm run start:tunnel"
+  echo "  npm run start:go"
   exit 1
 fi
 
@@ -19,7 +19,8 @@ print('exp://' + host)
 echo ""
 echo "Expo Go URL: $URL"
 echo ""
-echo "Scan expo-qr.png in the project root, or paste the URL in Expo Go → Enter URL manually."
+echo "In Expo Go: Camera, or Enter URL, then paste the line above."
+echo "Same Wi-Fi as this Mac. Do not use --tunnel (ngrok is broken in this Expo CLI)."
 echo ""
 
 curl -sf "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${URL}" -o expo-qr.png

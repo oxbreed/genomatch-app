@@ -5,7 +5,6 @@ import {
   Animated,
   Easing,
   KeyboardAvoidingView,
-  Linking,
   Platform,
   Pressable,
   ScrollView,
@@ -25,6 +24,8 @@ import { resolvePostSignInScreen } from '../src/lib/profiles';
 import { sendPasswordResetEmail } from '../src/lib/resetPassword';
 import { enforceAccountAccess, formatSecurityError } from '../src/lib/security';
 import { supabase } from '../src/lib/supabase';
+import PrivacyPolicy from './PrivacyPolicy';
+import TermsOfService from './TermsOfService';
 
 type SignInProps = {
   onBack: () => void;
@@ -45,6 +46,7 @@ export default function SignIn({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [focusedField, setFocusedField] = useState<'email' | 'password' | null>(null);
+  const [legalDoc, setLegalDoc] = useState<null | 'privacy' | 'terms'>(null);
 
   const introOpacity = useRef(new Animated.Value(0)).current;
   const introTranslateY = useRef(new Animated.Value(18)).current;
@@ -153,6 +155,13 @@ export default function SignIn({
       [{ text: 'OK', onPress: () => onNavigateResetPassword(trimmedEmail) }]
     );
   };
+
+  if (legalDoc === 'privacy') {
+    return <PrivacyPolicy onBack={() => setLegalDoc(null)} />;
+  }
+  if (legalDoc === 'terms') {
+    return <TermsOfService onBack={() => setLegalDoc(null)} />;
+  }
 
   return (
     <KeyboardAvoidingView
@@ -295,14 +304,14 @@ export default function SignIn({
                 By continuing you agree to our{' '}
                 <Text
                   style={styles.legalLink}
-                  onPress={() => void Linking.openURL('https://genomatch.app/terms')}
+                  onPress={() => setLegalDoc('terms')}
                 >
                   Terms of Service
                 </Text>
                 {' '}and{' '}
                 <Text
                   style={styles.legalLink}
-                  onPress={() => void Linking.openURL('https://genomatch.app/privacy')}
+                  onPress={() => setLegalDoc('privacy')}
                 >
                   Privacy Policy
                 </Text>

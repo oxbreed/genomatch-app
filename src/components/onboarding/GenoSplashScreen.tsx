@@ -61,8 +61,8 @@ export default function GenoSplashScreen({
         easing: Easing.in(Easing.cubic),
         useNativeDriver: true,
       }),
-    ]).start(({ finished }) => {
-      if (finished) onFinish();
+    ]).start(() => {
+      onFinish();
     });
   }, [minDisplayElapsed, onFinish, readyToExit, splashOpacity, splashScale]);
 

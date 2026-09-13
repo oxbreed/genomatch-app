@@ -36,7 +36,7 @@ const REASON_MESSAGES: Record<Exclude<VerificationBlockReason, 'already_verified
   missing_city: 'Set your city before verifying — it will be locked after verification.',
 };
 
-/** Checks whether a member can complete identity verification. */
+/** Checks whether a member can complete in-app genotype / photo attestation. */
 export function getVerificationEligibility(
   row: VerificationProfileInput | null,
   options?: { allowAlreadyVerified?: boolean }

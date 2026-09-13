@@ -92,8 +92,8 @@ export default function IdentityVerification() {
             </View>
             <Text style={styles.title}>Camera access needed</Text>
             <Text style={styles.subtitle}>
-              We need your front camera to take a live selfie for identity verification. Gallery
-              photos are not accepted.
+              We need your front camera to take a live selfie for photo review. Gallery
+              photos are not accepted. This is not a government ID check.
             </Text>
             <Pressable
               style={({ pressed }) => [styles.primaryBtnWrap, pressed && styles.pressed]}
@@ -121,7 +121,8 @@ export default function IdentityVerification() {
             </View>
             <Text style={styles.title}>Submitted — we'll review it shortly</Text>
             <Text style={styles.subtitle}>
-              Our team will verify your selfie manually. You'll be notified once review is complete.
+              Our team will review your selfie. You'll be notified when that review is complete.
+              This is a photo check, not a government identity document.
             </Text>
           </View>
         </View>

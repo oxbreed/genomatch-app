@@ -148,7 +148,7 @@ export default function DiscoverSwipeCard({
                 name="shield-checkmark"
                 size={17}
                 color={COLORS.verified}
-                accessibilityLabel="Genotype verified"
+                accessibilityLabel="Genotype self-verified"
               />
             ) : null}
           </View>

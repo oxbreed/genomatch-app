@@ -21,9 +21,9 @@ export default function ProfileIdentityRibbon({ verified, genotype, onVerify }: 
             <Ionicons name="shield-checkmark" size={20} color={COLORS.verified} />
           </View>
           <View style={styles.copy}>
-            <Text style={styles.title}>Verified member</Text>
+            <Text style={styles.title}>Self-attested member</Text>
             <Text style={styles.sub}>
-              {genotype} genotype confirmed — matches see you as authentic.
+              {genotype} genotype confirmed in-app — not a lab test or government ID.
             </Text>
           </View>
         </View>
@@ -39,11 +39,11 @@ export default function ProfileIdentityRibbon({ verified, genotype, onVerify }: 
           <Ionicons name="person-circle-outline" size={24} color={COLORS.gold} />
         </View>
         <View style={styles.copy}>
-          <Text style={styles.kicker}>IDENTITY CHECK</Text>
-          <Text style={styles.title}>Verify you&apos;re real</Text>
+          <Text style={styles.kicker}>PROFILE TRUST</Text>
+          <Text style={styles.title}>Confirm your genotype</Text>
           <Text style={styles.sub}>
-            Confirm your {genotype} genotype with a profile photo so matches know you&apos;re
-            legitimate on Genomatch Ltd Nigeria.
+            Attest your {genotype} genotype with a profile photo so matches know you completed
+            in-app confirmation on Genomatch Ltd Nigeria.
           </Text>
           <Pressable
             style={({ pressed }) => [styles.verifyBtn, pressed && styles.pressed]}

@@ -20,8 +20,13 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "ng.genomatch.app",
+      "associatedDomains": [
+        "applinks:genomatch.app",
+        "applinks:www.genomatch.app"
+      ],
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
+        "NSCameraUsageDescription": "GenoMatch uses your camera to take a live selfie for photo review.",
         "NSPhotoLibraryUsageDescription": "GenoMatch needs access to your photos so you can upload a profile picture.",
         "NSLocationWhenInUseUsageDescription": "GenoMatch uses your location to set your city on your profile and improve nearby matching.",
         "UIBackgroundModes": [
@@ -37,6 +42,7 @@
       },
       "predictiveBackGestureEnabled": false,
       "permissions": [
+        "android.permission.CAMERA",
         "android.permission.READ_MEDIA_IMAGES",
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.ACCESS_COARSE_LOCATION",
@@ -59,6 +65,7 @@
           "photosPermission": "GenoMatch needs access to your photos so you can upload a profile picture."
         }
       ],
+      "expo-font",
       "expo-secure-store",
       [
         "expo-location",
@@ -77,19 +84,6 @@
         }
       ],
       [
-        "expo-font",
-        {
-          "fonts": [
-            "./assets/fonts/ClashDisplay-Semibold.otf",
-            "./assets/fonts/ClashDisplay-Medium.otf",
-            "./assets/fonts/ClashDisplay-Regular.otf",
-            "./assets/fonts/Satoshi-Regular.otf",
-            "./assets/fonts/Satoshi-Medium.otf",
-            "./assets/fonts/Satoshi-Bold.otf"
-          ]
-        }
-      ],
-      [
         "expo-splash-screen",
         {
           "image": "./assets/splash-icon.png",
@@ -101,7 +95,7 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "GenoMatch uses your camera to take a live selfie for photo verification.",
+          "cameraPermission": "GenoMatch uses your camera to take a live selfie for photo review.",
           "microphonePermission": false,
           "recordAudioAndroid": false
         }

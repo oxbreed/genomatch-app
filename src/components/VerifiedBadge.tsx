@@ -8,7 +8,7 @@ type Props = {
 };
 
 /** Trust signal — genotype self-verified member */
-export default function VerifiedBadge({ compact, label = 'Verified' }: Props) {
+export default function VerifiedBadge({ compact, label = 'Self-verified' }: Props) {
   if (compact) {
     return (
       <View style={styles.compact}>
