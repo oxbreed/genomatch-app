@@ -1,0 +1,24 @@
+#!/usr/bin/expect -f
+# Drive Expo Go start on a real TTY: answer login + port prompts, then hand
+# the session to the user for the QR code.
+set timeout -1
+cd [lindex $argv 0]
+
+spawn npx expo start --go --clear --port 8081 --lan
+expect {
+  -re "Proceed anonymously" {
+    send "\033\[B\r"
+    exp_continue
+  }
+  -re "Use port" {
+    send "y\r"
+    exp_continue
+  }
+  -re "Logs for your project will appear below" {
+    interact
+  }
+  -re "Waiting on exp://" {
+    interact
+  }
+  eof
+}
