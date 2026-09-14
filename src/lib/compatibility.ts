@@ -85,6 +85,13 @@ export function getGenotypeRiskShort(
   return riskByPair[pairKey] ?? 'Compatible';
 }
 
+export function getCompatibilityHeadline(percent: number): string {
+  if (percent >= 90) return 'EXCELLENT MATCH';
+  if (percent >= 75) return 'STRONG MATCH';
+  if (percent >= 50) return 'ALIGNED MATCH';
+  return 'EXPLORE WITH CARE';
+}
+
 const FAMILY_PLANNING_BY_PAIR: Record<string, Omit<FamilyPlanningInsight, 'pairLabel'>> = {
   AAAA: {
     tier: 'favourable',

@@ -20,9 +20,9 @@ import FamilyPlanningCard from '../src/components/FamilyPlanningCard';
 import LifestyleBadges from '../src/components/LifestyleBadges';
 import PresenceBadge from '../src/components/PresenceBadge';
 import { ProfileViewSections } from '../src/components/profile';
-import { ProfileVitalityRing } from '../src/components/profileStudio';
-import ReportBlockSheet from '../src/components/ReportBlockSheet';
 import LocationLine from '../src/components/LocationLine';
+import ReportBlockSheet from '../src/components/ReportBlockSheet';
+import CompatibilityProfileCard from '../src/components/genomatch/CompatibilityProfileCard';
 import { FONT_FAMILY, COLORS, MOTION, RADIUS, SHADOWS } from '../src/theme';
 import { getCurrentProfile } from '../src/lib/profiles';
 import type { Genotype, MatchWithProfile } from '../src/types/database';
@@ -121,10 +121,15 @@ export default function MatchProfile({ match, onBack, onSendMessage }: MatchProf
                 avatarUrl={profile.avatarUrl}
                 size={108}
               />
-              <View style={styles.ringCol}>
-                <ProfileVitalityRing percent={profile.compatibility} size={88} />
-                <Text style={styles.ringLabel}>Compatible</Text>
-              </View>
+            </View>
+
+            <View style={styles.compatWrap}>
+              <CompatibilityProfileCard
+                percent={profile.compatibility}
+                theirTraits={profile.interests}
+                onViewReport={onSendMessage}
+                ctaLabel="View Full Report"
+              />
             </View>
 
             <Text style={styles.displayName}>
@@ -236,6 +241,11 @@ const styles = StyleSheet.create({
     paddingVertical: 24,
     paddingHorizontal: 18,
     alignItems: 'center',
+  },
+  compatWrap: {
+    alignSelf: 'stretch',
+    marginTop: 16,
+    marginBottom: 8,
   },
   heroTop: {
     flexDirection: 'row',

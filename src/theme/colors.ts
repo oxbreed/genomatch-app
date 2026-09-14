@@ -1,9 +1,13 @@
-/** GenoMatch brand palette — forest + gold + liquid glass (not a red brand). */
+/** GenoMatch brand palette — forest UI + glossy red/gold mark. */
 export const FOREST_DEEP = '#163522';
 export const FOREST = '#1A3D28';
 export const GOLD = '#D4A843';
 export const GOLD_BRIGHT = '#E8C56A';
 export const GOLD_DEEP = '#C49A3A';
+export const GLOSSY_RED = '#E31C3D';
+export const GLOSSY_RED_DEEP = '#8E1024';
+export const GLOSSY_RED_HOT = '#FF4D6D';
+export const INK = '#0B0B0D';
 export const LINEN = '#F5EFE6';
 export const SAGE = '#8FAF95';
 export const MINT = '#EDF3EE';
@@ -16,6 +20,10 @@ export const COLORS = {
   gold: GOLD,
   goldBright: GOLD_BRIGHT,
   goldDeep: GOLD_DEEP,
+  glossyRed: GLOSSY_RED,
+  glossyRedDeep: GLOSSY_RED_DEEP,
+  glossyRedHot: GLOSSY_RED_HOT,
+  ink: INK,
   linen: LINEN,
   sage: SAGE,
   mint: MINT,
@@ -27,7 +35,7 @@ export const COLORS = {
   background: LINEN,
   surface: WHITE,
   tabBar: FOREST_DEEP,
-  splash: FOREST_DEEP,
+  splash: INK,
   hero: FOREST,
 
   text: FOREST_DEEP,
