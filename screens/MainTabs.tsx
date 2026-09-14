@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
     zIndex: 50,
   },
   tabPane: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   tabHidden: {
     zIndex: -1,

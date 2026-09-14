@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   backdropPress: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   sheetWrap: {
     overflow: 'hidden',

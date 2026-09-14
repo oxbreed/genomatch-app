@@ -6,7 +6,7 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import { GenoPremiumChrome, GenoLogoCeremony } from '../../brand/graphics';
+import { GenoLogoCeremony } from '../../brand/graphics';
 import { COLORS } from '../../theme';
 
 const MIN_DISPLAY_MS = 2200;
@@ -61,14 +61,13 @@ export default function GenoSplashScreen({
         easing: Easing.in(Easing.cubic),
         useNativeDriver: true,
       }),
-    ]).start(({ finished }) => {
-      if (finished) onFinish();
+    ]).start(() => {
+      onFinish();
     });
   }, [minDisplayElapsed, onFinish, readyToExit, splashOpacity, splashScale]);
 
   return (
     <View style={styles.root}>
-      <GenoPremiumChrome variant="forest" />
       <Animated.View
         style={[
           styles.layer,
@@ -97,7 +96,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.splash,
   },
   layer: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 2,

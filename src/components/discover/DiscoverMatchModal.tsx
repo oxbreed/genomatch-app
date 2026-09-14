@@ -12,6 +12,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { GenoBondMark } from '../../brand';
+import CompatibilityProfileCard from '../genomatch/CompatibilityProfileCard';
 import { GenoGlassBackdrop, GenoGlassSurface } from '../../brand/graphics';
 import ProfileAvatar from '../ProfileAvatar';
 import VerifiedBadge from '../VerifiedBadge';
@@ -206,24 +207,23 @@ export default function DiscoverMatchModal({
                 </View>
 
                 {profile ? (
-                  <>
-                    <View style={styles.compatPill}>
-                      <Ionicons name="sparkles" size={14} color={COLORS.gold} />
-                      <Text style={styles.compatText}>{profile.compatibility}% genotype match</Text>
-                      {profile.genotypeVerified ? (
-                        <>
-                          <View style={styles.compatDivider} />
-                          <Ionicons name="shield-checkmark" size={13} color={COLORS.verified} />
-                          <Text style={styles.verifiedText}>Verified</Text>
-                        </>
-                      ) : null}
-                    </View>
+                  <View style={styles.compatCardWrap}>
+                    <CompatibilityProfileCard
+                      percent={profile.compatibility}
+                      theirTraits={profile.interests}
+                      onViewReport={() => {
+                        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        onContinue();
+                      }}
+                      ctaLabel="View Full Report"
+                    />
                     <Text style={styles.compatDisclaimer} numberOfLines={2}>
                       Informational only — not medical advice.
                     </Text>
-                  </>
+                  </View>
                 ) : null}
 
+                {profile ? null : (
                 <Pressable
                   style={({ pressed }) => [styles.ctaWrap, pressed && styles.ctaPressed]}
                   onPress={() => {
@@ -232,7 +232,7 @@ export default function DiscoverMatchModal({
                   }}
                 >
                   <LinearGradient
-                    colors={[COLORS.gold, '#C49A38']}
+                    colors={[COLORS.glossyRed, COLORS.goldBright]}
                     start={{ x: 0, y: 0.5 }}
                     end={{ x: 1, y: 0.5 }}
                     style={styles.cta}
@@ -240,6 +240,7 @@ export default function DiscoverMatchModal({
                     <Text style={styles.ctaText}>Continue</Text>
                   </LinearGradient>
                 </Pressable>
+                )}
 
                 {onSendMessage ? (
                   <Pressable
@@ -414,6 +415,10 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 11,
     color: COLORS.verified,
+  },
+  compatCardWrap: {
+    width: '100%',
+    marginTop: 4,
   },
   compatDisclaimer: {
     fontSize: 10,

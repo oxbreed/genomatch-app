@@ -6,7 +6,7 @@ import {
   Montserrat_800ExtraBold,
 } from '@expo-google-fonts/montserrat';
 
-export { COLORS, GLASS, FOREST_DEEP, FOREST, GOLD, LINEN, SAGE, MINT, WHITE } from './colors';
+export { COLORS, GLASS, FOREST_DEEP, FOREST, GOLD, GOLD_BRIGHT, GOLD_DEEP, GLOSSY_RED, INK, LINEN, SAGE, MINT, WHITE } from './colors';
 export { TYPOGRAPHY, FONT_FAMILY, FONT_ROLE, SYSTEM_FONT } from './typography';
 export { RADIUS, SHADOWS } from './shadows';
 export { SCENE } from './sceneLayout';

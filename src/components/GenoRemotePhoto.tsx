@@ -52,12 +52,12 @@ export default function GenoRemotePhoto({
       {!loaded ? (
         <LinearGradient
           colors={[COLORS.forestDeep, COLORS.forest, '#2A5A3E']}
-          style={StyleSheet.absoluteFillObject}
+          style={StyleSheet.absoluteFill}
         />
       ) : null}
       <Animated.Image
         source={{ uri }}
-        style={[StyleSheet.absoluteFillObject, imageStyle, { opacity }]}
+        style={[StyleSheet.absoluteFill, imageStyle, { opacity }]}
         resizeMode={resizeMode}
         onLoad={revealImage}
         onLoadEnd={revealImage}

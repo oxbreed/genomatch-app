@@ -1,7 +1,13 @@
-/** GenoMatch brand palette */
+/** GenoMatch brand palette — forest UI + glossy red/gold mark. */
 export const FOREST_DEEP = '#163522';
 export const FOREST = '#1A3D28';
 export const GOLD = '#D4A843';
+export const GOLD_BRIGHT = '#E8C56A';
+export const GOLD_DEEP = '#C49A3A';
+export const GLOSSY_RED = '#E31C3D';
+export const GLOSSY_RED_DEEP = '#8E1024';
+export const GLOSSY_RED_HOT = '#FF4D6D';
+export const INK = '#0B0B0D';
 export const LINEN = '#F5EFE6';
 export const SAGE = '#8FAF95';
 export const MINT = '#EDF3EE';
@@ -12,6 +18,12 @@ export const COLORS = {
   forestDeep: FOREST_DEEP,
   forest: FOREST,
   gold: GOLD,
+  goldBright: GOLD_BRIGHT,
+  goldDeep: GOLD_DEEP,
+  glossyRed: GLOSSY_RED,
+  glossyRedDeep: GLOSSY_RED_DEEP,
+  glossyRedHot: GLOSSY_RED_HOT,
+  ink: INK,
   linen: LINEN,
   sage: SAGE,
   mint: MINT,
@@ -23,24 +35,24 @@ export const COLORS = {
   background: LINEN,
   surface: WHITE,
   tabBar: FOREST_DEEP,
-  splash: FOREST_DEEP,
+  splash: INK,
   hero: FOREST,
 
   text: FOREST_DEEP,
   textOnDark: LINEN,
   textOnForest: LINEN,
   textMuted: SAGE,
-  textSubtle: 'rgba(13, 40, 24, 0.45)',
+  textSubtle: 'rgba(22, 53, 34, 0.45)',
 
-  border: 'rgba(13, 40, 24, 0.08)',
+  border: 'rgba(22, 53, 34, 0.08)',
   borderLight: 'rgba(143, 175, 149, 0.4)',
   borderOnDark: 'rgba(245, 239, 230, 0.12)',
 
   chip: MINT,
   chipFill: 'rgba(237, 243, 238, 0.85)',
   cta: GOLD,
-  overlay: 'rgba(13, 40, 24, 0.72)',
-  overlayLight: 'rgba(13, 40, 24, 0.45)',
+  overlay: 'rgba(22, 53, 34, 0.72)',
+  overlayLight: 'rgba(22, 53, 34, 0.45)',
 
   verified: '#3D7A52',
   error: '#A32D2D',
@@ -76,7 +88,7 @@ export const GLASS = {
   sheetTint: 'rgba(245, 239, 230, 0.58)',
   sheetBorder: 'rgba(212, 168, 67, 0.48)',
 
-  backdropDark: 'rgba(13, 40, 24, 0.28)',
+  backdropDark: 'rgba(22, 53, 34, 0.28)',
   backdropLight: 'rgba(245, 239, 230, 0.18)',
 
   topRule: ['transparent', 'rgba(212, 168, 67, 0.85)', 'transparent'] as [string, string, string],

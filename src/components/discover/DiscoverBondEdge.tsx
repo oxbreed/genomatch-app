@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   glow: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(255, 255, 255, 0.08)',
   },
 });

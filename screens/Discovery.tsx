@@ -55,7 +55,7 @@ import {
 import { clearMyPasses, recordLike, recordPass } from '../src/lib/likes';
 import { formatSecurityError } from '../src/lib/security';
 import { getMatchIdForProfile } from '../src/lib/matches';
-import { MOTION } from '../src/theme';
+import { FONT_FAMILY, MOTION } from '../src/theme';
 import type { DiscoveryProfile, Genotype } from '../src/types/database';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -1078,7 +1078,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     ...TYPOGRAPHY.display,
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: FONT_FAMILY.gothamBold,
     flex: 1,
   },
   filterBtn: {
@@ -1110,7 +1110,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   filterBadgeText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 10,
     color: COLORS.forestDeep,
   },
@@ -1128,7 +1128,7 @@ const styles = StyleSheet.create({
   headerSubtitle: {
     marginTop: 4,
     ...TYPOGRAPHY.caption,
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     color: COLORS.textMuted,
   },
   deckArea: {
@@ -1224,7 +1224,7 @@ const styles = StyleSheet.create({
   },
   genotypeCompatText: {
     flex: 1,
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
     color: 'rgba(245, 239, 230, 0.9)',
     lineHeight: 17,
@@ -1245,7 +1245,7 @@ const styles = StyleSheet.create({
   superLikeToastText: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#0D2818',
+    color: COLORS.forestDeep,
     textAlign: 'center',
   },
   superLikeBtnWrap: {
@@ -1257,13 +1257,13 @@ const styles = StyleSheet.create({
   superLikeBurstStar: {
     position: 'absolute',
     fontSize: 14,
-    color: '#D4A843',
+    color: COLORS.gold,
   },
   btnDisabled: {
     opacity: 0.5,
   },
   cardMedia: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     width: '100%',
     height: '100%',
   },
@@ -1290,14 +1290,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   noPhotoInitials: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 40,
     color: 'rgba(212, 168, 67, 0.75)',
     textAlign: 'center',
     letterSpacing: 1,
   },
   noPhotoCaption: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 13,
     color: COLORS.sage,
     marginTop: 10,
@@ -1352,7 +1352,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   cardName: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 22,
     fontWeight: '700',
     color: COLORS.linen,
@@ -1370,13 +1370,13 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   cityText: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
     fontWeight: '500',
     color: COLORS.sage,
   },
   cardBio: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
     lineHeight: 20,
     color: 'rgba(245, 239, 230, 0.88)',
@@ -1396,7 +1396,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(212, 168, 67, 0.42)',
   },
   tagText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 11,
     color: COLORS.linen,
   },
@@ -1457,14 +1457,14 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   matchPillText: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 15,
     fontWeight: '700',
     color: COLORS.forestDeep,
     letterSpacing: -0.2,
   },
   matchPillLabel: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 10,
     letterSpacing: 0.6,
     color: COLORS.linen,
@@ -1474,7 +1474,7 @@ const styles = StyleSheet.create({
     textShadowRadius: 3,
   },
   cardDragTint: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     borderRadius: 24,
     zIndex: 8,
   },
@@ -1494,29 +1494,29 @@ const styles = StyleSheet.create({
   },
   stampLike: {
     left: 24,
-    borderColor: '#D4A843',
+    borderColor: COLORS.gold,
     transform: [{ rotate: '-15deg' }],
   },
   stampNope: {
     right: 24,
-    borderColor: '#8FAF95',
+    borderColor: COLORS.sage,
     transform: [{ rotate: '15deg' }],
   },
   stampLikeText: {
     fontSize: 32,
     fontWeight: '900',
-    color: '#D4A843',
+    color: COLORS.gold,
   },
   stampNopeText: {
     fontSize: 32,
     fontWeight: '900',
-    color: '#8FAF95',
+    color: COLORS.sage,
   },
   superLikeBtn: {
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.white,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: COLORS.forestDeep,
@@ -1527,13 +1527,13 @@ const styles = StyleSheet.create({
   },
   superLikeStar: {
     fontSize: 22,
-    color: '#D4A843',
+    color: COLORS.gold,
   },
   passBtn: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.white,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: COLORS.forestDeep,
@@ -1560,12 +1560,12 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.96 }],
   },
   actionError: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     position: 'absolute',
     left: 16,
     right: 16,
     zIndex: 41,
-    color: '#A32D2D',
+    color: COLORS.error,
     fontSize: 12,
     fontWeight: '600',
     textAlign: 'center',
@@ -1578,7 +1578,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   loadingText: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 15,
     color: 'rgba(13, 40, 24, 0.6)',
     fontWeight: '600',
@@ -1630,7 +1630,7 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
   seenAllTitle: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 24,
     lineHeight: 30,
     letterSpacing: -0.4,
@@ -1639,7 +1639,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   seenAllSubtext: {
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 15,
     lineHeight: 22,
     color: COLORS.sage,
@@ -1679,7 +1679,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   refreshBtnText: {
-    fontFamily: 'Satoshi-Bold',
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 16,
     color: COLORS.forestDeep,
   },
@@ -1706,13 +1706,13 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     ...TYPOGRAPHY.headingSm,
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     textAlign: 'center',
     marginBottom: 8,
   },
   emptyBody: {
     ...TYPOGRAPHY.body,
-    fontFamily: 'Satoshi-Medium',
+    fontFamily: FONT_FAMILY.gothamMedium,
     textAlign: 'center',
   },
 });

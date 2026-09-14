@@ -121,7 +121,7 @@ export default function GenoMeshBackdrop({ studio = false }: Props) {
 
 const styles = StyleSheet.create({
   root: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     overflow: 'hidden',
     zIndex: 0,
   },
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
     right: 0,
   },
   vignette: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'transparent',
     borderTopWidth: 0,
   },

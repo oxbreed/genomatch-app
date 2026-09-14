@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   borderGlow: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     borderRadius: 24,
   },
   inner: {

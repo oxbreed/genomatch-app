@@ -117,7 +117,7 @@ export default function ProfileBondAura({ active, verified }: Props) {
 
 const styles = StyleSheet.create({
   wrap: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     overflow: 'hidden',
   },
   orbA: {

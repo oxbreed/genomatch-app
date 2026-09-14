@@ -3,7 +3,6 @@ import {
   Alert,
   Animated,
   KeyboardAvoidingView,
-  Linking,
   Platform,
   Pressable,
   ScrollView,
@@ -15,6 +14,7 @@ import { StatusBar } from 'expo-status-bar';
 import About from './About';
 import CommunityGuidelines from './CommunityGuidelines';
 import PrivacyPolicy from './PrivacyPolicy';
+import TermsOfService from './TermsOfService';
 import { GenoPremiumChrome, GenoLogoCeremony } from '../src/brand/graphics';
 import EmptyState from '../src/components/EmptyState';
 import { GenoInboxHeader, GenoInboxIconButton, GenoInboxRetryPanel } from '../src/components/inbox';
@@ -49,7 +49,6 @@ import { uploadAdditionalPhoto } from '../src/lib/photoUpload';
 import { mapProfileRow } from '../src/lib/profileMapper';
 import { logAuthState } from '../src/lib/auth';
 import { deleteUserAccount } from '../src/lib/accountDeletion';
-import { GENOMATCH_COMPANY } from '../src/constants/company';
 import { detectDeviceCity, syncProfileCityFromDevice } from '../src/lib/location';
 import { dateOfBirthFromAge, isMinimumAge } from '../src/lib/validation';
 import {
@@ -170,6 +169,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
   const [showAbout, setShowAbout] = useState(false);
   const [showCommunityGuidelines, setShowCommunityGuidelines] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
   const [showVerifyModal, setShowVerifyModal] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [locatingCity, setLocatingCity] = useState(false);
@@ -660,6 +660,9 @@ export default function Profile({ onSignOut }: ProfileProps) {
   if (showPrivacy) {
     return <PrivacyPolicy onBack={() => setShowPrivacy(false)} />;
   }
+  if (showTerms) {
+    return <TermsOfService onBack={() => setShowTerms(false)} />;
+  }
 
   const heroPhotoUri = data.photos[0] ?? data.avatarUrl ?? null;
 
@@ -879,7 +882,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
                   onAbout={() => setShowAbout(true)}
                   onCommunity={() => setShowCommunityGuidelines(true)}
                   onPrivacy={() => setShowPrivacy(true)}
-                  onTerms={() => void Linking.openURL(`https://${GENOMATCH_COMPANY.website}/terms`)}
+                  onTerms={() => setShowTerms(true)}
                   onDeleteAccount={requestDeleteAccount}
                   onSignOut={() => {
                     Alert.alert('Sign Out', 'Are you sure?', [

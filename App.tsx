@@ -1,17 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
-import { Linking, View, StyleSheet } from 'react-native';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Linking, View, StyleSheet } from 'react-native';
 import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
 import type { ComponentProps } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { FONTS_TO_LOAD } from './src/theme';
+import { COLORS, FONTS_TO_LOAD } from './src/theme';
 import { GenoOnboardingFlow, GenoSplashScreen } from './src/components/onboarding';
 import type { GenoOnboardingSlide } from './src/components/onboarding';
-import Register from './screens/Register';
-import SignIn from './screens/SignIn';
-import ResetPassword from './screens/ResetPassword';
-import ProfileSetup from './screens/ProfileSetup';
-import MainTabs from './screens/MainTabs';
+import GenoErrorBoundary from './src/components/shell/GenoErrorBoundary';
 import { resolveInitialScreen } from './src/lib/profiles';
 import { getAuthenticatedUserId, logAuthState } from './src/lib/auth';
 import { enforceAccountAccess } from './src/lib/security';
@@ -22,6 +18,12 @@ import {
   isResetPasswordDeepLink,
 } from './src/lib/resetPassword';
 import { supabase } from './src/lib/supabase';
+
+const Register = lazy(() => import('./screens/Register'));
+const SignIn = lazy(() => import('./screens/SignIn'));
+const ResetPassword = lazy(() => import('./screens/ResetPassword'));
+const ProfileSetup = lazy(() => import('./screens/ProfileSetup'));
+const MainTabs = lazy(() => import('./screens/MainTabs'));
 
 type IonName = ComponentProps<typeof Ionicons>['name'];
 
@@ -49,7 +51,15 @@ const ONBOARDING_SLIDES: GenoOnboardingSlide[] = [
   },
 ];
 
-export default function App() {
+function ScreenFallback() {
+  return (
+    <View style={styles.fallback}>
+      <ActivityIndicator size="large" color={COLORS.goldDeep} />
+    </View>
+  );
+}
+
+function AppInner() {
   const [fontsLoaded, fontError] = useFonts(FONTS_TO_LOAD);
   const [bootstrapping, setBootstrapping] = useState(true);
   const [screen, setScreen] = useState<
@@ -189,54 +199,68 @@ export default function App() {
 
   if (screen === 'register') {
     return (
-      <Register
-        onBack={() => setScreen('onboarding')}
-        onSignIn={() => setScreen('signIn')}
-        onSuccess={() => setScreen('profileSetup')}
-      />
+      <Suspense fallback={<ScreenFallback />}>
+        <Register
+          onBack={() => setScreen('onboarding')}
+          onSignIn={() => setScreen('signIn')}
+          onSuccess={() => setScreen('profileSetup')}
+        />
+      </Suspense>
     );
   }
 
   if (screen === 'signIn') {
     return (
-      <SignIn
-        onBack={() => setScreen('register')}
-        onCreateAccount={() => setScreen('register')}
-        onSignedIn={(destination) => setScreen(destination)}
-        onNavigateResetPassword={(resetEmail) => {
-          setResetPasswordEmail(resetEmail);
-          setScreen('resetPassword');
-        }}
-      />
+      <Suspense fallback={<ScreenFallback />}>
+        <SignIn
+          onBack={() => setScreen('register')}
+          onCreateAccount={() => setScreen('register')}
+          onSignedIn={(destination) => setScreen(destination)}
+          onNavigateResetPassword={(resetEmail) => {
+            setResetPasswordEmail(resetEmail);
+            setScreen('resetPassword');
+          }}
+        />
+      </Suspense>
     );
   }
 
   if (screen === 'resetPassword') {
     return (
-      <ResetPassword
-        email={resetPasswordEmail ?? undefined}
-        onBack={() => {
-          setResetPasswordEmail(null);
-          setScreen('signIn');
-        }}
-        onCreateAccount={() => {
-          setResetPasswordEmail(null);
-          setScreen('register');
-        }}
-        onSuccess={() => {
-          setResetPasswordEmail(null);
-          setScreen('signIn');
-        }}
-      />
+      <Suspense fallback={<ScreenFallback />}>
+        <ResetPassword
+          email={resetPasswordEmail ?? undefined}
+          onBack={() => {
+            setResetPasswordEmail(null);
+            setScreen('signIn');
+          }}
+          onCreateAccount={() => {
+            setResetPasswordEmail(null);
+            setScreen('register');
+          }}
+          onSuccess={() => {
+            setResetPasswordEmail(null);
+            setScreen('signIn');
+          }}
+        />
+      </Suspense>
     );
   }
 
   if (screen === 'profileSetup') {
-    return <ProfileSetup onComplete={() => setScreen('main')} />;
+    return (
+      <Suspense fallback={<ScreenFallback />}>
+        <ProfileSetup onComplete={() => setScreen('main')} />
+      </Suspense>
+    );
   }
 
   if (screen === 'main') {
-    return <MainTabs onSignOut={() => setScreen('onboarding')} />;
+    return (
+      <Suspense fallback={<ScreenFallback />}>
+        <MainTabs onSignOut={() => setScreen('onboarding')} />
+      </Suspense>
+    );
   }
 
   return (
@@ -248,6 +272,20 @@ export default function App() {
   );
 }
 
+export default function App() {
+  return (
+    <GenoErrorBoundary>
+      <AppInner />
+    </GenoErrorBoundary>
+  );
+}
+
 const styles = StyleSheet.create({
   boot: { flex: 1 },
+  fallback: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.linen,
+  },
 });

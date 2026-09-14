@@ -148,7 +148,7 @@ export default function DiscoverSwipeCard({
                 name="shield-checkmark"
                 size={17}
                 color={COLORS.verified}
-                accessibilityLabel="Genotype verified"
+                accessibilityLabel="Genotype self-verified"
               />
             ) : null}
           </View>
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.gold,
   },
   cardMedia: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   cardMediaImage: {
     borderRadius: DISCOVERY_CARD_RADIUS,
@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
     color: COLORS.sage,
   },
   cardGloss: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     zIndex: 3,
   },
   cardTopShade: {
