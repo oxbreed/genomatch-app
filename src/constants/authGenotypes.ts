@@ -6,8 +6,8 @@ import { COLORS } from '../theme';
 type IonName = ComponentProps<typeof Ionicons>['name'];
 
 export const AUTH_GENOTYPE_OPTIONS: GenotypeOption[] = [
-  { id: 'AA', icon: 'heart' as IonName, name: 'Double Healthy', accent: COLORS.forest },
-  { id: 'AS', icon: 'star-half' as IonName, name: 'Carrier', accent: '#BA7517' },
-  { id: 'SS', icon: 'medical' as IonName, name: 'Sickle Cell', accent: COLORS.error },
-  { id: 'AC', icon: 'water' as IonName, name: 'AC Carrier', accent: '#185FA5' },
+  { id: 'AA', icon: 'ellipse-outline' as IonName, name: 'Hemoglobin AA', accent: COLORS.sage },
+  { id: 'AS', icon: 'ellipse-outline' as IonName, name: 'Sickle cell trait', accent: COLORS.sage },
+  { id: 'SS', icon: 'ellipse-outline' as IonName, name: 'Sickle cell disease', accent: COLORS.sage },
+  { id: 'AC', icon: 'ellipse-outline' as IonName, name: 'Hemoglobin AC', accent: COLORS.sage },
 ];
