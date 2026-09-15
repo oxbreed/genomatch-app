@@ -42,6 +42,6 @@ const styles = StyleSheet.create({
     paddingTop: PROFILE.cardPadding + 2,
   },
   innerEditing: {
-    backgroundColor: 'rgba(237, 243, 238, 0.45)',
+    backgroundColor: 'rgba(240, 241, 243, 0.45)',
   },
 });

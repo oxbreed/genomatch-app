@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
   rule: {
     marginTop: 12,
     height: 1,
-    backgroundColor: 'rgba(143, 175, 149, 0.35)',
+    backgroundColor: 'rgba(184, 188, 196, 0.35)',
     borderRadius: 1,
   },
 });

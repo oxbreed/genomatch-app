@@ -3,11 +3,11 @@ import { computeCompatibility } from './compatibility';
 import { isNewMember, resolvePresenceState } from './presence';
 
 const GRADIENTS: [string, string][] = [
-  ['#2A5C40', '#163522'],
-  ['#3D7A52', '#1A3D28'],
+  ['#C8102E', '#0B0C0E'],
+  ['#D4AF37', '#15171A'],
   ['#185FA5', '#0D47A1'],
   ['#6A4C93', '#4A2C6A'],
-  ['#D4A843', '#8B6914'],
+  ['#D4AF37', '#8B6914'],
 ];
 
 export function ageFromDateOfBirth(dob: string | null): number | null {

@@ -260,7 +260,7 @@ export default function DiscoverProfileSheet({
                 </ScrollView>
               ) : (
                 <LinearGradient
-                  colors={[COLORS.forestDeep, COLORS.forest, '#2A5A3E']}
+                  colors={[COLORS.forestDeep, COLORS.forest, '#20222A']}
                   style={styles.heroPhoto}
                 >
                   <View style={styles.noPhotoCircle}>
@@ -412,7 +412,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 5,
     borderRadius: 999,
-    backgroundColor: 'rgba(22, 53, 34, 0.14)',
+    backgroundColor: 'rgba(11, 12, 14, 0.14)',
   },
   mainScroll: {
     flex: 1,
@@ -502,11 +502,11 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: 'rgba(245, 239, 230, 0.12)',
+    backgroundColor: 'rgba(250, 248, 245, 0.12)',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: 'rgba(212, 168, 67, 0.35)',
+    borderColor: 'rgba(212, 175, 55, 0.35)',
   },
   noPhotoInitials: {
     fontFamily: FONT_FAMILY.gothamBold,
@@ -597,7 +597,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: 'rgba(212, 168, 67, 0.12)',
+    backgroundColor: 'rgba(212, 175, 55, 0.12)',
     alignItems: 'center',
     justifyContent: 'center',
   },

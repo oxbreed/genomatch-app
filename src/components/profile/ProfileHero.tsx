@@ -64,7 +64,7 @@ export default function ProfileHero({
         <Image source={{ uri: heroPhotoUri }} style={styles.heroImage} resizeMode="cover" />
       ) : (
         <LinearGradient
-          colors={['rgba(22, 53, 34, 0.82)', 'rgba(22, 53, 34, 0.82)']}
+          colors={['rgba(11, 12, 14, 0.82)', 'rgba(11, 12, 14, 0.82)']}
           style={styles.heroPlaceholder}
         >
           <GenoLogoCeremony variant="hero" tone="light" />
@@ -138,7 +138,7 @@ export default function ProfileHero({
                 value={draftCity}
                 onChangeText={onChangeCity}
                 placeholder="City"
-                placeholderTextColor="rgba(143, 175, 149, 0.6)"
+                placeholderTextColor="rgba(184, 188, 196, 0.6)"
               />
             )}
             {!cityLocked ? (
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
     bottom: 72,
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: 'rgba(143, 175, 149, 0.85)',
+    color: 'rgba(184, 188, 196, 0.85)',
   },
   photoSeal: {
     position: 'absolute',
@@ -229,10 +229,10 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: 'rgba(13, 40, 24, 0.52)',
     borderWidth: 1,
-    borderColor: 'rgba(245, 239, 230, 0.12)',
+    borderColor: 'rgba(250, 248, 245, 0.12)',
   },
   studioPill: {
-    borderColor: 'rgba(212, 168, 67, 0.55)',
+    borderColor: 'rgba(212, 175, 55, 0.55)',
     backgroundColor: 'rgba(13, 40, 24, 0.78)',
   },
   brandText: {
@@ -280,14 +280,14 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: COLORS.linen,
     borderBottomWidth: 2,
-    borderBottomColor: 'rgba(212, 168, 67, 0.6)',
+    borderBottomColor: 'rgba(212, 175, 55, 0.6)',
     minWidth: 120,
     flexShrink: 1,
     paddingVertical: 2,
   },
   location: {
     ...PROFILE_TYPE.heroMeta,
-    color: 'rgba(245, 239, 230, 0.82)',
+    color: 'rgba(250, 248, 245, 0.82)',
   },
   locationRow: {
     flexDirection: 'row',
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.linen,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(212, 168, 67, 0.5)',
+    borderBottomColor: 'rgba(212, 175, 55, 0.5)',
     paddingVertical: 2,
   },
   locationLocked: {
@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
   locationLockedText: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
-    color: 'rgba(245, 239, 230, 0.82)',
+    color: 'rgba(250, 248, 245, 0.82)',
   },
   locationRefresh: {
     width: 36,
@@ -321,9 +321,9 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(245, 239, 230, 0.14)',
+    backgroundColor: 'rgba(250, 248, 245, 0.14)',
     borderWidth: 1,
-    borderColor: 'rgba(245, 239, 230, 0.28)',
+    borderColor: 'rgba(250, 248, 245, 0.28)',
   },
   editBtn: {
     flexDirection: 'row',
@@ -332,9 +332,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 999,
-    backgroundColor: 'rgba(245, 239, 230, 0.14)',
+    backgroundColor: 'rgba(250, 248, 245, 0.14)',
     borderWidth: 1,
-    borderColor: 'rgba(245, 239, 230, 0.28)',
+    borderColor: 'rgba(250, 248, 245, 0.28)',
   },
   editText: {
     fontFamily: FONT_FAMILY.gothamBold,

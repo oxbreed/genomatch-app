@@ -4,7 +4,7 @@ import { COLORS } from '../theme';
 
 const BADGE_BG = COLORS.mint;
 const BADGE_TEXT = COLORS.forestDeep;
-const BADGE_BORDER = 'rgba(22, 53, 34, 0.12)';
+const BADGE_BORDER = 'rgba(11, 12, 14, 0.12)';
 
 export default function GenotypeBadge({ genotype }: { genotype: string }) {
   return (

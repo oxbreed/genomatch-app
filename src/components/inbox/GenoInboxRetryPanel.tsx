@@ -27,7 +27,7 @@ export default function GenoInboxRetryPanel({ message, onRetry }: Props) {
         style={({ pressed }) => [styles.retryWrap, pressed && styles.pressed]}
         onPress={onRetry}
       >
-        <LinearGradient colors={[COLORS.gold, '#C49A3A']} style={styles.retry}>
+        <LinearGradient colors={[COLORS.gold, '#B8962E']} style={styles.retry}>
           <Text style={styles.retryText}>Try again</Text>
         </LinearGradient>
       </Pressable>

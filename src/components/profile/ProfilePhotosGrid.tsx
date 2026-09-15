@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.35)',
+    borderColor: 'rgba(212, 175, 55, 0.35)',
   },
   mainText: {
     fontFamily: FONT_FAMILY.gothamBold,
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
   addCell: {
     borderWidth: 1.5,
     borderStyle: 'dashed',
-    borderColor: 'rgba(143, 175, 149, 0.55)',
+    borderColor: 'rgba(184, 188, 196, 0.55)',
     backgroundColor: COLORS.mint,
     alignItems: 'center',
     justifyContent: 'center',
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.md,
     borderWidth: 1.5,
     borderStyle: 'dashed',
-    borderColor: 'rgba(143, 175, 149, 0.45)',
+    borderColor: 'rgba(184, 188, 196, 0.45)',
     backgroundColor: COLORS.mint,
     gap: 8,
   },

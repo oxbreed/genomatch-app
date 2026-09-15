@@ -241,14 +241,14 @@ export default function DiscoverMatchCelebration({
     <Modal visible={visible} transparent animationType="none" statusBarTranslucent>
       <Animated.View style={[styles.backdrop, { opacity: backdrop }]}>
         <LinearGradient
-          colors={['#061810', 'rgba(22, 53, 34, 0.96)', COLORS.forestDeep]}
+          colors={['#061810', 'rgba(11, 12, 14, 0.96)', COLORS.forestDeep]}
           locations={[0, 0.45, 1]}
           style={StyleSheet.absoluteFill}
         />
 
         <View style={styles.ambientTop} pointerEvents="none">
           <LinearGradient
-            colors={['rgba(212, 168, 67, 0.22)', 'transparent']}
+            colors={['rgba(212, 175, 55, 0.22)', 'transparent']}
             style={styles.ambientGlow}
           />
         </View>
@@ -271,14 +271,14 @@ export default function DiscoverMatchCelebration({
           ]}
         >
           <LinearGradient
-            colors={['rgba(212, 168, 67, 0.65)', 'rgba(61, 122, 82, 0.4)', 'rgba(212, 168, 67, 0.5)']}
+            colors={['rgba(212, 175, 55, 0.65)', 'rgba(61, 122, 82, 0.4)', 'rgba(212, 175, 55, 0.5)']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.cardBorder}
           >
             <View style={styles.cardInner}>
               <LinearGradient
-                colors={['#1F4A32', '#153D28', COLORS.forestDeep]}
+                colors={['#C8102E', '#8E0B20', COLORS.forestDeep]}
                 start={{ x: 0.2, y: 0 }}
                 end={{ x: 0.8, y: 1 }}
                 style={styles.cardGradient}
@@ -304,7 +304,7 @@ export default function DiscoverMatchCelebration({
                     style={[styles.shimmerBar, { transform: [{ translateX: shimmerX }] }]}
                   >
                     <LinearGradient
-                      colors={['transparent', 'rgba(212, 168, 67, 0.55)', 'transparent']}
+                      colors={['transparent', 'rgba(212, 175, 55, 0.55)', 'transparent']}
                       start={{ x: 0, y: 0.5 }}
                       end={{ x: 1, y: 0.5 }}
                       style={StyleSheet.absoluteFill}
@@ -345,7 +345,7 @@ export default function DiscoverMatchCelebration({
 
                     <Animated.View style={[styles.bondCenter, { transform: [{ scale: bondPulse }] }]}>
                       <LinearGradient
-                        colors={['rgba(212, 168, 67, 0.35)', 'rgba(13, 40, 24, 0.2)']}
+                        colors={['rgba(212, 175, 55, 0.35)', 'rgba(13, 40, 24, 0.2)']}
                         style={styles.bondGlow}
                       >
                         <GenoBondMark size={56} opacity={1} />
@@ -398,7 +398,7 @@ export default function DiscoverMatchCelebration({
                   }}
                 >
                   <LinearGradient
-                    colors={[COLORS.gold, '#E8C56A', '#C49A3A']}
+                    colors={[COLORS.gold, '#E5C766', '#B8962E']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     style={styles.ctaGradient}
@@ -494,7 +494,7 @@ const styles = StyleSheet.create({
   crownLine: {
     flex: 1,
     height: 1,
-    backgroundColor: 'rgba(212, 168, 67, 0.35)',
+    backgroundColor: 'rgba(212, 175, 55, 0.35)',
   },
   crownKicker: {
     fontFamily: FONT_FAMILY.gothamBold,
@@ -516,7 +516,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     marginBottom: 14,
     borderRadius: 1,
-    backgroundColor: 'rgba(212, 168, 67, 0.12)',
+    backgroundColor: 'rgba(212, 175, 55, 0.12)',
   },
   shimmerBar: {
     width: 120,
@@ -535,7 +535,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamBook,
     fontSize: 14,
     lineHeight: 20,
-    color: 'rgba(245, 239, 230, 0.62)',
+    color: 'rgba(250, 248, 245, 0.62)',
     textAlign: 'center',
     marginBottom: 22,
     paddingHorizontal: 8,
@@ -565,7 +565,7 @@ const styles = StyleSheet.create({
     height: 200,
     borderRadius: 100,
     borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.25)',
+    borderColor: 'rgba(212, 175, 55, 0.25)',
     borderStyle: 'dashed',
     alignItems: 'center',
     justifyContent: 'center',
@@ -599,7 +599,7 @@ const styles = StyleSheet.create({
     padding: 3,
     borderRadius: 40,
     borderWidth: 2,
-    borderColor: 'rgba(212, 168, 67, 0.5)',
+    borderColor: 'rgba(212, 175, 55, 0.5)',
     backgroundColor: 'rgba(13, 40, 24, 0.6)',
   },
   youRing: {
@@ -628,7 +628,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1.5,
-    borderColor: 'rgba(212, 168, 67, 0.4)',
+    borderColor: 'rgba(212, 175, 55, 0.4)',
   },
   avatarLabel: {
     fontFamily: FONT_FAMILY.gothamBold,
@@ -645,9 +645,9 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 14,
     borderRadius: 16,
-    backgroundColor: 'rgba(212, 168, 67, 0.1)',
+    backgroundColor: 'rgba(212, 175, 55, 0.1)',
     borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.28)',
+    borderColor: 'rgba(212, 175, 55, 0.28)',
     marginBottom: 20,
   },
   compatRing: {
@@ -677,7 +677,7 @@ const styles = StyleSheet.create({
   compatSub: {
     fontFamily: FONT_FAMILY.gothamBook,
     fontSize: 12,
-    color: 'rgba(245, 239, 230, 0.6)',
+    color: 'rgba(250, 248, 245, 0.6)',
   },
   cta: {
     width: '100%',
@@ -713,6 +713,6 @@ const styles = StyleSheet.create({
   skipText: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
-    color: 'rgba(245, 239, 230, 0.55)',
+    color: 'rgba(250, 248, 245, 0.55)',
   },
 });

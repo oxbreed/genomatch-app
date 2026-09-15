@@ -13,7 +13,7 @@ export default function StudioBanner({ doneCount, totalCount }: Props) {
   return (
     <View style={styles.wrap}>
       <LinearGradient
-        colors={['rgba(22, 53, 34, 0.82)', 'rgba(22, 53, 34, 0.82)', 'rgba(22, 53, 34, 0.82)']}
+        colors={['rgba(11, 12, 14, 0.82)', 'rgba(11, 12, 14, 0.82)', 'rgba(11, 12, 14, 0.82)']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.card}
@@ -47,7 +47,7 @@ export default function StudioBanner({ doneCount, totalCount }: Props) {
         <Ionicons
           name="chevron-down-outline"
           size={18}
-          color="rgba(245, 239, 230, 0.45)"
+          color="rgba(250, 248, 245, 0.45)"
           style={styles.chevron}
         />
       </LinearGradient>
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     gap: 14,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.35)',
+    borderColor: 'rgba(212, 175, 55, 0.35)',
     shadowColor: COLORS.forestDeep,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.2,
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: 'rgba(212, 168, 67, 0.2)',
+    backgroundColor: 'rgba(212, 175, 55, 0.2)',
   },
   logoSlot: {
     width: 64,
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
     lineHeight: 17,
-    color: 'rgba(245, 239, 230, 0.72)',
+    color: 'rgba(250, 248, 245, 0.72)',
   },
   dots: {
     flexDirection: 'row',
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: 'rgba(245, 239, 230, 0.2)',
+    backgroundColor: 'rgba(250, 248, 245, 0.2)',
   },
   dotLit: {
     backgroundColor: COLORS.gold,

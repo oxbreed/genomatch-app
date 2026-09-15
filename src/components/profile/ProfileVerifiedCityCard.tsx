@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.md,
     backgroundColor: COLORS.mint,
     borderWidth: 1,
-    borderColor: 'rgba(143, 175, 149, 0.35)',
+    borderColor: 'rgba(184, 188, 196, 0.35)',
   },
   buttonPressed: { opacity: 0.9 },
   buttonText: {

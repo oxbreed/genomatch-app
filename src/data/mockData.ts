@@ -7,7 +7,7 @@ import { COLORS } from '../theme';
 const GENOTYPE_BADGE_STYLE = {
   bg: COLORS.mint,
   text: COLORS.forestDeep,
-  border: 'rgba(22, 53, 34, 0.12)',
+  border: 'rgba(11, 12, 14, 0.12)',
 } as const;
 
 export const GENOTYPE_STYLES: Record<
@@ -46,7 +46,7 @@ export const MOCK_MATCHES: MockProfile[] = [
     compatibility: 94,
     bio: 'Architect who loves live music and long walks. Looking for someone intentional, kind, and ready for something real.',
     interests: ['Music', 'Travel', 'Art', 'Food'],
-    gradient: ['#2A5C40', '#1A3D28'],
+    gradient: ['#C8102E', '#15171A'],
     photoUrl: 'https://genomatch.app/demo/demo-amara.png',
     lastMessageAt: '2h ago',
   },
@@ -59,7 +59,7 @@ export const MOCK_MATCHES: MockProfile[] = [
     compatibility: 87,
     bio: 'Fitness coach and foodie. I value honesty, good conversation, and building a future with the right person.',
     interests: ['Fitness', 'Food', 'Sports', 'Movies'],
-    gradient: ['#2E7D32', '#1B5E20'],
+    gradient: ['#C8102E', '#8E0B20'],
     photoUrl: 'https://genomatch.app/demo/demo-kwame.png',
     lastMessageAt: 'Yesterday',
   },
@@ -85,7 +85,7 @@ export const MOCK_MATCHES: MockProfile[] = [
     compatibility: 82,
     bio: 'Software engineer who enjoys hiking and photography. Looking for an honest connection built on shared values and laughter.',
     interests: ['Hiking', 'Photography', 'Tech', 'Music'],
-    gradient: ['#1B5E20', COLORS.forestDeep],
+    gradient: ['#C8102E', COLORS.forestDeep],
     photoUrl: 'https://genomatch.app/demo/demo-amani.png',
     lastMessageAt: '3d ago',
   },
@@ -116,7 +116,7 @@ export const MOCK_CURRENT_USER: CurrentUserProfile = {
   bio: 'Passionate about meaningful connections, good food, and building a future with the right person. Genotype-aware and intentional about love.',
   interests: ['Music', 'Travel', 'Tech', 'Food'],
   relationshipGoal: 'serious',
-  gradient: ['#1A3D28', '#2A5C40'],
+  gradient: ['#15171A', '#C8102E'],
 };
 
 export function getInitials(name: string) {

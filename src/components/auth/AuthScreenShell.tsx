@@ -36,7 +36,7 @@ export default function AuthScreenShell({
         <GenoSignaturePattern width={320} height={160} opacity={0.2} />
       </View>
       <LinearGradient
-        colors={['rgba(212, 168, 67, 0.12)', 'transparent']}
+        colors={['rgba(212, 175, 55, 0.12)', 'transparent']}
         style={styles.topGlow}
         pointerEvents="none"
       />
@@ -97,7 +97,7 @@ export default function AuthScreenShell({
         ]}
       >
         <LinearGradient
-          colors={['rgba(212, 168, 67, 0.45)', 'rgba(61, 122, 82, 0.28)', 'rgba(212, 168, 67, 0.38)']}
+          colors={['rgba(212, 175, 55, 0.45)', 'rgba(61, 122, 82, 0.28)', 'rgba(212, 175, 55, 0.38)']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.formBorder}
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamBook,
     fontSize: 16,
     lineHeight: 24,
-    color: 'rgba(245, 239, 230, 0.78)',
+    color: 'rgba(250, 248, 245, 0.78)',
     maxWidth: '96%',
   },
   formWrap: {

@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 999,
-    backgroundColor: 'rgba(212, 168, 67, 0.2)',
+    backgroundColor: 'rgba(212, 175, 55, 0.2)',
   },
   requiredText: {
     fontFamily: FONT_FAMILY.gothamBold,
