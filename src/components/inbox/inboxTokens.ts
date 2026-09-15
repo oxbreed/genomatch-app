@@ -22,7 +22,7 @@ export const INBOX = {
   colors: {
     borderGradient: [
       'rgba(212, 175, 55, 0.45)',
-      'rgba(61, 122, 82, 0.28)',
+      'rgba(200, 16, 46, 0.28)',
       'rgba(212, 175, 55, 0.35)',
     ] as [string, string, string],
     goldBtn: [COLORS.gold, '#B8962E'] as [string, string],

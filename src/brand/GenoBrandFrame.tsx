@@ -54,7 +54,7 @@ export default function GenoBrandFrame({
         colors={
           isForest
             ? [COLORS.gold, COLORS.verified, 'transparent']
-            : [COLORS.gold, 'rgba(61, 122, 82, 0.55)', 'transparent']
+            : [COLORS.gold, 'rgba(200, 16, 46, 0.55)', 'transparent']
         }
         start={{ x: 0, y: 0.5 }}
         end={{ x: 1, y: 0.5 }}

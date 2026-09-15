@@ -97,7 +97,7 @@ export default function AuthScreenShell({
         ]}
       >
         <LinearGradient
-          colors={['rgba(212, 175, 55, 0.45)', 'rgba(61, 122, 82, 0.28)', 'rgba(212, 175, 55, 0.38)']}
+          colors={['rgba(212, 175, 55, 0.45)', 'rgba(200, 16, 46, 0.28)', 'rgba(212, 175, 55, 0.38)']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.formBorder}

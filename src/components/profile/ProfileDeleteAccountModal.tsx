@@ -84,7 +84,7 @@ export default function ProfileDeleteAccountModal({
             value={password}
             onChangeText={setPassword}
             placeholder="Your account password"
-            placeholderTextColor="rgba(27, 122, 110, 0.35)"
+            placeholderTextColor="rgba(200, 16, 46, 0.35)"
             secureTextEntry={!showPass}
             autoComplete="password"
             textContentType="password"
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
     height: 22,
     borderRadius: 6,
     borderWidth: 1.5,
-    borderColor: 'rgba(27, 122, 110, 0.28)',
+    borderColor: 'rgba(200, 16, 46, 0.28)',
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 1,
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: RADIUS.md,
     borderWidth: 1.5,
-    borderColor: 'rgba(27, 122, 110, 0.18)',
+    borderColor: 'rgba(200, 16, 46, 0.18)',
     backgroundColor: 'rgba(255, 255, 255, 0.72)',
     paddingHorizontal: 14,
     color: COLORS.forestDeep,
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: RADIUS.pill,
     borderWidth: 1,
-    borderColor: 'rgba(27, 122, 110, 0.2)',
+    borderColor: 'rgba(200, 16, 46, 0.2)',
     alignItems: 'center',
     justifyContent: 'center',
   },

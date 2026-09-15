@@ -78,8 +78,8 @@ export default function ProfileBondAura({ active, verified }: Props) {
         <LinearGradient
           colors={
             verified
-              ? ['rgba(61, 122, 82, 0.32)', 'rgba(212, 175, 55, 0.12)']
-              : ['rgba(212, 175, 55, 0.26)', 'rgba(61, 122, 82, 0.1)']
+              ? ['rgba(200, 16, 46, 0.32)', 'rgba(212, 175, 55, 0.12)']
+              : ['rgba(212, 175, 55, 0.26)', 'rgba(200, 16, 46, 0.1)']
           }
           style={styles.orbFill}
         />

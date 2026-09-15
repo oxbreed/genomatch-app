@@ -37,7 +37,7 @@ export default function ProfileEditBanner() {
   return (
     <Animated.View style={{ opacity }}>
       <LinearGradient
-        colors={['rgba(212, 175, 55, 0.35)', 'rgba(61, 122, 82, 0.2)']}
+        colors={['rgba(212, 175, 55, 0.35)', 'rgba(200, 16, 46, 0.2)']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={styles.banner}

@@ -64,7 +64,7 @@ export default function StudioSectionShell({ active, children, onLayout, style }
     <View onLayout={onLayout} style={[styles.outer, style]}>
       <Animated.View style={[styles.glow, { opacity: glowOpacity }]} pointerEvents="none">
         <LinearGradient
-          colors={['rgba(212, 175, 55, 0.35)', 'transparent', 'rgba(61, 122, 82, 0.2)']}
+          colors={['rgba(212, 175, 55, 0.35)', 'transparent', 'rgba(200, 16, 46, 0.2)']}
           style={StyleSheet.absoluteFill}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}

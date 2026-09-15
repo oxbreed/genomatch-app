@@ -100,7 +100,7 @@ export default function DiscoverSeenAllState({
       ]}
     >
       <LinearGradient
-        colors={['rgba(212, 175, 55, 0.4)', 'rgba(61, 122, 82, 0.25)', 'rgba(212, 175, 55, 0.35)']}
+        colors={['rgba(212, 175, 55, 0.4)', 'rgba(200, 16, 46, 0.25)', 'rgba(212, 175, 55, 0.35)']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.cardBorder}
@@ -271,9 +271,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 999,
-    backgroundColor: 'rgba(61, 122, 82, 0.12)',
+    backgroundColor: 'rgba(200, 16, 46, 0.12)',
     borderWidth: 1,
-    borderColor: 'rgba(61, 122, 82, 0.2)',
+    borderColor: 'rgba(200, 16, 46, 0.2)',
     marginBottom: 14,
   },
   statusText: {

@@ -840,7 +840,7 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
           ) : seenAll ? (
             <View style={styles.seenAllWrap}>
               <LinearGradient
-                colors={['rgba(212, 175, 55, 0.42)', 'rgba(61, 122, 82, 0.22)', 'rgba(212, 175, 55, 0.38)']}
+                colors={['rgba(212, 175, 55, 0.42)', 'rgba(200, 16, 46, 0.22)', 'rgba(212, 175, 55, 0.38)']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={styles.seenAllBorder}
@@ -1667,7 +1667,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     backgroundColor: COLORS.white,
     borderWidth: 1.5,
-    borderColor: 'rgba(7, 77, 46, 0.18)',
+    borderColor: 'rgba(11, 12, 14, 0.18)',
     borderRadius: RADIUS.xl,
   },
   refreshBtn: {

@@ -260,7 +260,7 @@ export default function ResetPassword({
                 value={otpCode}
                 onChangeText={(text) => setOtpCode(text.replace(/\D/g, '').slice(0, 6))}
                 placeholder="000000"
-                placeholderTextColor="rgba(27, 122, 110, 0.35)"
+                placeholderTextColor="rgba(200, 16, 46, 0.35)"
                 keyboardType="number-pad"
                 autoComplete="one-time-code"
                 textContentType="oneTimeCode"
@@ -304,7 +304,7 @@ export default function ResetPassword({
             value={password}
             onChangeText={setPassword}
             placeholder="At least 8 characters"
-            placeholderTextColor="rgba(27, 122, 110, 0.35)"
+            placeholderTextColor="rgba(200, 16, 46, 0.35)"
             secureTextEntry={!showPass}
             autoComplete="new-password"
             textContentType="newPassword"
@@ -323,7 +323,7 @@ export default function ResetPassword({
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             placeholder="Re-enter your password"
-            placeholderTextColor="rgba(27, 122, 110, 0.35)"
+            placeholderTextColor="rgba(200, 16, 46, 0.35)"
             secureTextEntry={!showConfirmPass}
             autoComplete="new-password"
             textContentType="newPassword"
@@ -417,14 +417,14 @@ const styles = StyleSheet.create({
     maxWidth: '95%',
   },
   subtitle: {
-    color: 'rgba(27, 122, 110, 0.72)',
+    color: 'rgba(200, 16, 46, 0.72)',
     fontSize: 15,
     lineHeight: 24,
     fontWeight: '500',
     maxWidth: '96%',
   },
   hint: {
-    color: 'rgba(27, 122, 110, 0.65)',
+    color: 'rgba(200, 16, 46, 0.65)',
     fontSize: 13,
     lineHeight: 18,
     fontWeight: '500',
@@ -443,7 +443,7 @@ const styles = StyleSheet.create({
     height: 54,
     borderRadius: 14,
     borderWidth: 1.5,
-    borderColor: 'rgba(27, 122, 110, 0.18)',
+    borderColor: 'rgba(200, 16, 46, 0.18)',
     backgroundColor: GLASS.insetFill,
     paddingHorizontal: 14,
     color: '#1D2B23',
@@ -465,13 +465,13 @@ const styles = StyleSheet.create({
     letterSpacing: 0.1,
   },
   resendTextDisabled: {
-    color: 'rgba(27, 122, 110, 0.45)',
+    color: 'rgba(200, 16, 46, 0.45)',
   },
   input: {
     height: 54,
     borderRadius: 14,
     borderWidth: 1.5,
-    borderColor: 'rgba(27, 122, 110, 0.18)',
+    borderColor: 'rgba(200, 16, 46, 0.18)',
     backgroundColor: GLASS.insetFill,
     paddingHorizontal: 14,
     color: '#1D2B23',
@@ -528,7 +528,7 @@ const styles = StyleSheet.create({
   },
   createText: {
     fontFamily: FONT_FAMILY.gothamMedium,
-    color: 'rgba(27, 122, 110, 0.65)',
+    color: 'rgba(200, 16, 46, 0.65)',
     fontSize: 14,
   },
   createBold: {

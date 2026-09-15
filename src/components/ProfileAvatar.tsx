@@ -82,7 +82,7 @@ export default function ProfileAvatar({
           borderRadius: outerRadius,
           backgroundColor: hasPhoto ? COLORS.white : fallbackBg,
           borderWidth: hasPhoto && !isCover ? 2 : 0,
-          borderColor: 'rgba(168, 213, 186, 0.5)',
+          borderColor: 'rgba(184, 188, 196, 0.5)',
         },
       ]}
     >
