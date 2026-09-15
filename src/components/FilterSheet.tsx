@@ -136,7 +136,7 @@ export default function FilterSheet({
                 keyboardShouldPersistTaps="handled"
                 showsVerticalScrollIndicator={false}
               >
-                <Text style={styles.sectionLabel}>Genotype compatibility</Text>
+                <Text style={styles.sectionLabel}>Lifestyle match</Text>
                 <View style={styles.toggleRow}>
                   {(['all', 'high'] as const).map((mode) => (
                     <Pressable

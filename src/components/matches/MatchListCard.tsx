@@ -37,8 +37,14 @@ export default function MatchListCard({
 }: Props) {
   const { profile } = item;
   const riskShort = getGenotypeRiskShort(viewerGenotype, profile.genotype);
-  const compatHigh = profile.compatibility >= 80;
+  const compatHigh = profile.lifestyleMatch >= 80;
   const isNew = isRecentMatch(item.matchedAt);
+  const locationLine = profile.city
+    ? formatLocationLine(profile.city, profile.distanceBand)
+    : '';
+  const summaryText = [riskShort ? `Genotype: ${riskShort}` : '', locationLine]
+    .filter(Boolean)
+    .join(' · ');
 
   return (
     <GenoInboxCardShell
@@ -81,15 +87,12 @@ export default function MatchListCard({
               style={styles.compatPill}
             >
               <Text style={[styles.pct, compatHigh && styles.pctHigh]}>
-                {profile.compatibility}%
+                {profile.lifestyleMatch}%
               </Text>
             </LinearGradient>
           </View>
           <Text style={styles.summary} numberOfLines={1}>
-            {riskShort}
-            {profile.city
-              ? ` · ${formatLocationLine(profile.city, profile.distanceBand)}`
-              : ''}
+            {summaryText}
           </Text>
         </>
       }

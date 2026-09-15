@@ -133,13 +133,16 @@ export async function fetchConversations(): Promise<ConversationPreview[]> {
 
   const { data: me, error: meError } = await supabase
     .from('profiles')
-    .select('genotype')
+    .select('genotype, interests, relationship_goal')
     .eq('id', userId)
     .maybeSingle();
 
   logSupabaseResult('messages.viewerGenotype', me, meError);
   if (meError) throw meError;
-  const viewerGenotype = (me as { genotype: ProfileRow['genotype'] } | null)?.genotype ?? null;
+  const viewer = me as Pick<ProfileRow, 'genotype' | 'interests' | 'relationship_goal'> | null;
+  const viewerGenotype = viewer?.genotype ?? null;
+  const viewerInterests = viewer?.interests ?? null;
+  const viewerRelationshipGoal = viewer?.relationship_goal ?? null;
 
   const otherIds = visibleMatches.map((m) =>
     m.user_a_id === userId ? m.user_b_id : m.user_a_id
@@ -215,7 +218,10 @@ export async function fetchConversations(): Promise<ConversationPreview[]> {
 
       return {
         matchId: match.id,
-        profile: mapProfileRow(row, viewerGenotype),
+        profile: mapProfileRow(row, viewerGenotype, {
+          viewerInterests,
+          viewerRelationshipGoal,
+        }),
         lastMessage: last?.body ?? null,
         lastMessageAt: previewTimeByMatch.get(match.id) ?? last?.created_at ?? match.created_at,
         unread,

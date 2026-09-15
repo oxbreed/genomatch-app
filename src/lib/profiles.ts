@@ -320,12 +320,15 @@ export async function fetchDiscoveryProfiles(): Promise<{
 
   const { data: me, error: meError } = await supabase
     .from('profiles')
-    .select('genotype')
+    .select('genotype, interests, relationship_goal')
     .eq('id', userId)
     .maybeSingle();
 
   if (meError) throw meError;
-  const viewerGenotype = (me as ProfileRow | null)?.genotype ?? null;
+  const viewer = me as Pick<ProfileRow, 'genotype' | 'interests' | 'relationship_goal'> | null;
+  const viewerGenotype = viewer?.genotype ?? null;
+  const viewerInterests = viewer?.interests ?? null;
+  const viewerRelationshipGoal = viewer?.relationship_goal ?? null;
 
   let seenSet = new Set<string>();
   try {
@@ -367,7 +370,11 @@ export async function fetchDiscoveryProfiles(): Promise<{
   const profiles = rows
     .filter(({ row }) => !seenSet.has(row.id) && !blockedSet.has(row.id))
     .map(({ row, distanceBand }) =>
-      mapProfileRow(row, viewerGenotype, { distanceBand })
+      mapProfileRow(row, viewerGenotype, {
+        distanceBand,
+        viewerInterests,
+        viewerRelationshipGoal,
+      })
     );
 
   const deckStats =
@@ -517,7 +524,10 @@ export async function getViewerProfileSnapshot(): Promise<ViewerProfileSnapshot 
   const row = await getCurrentProfile();
   if (!row) return null;
 
-  const mapped = mapProfileRow(row, row.genotype ?? null);
+  const mapped = mapProfileRow(row, row.genotype ?? null, {
+    viewerInterests: row.interests,
+    viewerRelationshipGoal: row.relationship_goal,
+  });
   return {
     name: mapped.name,
     avatarUrl: mapped.avatarUrl ?? null,

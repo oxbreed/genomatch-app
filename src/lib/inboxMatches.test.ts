@@ -7,7 +7,7 @@ const profile: DiscoveryProfile = {
   age: 28,
   city: 'Lagos',
   genotype: 'AA',
-  compatibility: 90,
+  lifestyleMatch: 90,
   bio: 'Bio',
   interests: [],
   gradient: ['#000', '#111'],

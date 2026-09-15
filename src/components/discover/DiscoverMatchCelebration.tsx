@@ -381,11 +381,11 @@ export default function DiscoverMatchCelebration({
                 {profile ? (
                   <View style={styles.compatRow}>
                     <View style={styles.compatRing}>
-                      <Text style={styles.compatPercent}>{profile.compatibility}%</Text>
+                      <Text style={styles.compatPercent}>{profile.lifestyleMatch}%</Text>
                     </View>
                     <View style={styles.compatCopy}>
-                      <Text style={styles.compatTitle}>Genotype compatibility</Text>
-                      <Text style={styles.compatSub}>Aligned for a safer connection</Text>
+                      <Text style={styles.compatTitle}>Lifestyle match</Text>
+                      <Text style={styles.compatSub}>Based on shared interests &amp; goals</Text>
                     </View>
                   </View>
                 ) : null}

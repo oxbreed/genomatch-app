@@ -203,7 +203,10 @@ export default function Profile({ onSignOut }: ProfileProps) {
         return;
       }
 
-      const mapped: DiscoveryProfile = mapProfileRow(row, row.genotype);
+      const mapped: DiscoveryProfile = mapProfileRow(row, row.genotype, {
+        viewerInterests: row.interests,
+        viewerRelationshipGoal: row.relationship_goal,
+      });
       const loaded: EditableProfile = {
         displayName: mapped.name,
         city: mapped.city,

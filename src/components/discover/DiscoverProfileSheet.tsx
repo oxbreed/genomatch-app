@@ -136,6 +136,7 @@ export default function DiscoverProfileSheet({
   const [photoIndex, setPhotoIndex] = useState(0);
   const scrollAtTop = useRef(true);
   const photoScrollRef = useRef<ScrollView>(null);
+  const genotypeRisk = profile ? getGenotypeRiskShort(viewerGenotype, profile.genotype) : null;
 
   const gallery = useMemo(() => {
     if (!profile) return [] as string[];
@@ -312,12 +313,12 @@ export default function DiscoverProfileSheet({
               <View style={styles.bondPanel}>
                 <View style={styles.bondHeader}>
                   <GenoBondMark size={18} opacity={0.75} />
-                  <Text style={styles.bondKicker}>Genotype bond</Text>
+                  <Text style={styles.bondKicker}>Lifestyle match</Text>
                 </View>
-                <GenoCompatRing percent={profile.compatibility} size={88} />
-                <Text style={styles.bondRisk}>
-                  {getGenotypeRiskShort(viewerGenotype, profile.genotype)}
-                </Text>
+                <GenoCompatRing percent={profile.lifestyleMatch} size={88} />
+                {genotypeRisk ? (
+                  <Text style={styles.bondRisk}>Genotype: {genotypeRisk}</Text>
+                ) : null}
                 <Text style={styles.bondDisclaimer}>Informational only — not medical advice.</Text>
               </View>
 

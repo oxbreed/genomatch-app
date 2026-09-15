@@ -160,13 +160,18 @@ export default function DiscoverSwipeCard({
           <View
             style={[
               styles.compatDot,
-              { backgroundColor: getCompatDotColor(profile.compatibility) },
+              { backgroundColor: getCompatDotColor(profile.lifestyleMatch) },
             ]}
           />
           <Text style={styles.compatText} numberOfLines={1}>
-            {profile.compatibility}% · {riskShort}
+            {profile.lifestyleMatch}% match
           </Text>
         </View>
+        {riskShort ? (
+          <Text style={styles.genotypeRisk} numberOfLines={1}>
+            Genotype: {riskShort}
+          </Text>
+        ) : null}
       </Pressable>
 
       {onExpand ? (
@@ -204,7 +209,7 @@ export default function DiscoverSwipeCard({
         </>
       ) : null}
 
-      <DiscoverMatchPill percent={profile.compatibility} />
+      <DiscoverMatchPill percent={profile.lifestyleMatch} />
     </View>
   );
 }
@@ -335,6 +340,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 17,
     color: 'rgba(250, 248, 245, 0.9)',
+  },
+  genotypeRisk: {
+    fontFamily: FONT_FAMILY.gothamBook,
+    fontSize: 11,
+    lineHeight: 15,
+    color: 'rgba(250, 248, 245, 0.7)',
+    marginTop: 1,
   },
   expandHintWrap: {
     position: 'absolute',
