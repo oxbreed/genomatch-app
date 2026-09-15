@@ -1,0 +1,17 @@
+{
+  "name": "GenoMatch (Expo SDK 57)",
+  "install": "npm install",
+  "terminals": [
+    {
+      "name": "expo-web",
+      "command": "npx expo start --web --port 8081",
+      "description": "Expo SDK 57 web dev server (Metro). Open http://localhost:8081 in a browser. Requires EXPO_PUBLIC_SUPABASE_ANON_KEY (add via Secrets) for full runtime; Metro bundles regardless."
+    }
+  ],
+  "ports": [
+    {
+      "name": "expo-web",
+      "port": 8081
+    }
+  ]
+}
