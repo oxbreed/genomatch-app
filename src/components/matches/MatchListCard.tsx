@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: 'rgba(255, 255, 255, 0.55)',
     borderWidth: 1,
-    borderColor: 'rgba(61, 122, 82, 0.14)',
+    borderColor: 'rgba(200, 16, 46, 0.14)',
   },
   genotypeText: {
     fontFamily: FONT_FAMILY.gothamBold,

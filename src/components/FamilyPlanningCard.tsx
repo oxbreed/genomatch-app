@@ -18,10 +18,10 @@ const TIER_STYLE: Record<
 > = {
   favourable: {
     accent: COLORS.verified,
-    bg: 'rgba(61, 122, 82, 0.1)',
-    border: 'rgba(61, 122, 82, 0.28)',
-    darkBg: 'rgba(61, 122, 82, 0.22)',
-    darkBorder: 'rgba(61, 122, 82, 0.4)',
+    bg: 'rgba(200, 16, 46, 0.1)',
+    border: 'rgba(200, 16, 46, 0.28)',
+    darkBg: 'rgba(200, 16, 46, 0.22)',
+    darkBorder: 'rgba(200, 16, 46, 0.4)',
   },
   low_risk: {
     accent: COLORS.forest,

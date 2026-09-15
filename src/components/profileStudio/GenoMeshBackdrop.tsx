@@ -10,7 +10,7 @@ type Props = {
 };
 
 const ORB_A = ['rgba(212, 175, 55, 0.22)', 'rgba(212, 175, 55, 0)'] as const;
-const ORB_B = ['rgba(61, 122, 82, 0.2)', 'rgba(61, 122, 82, 0)'] as const;
+const ORB_B = ['rgba(200, 16, 46, 0.2)', 'rgba(200, 16, 46, 0)'] as const;
 const ORB_C = ['rgba(21, 23, 26, 0.14)', 'rgba(21, 23, 26, 0)'] as const;
 
 function HelixDecor({ opacity }: { opacity: number }) {

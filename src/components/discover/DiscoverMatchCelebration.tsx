@@ -271,7 +271,7 @@ export default function DiscoverMatchCelebration({
           ]}
         >
           <LinearGradient
-            colors={['rgba(212, 175, 55, 0.65)', 'rgba(61, 122, 82, 0.4)', 'rgba(212, 175, 55, 0.5)']}
+            colors={['rgba(212, 175, 55, 0.65)', 'rgba(200, 16, 46, 0.4)', 'rgba(212, 175, 55, 0.5)']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.cardBorder}

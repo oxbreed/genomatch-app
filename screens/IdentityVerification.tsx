@@ -259,13 +259,13 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: 'rgba(168, 213, 186, 0.3)',
+    backgroundColor: 'rgba(184, 188, 196, 0.3)',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 4,
   },
   successIconWrap: {
-    backgroundColor: 'rgba(168, 213, 186, 0.45)',
+    backgroundColor: 'rgba(184, 188, 196, 0.45)',
   },
   title: {
     fontSize: 26,
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 15,
     lineHeight: 22,
-    color: 'rgba(7, 77, 46, 0.65)',
+    color: 'rgba(11, 12, 14, 0.65)',
     fontWeight: '500',
     textAlign: 'center',
     marginBottom: 20,
@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
     height: 56,
     borderRadius: RADIUS.md,
     borderWidth: 1.5,
-    borderColor: 'rgba(7, 77, 46, 0.2)',
+    borderColor: 'rgba(11, 12, 14, 0.2)',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: COLORS.white,

@@ -36,7 +36,7 @@ export default function GenoCardFrame({ children, style }: Props) {
   return (
     <View style={[styles.frame, style]}>
       <LinearGradient
-        colors={['rgba(212, 175, 55, 0.45)', 'rgba(13, 40, 24, 0.2)', 'rgba(61, 122, 82, 0.35)']}
+        colors={['rgba(212, 175, 55, 0.45)', 'rgba(13, 40, 24, 0.2)', 'rgba(200, 16, 46, 0.35)']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.borderGlow}

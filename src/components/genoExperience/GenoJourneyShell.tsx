@@ -84,7 +84,7 @@ export function GenoJourneyCard({ children, style }: JourneyCardProps) {
   return (
     <View style={[styles.cardOuter, style]}>
       <LinearGradient
-        colors={['rgba(212, 175, 55, 0.48)', 'rgba(61, 122, 82, 0.3)', 'rgba(212, 175, 55, 0.42)']}
+        colors={['rgba(212, 175, 55, 0.48)', 'rgba(200, 16, 46, 0.3)', 'rgba(212, 175, 55, 0.42)']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.cardBorder}

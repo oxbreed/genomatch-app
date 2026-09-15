@@ -141,7 +141,7 @@ export default function GenoOnboardingFlow({
           {slides.map((slide) => (
             <View key={slide.title} style={styles.slide}>
               <LinearGradient
-                colors={['rgba(212, 175, 55, 0.35)', 'rgba(61, 122, 82, 0.25)']}
+                colors={['rgba(212, 175, 55, 0.35)', 'rgba(200, 16, 46, 0.25)']}
                 style={styles.slideCardBorder}
               >
                 <GenoGlassSurface

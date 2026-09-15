@@ -21,7 +21,7 @@ export default function GenoBrandDivider({ width = '100%', marginVertical = 16 }
         <View style={styles.dotInner} />
       </View>
       <LinearGradient
-        colors={['transparent', 'rgba(61, 122, 82, 0.5)', 'transparent']}
+        colors={['transparent', 'rgba(200, 16, 46, 0.5)', 'transparent']}
         start={{ x: 0, y: 0.5 }}
         end={{ x: 1, y: 0.5 }}
         style={styles.line}

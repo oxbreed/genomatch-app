@@ -57,7 +57,7 @@ function StepPill({
       <Animated.View style={[styles.pillOuter, { transform: [{ scale }] }]}>
         {active ? (
           <LinearGradient
-            colors={['rgba(212, 175, 55, 0.55)', 'rgba(61, 122, 82, 0.35)']}
+            colors={['rgba(212, 175, 55, 0.55)', 'rgba(200, 16, 46, 0.35)']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.pillGlow}
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(212, 175, 55, 0.55)',
   },
   pillComplete: {
-    borderColor: 'rgba(61, 122, 82, 0.35)',
+    borderColor: 'rgba(200, 16, 46, 0.35)',
     backgroundColor: 'rgba(240, 241, 243, 0.85)',
   },
   stepBadge: {
@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.gold,
   },
   stepBadgeComplete: {
-    backgroundColor: 'rgba(61, 122, 82, 0.25)',
+    backgroundColor: 'rgba(200, 16, 46, 0.25)',
   },
   stepBadgeText: {
     fontFamily: FONT_FAMILY.gothamBold,
