@@ -22,7 +22,8 @@ import PresenceBadge from '../src/components/PresenceBadge';
 import { ProfileViewSections } from '../src/components/profile';
 import LocationLine from '../src/components/LocationLine';
 import ReportBlockSheet from '../src/components/ReportBlockSheet';
-import CompatibilityProfileCard from '../src/components/genomatch/CompatibilityProfileCard';
+import MatchProfileCard from '../src/components/genomatch/MatchProfileCard';
+import GenotypeInfoRow from '../src/components/genomatch/GenotypeInfoRow';
 import { FONT_FAMILY, COLORS, MOTION, RADIUS, SHADOWS } from '../src/theme';
 import { getCurrentProfile } from '../src/lib/profiles';
 import type { Genotype, MatchWithProfile } from '../src/types/database';
@@ -124,11 +125,18 @@ export default function MatchProfile({ match, onBack, onSendMessage }: MatchProf
             </View>
 
             <View style={styles.compatWrap}>
-              <CompatibilityProfileCard
-                percent={profile.compatibility}
+              <MatchProfileCard
+                percent={profile.lifestyleMatch}
                 theirTraits={profile.interests}
                 onViewReport={onSendMessage}
                 ctaLabel="View Full Report"
+              />
+            </View>
+
+            <View style={styles.genotypeInfoWrap}>
+              <GenotypeInfoRow
+                viewerGenotype={viewerGenotype}
+                candidateGenotype={profile.genotype}
               />
             </View>
 
@@ -245,6 +253,11 @@ const styles = StyleSheet.create({
   compatWrap: {
     alignSelf: 'stretch',
     marginTop: 16,
+    marginBottom: 8,
+  },
+  genotypeInfoWrap: {
+    alignSelf: 'stretch',
+    paddingHorizontal: 4,
     marginBottom: 8,
   },
   heroTop: {

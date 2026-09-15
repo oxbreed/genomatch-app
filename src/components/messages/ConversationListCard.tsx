@@ -20,7 +20,7 @@ type Props = {
 export default function ConversationListCard({ item, onOpenProfile, onOpenChat }: Props) {
   const { profile } = item;
   const timeLabel = item.lastMessageAt ? formatMessageTime(item.lastMessageAt) : 'New';
-  const compatHigh = profile.compatibility >= 80;
+  const compatHigh = profile.lifestyleMatch >= 80;
   const isFresh = !item.lastMessage;
 
   return (
@@ -58,7 +58,7 @@ export default function ConversationListCard({ item, onOpenProfile, onOpenChat }
               style={styles.compatPill}
             >
               <Text style={[styles.pct, compatHigh && styles.pctHigh]}>
-                {profile.compatibility}%
+                {profile.lifestyleMatch}%
               </Text>
             </LinearGradient>
             <Text style={styles.time}>{timeLabel}</Text>

@@ -28,13 +28,16 @@ export async function fetchMatches(): Promise<FetchMatchesResult> {
 
   const { data: me, error: meError } = await supabase
     .from('profiles')
-    .select('genotype')
+    .select('genotype, interests, relationship_goal')
     .eq('id', userId)
     .maybeSingle();
 
   logSupabaseResult('matches.viewerGenotype', me, meError);
   if (meError) throw meError;
-  const viewerGenotype = (me as { genotype: ProfileRow['genotype'] } | null)?.genotype ?? null;
+  const viewer = me as Pick<ProfileRow, 'genotype' | 'interests' | 'relationship_goal'> | null;
+  const viewerGenotype = viewer?.genotype ?? null;
+  const viewerInterests = viewer?.interests ?? null;
+  const viewerRelationshipGoal = viewer?.relationship_goal ?? null;
 
   if (!matchRows?.length) return { matches: [], viewerGenotype };
 
@@ -66,6 +69,8 @@ export async function fetchMatches(): Promise<FetchMatchesResult> {
           matchId: match.id,
           profile: mapProfileRow(row, viewerGenotype, {
             distanceBand: distanceBands.get(otherId) ?? null,
+            viewerInterests,
+            viewerRelationshipGoal,
           }),
           matchedAt: match.created_at,
         };

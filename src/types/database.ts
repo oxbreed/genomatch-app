@@ -57,7 +57,7 @@ export type DiscoveryProfile = {
   city: string;
   distanceBand?: DistanceBand | null;
   genotype: Genotype;
-  compatibility: number;
+  lifestyleMatch: number;
   bio: string;
   interests: string[];
   gradient: [string, string];
