@@ -27,7 +27,7 @@ export default function OnboardingInsightSlide({ slide, width }: Props) {
 
       <View style={styles.iconOuter}>
         <LinearGradient
-          colors={['rgba(212, 168, 67, 0.35)', 'rgba(143, 175, 149, 0.2)']}
+          colors={['rgba(212, 175, 55, 0.35)', 'rgba(184, 188, 196, 0.2)']}
           style={styles.iconRing}
         >
           <View style={[styles.iconCard, { borderColor: `${accent}55` }]}>
@@ -46,7 +46,7 @@ export default function OnboardingInsightSlide({ slide, width }: Props) {
       <Text style={styles.body}>{slide.body}</Text>
 
       <LinearGradient
-        colors={['transparent', 'rgba(212, 168, 67, 0.5)', 'transparent']}
+        colors={['transparent', 'rgba(212, 175, 55, 0.5)', 'transparent']}
         start={{ x: 0, y: 0.5 }}
         end={{ x: 1, y: 0.5 }}
         style={styles.rule}
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: 'rgba(255, 255, 255, 0.08)',
     borderWidth: 1,
-    borderColor: 'rgba(245, 239, 230, 0.12)',
+    borderColor: 'rgba(250, 248, 245, 0.12)',
   },
   statValue: {
     fontFamily: FONT_FAMILY.gothamBold,
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
   statLabel: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: 'rgba(245, 239, 230, 0.65)',
+    color: 'rgba(250, 248, 245, 0.65)',
   },
   kicker: {
     fontFamily: FONT_FAMILY.gothamBold,
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamBook,
     fontSize: 17,
     lineHeight: 26,
-    color: 'rgba(245, 239, 230, 0.82)',
+    color: 'rgba(250, 248, 245, 0.82)',
     maxWidth: '96%',
   },
   rule: {

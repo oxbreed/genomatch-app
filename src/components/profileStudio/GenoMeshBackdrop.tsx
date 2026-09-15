@@ -9,9 +9,9 @@ type Props = {
   studio?: boolean;
 };
 
-const ORB_A = ['rgba(212, 168, 67, 0.22)', 'rgba(212, 168, 67, 0)'] as const;
+const ORB_A = ['rgba(212, 175, 55, 0.22)', 'rgba(212, 175, 55, 0)'] as const;
 const ORB_B = ['rgba(61, 122, 82, 0.2)', 'rgba(61, 122, 82, 0)'] as const;
-const ORB_C = ['rgba(26, 61, 40, 0.14)', 'rgba(26, 61, 40, 0)'] as const;
+const ORB_C = ['rgba(21, 23, 26, 0.14)', 'rgba(21, 23, 26, 0)'] as const;
 
 function HelixDecor({ opacity }: { opacity: number }) {
   return (
@@ -172,6 +172,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 0,
   },
   vignetteStudio: {
-    backgroundColor: 'rgba(245, 239, 230, 0.08)',
+    backgroundColor: 'rgba(250, 248, 245, 0.08)',
   },
 });

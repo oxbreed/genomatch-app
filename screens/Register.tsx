@@ -393,7 +393,7 @@ export default function Register({
                   disabled={loading || !!successMessage}
                 >
                   <LinearGradient
-                    colors={[COLORS.gold, '#E8C56A', '#C49A3A']}
+                    colors={[COLORS.gold, '#E5C766', '#B8962E']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     style={styles.submitGradient}
@@ -489,9 +489,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: RADIUS.pill,
-    backgroundColor: 'rgba(212, 168, 67, 0.14)',
+    backgroundColor: 'rgba(212, 175, 55, 0.14)',
     borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.35)',
+    borderColor: 'rgba(212, 175, 55, 0.35)',
     marginBottom: 14,
   },
   brandChipText: {
@@ -543,7 +543,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   inputFocused: {
-    borderColor: 'rgba(212, 168, 67, 0.65)',
+    borderColor: 'rgba(212, 175, 55, 0.65)',
     backgroundColor: GLASS.insetFill,
     ...SHADOWS.card,
     shadowOpacity: 0.05,
@@ -573,9 +573,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: RADIUS.pill,
-    backgroundColor: 'rgba(212, 168, 67, 0.16)',
+    backgroundColor: 'rgba(212, 175, 55, 0.16)',
     borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.3)',
+    borderColor: 'rgba(212, 175, 55, 0.3)',
   },
   requiredPillText: {
     fontFamily: FONT_FAMILY.gothamBold,

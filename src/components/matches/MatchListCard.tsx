@@ -75,7 +75,7 @@ export default function MatchListCard({
             <LinearGradient
               colors={
                 compatHigh
-                  ? ['rgba(212, 168, 67, 0.35)', 'rgba(212, 168, 67, 0.12)']
+                  ? ['rgba(212, 175, 55, 0.35)', 'rgba(212, 175, 55, 0.12)']
                   : ['rgba(255, 255, 255, 0.65)', 'rgba(255, 255, 255, 0.35)']
               }
               style={styles.compatPill}

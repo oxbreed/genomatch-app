@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
   track: {
     height: 10,
     borderRadius: 999,
-    backgroundColor: 'rgba(143, 175, 149, 0.25)',
+    backgroundColor: 'rgba(184, 188, 196, 0.25)',
     overflow: 'hidden',
     marginBottom: 8,
   },

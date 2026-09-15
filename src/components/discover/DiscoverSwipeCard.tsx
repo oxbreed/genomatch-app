@@ -248,11 +248,11 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: 'rgba(245, 239, 230, 0.12)',
+    backgroundColor: 'rgba(250, 248, 245, 0.12)',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: 'rgba(212, 168, 67, 0.35)',
+    borderColor: 'rgba(212, 175, 55, 0.35)',
   },
   noPhotoInitials: {
     fontFamily: FONT_FAMILY.gothamBold,
@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
     lineHeight: 17,
-    color: 'rgba(245, 239, 230, 0.9)',
+    color: 'rgba(250, 248, 245, 0.9)',
   },
   expandHintWrap: {
     position: 'absolute',

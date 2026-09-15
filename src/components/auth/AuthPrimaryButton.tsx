@@ -33,7 +33,7 @@ export default function AuthPrimaryButton({
         disabled={loading || disabled}
       >
         <LinearGradient
-          colors={[COLORS.gold, '#E8C56A', '#C49A3A']}
+          colors={[COLORS.gold, '#E5C766', '#B8962E']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.gradient}

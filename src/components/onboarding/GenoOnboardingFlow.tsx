@@ -141,7 +141,7 @@ export default function GenoOnboardingFlow({
           {slides.map((slide) => (
             <View key={slide.title} style={styles.slide}>
               <LinearGradient
-                colors={['rgba(212, 168, 67, 0.35)', 'rgba(61, 122, 82, 0.25)']}
+                colors={['rgba(212, 175, 55, 0.35)', 'rgba(61, 122, 82, 0.25)']}
                 style={styles.slideCardBorder}
               >
                 <GenoGlassSurface
@@ -201,7 +201,7 @@ export default function GenoOnboardingFlow({
               }
               onPress={onContinue}
             >
-              <LinearGradient colors={[COLORS.gold, '#C49A3A']} style={styles.cta}>
+              <LinearGradient colors={[COLORS.gold, '#B8962E']} style={styles.cta}>
                 <Text style={styles.ctaText}>{ctaLabel}</Text>
                 <Ionicons name="arrow-forward" size={18} color={COLORS.forestDeep} />
               </LinearGradient>
@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
   skip: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 14,
-    color: 'rgba(245, 239, 230, 0.7)',
+    color: 'rgba(250, 248, 245, 0.7)',
   },
   track: {
     flexDirection: 'row',
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamBook,
     fontSize: 16,
     lineHeight: 24,
-    color: 'rgba(245, 239, 230, 0.8)',
+    color: 'rgba(250, 248, 245, 0.8)',
   },
   footer: {
     paddingHorizontal: 24,
@@ -312,7 +312,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: 'rgba(245, 239, 230, 0.25)',
+    backgroundColor: 'rgba(250, 248, 245, 0.25)',
   },
   dotActive: {
     width: 28,
@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
   helper: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 13,
-    color: 'rgba(245, 239, 230, 0.55)',
+    color: 'rgba(250, 248, 245, 0.55)',
     textAlign: 'center',
     marginTop: 14,
     lineHeight: 18,

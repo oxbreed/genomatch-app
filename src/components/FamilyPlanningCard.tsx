@@ -25,17 +25,17 @@ const TIER_STYLE: Record<
   },
   low_risk: {
     accent: COLORS.forest,
-    bg: 'rgba(237, 243, 238, 0.95)',
-    border: 'rgba(143, 175, 149, 0.45)',
+    bg: 'rgba(240, 241, 243, 0.95)',
+    border: 'rgba(184, 188, 196, 0.45)',
     darkBg: 'rgba(255, 255, 255, 0.1)',
     darkBorder: 'rgba(255, 255, 255, 0.2)',
   },
   awareness: {
     accent: COLORS.gold,
-    bg: 'rgba(212, 168, 67, 0.12)',
-    border: 'rgba(212, 168, 67, 0.35)',
-    darkBg: 'rgba(212, 168, 67, 0.18)',
-    darkBorder: 'rgba(212, 168, 67, 0.45)',
+    bg: 'rgba(212, 175, 55, 0.12)',
+    border: 'rgba(212, 175, 55, 0.35)',
+    darkBg: 'rgba(212, 175, 55, 0.18)',
+    darkBorder: 'rgba(212, 175, 55, 0.45)',
   },
   counseling: {
     accent: '#B86B2E',
@@ -54,9 +54,9 @@ export default function FamilyPlanningCard({
   locked = false,
 }: Props) {
   const textPrimary = dark ? COLORS.linen : COLORS.forestDeep;
-  const textSecondary = dark ? 'rgba(245, 239, 230, 0.82)' : COLORS.sage;
-  const lockedBg = dark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(237, 243, 238, 0.95)';
-  const lockedBorder = dark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(143, 175, 149, 0.45)';
+  const textSecondary = dark ? 'rgba(250, 248, 245, 0.82)' : COLORS.sage;
+  const lockedBg = dark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(240, 241, 243, 0.95)';
+  const lockedBorder = dark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(184, 188, 196, 0.45)';
 
   if (locked) {
     if (compact) {
@@ -143,7 +143,7 @@ export default function FamilyPlanningCard({
       <Text style={[styles.summary, { color: textPrimary }]}>{insight.summary}</Text>
       <Text style={[styles.detail, { color: textSecondary }]}>{insight.detail}</Text>
 
-      <Text style={[styles.disclaimer, { color: dark ? 'rgba(245,239,230,0.55)' : COLORS.textSubtle }]}>
+      <Text style={[styles.disclaimer, { color: dark ? 'rgba(250, 248, 245,0.55)' : COLORS.textSubtle }]}>
         Educational guidance only — consult a healthcare provider for personal advice.
       </Text>
     </View>

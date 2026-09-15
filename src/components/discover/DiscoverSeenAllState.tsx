@@ -100,14 +100,14 @@ export default function DiscoverSeenAllState({
       ]}
     >
       <LinearGradient
-        colors={['rgba(212, 168, 67, 0.4)', 'rgba(61, 122, 82, 0.25)', 'rgba(212, 168, 67, 0.35)']}
+        colors={['rgba(212, 175, 55, 0.4)', 'rgba(61, 122, 82, 0.25)', 'rgba(212, 175, 55, 0.35)']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.cardBorder}
       >
         <View style={styles.card}>
           <LinearGradient
-            colors={[COLORS.white, COLORS.mint, 'rgba(237, 243, 238, 0.95)']}
+            colors={[COLORS.white, COLORS.mint, 'rgba(240, 241, 243, 0.95)']}
             start={{ x: 0.5, y: 0 }}
             end={{ x: 0.5, y: 1 }}
             style={styles.cardGradient}
@@ -120,7 +120,7 @@ export default function DiscoverSeenAllState({
               <Animated.View style={[styles.outerRing, { opacity: ringOpacity }]} />
               <Animated.View style={[styles.markWrap, { transform: [{ scale: markPulse }] }]}>
                 <LinearGradient
-                  colors={['rgba(237, 243, 238, 0.95)', COLORS.white]}
+                  colors={['rgba(240, 241, 243, 0.95)', COLORS.white]}
                   style={styles.markCircle}
                 >
                   <GenoBondMark size={52} opacity={0.95} />
@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
     height: 132,
     borderRadius: 66,
     borderWidth: 2,
-    borderColor: 'rgba(212, 168, 67, 0.45)',
+    borderColor: 'rgba(212, 175, 55, 0.45)',
   },
   markWrap: {
     zIndex: 2,
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1.5,
-    borderColor: 'rgba(212, 168, 67, 0.35)',
+    borderColor: 'rgba(212, 175, 55, 0.35)',
     shadowColor: COLORS.gold,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.2,
@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(212, 168, 67, 0.18)',
+    backgroundColor: 'rgba(212, 175, 55, 0.18)',
     alignItems: 'center',
     justifyContent: 'center',
   },

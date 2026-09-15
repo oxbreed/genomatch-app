@@ -30,20 +30,20 @@ async function ensureAndroidChannels(): Promise<void> {
     name: 'Messages',
     importance: Notifications.AndroidImportance.HIGH,
     vibrationPattern: [0, 250, 250, 250],
-    lightColor: '#163522',
+    lightColor: '#0B0C0E',
   });
 
   await Notifications.setNotificationChannelAsync('matches', {
     name: 'Matches',
     importance: Notifications.AndroidImportance.HIGH,
     vibrationPattern: [0, 250, 250, 250],
-    lightColor: '#163522',
+    lightColor: '#0B0C0E',
   });
 
   await Notifications.setNotificationChannelAsync('default', {
     name: 'General',
     importance: Notifications.AndroidImportance.DEFAULT,
-    lightColor: '#163522',
+    lightColor: '#0B0C0E',
   });
 }
 

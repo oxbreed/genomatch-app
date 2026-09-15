@@ -22,7 +22,7 @@ export default function GenoAuthHeader({
   light = true,
 }: Props) {
   const titleColor = light ? COLORS.linen : COLORS.forestDeep;
-  const subColor = light ? 'rgba(245, 239, 230, 0.78)' : COLORS.sage;
+  const subColor = light ? 'rgba(250, 248, 245, 0.78)' : COLORS.sage;
 
   return (
     <View style={styles.wrap}>

@@ -840,7 +840,7 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
           ) : seenAll ? (
             <View style={styles.seenAllWrap}>
               <LinearGradient
-                colors={['rgba(212, 168, 67, 0.42)', 'rgba(61, 122, 82, 0.22)', 'rgba(212, 168, 67, 0.38)']}
+                colors={['rgba(212, 175, 55, 0.42)', 'rgba(61, 122, 82, 0.22)', 'rgba(212, 175, 55, 0.38)']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={styles.seenAllBorder}
@@ -1085,7 +1085,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: 'rgba(143, 175, 149, 0.35)',
+    backgroundColor: 'rgba(184, 188, 196, 0.35)',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
@@ -1226,7 +1226,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: 'rgba(245, 239, 230, 0.9)',
+    color: 'rgba(250, 248, 245, 0.9)',
     lineHeight: 17,
   },
   superLikeToast: {
@@ -1283,16 +1283,16 @@ const styles = StyleSheet.create({
     width: 108,
     height: 108,
     borderRadius: 54,
-    backgroundColor: 'rgba(212, 168, 67, 0.14)',
+    backgroundColor: 'rgba(212, 175, 55, 0.14)',
     borderWidth: 1.5,
-    borderColor: 'rgba(212, 168, 67, 0.45)',
+    borderColor: 'rgba(212, 175, 55, 0.45)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   noPhotoInitials: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 40,
-    color: 'rgba(212, 168, 67, 0.75)',
+    color: 'rgba(212, 175, 55, 0.75)',
     textAlign: 'center',
     letterSpacing: 1,
   },
@@ -1379,7 +1379,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
     lineHeight: 20,
-    color: 'rgba(245, 239, 230, 0.88)',
+    color: 'rgba(250, 248, 245, 0.88)',
     marginBottom: 10,
   },
   tagsRow: {
@@ -1391,9 +1391,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 999,
-    backgroundColor: 'rgba(212, 168, 67, 0.22)',
+    backgroundColor: 'rgba(212, 175, 55, 0.22)',
     borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.42)',
+    borderColor: 'rgba(212, 175, 55, 0.42)',
   },
   tagText: {
     fontFamily: FONT_FAMILY.gothamBold,
@@ -1482,7 +1482,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(13, 40, 24, 0.3)',
   },
   cardDragTintNope: {
-    backgroundColor: 'rgba(143, 175, 149, 0.3)',
+    backgroundColor: 'rgba(184, 188, 196, 0.3)',
   },
   stamp: {
     position: 'absolute',
@@ -1616,7 +1616,7 @@ const styles = StyleSheet.create({
     paddingVertical: 32,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.2)',
+    borderColor: 'rgba(212, 175, 55, 0.2)',
   },
   seenAllIconWrap: {
     width: 64,
@@ -1624,7 +1624,7 @@ const styles = StyleSheet.create({
     borderRadius: 32,
     backgroundColor: COLORS.mint,
     borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.35)',
+    borderColor: 'rgba(212, 175, 55, 0.35)',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 18,
@@ -1699,7 +1699,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: 'rgba(143, 175, 149, 0.35)',
+    backgroundColor: 'rgba(184, 188, 196, 0.35)',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
