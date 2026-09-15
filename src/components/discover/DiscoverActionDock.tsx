@@ -98,7 +98,7 @@ export default function DiscoverActionDock({
                 contentStyle={styles.likeGlassContent}
               >
                 <LinearGradient
-                  colors={[COLORS.gold, '#C49A3A']}
+                  colors={[COLORS.gold, '#B8962E']}
                   style={styles.likeGlassGradient}
                 >
                   <Ionicons name="heart" size={26} color={COLORS.forestDeep} />
@@ -155,7 +155,7 @@ export default function DiscoverActionDock({
           disabled={disabled}
           accessibilityLabel="Like"
         >
-          <LinearGradient colors={[COLORS.gold, '#C49A3A']} style={styles.likeBtnGradient}>
+          <LinearGradient colors={[COLORS.gold, '#B8962E']} style={styles.likeBtnGradient}>
             <Ionicons name="heart" size={overlay ? 32 : 28} color={COLORS.forestDeep} />
           </LinearGradient>
         </Pressable>
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1.5,
-    borderColor: 'rgba(143, 175, 149, 0.45)',
+    borderColor: 'rgba(184, 188, 196, 0.45)',
     shadowColor: COLORS.forestDeep,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.08,
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     overflow: 'hidden',
     borderWidth: 1.5,
-    borderColor: 'rgba(212, 168, 67, 0.55)',
+    borderColor: 'rgba(212, 175, 55, 0.55)',
     shadowColor: COLORS.gold,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.18,
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     overflow: 'hidden',
     borderWidth: 1.5,
-    borderColor: 'rgba(212, 168, 67, 0.55)',
+    borderColor: 'rgba(212, 175, 55, 0.55)',
     ...SHADOWS.glassFloat,
     shadowColor: COLORS.gold,
     shadowOpacity: 0.22,
@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
     borderRadius: 31,
     overflow: 'hidden',
     borderWidth: 2,
-    borderColor: 'rgba(212, 168, 67, 0.45)',
+    borderColor: 'rgba(212, 175, 55, 0.45)',
     shadowColor: COLORS.gold,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.22,

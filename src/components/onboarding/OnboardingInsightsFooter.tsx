@@ -49,7 +49,7 @@ export default function OnboardingInsightsFooter({
           onPress={onContinue}
         >
           <LinearGradient
-            colors={[COLORS.gold, '#E8C56A', '#C49A3A']}
+            colors={[COLORS.gold, '#E5C766', '#B8962E']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.ctaGradient}
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: 'rgba(245, 239, 230, 0.28)',
+    backgroundColor: 'rgba(250, 248, 245, 0.28)',
   },
   dotActive: {
     width: 32,
@@ -118,6 +118,6 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 13,
     textAlign: 'center',
-    color: 'rgba(245, 239, 230, 0.58)',
+    color: 'rgba(250, 248, 245, 0.58)',
   },
 });

@@ -90,7 +90,7 @@ export default function ProfileEditFields({
                 <Pressable key={item} onPress={() => onToggleInterest(item)}>
                   {active ? (
                     <LinearGradient
-                      colors={[COLORS.gold, '#C49A3A']}
+                      colors={[COLORS.gold, '#B8962E']}
                       style={styles.chipActive}
                     >
                       <Text style={styles.chipTextActive}>{item}</Text>
@@ -116,7 +116,7 @@ export default function ProfileEditFields({
               return (
                 <Pressable key={g.id} onPress={() => onSelectGoal(g.id)}>
                   {selected ? (
-                    <LinearGradient colors={[COLORS.gold, '#C49A3A']} style={styles.goalChipActive}>
+                    <LinearGradient colors={[COLORS.gold, '#B8962E']} style={styles.goalChipActive}>
                       <Text style={styles.goalTextActive}>{g.label}</Text>
                     </LinearGradient>
                   ) : (
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
     minHeight: 100,
     borderRadius: 14,
     borderWidth: 1.5,
-    borderColor: 'rgba(212, 168, 67, 0.35)',
+    borderColor: 'rgba(212, 175, 55, 0.35)',
     backgroundColor: COLORS.white,
     padding: 14,
     fontFamily: FONT_FAMILY.gothamMedium,

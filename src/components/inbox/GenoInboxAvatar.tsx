@@ -10,7 +10,7 @@ import { INBOX } from './inboxTokens';
 function brandGradient(name: string): [string, string] {
   const pairs: [string, string][] = [
     [COLORS.forest, COLORS.forestDeep],
-    [COLORS.forestDeep, '#0A1F12'],
+    [COLORS.forestDeep, '#0B0C0E'],
   ];
   return pairs[name.charCodeAt(0) % pairs.length]!;
 }

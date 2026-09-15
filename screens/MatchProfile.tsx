@@ -190,7 +190,7 @@ export default function MatchProfile({ match, onBack, onSendMessage }: MatchProf
 
       <View style={styles.footer}>
         <LinearGradient
-          colors={['rgba(245, 239, 230, 0)', 'rgba(245, 239, 230, 0.95)', COLORS.linen]}
+          colors={['rgba(250, 248, 245, 0)', 'rgba(250, 248, 245, 0.95)', COLORS.linen]}
           style={styles.footerFade}
           pointerEvents="none"
         />
@@ -303,9 +303,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 7,
     borderRadius: RADIUS.pill,
-    backgroundColor: 'rgba(212, 168, 67, 0.22)',
+    backgroundColor: 'rgba(212, 175, 55, 0.22)',
     borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.35)',
+    borderColor: 'rgba(212, 175, 55, 0.35)',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,

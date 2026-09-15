@@ -13,10 +13,10 @@ export default function DiscoverBondEdge({ percent }: Props) {
   const mid = clamped >= 60;
 
   const fillColors: [string, string] = high
-    ? [COLORS.gold, '#C49A3A']
+    ? [COLORS.gold, '#B8962E']
     : mid
-      ? [COLORS.sage, '#5E9470']
-      : ['rgba(245, 239, 230, 0.85)', 'rgba(245, 239, 230, 0.45)'];
+      ? [COLORS.sage, '#8A8E96']
+      : ['rgba(250, 248, 245, 0.85)', 'rgba(250, 248, 245, 0.45)'];
 
   return (
     <View style={styles.track} pointerEvents="none">

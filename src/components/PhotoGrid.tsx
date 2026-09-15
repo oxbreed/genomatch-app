@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
   addCell: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(143, 175, 149, 0.25)',
+    backgroundColor: 'rgba(184, 188, 196, 0.25)',
     borderStyle: 'dashed',
     borderColor: 'rgba(13, 40, 24, 0.25)',
   },

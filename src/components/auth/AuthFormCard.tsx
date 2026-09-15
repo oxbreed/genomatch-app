@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.xl,
     padding: 1.5,
     ...SHADOWS.glassElevated,
-    shadowColor: '#D4A843',
+    shadowColor: '#D4AF37',
     shadowOpacity: 0.16,
   },
   glass: {

@@ -51,7 +51,7 @@ export default function GenoRemotePhoto({
     <View style={[styles.wrap, style]}>
       {!loaded ? (
         <LinearGradient
-          colors={[COLORS.forestDeep, COLORS.forest, '#2A5A3E']}
+          colors={[COLORS.forestDeep, COLORS.forest, '#20222A']}
           style={StyleSheet.absoluteFill}
         />
       ) : null}

@@ -10,23 +10,23 @@ export const GENO_VISUAL = {
     opacity: { subtle: 0.14, medium: 0.22, rich: 0.32 },
   },
   chrome: {
-    topRule: [COLORS.gold, 'rgba(61, 122, 82, 0.45)', 'transparent'] as [string, string, string],
+    topRule: [COLORS.gold, 'rgba(200, 16, 46, 0.45)', 'transparent'] as [string, string, string],
     topRuleForest: [COLORS.gold, COLORS.verified, 'transparent'] as [string, string, string],
-    washLinen: ['rgba(212, 168, 67, 0.12)', 'transparent', COLORS.linen] as [string, string, string],
-    washMint: ['rgba(237, 243, 238, 0.92)', 'rgba(212, 168, 67, 0.06)', COLORS.linen] as [
+    washLinen: ['rgba(212, 175, 55, 0.12)', 'transparent', COLORS.linen] as [string, string, string],
+    washMint: ['rgba(240, 241, 243, 0.92)', 'rgba(212, 175, 55, 0.06)', COLORS.linen] as [
       string,
       string,
       string,
     ],
     washDiscover: [
-      'rgba(212, 168, 67, 0.14)',
+      'rgba(212, 175, 55, 0.14)',
       'transparent',
-      'rgba(237, 243, 238, 0.35)',
+      'rgba(240, 241, 243, 0.35)',
     ] as [string, string, string],
     cardBorder: [
-      'rgba(212, 168, 67, 0.5)',
-      'rgba(61, 122, 82, 0.32)',
-      'rgba(212, 168, 67, 0.38)',
+      'rgba(212, 175, 55, 0.5)',
+      'rgba(200, 16, 46, 0.32)',
+      'rgba(212, 175, 55, 0.38)',
     ] as [string, string, string],
   },
   motion: {

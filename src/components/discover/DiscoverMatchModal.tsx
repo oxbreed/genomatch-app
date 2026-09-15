@@ -140,7 +140,7 @@ export default function DiscoverMatchModal({
           ]}
         >
           <LinearGradient
-            colors={['rgba(212, 168, 67, 0.65)', 'rgba(61, 122, 82, 0.42)', 'rgba(212, 168, 67, 0.55)']}
+            colors={['rgba(212, 175, 55, 0.65)', 'rgba(200, 16, 46, 0.42)', 'rgba(212, 175, 55, 0.55)']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.cardBorder}
@@ -301,7 +301,7 @@ const styles = StyleSheet.create({
   kickerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: 'rgba(212, 168, 67, 0.35)',
+    backgroundColor: 'rgba(212, 175, 55, 0.35)',
   },
   kicker: {
     fontFamily: FONT_FAMILY.gothamBold,
@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 16,
     lineHeight: 22,
-    color: 'rgba(245, 239, 230, 0.82)',
+    color: 'rgba(250, 248, 245, 0.82)',
     textAlign: 'center',
     marginBottom: 24,
     paddingHorizontal: 4,
@@ -351,7 +351,7 @@ const styles = StyleSheet.create({
     padding: 3,
     borderRadius: 999,
     borderWidth: 2,
-    borderColor: 'rgba(212, 168, 67, 0.55)',
+    borderColor: 'rgba(212, 175, 55, 0.55)',
     backgroundColor: 'rgba(13, 40, 24, 0.35)',
   },
   verifiedDot: {
@@ -371,9 +371,9 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: 'rgba(212, 168, 67, 0.12)',
+    backgroundColor: 'rgba(212, 175, 55, 0.12)',
     borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.3)',
+    borderColor: 'rgba(212, 175, 55, 0.3)',
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 10,
@@ -392,9 +392,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: RADIUS.pill,
-    backgroundColor: 'rgba(212, 168, 67, 0.12)',
+    backgroundColor: 'rgba(212, 175, 55, 0.12)',
     borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.28)',
+    borderColor: 'rgba(212, 175, 55, 0.28)',
     marginBottom: 20,
     flexWrap: 'wrap',
     justifyContent: 'center',
@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
   compatDivider: {
     width: 1,
     height: 12,
-    backgroundColor: 'rgba(212, 168, 67, 0.35)',
+    backgroundColor: 'rgba(212, 175, 55, 0.35)',
     marginHorizontal: 2,
   },
   compatText: {

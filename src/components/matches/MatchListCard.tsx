@@ -75,7 +75,7 @@ export default function MatchListCard({
             <LinearGradient
               colors={
                 compatHigh
-                  ? ['rgba(212, 168, 67, 0.35)', 'rgba(212, 168, 67, 0.12)']
+                  ? ['rgba(212, 175, 55, 0.35)', 'rgba(212, 175, 55, 0.12)']
                   : ['rgba(255, 255, 255, 0.65)', 'rgba(255, 255, 255, 0.35)']
               }
               style={styles.compatPill}
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: 'rgba(255, 255, 255, 0.55)',
     borderWidth: 1,
-    borderColor: 'rgba(61, 122, 82, 0.14)',
+    borderColor: 'rgba(200, 16, 46, 0.14)',
   },
   genotypeText: {
     fontFamily: FONT_FAMILY.gothamBold,

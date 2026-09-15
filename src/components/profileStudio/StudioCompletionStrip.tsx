@@ -21,7 +21,7 @@ export default function StudioCompletionStrip({
       </View>
       <View style={styles.track}>
         <LinearGradient
-          colors={['rgba(61, 122, 82, 0.35)', COLORS.gold]}
+          colors={['rgba(200, 16, 46, 0.35)', COLORS.gold]}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}
           style={[styles.fill, { width: `${Math.min(100, Math.max(0, percent))}%` }]}
