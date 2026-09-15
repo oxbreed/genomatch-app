@@ -6,7 +6,33 @@ import {
   Montserrat_800ExtraBold,
 } from '@expo-google-fonts/montserrat';
 
-export { COLORS, GLASS, FOREST_DEEP, FOREST, GOLD, GOLD_BRIGHT, GOLD_DEEP, GLOSSY_RED, INK, LINEN, SAGE, MINT, WHITE } from './colors';
+export {
+  COLORS,
+  GLASS,
+  LOGO_RED,
+  LOGO_RED_DEEP,
+  LOGO_RED_HOT,
+  LOGO_GOLD,
+  LOGO_GOLD_BRIGHT,
+  LOGO_GOLD_DEEP,
+  BRAND_BLACK,
+  BRAND_BLACK_SOFT,
+  METALLIC_SILVER,
+  METALLIC_CHROME,
+  CREAM,
+  CREAM_TINT,
+  FOREST_DEEP,
+  FOREST,
+  GOLD,
+  GOLD_BRIGHT,
+  GOLD_DEEP,
+  GLOSSY_RED,
+  INK,
+  LINEN,
+  SAGE,
+  MINT,
+  WHITE,
+} from './colors';
 export { TYPOGRAPHY, FONT_FAMILY, FONT_ROLE, SYSTEM_FONT } from './typography';
 export { RADIUS, SHADOWS } from './shadows';
 export { SCENE } from './sceneLayout';

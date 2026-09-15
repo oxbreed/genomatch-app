@@ -1,60 +1,86 @@
-/** GenoMatch brand palette — forest UI + glossy red/gold mark. */
-export const FOREST_DEEP = '#163522';
-export const FOREST = '#1A3D28';
-export const GOLD = '#D4A843';
-export const GOLD_BRIGHT = '#E8C56A';
-export const GOLD_DEEP = '#C49A3A';
-export const GLOSSY_RED = '#E31C3D';
-export const GLOSSY_RED_DEEP = '#8E1024';
-export const GLOSSY_RED_HOT = '#FF4D6D';
-export const INK = '#0B0B0D';
-export const LINEN = '#F5EFE6';
-export const SAGE = '#8FAF95';
-export const MINT = '#EDF3EE';
+/** GenoMatch brand palette — mirror system: logo red/gold on brand black. */
+
+// Canonical mirror brand colors (FINAL). Source of truth for the app palette.
+export const LOGO_RED = '#C8102E';
+export const LOGO_RED_DEEP = '#8E0B20';
+export const LOGO_RED_HOT = '#E5344E';
+export const LOGO_GOLD = '#D4AF37';
+export const LOGO_GOLD_BRIGHT = '#E5C766';
+export const LOGO_GOLD_DEEP = '#B8962E';
+export const BRAND_BLACK = '#0B0C0E';
+export const BRAND_BLACK_SOFT = '#15171A';
+export const METALLIC_SILVER = '#B8BCC4';
+export const METALLIC_CHROME = '#D4D8E0';
+export const CREAM = '#FAF8F5';
+export const CREAM_TINT = '#F0F1F3';
 export const WHITE = '#FFFFFF';
+
+// Backward-compatible aliases. Names are retained so existing imports keep
+// compiling; every value now points at the mirror palette (no forest colors).
+export const FOREST_DEEP = BRAND_BLACK;
+export const FOREST = BRAND_BLACK_SOFT;
+export const GOLD = LOGO_GOLD;
+export const GOLD_BRIGHT = LOGO_GOLD_BRIGHT;
+export const GOLD_DEEP = LOGO_GOLD_DEEP;
+export const GLOSSY_RED = LOGO_RED;
+export const GLOSSY_RED_DEEP = LOGO_RED_DEEP;
+export const GLOSSY_RED_HOT = LOGO_RED_HOT;
+export const INK = BRAND_BLACK;
+export const LINEN = CREAM;
+export const SAGE = METALLIC_SILVER;
+export const MINT = CREAM_TINT;
 
 /** Semantic color tokens — use these in UI code */
 export const COLORS = {
-  forestDeep: FOREST_DEEP,
-  forest: FOREST,
-  gold: GOLD,
-  goldBright: GOLD_BRIGHT,
-  goldDeep: GOLD_DEEP,
-  glossyRed: GLOSSY_RED,
-  glossyRedDeep: GLOSSY_RED_DEEP,
-  glossyRedHot: GLOSSY_RED_HOT,
-  ink: INK,
-  linen: LINEN,
-  sage: SAGE,
-  mint: MINT,
+  // Brand
+  logoRed: LOGO_RED,
+  logoGold: LOGO_GOLD,
+  brandBlack: BRAND_BLACK,
+  metallicSilver: METALLIC_SILVER,
+  metallicChrome: METALLIC_CHROME,
+  cream: CREAM,
+
+  // Legacy keys retained for compatibility (mapped to mirror palette)
+  forestDeep: BRAND_BLACK,
+  forest: BRAND_BLACK_SOFT,
+  gold: LOGO_GOLD,
+  goldBright: LOGO_GOLD_BRIGHT,
+  goldDeep: LOGO_GOLD_DEEP,
+  glossyRed: LOGO_RED,
+  glossyRedDeep: LOGO_RED_DEEP,
+  glossyRedHot: LOGO_RED_HOT,
+  ink: BRAND_BLACK,
+  linen: CREAM,
+  sage: METALLIC_SILVER,
+  mint: CREAM_TINT,
   white: WHITE,
 
-  /** @deprecated Use linen — kept for gradual migration */
-  ivory: LINEN,
+  /** @deprecated Use cream — kept for gradual migration */
+  ivory: CREAM,
 
-  background: LINEN,
+  background: CREAM,
   surface: WHITE,
-  tabBar: FOREST_DEEP,
-  splash: INK,
-  hero: FOREST,
+  tabBar: BRAND_BLACK,
+  splash: BRAND_BLACK,
+  hero: BRAND_BLACK_SOFT,
 
-  text: FOREST_DEEP,
-  textOnDark: LINEN,
-  textOnForest: LINEN,
-  textMuted: SAGE,
-  textSubtle: 'rgba(22, 53, 34, 0.45)',
+  text: BRAND_BLACK,
+  textOnDark: CREAM,
+  textOnForest: CREAM,
+  textMuted: 'rgba(11, 12, 14, 0.55)',
+  textSubtle: 'rgba(11, 12, 14, 0.45)',
 
-  border: 'rgba(22, 53, 34, 0.08)',
-  borderLight: 'rgba(143, 175, 149, 0.4)',
-  borderOnDark: 'rgba(245, 239, 230, 0.12)',
+  border: 'rgba(11, 12, 14, 0.08)',
+  borderLight: 'rgba(184, 188, 196, 0.4)',
+  borderOnDark: 'rgba(250, 248, 245, 0.12)',
 
-  chip: MINT,
-  chipFill: 'rgba(237, 243, 238, 0.85)',
-  cta: GOLD,
-  overlay: 'rgba(22, 53, 34, 0.72)',
-  overlayLight: 'rgba(22, 53, 34, 0.45)',
+  chip: CREAM_TINT,
+  chipFill: 'rgba(240, 241, 243, 0.85)',
+  cta: LOGO_GOLD,
+  overlay: 'rgba(11, 12, 14, 0.72)',
+  overlayLight: 'rgba(11, 12, 14, 0.45)',
 
-  verified: '#3D7A52',
+  verified: LOGO_GOLD,
   error: '#A32D2D',
   errorBg: '#FFEBEE',
 } as const;
@@ -69,29 +95,29 @@ export const GLASS = {
     string,
   ],
 
-  linenTint: 'rgba(245, 239, 230, 0.48)',
-  linenBorder: 'rgba(212, 168, 67, 0.42)',
-  linenSheen: ['rgba(255, 255, 255, 0.72)', 'rgba(212, 168, 67, 0.14)', 'transparent'] as [
+  linenTint: 'rgba(250, 248, 245, 0.48)',
+  linenBorder: 'rgba(212, 175, 55, 0.42)',
+  linenSheen: ['rgba(255, 255, 255, 0.72)', 'rgba(212, 175, 55, 0.14)', 'transparent'] as [
     string,
     string,
     string,
   ],
 
-  darkTint: 'rgba(22, 53, 34, 0.44)',
-  darkBorder: 'rgba(245, 239, 230, 0.22)',
-  darkSheen: ['rgba(212, 168, 67, 0.38)', 'rgba(255, 255, 255, 0.12)', 'transparent'] as [
+  darkTint: 'rgba(11, 12, 14, 0.44)',
+  darkBorder: 'rgba(250, 248, 245, 0.22)',
+  darkSheen: ['rgba(212, 175, 55, 0.38)', 'rgba(255, 255, 255, 0.12)', 'transparent'] as [
     string,
     string,
     string,
   ],
 
-  sheetTint: 'rgba(245, 239, 230, 0.58)',
-  sheetBorder: 'rgba(212, 168, 67, 0.48)',
+  sheetTint: 'rgba(250, 248, 245, 0.58)',
+  sheetBorder: 'rgba(212, 175, 55, 0.48)',
 
-  backdropDark: 'rgba(22, 53, 34, 0.28)',
-  backdropLight: 'rgba(245, 239, 230, 0.18)',
+  backdropDark: 'rgba(11, 12, 14, 0.28)',
+  backdropLight: 'rgba(250, 248, 245, 0.18)',
 
-  topRule: ['transparent', 'rgba(212, 168, 67, 0.85)', 'transparent'] as [string, string, string],
+  topRule: ['transparent', 'rgba(212, 175, 55, 0.85)', 'transparent'] as [string, string, string],
   edgeHighlight: 'rgba(255, 255, 255, 0.62)',
   rimHighlight: ['rgba(255, 255, 255, 0.55)', 'rgba(255, 255, 255, 0.08)', 'transparent'] as [
     string,
@@ -107,11 +133,11 @@ export const GLASS = {
     string,
     string,
   ],
-  tabBarIndicator: 'rgba(212, 168, 67, 0.18)',
+  tabBarIndicator: 'rgba(212, 175, 55, 0.18)',
 
   /** Flat controls that mimic glass without blur (chips, legacy inputs) */
   insetFill: 'rgba(255, 255, 255, 0.58)',
   insetBorder: 'rgba(255, 255, 255, 0.72)',
-  insetActiveFill: 'rgba(212, 168, 67, 0.2)',
-  insetActiveBorder: 'rgba(212, 168, 67, 0.55)',
+  insetActiveFill: 'rgba(212, 175, 55, 0.2)',
+  insetActiveBorder: 'rgba(212, 175, 55, 0.55)',
 } as const;
