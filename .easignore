@@ -1,0 +1,16 @@
+# Pipeline-only media — not required() by the JS bundle
+assets/onboarding-ribbon-logo.mp4
+assets/onboarding-ribbon-logo-color.mp4
+assets/onboarding-ribbon-logo-cream.mp4
+assets/onboarding-ribbon-logo-dark.mp4
+assets/onboarding-ribbon-logo-mask.mp4
+assets/onboarding-ribbon-logo.gif
+
+# Marketing site is deployed separately
+website/
+
+# Local tooling
+scripts/__pycache__/
+**/*.pyc
+security-reports/
+.tools/

@@ -175,7 +175,8 @@ export default function DiscoverSwipeCard({
             ]}
           />
           <Text style={styles.compatText} numberOfLines={2}>
-            {profile.compatibility}% · {riskShort}
+            {profile.compatibility > 0 ? `${profile.compatibility}% · ` : ''}
+            {riskShort}
           </Text>
         </View>
       </Pressable>
@@ -215,7 +216,7 @@ export default function DiscoverSwipeCard({
         </>
       ) : null}
 
-      <DiscoverMatchPill percent={profile.compatibility} />
+      {profile.compatibility > 0 ? <DiscoverMatchPill percent={profile.compatibility} /> : null}
     </View>
   );
 }

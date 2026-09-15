@@ -177,9 +177,12 @@ export default function MatchProfile({ match, onBack, onSendMessage }: MatchProf
           <DiscoverPremiumSection title="Compatibility score" accent serif>
             <View style={styles.harmonyBody}>
               <GenoBondMark size={20} opacity={0.85} />
-              <GenoCompatRing percent={profile.compatibility} size={100} glow />
+              {profile.compatibility > 0 ? (
+                <GenoCompatRing percent={profile.compatibility} size={100} glow />
+              ) : null}
               <Text style={styles.harmonyLine}>
-                {profile.compatibility}% compatible · {riskShort}
+                {profile.compatibility > 0 ? `${profile.compatibility}% compatible · ` : ''}
+                {riskShort}
               </Text>
               <Text style={styles.harmonyDisclaimer}>
                 Educational information only. Not medical advice.

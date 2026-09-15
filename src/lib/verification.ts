@@ -39,8 +39,8 @@ const REASON_MESSAGES: Record<Exclude<VerificationBlockReason, 'already_verified
   missing_genotype: 'Set your genotype before verifying.',
   missing_city: 'Set your city before verifying — it will be locked after verification.',
   identity_pending:
-    'Your selfie is under review. You can confirm your genotype once identity verification is approved.',
-  identity_required: 'Submit a live selfie for identity verification before confirming your genotype.',
+    'Your selfie is under review. You can confirm your genotype once photo verification is approved.',
+  identity_required: 'Submit a live selfie for photo verification before confirming your genotype.',
 };
 
 /** Checks whether a member can complete genotype self-verification. */
@@ -61,7 +61,7 @@ export function getVerificationEligibility(
     return {
       ok: false,
       reason: 'already_verified',
-      message: 'Your profile is already verified.',
+      message: 'Your genotype is already confirmed.',
     };
   }
 

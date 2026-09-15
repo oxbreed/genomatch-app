@@ -68,12 +68,14 @@ export default function MatchListCard({
               isNewMember={profile.isNewMember}
               compact
             />
-            <GenoInboxMirrorPill
-              label={`${profile.compatibility}%`}
-              kind={compatHigh ? 'gold' : 'steel'}
-              style={styles.compatPill}
-              textStyle={compatHigh ? styles.pctHigh : styles.pct}
-            />
+            {profile.compatibility > 0 ? (
+              <GenoInboxMirrorPill
+                label={`${profile.compatibility}%`}
+                kind={compatHigh ? 'gold' : 'steel'}
+                style={styles.compatPill}
+                textStyle={compatHigh ? styles.pctHigh : styles.pct}
+              />
+            ) : null}
           </View>
           <Text style={styles.summary} numberOfLines={1}>
             {riskShort}

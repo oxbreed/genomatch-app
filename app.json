@@ -8,16 +8,8 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
-    "description": "GenoMatch is the world's first genotype-aware dating app. Find compatible partners based on AA, AS, SS, AC genotype matching.",
+    "description": "GenoMatch is a genotype-aware dating app. Members share their self-reported sickle cell genotype (AA, AS, SS, AC) so compatibility is part of the conversation from the start. Educational information only, not medical advice.",
     "primaryColor": "#0B0C0E",
-    "fonts": [
-      "./assets/fonts/ClashDisplay-Semibold.otf",
-      "./assets/fonts/ClashDisplay-Medium.otf",
-      "./assets/fonts/ClashDisplay-Regular.otf",
-      "./assets/fonts/Satoshi-Regular.otf",
-      "./assets/fonts/Satoshi-Medium.otf",
-      "./assets/fonts/Satoshi-Bold.otf"
-    ],
     "splash": {
       "image": "./assets/genomatch-ribbon-logo.png",
       "resizeMode": "contain",
@@ -35,9 +27,13 @@
       "supportsTablet": false,
       "bundleIdentifier": "ng.genomatch.app",
       "buildNumber": "1",
+      "associatedDomains": [
+        "applinks:genomatch.app",
+        "applinks:www.genomatch.app"
+      ],
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "NSCameraUsageDescription": "GenoMatch uses your camera to verify your identity with a live selfie.",
+        "NSCameraUsageDescription": "GenoMatch uses your camera to take a live selfie so your profile photo can be marked as photo-verified.",
         "NSPhotoLibraryUsageDescription": "GenoMatch needs access to your photos so you can upload a profile picture.",
         "NSLocationWhenInUseUsageDescription": "GenoMatch uses your location to set your city on your profile and improve nearby matching.",
         "UIBackgroundModes": [
@@ -49,7 +45,7 @@
       "package": "ng.genomatch.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#0B0C0E"
+        "backgroundColor": "#FFFFFF"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
@@ -97,16 +93,20 @@
         "expo-font",
         {
           "fonts": [
-            "./assets/fonts/ClashDisplay-Semibold.otf",
-            "./assets/fonts/ClashDisplay-Medium.otf",
-            "./assets/fonts/ClashDisplay-Regular.otf",
             "./assets/fonts/Satoshi-Regular.otf",
             "./assets/fonts/Satoshi-Medium.otf",
             "./assets/fonts/Satoshi-Bold.otf"
           ]
         }
       ],
-      "expo-camera",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "GenoMatch uses your camera to take a live selfie for profile photo verification.",
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
+      ],
       "expo-video"
     ]
   }

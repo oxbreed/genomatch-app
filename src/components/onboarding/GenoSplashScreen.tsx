@@ -1,70 +1,96 @@
 import { useEffect, useRef } from 'react';
-import { ActivityIndicator, Animated, Easing, Image, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Animated, StyleSheet, View } from 'react-native';
+import { Image } from 'expo-image';
 import { BRAND_BLACK, LOGO_GOLD, MOTION } from '../../theme';
 import {
   ONBOARDING_LOGO_HEIGHT,
   ONBOARDING_LOGO_WIDTH,
 } from './onboardingLayout';
-import GenoPremiumOnboardingBackdrop from './GenoPremiumOnboardingBackdrop';
+import { RIBBON_POSTER } from '../../brand/ribbonPoster';
 
-/** Splash poster only — do not import ribbonLogo.ts (pulls animated GIF into cold start) */
-const SPLASH_LOGO = require('../../../assets/genomatch-ribbon-logo.png');
-
-const MIN_DISPLAY_MS = 1100;
-const HARD_CAP_MS = 2800;
-const FADE_OUT_MS = 220;
+const MIN_DISPLAY_MS = 1200;
+const ABSOLUTE_CAP_MS = 12000;
+const FADE_OUT_MS = 240;
 
 type Props = {
+  /** Keep the splash up (with spinner) until fonts/session are ready. */
+  hold?: boolean;
   bootstrapping?: boolean;
   onFinish: () => void;
 };
 
-/** Cold open — static logo, quick fade handoff */
-export default function GenoSplashScreen({ bootstrapping, onFinish }: Props) {
+/** Cold open — crisp transparent ribbon (expo-image for sharper decode) */
+export default function GenoSplashScreen({ hold = false, bootstrapping, onFinish }: Props) {
   const finished = useRef(false);
+  const pendingExit = useRef(false);
+  const beginExitRef = useRef<() => void>(() => {});
+  const holdRef = useRef(hold);
   const onFinishRef = useRef(onFinish);
   const opacity = useRef(new Animated.Value(1)).current;
+  const scale = useRef(new Animated.Value(0.985)).current;
+
+  holdRef.current = hold;
 
   useEffect(() => {
     onFinishRef.current = onFinish;
   }, [onFinish]);
 
   useEffect(() => {
-    const done = () => {
+    Animated.spring(scale, {
+      toValue: 1,
+      friction: 9,
+      tension: 80,
+      useNativeDriver: true,
+    }).start();
+  }, [scale]);
+
+  useEffect(() => {
+    const beginExit = (force = false) => {
       if (finished.current) return;
+      if (!force && holdRef.current) {
+        pendingExit.current = true;
+        return;
+      }
       finished.current = true;
+      pendingExit.current = false;
       Animated.timing(opacity, {
         toValue: 0,
         duration: FADE_OUT_MS,
         easing: MOTION.easing.out,
         useNativeDriver: true,
-      }).start(({ finished: animDone }) => {
-        if (animDone) onFinishRef.current();
+      }).start(() => {
+        onFinishRef.current();
       });
     };
 
-    const minTimer = setTimeout(done, MIN_DISPLAY_MS);
-    const capTimer = setTimeout(done, HARD_CAP_MS);
+    beginExitRef.current = () => beginExit(false);
+    const minTimer = setTimeout(() => beginExit(false), MIN_DISPLAY_MS);
+    const capTimer = setTimeout(() => beginExit(true), ABSOLUTE_CAP_MS);
     return () => {
       clearTimeout(minTimer);
       clearTimeout(capTimer);
     };
   }, [opacity]);
 
+  useEffect(() => {
+    if (!hold && pendingExit.current) {
+      beginExitRef.current();
+    }
+  }, [hold]);
+
   return (
     <View style={styles.root}>
-      <GenoPremiumOnboardingBackdrop />
-
-      <Animated.View style={[styles.layer, { opacity }]}>
+      <Animated.View style={[styles.layer, { opacity, transform: [{ scale }] }]}>
         <Image
-          source={SPLASH_LOGO}
+          source={RIBBON_POSTER}
           style={{
             width: ONBOARDING_LOGO_WIDTH,
             height: ONBOARDING_LOGO_HEIGHT,
           }}
-          resizeMode="contain"
+          contentFit="contain"
+          transition={0}
+          cachePolicy="none"
           accessibilityLabel="GenoMatch logo"
-          accessibilityIgnoresInvertColors
         />
 
         {bootstrapping ? (

@@ -237,12 +237,16 @@ export default function DiscoverMatchModal({
                   <GenoMirrorRimFrame kind="steel" borderRadius={RADIUS.pill} style={styles.compatRim}>
                     <GenoMirrorSteelFill style={styles.compatPill}>
                       <GenoMirrorMetallicIcon name="sparkles" size={14} tone="gold" />
-                      <Text style={styles.compatText}>{profile.compatibility}% compatible</Text>
+                      <Text style={styles.compatText}>
+                        {profile.compatibility > 0
+                          ? `${profile.compatibility}% compatible`
+                          : 'Add your genotype to see compatibility'}
+                      </Text>
                       {profile.genotypeVerified ? (
                         <>
                           <View style={styles.compatDivider} />
                           <GenoMirrorMetallicIcon name="shield-checkmark" size={13} tone="chrome" />
-                          <Text style={styles.verifiedText}>Verified</Text>
+                          <Text style={styles.verifiedText}>Self-declared</Text>
                         </>
                       ) : null}
                     </GenoMirrorSteelFill>

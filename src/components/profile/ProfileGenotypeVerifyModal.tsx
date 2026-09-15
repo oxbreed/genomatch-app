@@ -59,11 +59,10 @@ export default function ProfileGenotypeVerifyModal({
           <View style={styles.iconWrap}>
             <GenoBondMark size={40} />
           </View>
-          <Text style={styles.title}>Verify your identity</Text>
+          <Text style={styles.title}>Confirm your genotype</Text>
           <Text style={styles.body}>
             Confirm that <Text style={styles.bold}>{genotype}</Text> is accurate and that your
-            profile represents you honestly. Verified members build stronger trust on Genomatch
-            Ltd Nigeria.
+            profile represents you honestly. This is a self-declaration, not a laboratory result.
           </Text>
 
           <View style={styles.checklist}>

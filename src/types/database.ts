@@ -1,6 +1,13 @@
 import type { DistanceBand } from '../lib/distanceBands';
 
-export type Genotype = 'AA' | 'AS' | 'SS' | 'AC';
+/**
+ * Supported haemoglobin genotypes. Mirrors public.genotype_type in Postgres —
+ * change both together.
+ *
+ * SC is HbSC disease, a sickle cell disorder in its own right, not a carrier
+ * state. It is common in West Africa and must stay selectable.
+ */
+export type Genotype = 'AA' | 'AS' | 'SS' | 'AC' | 'SC';
 
 export type PresenceState = 'online' | 'recently_online' | 'offline';
 

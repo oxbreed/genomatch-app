@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState, type ComponentType, type ReactNode } from 'react';
-import { Animated, Linking, StyleSheet, Text, View, ActivityIndicator } from 'react-native';
+import { Linking, StyleSheet, Text, View, ActivityIndicator } from 'react-native';
 import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
-import { FONTS_TO_LOAD, MOTION } from './src/theme';
+import { FONTS_TO_LOAD } from './src/theme';
 import GenoSplashScreen from './src/components/onboarding/GenoSplashScreen';
 import GenoErrorBoundary from './src/components/shell/GenoErrorBoundary';
 import { getAuthenticatedUserId, logAuthState } from './src/lib/auth';
@@ -160,12 +160,12 @@ export default function App() {
   const screenRef = useRef(screen);
   const splashDoneRef = useRef(false);
   const pendingScreenRef = useRef<AppScreen | null>(null);
-  const deferredAuthRouteRef = useRef<AppScreen | null>(null);
   const [OnboardingFlow, setOnboardingFlow] = useState<ComponentType<{
     onFinish: () => void;
     onSignIn?: () => void;
   }> | null>(null);
-  const onboardingOpacity = useRef(new Animated.Value(0)).current;
+  const [onboardingError, setOnboardingError] = useState<string | null>(null);
+  const [routesResolved, setRoutesResolved] = useState(false);
 
   const fontsReady = fontsLoaded || !!fontError;
   const appReady = fontsReady && !bootstrapping;
@@ -179,16 +179,75 @@ export default function App() {
   }, [splashDone]);
 
   useEffect(() => {
-    if (OnboardingFlow) return;
-    void import('./src/components/onboarding/GenoOnboardingFlow')
-      .then((mod) => {
-        bootLog('onboarding module preloaded');
-        setOnboardingFlow(() => mod.default);
-      })
-      .catch((err) => {
-        console.error('[App] onboarding preload failed', err);
-      });
-  }, [OnboardingFlow]);
+    if (!splashDone || screen !== 'onboarding' || OnboardingFlow) return;
+
+    let cancelled = false;
+    bootLog('loading onboarding (post-splash)');
+
+    const timer = setTimeout(() => {
+      void import('./src/components/onboarding/GenoOnboardingFlow')
+        .then((mod) => {
+          if (cancelled) return;
+          bootLog('onboarding module ready');
+          setOnboardingFlow(() => mod.default);
+        })
+        .catch((err) => {
+          const message = err instanceof Error ? err.message : String(err);
+          console.error('[App] onboarding import failed', err);
+          if (!cancelled) setOnboardingError(message);
+        });
+    }, 320);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [OnboardingFlow, screen, splashDone]);
+
+  useEffect(() => {
+    if (!splashDone || routesResolved) return;
+
+    let mounted = true;
+    bootLog('resolving routes (post-splash)');
+
+    (async () => {
+      try {
+        const { resolveInitialScreen } = await import('./src/lib/profiles');
+        const initial = await resolveInitialScreen();
+        bootLog('resolved initial screen', { initial });
+
+        if (!mounted) return;
+
+        // Never clobber a password-reset deep link.
+        if (
+          screenRef.current === 'resetPassword' ||
+          pendingScreenRef.current === 'resetPassword'
+        ) {
+          return;
+        }
+
+        if (initial === 'onboarding') {
+          pendingScreenRef.current = null;
+        } else {
+          pendingScreenRef.current = initial;
+          if (FORCE_ONBOARDING_AFTER_SPLASH) {
+            // Signed-in MainTabs OOMs in Expo Go — stay on onboarding in __DEV__.
+          } else if (screenRef.current === 'onboarding') {
+            pendingScreenRef.current = null;
+            setScreen(initial);
+          }
+        }
+      } catch (err) {
+        console.error('[App] route resolution failed', err);
+      } finally {
+        if (mounted) setRoutesResolved(true);
+      }
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, [routesResolved, splashDone]);
 
   useEffect(() => {
     if (fontError) {
@@ -246,19 +305,8 @@ export default function App() {
 
         await logAuthState('App.startup');
 
-        const { resolveInitialScreen } = await import('./src/lib/profiles');
-        const initial = await resolveInitialScreen();
-        bootLog('resolved initial screen (applied after splash)', { initial });
-
-        if (mounted) {
-          if (initial === 'onboarding') {
-            pendingScreenRef.current = null;
-          } else {
-            pendingScreenRef.current = initial;
-            if (FORCE_ONBOARDING_AFTER_SPLASH) {
-              deferredAuthRouteRef.current = initial;
-            }
-          }
+        if (mounted && pendingScreenRef.current !== 'resetPassword') {
+          pendingScreenRef.current = null;
         }
 
         void syncPushTokenToProfile().catch((err) => {
@@ -310,35 +358,23 @@ export default function App() {
 
   const finishSplash = useCallback(() => {
     const pending = pendingScreenRef.current;
-    const nextScreen =
-      FORCE_ONBOARDING_AFTER_SPLASH || !pending ? 'onboarding' : pending;
+    const honorPending =
+      pending === 'resetPassword' || (!FORCE_ONBOARDING_AFTER_SPLASH && !!pending);
     bootLog('splash finished', {
-      nextScreen,
+      nextScreen: honorPending && pending ? pending : 'onboarding',
       pending,
       forceOnboarding: FORCE_ONBOARDING_AFTER_SPLASH,
-      deferredAuthRoute: deferredAuthRouteRef.current,
       fontsReady,
       bootstrapping,
     });
 
     setSplashDone(true);
 
-    if (!FORCE_ONBOARDING_AFTER_SPLASH && pending) {
+    if (honorPending && pending) {
       pendingScreenRef.current = null;
       setScreen(pending);
     }
   }, [bootstrapping, fontsReady]);
-
-  useEffect(() => {
-    if (!splashDone || !OnboardingFlow) return;
-    onboardingOpacity.setValue(0);
-    Animated.timing(onboardingOpacity, {
-      toValue: 1,
-      duration: 260,
-      easing: MOTION.easing.out,
-      useNativeDriver: true,
-    }).start();
-  }, [OnboardingFlow, onboardingOpacity, splashDone]);
 
   useEffect(() => {
     bootLog('route', { splashDone, screen, bootstrapping, fontsReady });
@@ -348,7 +384,7 @@ export default function App() {
     return (
       <View style={styles.boot}>
         <StatusBar style="light" />
-        <GenoSplashScreen bootstrapping={!appReady} onFinish={finishSplash} />
+        <GenoSplashScreen hold={!appReady} bootstrapping={!appReady} onFinish={finishSplash} />
       </View>
     );
   }
@@ -356,25 +392,23 @@ export default function App() {
   if (screen === 'onboarding') {
     return (
       <GenoErrorBoundary onReset={() => setScreen('onboarding')}>
-        <View style={styles.boot}>
+        <View style={styles.onboardingShell}>
           <StatusBar style="light" />
-          {OnboardingFlow ? (
-            <Animated.View style={[styles.onboardingEnter, { opacity: onboardingOpacity }]}>
-              <OnboardingFlow
-                onFinish={() => setScreen('register')}
-                onSignIn={() => {
-                  const deferred = deferredAuthRouteRef.current;
-                  if (deferred && deferred !== 'onboarding') {
-                    deferredAuthRouteRef.current = null;
-                    setScreen(deferred);
-                  } else {
-                    setScreen('signIn');
-                  }
-                }}
-              />
-            </Animated.View>
+          {onboardingError ? (
+            <View style={styles.boot}>
+              <Text style={styles.bootError}>Could not open onboarding</Text>
+              <Text style={styles.bootLabel}>{onboardingError}</Text>
+            </View>
+          ) : OnboardingFlow ? (
+            <OnboardingFlow
+              onFinish={() => setScreen('register')}
+              onSignIn={() => setScreen('signIn')}
+            />
           ) : (
-            <ActivityIndicator size="small" color="#D4A843" />
+            <View style={styles.onboardingLoading}>
+              <ActivityIndicator size="small" color="#D4A843" />
+              <Text style={styles.bootLabel}>Opening onboarding…</Text>
+            </View>
           )}
         </View>
       </GenoErrorBoundary>
@@ -413,8 +447,16 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     textAlign: 'center',
   },
-  onboardingEnter: {
+  onboardingShell: {
     flex: 1,
     width: '100%',
+    backgroundColor: '#0B0C0E',
+  },
+  onboardingLoading: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+    backgroundColor: '#0B0C0E',
   },
 });

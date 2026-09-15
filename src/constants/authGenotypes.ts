@@ -30,4 +30,10 @@ export const AUTH_GENOTYPE_OPTIONS: GenotypeOption[] = [
     name: 'AC — hemoglobin C carrier',
     accent: BRAND_RED_SOFT,
   },
+  {
+    id: 'SC',
+    icon: 'medical' as IonName,
+    name: 'SC — sickle cell disease (HbSC)',
+    accent: COLORS.error,
+  },
 ];

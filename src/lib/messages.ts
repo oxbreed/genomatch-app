@@ -7,6 +7,7 @@ import type {
 import { getOpenChatMatchId } from './activeChat';
 import { peekUserId, logSupabaseResult } from './auth';
 import { publishLiveMessage, publishLiveMessageUpdated } from './chatLive';
+import { assertModerationAllowed } from './contentModeration';
 import { mapProfileRow } from './profileMapper';
 import { getBlockedUserIds } from './moderation';
 import { fetchPublicProfilesByIds, getCurrentUserId } from './profiles';
@@ -276,12 +277,19 @@ export async function sendMessage(
   const sanitized = validateMessage(body);
   if (!sanitized) throw new Error('Message cannot be empty');
 
+  // Screen before storing. Throws with a member-facing reason for hard blocks;
+  // returns a flagged verdict for content that sends but needs review.
+  // The database enforces the same rules, since this check is client-side and
+  // therefore advisory.
+  const verdict = assertModerationAllowed(sanitized, 'message');
+
   const { data, error } = await supabase
     .from('messages')
     .insert({
       match_id: matchId,
       sender_id: userId,
       body: sanitized,
+      moderation_category: verdict.flagged ? verdict.category : null,
     })
     .select('id, match_id, sender_id, body, created_at, read_at')
     .single();

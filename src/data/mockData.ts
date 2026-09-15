@@ -18,9 +18,10 @@ export const GENOTYPE_STYLES: Record<
   AS: { ...GENOTYPE_BADGE_STYLE },
   SS: { ...GENOTYPE_BADGE_STYLE },
   AC: { ...GENOTYPE_BADGE_STYLE },
+  SC: { ...GENOTYPE_BADGE_STYLE },
 };
 
-export type Genotype = 'AA' | 'AS' | 'SS' | 'AC';
+export type Genotype = 'AA' | 'AS' | 'SS' | 'AC' | 'SC';
 
 export type MockProfile = {
   id: string;

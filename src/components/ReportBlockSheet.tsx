@@ -71,7 +71,7 @@ export default function ReportBlockSheet({
     setError('');
     try {
       await reportUser(targetUserId, reason);
-      setSuccessMessage('Report submitted. We will review within 24 hours.');
+      setSuccessMessage('Report submitted. Our team reviews every report. You can also block this person now.');
       setStep('success');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not submit report');

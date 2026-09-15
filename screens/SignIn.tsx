@@ -5,7 +5,6 @@ import {
   Animated,
   Easing,
   KeyboardAvoidingView,
-  Linking,
   Platform,
   Pressable,
   ScrollView,
@@ -17,6 +16,8 @@ import {
 import { StatusBar } from 'expo-status-bar';
 import { GenoLogoCeremony, GenoMirrorBrandCtaFill, GenoMirrorGoldFill, GenoMirrorMetallicIcon, GenoMirrorRimFrame, GenoMirrorSteelFill, GenoGlassSurface, GenoPremiumChrome } from '../src/brand/graphics';
 import { AuthFormCard } from '../src/components/auth';
+import PrivacyPolicy from './PrivacyPolicy';
+import TermsOfService from './TermsOfService';
 import {COLORS, FONT_FAMILY, GLASS, LOGO_GOLD, RADIUS, chromeAlpha, goldAlpha} from '../src/theme';
 import { resolvePostSignInScreen } from '../src/lib/profiles';
 import { sendPasswordResetEmail } from '../src/lib/resetPassword';
@@ -42,6 +43,7 @@ export default function SignIn({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [focusedField, setFocusedField] = useState<'email' | 'password' | null>(null);
+  const [legalDoc, setLegalDoc] = useState<'privacy' | 'terms' | null>(null);
 
   const introOpacity = useRef(new Animated.Value(0)).current;
   const introTranslateY = useRef(new Animated.Value(18)).current;
@@ -150,6 +152,13 @@ export default function SignIn({
       [{ text: 'OK', onPress: () => onNavigateResetPassword(trimmedEmail) }]
     );
   };
+
+  if (legalDoc === 'privacy') {
+    return <PrivacyPolicy onBack={() => setLegalDoc(null)} />;
+  }
+  if (legalDoc === 'terms') {
+    return <TermsOfService onBack={() => setLegalDoc(null)} />;
+  }
 
   return (
     <KeyboardAvoidingView
@@ -322,14 +331,14 @@ export default function SignIn({
                 By continuing you agree to our{' '}
                 <Text
                   style={styles.legalLink}
-                  onPress={() => void Linking.openURL('https://genomatch.app/terms')}
+                  onPress={() => setLegalDoc('terms')}
                 >
                   Terms of Service
                 </Text>
                 {' '}and{' '}
                 <Text
                   style={styles.legalLink}
-                  onPress={() => void Linking.openURL('https://genomatch.app/privacy')}
+                  onPress={() => setLegalDoc('privacy')}
                 >
                   Privacy Policy
                 </Text>

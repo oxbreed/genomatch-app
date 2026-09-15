@@ -1,6 +1,7 @@
 import type { PostgrestError } from '@supabase/supabase-js';
 import { getSeenProfileIds } from './likes';
 import { getBlockedUserIds } from './moderation';
+import { assertModerationAllowed } from './contentModeration';
 import type { DiscoveryInterest } from './discoveryInterest';
 import { orderDiscoveryInterests } from './discoveryInterest';
 import { parseDistanceBand } from './distanceBands';
@@ -214,7 +215,7 @@ export async function ensureUserProfile(): Promise<ProfileRow | null> {
     id: user.id,
     email: user.email ?? null,
     genotype:
-      metaGenotype && ['AA', 'AS', 'SS', 'AC'].includes(metaGenotype)
+      metaGenotype && ['AA', 'AS', 'SS', 'AC', 'SC'].includes(metaGenotype)
         ? metaGenotype
         : null,
   };
@@ -388,6 +389,10 @@ export async function fetchDiscoveryProfiles(): Promise<{
   }
 
   const profiles = rows
+    // A profile with no genotype on file must never reach the deck: mapProfileRow
+    // would otherwise render it as AA, which states a health fact about a member
+    // that they never gave us.
+    .filter(({ row }) => row.genotype != null)
     .filter(({ row }) => !seenSet.has(row.id) && !blockedSet.has(row.id))
     .map(({ row, distanceBand }) =>
       mapProfileRow(row, viewerGenotype, { distanceBand })
@@ -464,6 +469,13 @@ export async function updateProfileFields(
   }
   if (payload.bio != null) {
     payload.bio = sanitizeText(payload.bio);
+  }
+
+  // Profiles are public surfaces, so they are screened harder than chat:
+  // contact details and payment handles are blocked outright here.
+  for (const field of ['display_name', 'bio'] as const) {
+    const value = payload[field];
+    if (typeof value === 'string' && value) assertModerationAllowed(value, 'profile');
   }
 
   const { error } = await supabase.from('profiles').update(payload).eq('id', userId);

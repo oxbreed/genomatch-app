@@ -21,7 +21,7 @@ export async function submitIdentitySelfie(imageUri: string): Promise<{ status: 
 
   if (error) {
     if (isMissingRpcError(error)) {
-      throw new Error('Identity verification is not available yet. Please try again after the app updates.');
+      throw new Error('Photo verification is not available yet. Please try again after the app updates.');
     }
     throw error;
   }

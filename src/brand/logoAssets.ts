@@ -1,6 +1,5 @@
 import {
   GENOMATCH_RIBBON_POSTER,
-  GENOMATCH_RIBBON_ANIMATED,
   ONBOARDING_CREAM,
   GENOMATCH_RIBBON_ASPECT,
   GENOMATCH_RIBBON_EXPORT_SCALE,
@@ -20,9 +19,6 @@ export {
 
 /** @deprecated Use GENOMATCH_RIBBON_POSTER */
 export const GENOMATCH_RIBBON_LOGO = GENOMATCH_RIBBON_POSTER;
-
-/** @deprecated Use GENOMATCH_RIBBON_ANIMATED */
-export const GENOMATCH_RIBBON_LOGO_VIDEO = GENOMATCH_RIBBON_ANIMATED;
 
 /** Official GenoMatch 3D logo raster assets */
 export const GENOMATCH_LOGO_LIGHT = require('../../assets/genomatch-logo-light.png');

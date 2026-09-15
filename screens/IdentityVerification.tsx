@@ -15,6 +15,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { GenoPremiumChrome } from '../src/brand/graphics';
 import { submitIdentitySelfie } from '../src/lib/identityVerification';
+import { assertPhotoAllowed } from '../src/lib/photoModeration';
 import {COLORS, GLASS, RADIUS, SHADOWS, MIRROR_RED_TEXT} from '../src/theme';
 import { GenoMirrorRedFill } from '../src/brand/graphics';
 
@@ -82,6 +83,7 @@ export default function IdentityVerification({
     setSubmitting(true);
     setError('');
     try {
+      await assertPhotoAllowed(capturedUri);
       await submitIdentitySelfie(capturedUri);
       setPhase('success');
       onComplete?.();
@@ -124,7 +126,7 @@ export default function IdentityVerification({
           </View>
           <Text style={styles.title}>Camera access needed</Text>
           <Text style={styles.subtitle}>
-            We need your front camera to take a live selfie for identity verification. Gallery photos
+            We need your front camera to take a live selfie for photo verification. Gallery photos
             are not accepted.
           </Text>
           <Pressable
@@ -150,7 +152,7 @@ export default function IdentityVerification({
           </View>
           <Text style={styles.title}>Submitted — we'll review it shortly</Text>
           <Text style={styles.subtitle}>
-            Our team will verify your selfie manually. You'll be notified once review is complete.
+            Our team will review your selfie. You'll be notified once photo verification is complete.
           </Text>
         </View>
       </View>

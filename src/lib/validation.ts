@@ -5,7 +5,10 @@ const JAVASCRIPT_URL_REGEX = /javascript:/gi;
 const EMAIL_REGEX =
   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
 
-const VALID_GENOTYPES = new Set(['AA', 'AS', 'SS', 'AC', 'SC', 'CC']);
+// Must match public.genotype_type and the Genotype union in types/database.ts.
+// CC was previously accepted here but is not in the enum, so a profile could
+// pass validation and then fail to save.
+const VALID_GENOTYPES = new Set(['AA', 'AS', 'SS', 'AC', 'SC']);
 
 /** Trims whitespace and strips HTML/script injection patterns. */
 export function sanitizeText(input: string): string {

@@ -305,9 +305,12 @@ export default function DiscoverProfileSheet({
                     <Text style={styles.bondKicker}>Compatibility Profile</Text>
                   </View>
                   <Text style={styles.bondScoreLabel}>Compatibility score</Text>
-                  <GenoCompatRing percent={profile.compatibility} size={96} glow />
+                  {profile.compatibility > 0 ? (
+                    <GenoCompatRing percent={profile.compatibility} size={96} glow />
+                  ) : null}
                   <Text style={styles.bondRisk}>
-                    {profile.compatibility}% compatible · {getGenotypeRiskShort(viewerGenotype, profile.genotype)}
+                    {profile.compatibility > 0 ? `${profile.compatibility}% compatible · ` : ''}
+                    {getGenotypeRiskShort(viewerGenotype, profile.genotype)}
                   </Text>
                   <Text style={styles.bondDisclaimer}>
                     Educational information only. Not medical advice.

@@ -26,6 +26,7 @@ import { subscribeToLiveMatch } from '../src/lib/chatLive';
 import type { DiscoveryProfile, Genotype, MatchWithProfile } from '../src/types/database';
 import { getCurrentProfile } from '../src/lib/profiles';
 import { formatSecurityError } from '../src/lib/security';
+import { describeServerModerationError } from '../src/lib/contentModeration';
 import { rateLimitAction } from '../src/lib/rateLimit';
 import {
   appendMessageToList,
@@ -219,7 +220,13 @@ export default function ChatScreen({ matchId, profile, userId: userIdProp, onBac
       .catch((err) => {
         setMessages((prev) => prev.filter((m) => m.id !== optimisticId));
         setDraft(text);
-        setError(formatSecurityError(err, err instanceof Error ? err.message : 'Failed to send message'));
+        // The database screening trigger raises `content_blocked:<category>`.
+        // Show the member-facing reason rather than the raw Postgres error.
+        const moderation = describeServerModerationError(err);
+        setError(
+          moderation ??
+            formatSecurityError(err, err instanceof Error ? err.message : 'Failed to send message')
+        );
       });
   };
 

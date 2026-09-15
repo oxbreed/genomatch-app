@@ -9,7 +9,6 @@ export type { GenoLogoSurface } from './logoAssets';
 export {
   ONBOARDING_CREAM,
   GENOMATCH_RIBBON_POSTER,
-  GENOMATCH_RIBBON_ANIMATED,
   snapRibbonLogoWidth,
   ribbonLogoHeight,
 } from './ribbonLogo';

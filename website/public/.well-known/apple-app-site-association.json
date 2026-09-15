@@ -1,0 +1,22 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "REPLACE_APPLE_TEAM_ID.ng.genomatch.app",
+        "paths": [
+          "/reset-password",
+          "/reset-password/*",
+          "/privacy",
+          "/privacy/*",
+          "/terms",
+          "/terms/*",
+          "/support",
+          "/support/*",
+          "/guidelines",
+          "/guidelines/*"
+        ]
+      }
+    ]
+  }
+}

@@ -14,23 +14,23 @@ export type GenoOnboardingSlide = {
 export const GENO_ONBOARDING_SLIDES: GenoOnboardingSlide[] = [
   {
     icon: 'git-network-outline',
-    kicker: 'Genotype-aware matching',
+    kicker: 'Science-led matching',
     title: 'Compatibility you can trust',
-    body: 'Thoughtful genotype pairing for intentional singles — so every match starts with clarity, not guesswork.',
-    highlights: ['Science-led risk insights', 'Built for Nigeria & West Africa'],
+    body: 'Genotype-aware pairing helps you meet with clarity — before chemistry takes over.',
+    highlights: ['Risk insights you can understand', 'Built for Nigeria & West Africa'],
   },
   {
     icon: 'heart-half-outline',
-    kicker: 'Profiles that feel human',
+    kicker: 'Rich profiles',
     title: 'More than a photo',
-    body: 'Bios, interests, goals, and emotional signals — profiles designed to feel real before the first message.',
-    highlights: ['Rich profile storytelling', 'Compatibility at a glance'],
+    body: 'See bios, interests, and relationship goals so every match feels intentional.',
+    highlights: ['Story-driven profiles', 'Compatibility at a glance'],
   },
   {
     icon: 'sparkles-outline',
-    kicker: 'Premium journey to forever',
-    title: 'Ready when you are',
-    body: 'Create your profile, confirm your age, and step into a dating experience crafted for lasting connection.',
+    kicker: 'Get started',
+    title: 'Create your profile',
+    body: 'Confirm your age, set up your profile, and start connecting with confidence.',
     highlights: ['Guided from match to message', 'Private & verification-ready'],
   },
 ];

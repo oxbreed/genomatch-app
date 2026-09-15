@@ -1119,7 +1119,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     ...TYPOGRAPHY.display,
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: 'Satoshi-Bold',
     flex: 1,
   },
   filterBtn: {
@@ -1331,7 +1331,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   noPhotoInitials: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: 'Satoshi-Bold',
     fontSize: 40,
     color: 'rgba(255, 255, 255, 0.75)',
     textAlign: 'center',
@@ -1393,7 +1393,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   cardName: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: 'Satoshi-Bold',
     fontSize: 22,
     fontWeight: '700',
     color: COLORS.linen,
@@ -1498,7 +1498,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   matchPillText: {
-    fontFamily: 'ClashDisplay-Semibold',
+    fontFamily: 'Satoshi-Bold',
     fontSize: 15,
     fontWeight: '700',
     color: COLORS.text,
