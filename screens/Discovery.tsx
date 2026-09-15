@@ -1051,6 +1051,7 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
         matchName={matchedName}
         profile={matchedProfile}
         viewer={viewerSnapshot}
+        viewerGenotype={viewerGenotype}
         onContinue={dismissMatchOverlay}
         onSendMessage={() => { void handleSendMessageFromMatch(); }}
       />

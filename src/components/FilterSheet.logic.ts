@@ -1,6 +1,7 @@
 import type { DiscoveryProfile, DistanceBand } from '../types/database';
 
-export const HIGH_COMPATIBILITY_MIN = 75;
+/** Minimum lifestyle-overlap percent for the "high match" discovery filter. */
+export const HIGH_LIFESTYLE_MATCH_MIN = 75;
 
 export type DiscoveryFilters = {
   compatibilityMode: 'all' | 'high';
@@ -43,7 +44,7 @@ export function applyDiscoveryFilters(
   filters: DiscoveryFilters
 ): DiscoveryProfile[] {
   return profiles.filter((p) => {
-    if (filters.compatibilityMode === 'high' && p.compatibility < HIGH_COMPATIBILITY_MIN) {
+    if (filters.compatibilityMode === 'high' && p.lifestyleMatch < HIGH_LIFESTYLE_MATCH_MIN) {
       return false;
     }
     if (filters.verifiedOnly && !p.genotypeVerified) {

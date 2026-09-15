@@ -1,10 +1,11 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import GenoMatchLogo from '../GenoMatchLogo';
-import { getCompatibilityHeadline } from '../../lib/compatibility';
+import { getMatchHeadline } from '../../lib/lifestyleMatch';
 import { FONT_FAMILY, COLORS } from '../../theme';
 
 type Props = {
+  /** Lifestyle / interest-overlap percent (0–100). Never a genotype pairing result. */
   percent: number;
   yourTraits?: string[];
   theirTraits?: string[];
@@ -12,14 +13,14 @@ type Props = {
   ctaLabel?: string;
 };
 
-export default function CompatibilityProfileCard({
+export default function MatchProfileCard({
   percent,
   yourTraits = [],
   theirTraits = [],
   onViewReport,
   ctaLabel = 'View Full Report',
 }: Props) {
-  const headline = getCompatibilityHeadline(percent);
+  const headline = getMatchHeadline(percent);
   const yours = yourTraits.filter(Boolean).slice(0, 2);
   const theirs = theirTraits.filter(Boolean).slice(0, 2);
 
@@ -27,12 +28,13 @@ export default function CompatibilityProfileCard({
     <View style={styles.root}>
       <Text style={styles.wordmark}>GenoMatch</Text>
       <GenoMatchLogo size={72} />
-      <Text style={styles.kicker}>Compatibility profile</Text>
+      <Text style={styles.kicker}>Match profile</Text>
 
       <View style={styles.scoreCard}>
         <Text style={styles.percent}>{percent}%</Text>
-        <Text style={styles.scoreLabel}>Compatibility Score</Text>
+        <Text style={styles.scoreLabel}>Lifestyle Match</Text>
         <Text style={styles.headline}>{headline}</Text>
+        <Text style={styles.scoreCaption}>Based on shared interests &amp; goals</Text>
       </View>
 
       {yours.length > 0 || theirs.length > 0 ? (
@@ -140,8 +142,14 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 13,
     letterSpacing: 1.1,
-    color: COLORS.glossyRed,
+    color: COLORS.gold,
     marginTop: 8,
+  },
+  scoreCaption: {
+    fontFamily: FONT_FAMILY.gothamBook,
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.6)',
+    marginTop: 6,
   },
   traitRow: {
     flexDirection: 'row',

@@ -40,34 +40,17 @@ export function computeCompatibility(
   return scores[pair] ?? 65;
 }
 
-export function getGenotypeCompatibilityLine(
-  viewerGenotype: Genotype | null,
-  candidateGenotype: Genotype
-): string {
-  const viewer = viewerGenotype ?? 'AA';
-  const pairLabel = `${viewer} × ${candidateGenotype}`;
-  const pairKey = [viewer, candidateGenotype].sort().join('');
-  const riskByPair: Record<string, string> = {
-    AAAA: 'Very low sickle cell risk',
-    AAAS: 'Low sickle cell risk',
-    AAAC: 'Low sickle cell risk',
-    AASS: 'Elevated sickle cell risk',
-    ASAS: 'Moderate sickle cell risk',
-    ASAC: 'Moderate sickle cell risk',
-    ASSS: 'Higher sickle cell risk',
-    ACAC: 'Moderate sickle cell risk',
-    ACCC: 'Moderate sickle cell risk',
-    SSSS: 'Higher sickle cell risk',
-  };
-  const risk = riskByPair[pairKey] ?? 'Genotype-compatible match';
-  return `${pairLabel} — ${risk}`;
-}
-
-/** Short risk label for swipe cards and match rows */
+/**
+ * Short risk label for swipe cards and match rows.
+ *
+ * Returns `null` for any unmapped pairing — an explicit unresolved state.
+ * Consumers MUST hide the label entirely when the result is `null`; they must
+ * never substitute a default like "Compatible".
+ */
 export function getGenotypeRiskShort(
   viewerGenotype: Genotype | null,
   candidateGenotype: Genotype
-): string {
+): string | null {
   const viewer = viewerGenotype ?? 'AA';
   const pairKey = [viewer, candidateGenotype].sort().join('');
   const riskByPair: Record<string, string> = {
@@ -82,14 +65,7 @@ export function getGenotypeRiskShort(
     ACCC: 'Moderate risk',
     SSSS: 'Higher risk',
   };
-  return riskByPair[pairKey] ?? 'Compatible';
-}
-
-export function getCompatibilityHeadline(percent: number): string {
-  if (percent >= 90) return 'EXCELLENT MATCH';
-  if (percent >= 75) return 'STRONG MATCH';
-  if (percent >= 50) return 'ALIGNED MATCH';
-  return 'EXPLORE WITH CARE';
+  return riskByPair[pairKey] ?? null;
 }
 
 const FAMILY_PLANNING_BY_PAIR: Record<string, Omit<FamilyPlanningInsight, 'pairLabel'>> = {

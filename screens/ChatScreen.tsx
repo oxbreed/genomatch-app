@@ -303,7 +303,7 @@ export default function ChatScreen({ matchId, profile, userId: userIdProp, onBac
             {otherTyping ? (
               <Text style={styles.typingMeta}>typing…</Text>
             ) : (
-              <Text style={styles.chatMeta}>{profile.compatibility}% genotype match</Text>
+              <Text style={styles.chatMeta}>{profile.lifestyleMatch}% shared interests</Text>
             )}
           </View>
         </Pressable>
