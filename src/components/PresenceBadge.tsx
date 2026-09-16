@@ -17,9 +17,12 @@ const PRESENCE_CONFIG: Record<
   online: {
     label: 'Online',
     icon: 'radio-button-on',
-    color: '#D4AF37',
-    bg: 'rgba(212, 175, 55, 0.18)',
-    border: 'rgba(212, 175, 55, 0.35)',
+    // Intentional status-green (universal "online" convention), NOT a brand
+    // color. Deliberately kept green and exempt from the forest-hex removal;
+    // #2ECC71 is a standard status green, not the old forest palette.
+    color: '#2ECC71',
+    bg: 'rgba(46, 204, 113, 0.18)',
+    border: 'rgba(46, 204, 113, 0.35)',
   },
   recently_online: {
     label: 'Recently online',
@@ -39,7 +42,8 @@ export function PresenceDot({
 }) {
   if (presenceState === 'offline') return null;
 
-  const color = presenceState === 'online' ? '#D4AF37' : COLORS.sage;
+  // Status-green for "online" (UX convention), silver for recently-online.
+  const color = presenceState === 'online' ? '#2ECC71' : COLORS.sage;
 
   return (
     <View
@@ -162,7 +166,8 @@ const styles = StyleSheet.create({
     width: 7,
     height: 7,
     borderRadius: 4,
-    backgroundColor: '#D4AF37',
+    // Status-green "online" dot (UX convention), not a brand color.
+    backgroundColor: '#2ECC71',
   },
   dotRing: {
     alignItems: 'center',
