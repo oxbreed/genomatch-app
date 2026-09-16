@@ -21,7 +21,7 @@ type Props = {
   glow?: boolean;
 };
 
-/** Genetic Harmony Score — premium orbit ring with red-gold glow */
+/** Match ring — renders a percent value and a "Match" label inside an animated orbit ring. */
 export default function GenoCompatRing({ percent, size = 88, glow = true }: Props) {
   const orbit = useRef(new Animated.Value(0)).current;
   const breathe = useRef(new Animated.Value(1)).current;
