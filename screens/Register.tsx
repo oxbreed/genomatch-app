@@ -31,10 +31,10 @@ import TermsOfService from './TermsOfService';
 type IonName = ComponentProps<typeof Ionicons>['name'];
 
 const GENOTYPES: { id: string; icon: IonName; name: string; accent: string }[] = [
-  { id: 'AA', icon: 'heart', name: 'Double Healthy', accent: COLORS.forest },
-  { id: 'AS', icon: 'star-half', name: 'Carrier', accent: '#BA7517' },
-  { id: 'SS', icon: 'medical', name: 'Sickle Cell', accent: COLORS.error },
-  { id: 'AC', icon: 'water', name: 'AC Carrier', accent: '#185FA5' },
+  { id: 'AA', icon: 'ellipse-outline', name: 'Hemoglobin AA', accent: COLORS.sage },
+  { id: 'AS', icon: 'ellipse-outline', name: 'Sickle cell trait', accent: COLORS.sage },
+  { id: 'SS', icon: 'ellipse-outline', name: 'Sickle cell disease', accent: COLORS.sage },
+  { id: 'AC', icon: 'ellipse-outline', name: 'Hemoglobin AC', accent: COLORS.sage },
 ];
 
 export default function Register({
