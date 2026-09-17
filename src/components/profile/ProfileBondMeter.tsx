@@ -22,7 +22,7 @@ export default function ProfileBondMeter({ percent, fillWidth, hint }: Props) {
       <View style={styles.track}>
         <Animated.View style={[styles.fillWrap, { width: fillWidth }]}>
           <LinearGradient
-            colors={[COLORS.gold, COLORS.verified, COLORS.forest]}
+            colors={[COLORS.gold, COLORS.verified, COLORS.hero]}
             start={{ x: 0, y: 0.5 }}
             end={{ x: 1, y: 0.5 }}
             style={styles.fill}
@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 16,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   percent: {
     fontFamily: FONT_FAMILY.gothamBold,
@@ -78,6 +78,6 @@ const styles = StyleSheet.create({
   hint: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 13,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
   },
 });

@@ -39,7 +39,7 @@ export default function GenoInboxIconButton({
           contentStyle={styles.glassInner}
         >
           <LinearGradient colors={INBOX.colors.goldBtn} style={styles.goldFill}>
-            <Ionicons name={icon} size={17} color={COLORS.forestDeep} />
+            <Ionicons name={icon} size={17} color={COLORS.ink} />
           </LinearGradient>
         </GenoGlassSurface>
       </Pressable>
@@ -67,7 +67,7 @@ export default function GenoInboxIconButton({
         <Ionicons
           name={icon}
           size={17}
-          color={variant === 'danger' ? COLORS.error : COLORS.sage}
+          color={variant === 'danger' ? COLORS.error : COLORS.metallicSilver}
         />
       </GenoGlassSurface>
     </Pressable>

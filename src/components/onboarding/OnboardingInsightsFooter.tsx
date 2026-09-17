@@ -105,13 +105,13 @@ const styles = StyleSheet.create({
   ctaLabel: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 17,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     letterSpacing: 0.2,
   },
   ctaArrow: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 18,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   helperText: {
     marginTop: 14,

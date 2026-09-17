@@ -114,7 +114,7 @@ export default function GenoOnboardingFlow({
 
   return (
     <View style={styles.root}>
-      <GenoPremiumChrome variant="forest" />
+      <GenoPremiumChrome variant="ink" />
       <StatusBar style="light" />
 
       <View style={styles.helixDecor} pointerEvents="none">
@@ -203,7 +203,7 @@ export default function GenoOnboardingFlow({
             >
               <LinearGradient colors={[COLORS.gold, '#B8962E']} style={styles.cta}>
                 <Text style={styles.ctaText}>{ctaLabel}</Text>
-                <Ionicons name="arrow-forward" size={18} color={COLORS.forestDeep} />
+                <Ionicons name="arrow-forward" size={18} color={COLORS.ink} />
               </LinearGradient>
             </Pressable>
           </Animated.View>
@@ -222,7 +222,7 @@ export default function GenoOnboardingFlow({
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: COLORS.forestDeep,
+    backgroundColor: COLORS.ink,
   },
   helixDecor: {
     position: 'absolute',
@@ -329,7 +329,7 @@ const styles = StyleSheet.create({
   ctaText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 17,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   helper: {
     fontFamily: FONT_FAMILY.gothamMedium,

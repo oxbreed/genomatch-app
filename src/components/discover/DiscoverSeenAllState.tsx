@@ -125,14 +125,14 @@ export default function DiscoverSeenAllState({
                 >
                   <GenoBondMark size={52} opacity={0.95} />
                   <View style={styles.checkBadge}>
-                    <Ionicons name="checkmark" size={14} color={COLORS.forestDeep} />
+                    <Ionicons name="checkmark" size={14} color={COLORS.ink} />
                   </View>
                 </LinearGradient>
               </Animated.View>
             </View>
 
             <View style={styles.statusPill}>
-              <Ionicons name="checkmark-done" size={14} color={COLORS.forestDeep} />
+              <Ionicons name="checkmark-done" size={14} color={COLORS.ink} />
               <Text style={styles.statusText}>Stack complete</Text>
             </View>
 
@@ -161,7 +161,7 @@ export default function DiscoverSeenAllState({
                 }}
               >
                 <LinearGradient
-                  colors={[COLORS.forest, COLORS.forestDeep]}
+                  colors={[COLORS.hero, COLORS.ink]}
                   start={{ x: 0, y: 0.5 }}
                   end={{ x: 1, y: 0.5 }}
                   style={styles.primaryGradient}
@@ -180,7 +180,7 @@ export default function DiscoverSeenAllState({
                   onAdjustFilters();
                 }}
               >
-                <Ionicons name="options-outline" size={18} color={COLORS.forest} />
+                <Ionicons name="options-outline" size={18} color={COLORS.hero} />
                 <Text style={styles.secondaryText}>Refine filters</Text>
               </Pressable>
             ) : null}
@@ -281,13 +281,13 @@ const styles = StyleSheet.create({
     fontSize: 11,
     letterSpacing: 1.2,
     textTransform: 'uppercase',
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   title: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 26,
     letterSpacing: -0.5,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     textAlign: 'center',
     marginBottom: 10,
   },
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamBook,
     fontSize: 15,
     lineHeight: 22,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
     textAlign: 'center',
     marginBottom: 18,
     maxWidth: 300,
@@ -329,12 +329,12 @@ const styles = StyleSheet.create({
     fontSize: 11,
     letterSpacing: 1,
     textTransform: 'uppercase',
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
   },
   tomorrowValue: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 15,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   primaryBtn: {
     width: '100%',
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
   secondaryText: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 15,
-    color: COLORS.forest,
+    color: COLORS.hero,
   },
   btnPressed: {
     opacity: 0.9,

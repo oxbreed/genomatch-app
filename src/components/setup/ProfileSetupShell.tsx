@@ -56,20 +56,20 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 11,
     letterSpacing: 1.6,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
     marginTop: 4,
   },
   title: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 26,
     letterSpacing: -0.4,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   subtitle: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
     lineHeight: 20,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
     marginBottom: 4,
   },
   rule: {

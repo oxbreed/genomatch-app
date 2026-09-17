@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
   label: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 13,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     letterSpacing: 0.2,
   },
   value: {
@@ -76,6 +76,6 @@ const styles = StyleSheet.create({
   hint: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
   },
 });

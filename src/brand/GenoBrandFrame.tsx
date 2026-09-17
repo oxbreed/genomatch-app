@@ -6,14 +6,14 @@ import { GenoBondMark, GenoSignaturePattern } from './GenoSignaturePattern';
 
 type Props = {
   children: ReactNode;
-  /** linen = main app; forest = auth / onboarding */
-  variant?: 'linen' | 'forest';
+  /** linen = main app; ink = auth / onboarding */
+  variant?: 'linen' | 'ink';
   /** Show faint bond mark — signature watermark */
   watermark?: boolean;
 };
 
 /**
- * Classy GenoMatch screen chrome: linen/forest base, helix texture, gold top rule.
+ * Classy GenoMatch screen chrome: linen/ink base, helix texture, gold top rule.
  * Identifiable but quiet — not the heavy animated mesh from earlier experiments.
  */
 export default function GenoBrandFrame({
@@ -21,38 +21,38 @@ export default function GenoBrandFrame({
   variant = 'linen',
   watermark = false,
 }: Props) {
-  const isForest = variant === 'forest';
-  const bg = isForest ? COLORS.forestDeep : COLORS.linen;
+  const isInk = variant === 'ink';
+  const bg = isInk ? COLORS.ink : COLORS.linen;
 
   return (
     <View style={[styles.root, { backgroundColor: bg }]}>
       <View style={styles.patternTop} pointerEvents="none">
-        <GenoSignaturePattern width={400} height={200} opacity={isForest ? 0.35 : 0.22} />
+        <GenoSignaturePattern width={400} height={200} opacity={isInk ? 0.35 : 0.22} />
       </View>
       <View style={styles.patternBottom} pointerEvents="none">
-        <GenoSignaturePattern width={360} height={180} opacity={isForest ? 0.2 : 0.14} />
+        <GenoSignaturePattern width={360} height={180} opacity={isInk ? 0.2 : 0.14} />
       </View>
 
       <View
         style={[
           styles.orb,
           styles.orbGold,
-          { opacity: isForest ? 0.12 : 0.08 },
+          { opacity: isInk ? 0.12 : 0.08 },
         ]}
         pointerEvents="none"
       />
       <View
         style={[
           styles.orb,
-          styles.orbSage,
-          { opacity: isForest ? 0.1 : 0.06 },
+          styles.orbSilver,
+          { opacity: isInk ? 0.1 : 0.06 },
         ]}
         pointerEvents="none"
       />
 
       <LinearGradient
         colors={
-          isForest
+          isInk
             ? [COLORS.gold, COLORS.verified, 'transparent']
             : [COLORS.gold, 'rgba(200, 16, 46, 0.55)', 'transparent']
         }
@@ -64,7 +64,7 @@ export default function GenoBrandFrame({
 
       {watermark ? (
         <View style={styles.watermark} pointerEvents="none">
-          <GenoBondMark size={36} opacity={isForest ? 0.2 : 0.12} />
+          <GenoBondMark size={36} opacity={isInk ? 0.2 : 0.12} />
         </View>
       ) : null}
 
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     right: -80,
     backgroundColor: COLORS.gold,
   },
-  orbSage: {
+  orbSilver: {
     width: 280,
     height: 280,
     bottom: 100,

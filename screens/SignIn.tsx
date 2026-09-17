@@ -190,7 +190,7 @@ export default function SignIn({
             accessibilityRole="button"
             accessibilityLabel="Go back"
           >
-            <Ionicons name="chevron-back" size={18} color={COLORS.forestDeep} />
+            <Ionicons name="chevron-back" size={18} color={COLORS.ink} />
             <Text style={styles.backText}>Back</Text>
           </Pressable>
 
@@ -284,7 +284,7 @@ export default function SignIn({
                   >
                     {loading ? (
                       <View style={styles.submitContent}>
-                        <ActivityIndicator color={COLORS.forestDeep} size="small" />
+                        <ActivityIndicator color={COLORS.ink} size="small" />
                         <Text style={styles.submitText}>Signing in…</Text>
                       </View>
                     ) : (
@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.98 }],
   },
   backText: {
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 14,
     letterSpacing: 0.1,
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     fontSize: 32,
     lineHeight: 38,
     letterSpacing: -0.8,
@@ -404,7 +404,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.forest,
+    color: COLORS.hero,
     fontSize: 14,
     marginBottom: 8,
     marginTop: 14,
@@ -420,7 +420,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(200, 16, 46, 0.16)',
     backgroundColor: GLASS.insetFill,
     paddingHorizontal: 14,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 16,
   },
@@ -438,7 +438,7 @@ const styles = StyleSheet.create({
   },
   togglePassText: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.forest,
+    color: COLORS.hero,
     fontSize: 13,
     marginBottom: 8,
     opacity: 0.8,
@@ -477,7 +477,7 @@ const styles = StyleSheet.create({
   trustText: {
     flex: 1,
     fontFamily: FONT_FAMILY.gothamMedium,
-    color: COLORS.forest,
+    color: COLORS.hero,
     fontSize: 12,
     lineHeight: 18,
   },
@@ -511,7 +511,7 @@ const styles = StyleSheet.create({
   },
   submitText: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     fontSize: 17,
     letterSpacing: 0.1,
   },
@@ -526,7 +526,7 @@ const styles = StyleSheet.create({
   },
   createBold: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.forest,
+    color: COLORS.hero,
   },
   legalText: {
     textAlign: 'center',
@@ -538,7 +538,7 @@ const styles = StyleSheet.create({
   },
   legalLink: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.forest,
+    color: COLORS.hero,
     textDecorationLine: 'underline',
   },
 });

@@ -76,7 +76,7 @@ export default function ProfileGenotypeVerifyModal({
                   disabled={verifying}
                 >
                   <View style={[styles.checkbox, isOn && styles.checkboxOn]}>
-                    {isOn ? <Ionicons name="checkmark" size={14} color={COLORS.forestDeep} /> : null}
+                    {isOn ? <Ionicons name="checkmark" size={14} color={COLORS.ink} /> : null}
                   </View>
                   <Text style={styles.checkLabel}>{item.label}</Text>
                 </Pressable>
@@ -108,7 +108,7 @@ export default function ProfileGenotypeVerifyModal({
               style={styles.confirm}
             >
               {verifying ? (
-                <ActivityIndicator color={COLORS.forestDeep} />
+                <ActivityIndicator color={COLORS.ink} />
               ) : (
                 <Text style={styles.confirmText}>Confirm verification</Text>
               )}
@@ -151,21 +151,21 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 22,
     letterSpacing: -0.3,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     textAlign: 'center',
   },
   body: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
     lineHeight: 21,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
     textAlign: 'center',
     marginTop: 10,
     marginBottom: 16,
   },
   bold: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   checklist: {
     gap: 10,
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
     lineHeight: 20,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   note: {
     fontFamily: FONT_FAMILY.gothamMedium,
@@ -220,12 +220,12 @@ const styles = StyleSheet.create({
   confirmText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 16,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   cancel: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 15,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
     marginTop: 14,
     textAlign: 'center',
   },

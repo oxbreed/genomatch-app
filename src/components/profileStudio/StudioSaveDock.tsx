@@ -67,11 +67,11 @@ export default function StudioSaveDock({ saveState, onDone, busy }: Props) {
             style={styles.done}
           >
             {busy ? (
-              <ActivityIndicator color={COLORS.forestDeep} size="small" />
+              <ActivityIndicator color={COLORS.ink} size="small" />
             ) : (
               <>
                 <Text style={styles.doneText}>Done</Text>
-                <Ionicons name="checkmark" size={18} color={COLORS.forestDeep} />
+                <Ionicons name="checkmark" size={18} color={COLORS.ink} />
               </>
             )}
           </LinearGradient>
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(13, 40, 24, 0.08)',
     gap: 10,
-    shadowColor: COLORS.forestDeep,
+    shadowColor: COLORS.ink,
     shadowOffset: { width: 0, height: -3 },
     shadowOpacity: 0.06,
     shadowRadius: 12,
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
   },
   doneWrap: {
     borderRadius: RADIUS.md,
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
   doneText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 15,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   pressed: {
     opacity: 0.9,

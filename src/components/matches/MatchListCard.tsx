@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: INBOX.nameSize + 1,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     letterSpacing: -0.3,
   },
   newPill: {
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
     fontSize: 9,
     letterSpacing: 0.8,
     textTransform: 'uppercase',
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   genotypePill: {
     paddingHorizontal: 7,
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: INBOX.badgeSize,
     letterSpacing: 0.4,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   compatPill: {
     paddingHorizontal: 8,
@@ -168,10 +168,10 @@ const styles = StyleSheet.create({
   pct: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: INBOX.pctSize,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
   },
   pctHigh: {
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   summary: {
     fontFamily: FONT_FAMILY.gothamMedium,

@@ -38,7 +38,7 @@ export default function ProfileVerifiedCityCard({
       contentStyle={styles.inner}
     >
       <View style={styles.header}>
-        <Ionicons name="location" size={18} color={COLORS.forest} />
+        <Ionicons name="location" size={18} color={COLORS.hero} />
         <Text style={styles.title}>Verified location</Text>
       </View>
       <Text style={styles.body}>
@@ -52,10 +52,10 @@ export default function ProfileVerifiedCityCard({
           disabled={updating}
         >
           {updating ? (
-            <ActivityIndicator color={COLORS.forestDeep} />
+            <ActivityIndicator color={COLORS.ink} />
           ) : (
             <>
-              <Ionicons name="locate" size={16} color={COLORS.forestDeep} />
+              <Ionicons name="locate" size={16} color={COLORS.ink} />
               <Text style={styles.buttonText}>Update my city (GPS)</Text>
             </>
           )}
@@ -92,17 +92,17 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 14,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   body: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 13,
     lineHeight: 19,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
   },
   bold: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   button: {
     flexDirection: 'row',
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 14,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   hint: {
     fontFamily: FONT_FAMILY.gothamMedium,

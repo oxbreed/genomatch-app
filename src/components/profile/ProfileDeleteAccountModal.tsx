@@ -64,7 +64,7 @@ export default function ProfileDeleteAccountModal({
           >
             <View style={[styles.checkbox, acknowledged && styles.checkboxOn]}>
               {acknowledged ? (
-                <Ionicons name="checkmark" size={14} color={COLORS.forestDeep} />
+                <Ionicons name="checkmark" size={14} color={COLORS.ink} />
               ) : null}
             </View>
             <Text style={styles.checkLabel}>
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 22,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     marginBottom: 10,
   },
   body: {
@@ -189,12 +189,12 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 13,
     lineHeight: 20,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   label: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 14,
-    color: COLORS.forest,
+    color: COLORS.hero,
     marginBottom: 8,
   },
   passwordRow: {
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
   togglePassText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 13,
-    color: COLORS.forest,
+    color: COLORS.hero,
     marginBottom: 8,
     opacity: 0.8,
   },
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(200, 16, 46, 0.18)',
     backgroundColor: 'rgba(255, 255, 255, 0.72)',
     paddingHorizontal: 14,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 16,
     marginBottom: 20,
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
   cancelText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 15,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   deleteBtn: {
     flex: 1.2,

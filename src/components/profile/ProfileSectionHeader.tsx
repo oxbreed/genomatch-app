@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
   },
   title: {
     ...PROFILE_TYPE.sectionTitle,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   hint: {
     ...PROFILE_TYPE.sectionHint,

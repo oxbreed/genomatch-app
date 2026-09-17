@@ -85,7 +85,7 @@ export const TYPOGRAPHY = {
     ...gothamBold(),
     fontSize: 32,
     letterSpacing: -0.6,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   } satisfies TextStyle,
 
   /** Screen & inbox titles */
@@ -93,21 +93,21 @@ export const TYPOGRAPHY = {
     ...gothamSemiBold(),
     fontSize: 26,
     letterSpacing: -0.4,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   } satisfies TextStyle,
 
   heading: {
     ...gothamSemiBold(),
     fontSize: 26,
     letterSpacing: -0.4,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   } satisfies TextStyle,
 
   headingSm: {
     ...gothamMedium(),
     fontSize: 20,
     letterSpacing: -0.2,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   } satisfies TextStyle,
 
   /** Profile names, match names */
@@ -115,7 +115,7 @@ export const TYPOGRAPHY = {
     ...gothamBold(),
     fontSize: 17,
     letterSpacing: -0.15,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   } satisfies TextStyle,
 
   /** Ages, meta on profiles */
@@ -123,7 +123,7 @@ export const TYPOGRAPHY = {
     ...gothamMedium(),
     fontSize: 14,
     letterSpacing: 0.1,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
   } satisfies TextStyle,
 
   body: {
@@ -137,7 +137,7 @@ export const TYPOGRAPHY = {
     ...gothamMedium(),
     fontSize: 15,
     lineHeight: 22.5,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   } satisfies TextStyle,
 
   label: {
@@ -145,7 +145,7 @@ export const TYPOGRAPHY = {
     fontSize: 12,
     letterSpacing: 1.1,
     textTransform: 'uppercase',
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
   } satisfies TextStyle,
 
   caption: {
@@ -159,7 +159,7 @@ export const TYPOGRAPHY = {
     ...gothamBold(),
     fontSize: 16,
     letterSpacing: 0.15,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   } satisfies TextStyle,
 
   /** GENOMATCH kickers, onboarding, splash — Proxima Nova */
@@ -200,6 +200,6 @@ export const TYPOGRAPHY = {
     fontSize: 10,
     fontWeight: '600',
     letterSpacing: 0.12,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   } satisfies TextStyle,
 } as const;

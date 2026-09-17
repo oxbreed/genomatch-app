@@ -59,9 +59,9 @@ export default function AvatarPhotoPicker({
           ]}
         >
           {uploading ? (
-            <ActivityIndicator color={COLORS.forest} size="small" />
+            <ActivityIndicator color={COLORS.hero} size="small" />
           ) : (
-            <Ionicons name="camera" size={16} color={COLORS.forest} />
+            <Ionicons name="camera" size={16} color={COLORS.hero} />
           )}
         </View>
       </Pressable>
@@ -88,9 +88,9 @@ export default function AvatarPhotoPicker({
         ]}
       >
         {uploading ? (
-          <ActivityIndicator color={COLORS.forest} size="small" />
+          <ActivityIndicator color={COLORS.hero} size="small" />
         ) : (
-          <Ionicons name="camera" size={badgeSize * 0.45} color={COLORS.forest} />
+          <Ionicons name="camera" size={badgeSize * 0.45} color={COLORS.hero} />
         )}
       </View>
     </Pressable>
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 5,
-    shadowColor: COLORS.forest,
+    shadowColor: COLORS.hero,
     shadowOpacity: 0.22,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 2 },
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.white,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: COLORS.forest,
+    shadowColor: COLORS.hero,
     shadowOpacity: 0.22,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 2 },

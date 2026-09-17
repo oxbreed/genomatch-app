@@ -33,7 +33,7 @@ export default function AuthField({ label, icon, rightAction, style, ...inputPro
       >
         {icon ? (
           <View style={styles.iconWrap}>
-            <Ionicons name={icon} size={18} color={COLORS.sage} />
+            <Ionicons name={icon} size={18} color={COLORS.metallicSilver} />
           </View>
         ) : null}
         <TextInput
@@ -59,13 +59,13 @@ const styles = StyleSheet.create({
   label: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 13,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     letterSpacing: 0.2,
   },
   rightAction: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 13,
-    color: COLORS.forest,
+    color: COLORS.hero,
   },
   glass: {
     overflow: 'hidden',
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 16,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   inputWithIcon: {
     paddingLeft: 8,

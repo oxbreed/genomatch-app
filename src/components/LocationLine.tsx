@@ -19,7 +19,7 @@ export default function LocationLine({ city, distanceBand, dark = false, compact
       <Ionicons
         name="location-outline"
         size={compact ? 13 : 14}
-        color={dark ? COLORS.sage : COLORS.sage}
+        color={dark ? COLORS.metallicSilver : COLORS.metallicSilver}
       />
       <Text
         style={[styles.text, dark && styles.textDark, compact && styles.textCompact]}
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
   text: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
-    color: COLORS.forest,
+    color: COLORS.hero,
     flexShrink: 1,
   },
   textDark: {

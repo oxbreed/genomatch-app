@@ -3,8 +3,8 @@ import { COLORS, getInitials } from '../data/mockData';
 
 // Brand-safe gradient pairs — no purple, no off-brand colors
 const BRAND_GRADIENTS: [string, string][] = [
-  [COLORS.forest, COLORS.forestDeep],
-  [COLORS.forestDeep, '#0B0C0E'],
+  [COLORS.hero, COLORS.ink],
+  [COLORS.ink, '#0B0C0E'],
   ['#15171A', '#0B0C0E'],
   ['#20222A', '#15171A'],
 ];

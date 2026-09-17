@@ -6,7 +6,7 @@ import { COLORS } from '../theme';
 
 const GENOTYPE_BADGE_STYLE = {
   bg: COLORS.mint,
-  text: COLORS.forestDeep,
+  text: COLORS.ink,
   border: 'rgba(11, 12, 14, 0.12)',
 } as const;
 
@@ -86,7 +86,7 @@ export const MOCK_MATCHES: MockProfile[] = [
     lifestyleMatch: 82,
     bio: 'Software engineer who enjoys hiking and photography. Looking for an honest connection built on shared values and laughter.',
     interests: ['Hiking', 'Photography', 'Tech', 'Music'],
-    gradient: ['#C8102E', COLORS.forestDeep],
+    gradient: ['#C8102E', COLORS.ink],
     photoUrl: 'https://genomatch.app/demo/demo-amani.png',
     lastMessageAt: '3d ago',
   },

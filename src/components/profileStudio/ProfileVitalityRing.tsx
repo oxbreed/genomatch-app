@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
   },
   percent: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     letterSpacing: -0.5,
   },
 });

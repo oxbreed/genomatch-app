@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: 'rgba(212, 175, 55, 0.35)',
-    shadowColor: COLORS.forestDeep,
+    shadowColor: COLORS.ink,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.2,
     shadowRadius: 16,

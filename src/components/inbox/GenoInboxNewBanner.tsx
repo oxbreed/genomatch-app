@@ -45,6 +45,6 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
     lineHeight: 17,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
 });

@@ -62,7 +62,7 @@ function MatchPhoto({
           gradient={gradient}
           avatarUrl={uri}
           size={72}
-          noPhotoBackground={COLORS.forestDeep}
+          noPhotoBackground={COLORS.ink}
           noPhotoInitialColor={COLORS.linen}
         />
       </View>
@@ -90,7 +90,7 @@ export default function DiscoverMatchModal({
 
   const firstName = matchName.trim().split(/\s+/)[0] || matchName;
   const viewerFirstName = viewer?.name?.trim().split(/\s+/)[0] || 'You';
-  const viewerGradient = viewer?.gradient ?? [COLORS.forest, COLORS.forestDeep];
+  const viewerGradient = viewer?.gradient ?? [COLORS.hero, COLORS.ink];
 
   const matchPhotoUri = useMemo(
     () => (profile ? getPrimaryPhotoUri(profile.avatarUrl, profile.photos) : null),
@@ -197,7 +197,7 @@ export default function DiscoverMatchModal({
                       <View style={styles.photoRing}>
                         <ProfileAvatar
                           name={matchName}
-                          gradient={[COLORS.forest, COLORS.forestDeep]}
+                          gradient={[COLORS.hero, COLORS.ink]}
                           avatarUrl={null}
                           size={72}
                         />
@@ -374,7 +374,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: COLORS.forestDeep,
+    borderColor: COLORS.ink,
   },
   bondMark: {
     width: 56,
@@ -390,7 +390,7 @@ const styles = StyleSheet.create({
   avatarLabel: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
     textAlign: 'center',
     maxWidth: 88,
   },
@@ -437,7 +437,7 @@ const styles = StyleSheet.create({
   compatDisclaimer: {
     fontSize: 10,
     lineHeight: 13,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
     textAlign: 'center',
     marginTop: 6,
     opacity: 0.8,
@@ -461,7 +461,7 @@ const styles = StyleSheet.create({
   ctaText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 16,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     letterSpacing: 0.1,
   },
   secondaryBtn: {

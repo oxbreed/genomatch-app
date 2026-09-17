@@ -58,7 +58,7 @@ export default function ProfilePhotosGrid({
             <Text style={styles.emptyStudioTitle}>Add your first photo</Text>
             <Text style={styles.emptyStudioSub}>Your main photo appears on Discover & Matches</Text>
             <View style={styles.emptyStudioBtn}>
-              <Ionicons name="camera-outline" size={18} color={COLORS.forestDeep} />
+              <Ionicons name="camera-outline" size={18} color={COLORS.ink} />
               <Text style={styles.emptyStudioBtnText}>Choose photo</Text>
             </View>
           </>
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
   hint: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
     marginBottom: 12,
   },
   grid: {
@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
   addLabel: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 11,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
   },
   emptyView: {
     paddingVertical: 22,
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
     lineHeight: 21,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
     textAlign: 'center',
   },
   emptyStudio: {
@@ -211,13 +211,13 @@ const styles = StyleSheet.create({
   emptyStudioTitle: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 17,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     marginTop: 4,
   },
   emptyStudioSub: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
     textAlign: 'center',
     lineHeight: 17,
     marginBottom: 4,
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
   emptyStudioBtnText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 13,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   pressed: { opacity: 0.88 },
 });

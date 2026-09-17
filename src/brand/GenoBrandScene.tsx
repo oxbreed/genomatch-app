@@ -35,7 +35,7 @@ function accentStyle(type: EmptyStateType) {
     case 'seen-all':
       return { backgroundColor: COLORS.gold, top: 12, left: 14 };
     case 'no-results':
-      return { backgroundColor: COLORS.sage, bottom: 10, right: 14 };
+      return { backgroundColor: COLORS.metallicSilver, bottom: 10, right: 14 };
     default:
       return { backgroundColor: COLORS.verified, top: 10, right: 10 };
   }

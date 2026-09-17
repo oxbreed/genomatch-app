@@ -10,7 +10,7 @@ type Props = {
   rightAction?: ReactNode;
   onRightPress?: () => void;
   rightAccessibilityLabel?: string;
-  variant?: 'light' | 'forest';
+  variant?: 'light' | 'ink';
 };
 
 export default function GenoScreenHeader({
@@ -22,13 +22,13 @@ export default function GenoScreenHeader({
   rightAccessibilityLabel,
   variant = 'light',
 }: Props) {
-  const isForest = variant === 'forest';
+  const isInk = variant === 'ink';
 
   return (
     <View style={styles.wrap}>
       <LinearGradient
         colors={
-          isForest
+          isInk
             ? ['rgba(13, 40, 24, 0.08)', 'transparent']
             : ['rgba(212, 175, 55, 0.12)', 'transparent']
         }
@@ -37,10 +37,10 @@ export default function GenoScreenHeader({
       />
       <View style={styles.row}>
         <View style={styles.copy}>
-          <Text style={[styles.kicker, isForest && styles.kickerForest]}>{kicker}</Text>
-          <Text style={[styles.title, isForest && styles.titleForest]}>{title}</Text>
+          <Text style={[styles.kicker, isInk && styles.kickerInk]}>{kicker}</Text>
+          <Text style={[styles.title, isInk && styles.titleInk]}>{title}</Text>
           {subtitle ? (
-            <Text style={[styles.subtitle, isForest && styles.subtitleForest]}>{subtitle}</Text>
+            <Text style={[styles.subtitle, isInk && styles.subtitleInk]}>{subtitle}</Text>
           ) : null}
         </View>
         {rightAction ? (
@@ -100,26 +100,26 @@ const styles = StyleSheet.create({
     letterSpacing: 2.4,
     color: COLORS.gold,
   },
-  kickerForest: {
+  kickerInk: {
     color: 'rgba(212, 175, 55, 0.85)',
   },
   title: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 30,
     letterSpacing: -0.6,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
-  titleForest: {
+  titleInk: {
     color: COLORS.linen,
   },
   subtitle: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
     lineHeight: 20,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
     marginTop: 2,
   },
-  subtitleForest: {
+  subtitleInk: {
     color: 'rgba(250, 248, 245, 0.72)',
   },
   actionSlot: {

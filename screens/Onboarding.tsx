@@ -55,7 +55,7 @@ export default function Onboarding({ onFinish }: { onFinish: () => void }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.forest,
+    backgroundColor: COLORS.hero,
     paddingHorizontal: 24,
     paddingTop: 80,
     paddingBottom: 40,
@@ -98,6 +98,6 @@ const styles = StyleSheet.create({
   ctaText: {
     fontSize: 17,
     fontWeight: '700',
-    color: COLORS.forest,
+    color: COLORS.hero,
   },
 });

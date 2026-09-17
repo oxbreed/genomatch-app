@@ -24,7 +24,7 @@ const TIER_STYLE: Record<
     darkBorder: 'rgba(200, 16, 46, 0.4)',
   },
   low_risk: {
-    accent: COLORS.forest,
+    accent: COLORS.hero,
     bg: 'rgba(240, 241, 243, 0.95)',
     border: 'rgba(184, 188, 196, 0.45)',
     darkBg: 'rgba(255, 255, 255, 0.1)',
@@ -53,8 +53,8 @@ export default function FamilyPlanningCard({
   dark,
   locked = false,
 }: Props) {
-  const textPrimary = dark ? COLORS.linen : COLORS.forestDeep;
-  const textSecondary = dark ? 'rgba(250, 248, 245, 0.82)' : COLORS.sage;
+  const textPrimary = dark ? COLORS.linen : COLORS.ink;
+  const textSecondary = dark ? 'rgba(250, 248, 245, 0.82)' : COLORS.metallicSilver;
   const lockedBg = dark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(240, 241, 243, 0.95)';
   const lockedBorder = dark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(184, 188, 196, 0.45)';
 
@@ -62,7 +62,7 @@ export default function FamilyPlanningCard({
     if (compact) {
       return (
         <View style={[styles.compact, { backgroundColor: lockedBg, borderColor: lockedBorder }]}>
-          <Ionicons name="lock-closed-outline" size={14} color={dark ? COLORS.gold : COLORS.forest} />
+          <Ionicons name="lock-closed-outline" size={14} color={dark ? COLORS.gold : COLORS.hero} />
           <Text style={[styles.compactTitle, { color: textPrimary }]} numberOfLines={1}>
             Unlocks after you match
           </Text>
@@ -79,10 +79,10 @@ export default function FamilyPlanningCard({
               { borderColor: lockedBorder, backgroundColor: dark ? 'rgba(255,255,255,0.08)' : COLORS.white },
             ]}
           >
-            <Ionicons name="lock-closed-outline" size={18} color={dark ? COLORS.gold : COLORS.forest} />
+            <Ionicons name="lock-closed-outline" size={18} color={dark ? COLORS.gold : COLORS.hero} />
           </View>
           <View style={styles.headerCopy}>
-            <Text style={[styles.kicker, { color: dark ? COLORS.gold : COLORS.sage }]}>
+            <Text style={[styles.kicker, { color: dark ? COLORS.gold : COLORS.metallicSilver }]}>
               FAMILY PLANNING
             </Text>
             <Text style={[styles.title, { color: textPrimary }]}>Unlocks after you match</Text>
@@ -132,7 +132,7 @@ export default function FamilyPlanningCard({
           <Ionicons name={insight.icon} size={18} color={tier.accent} />
         </View>
         <View style={styles.headerCopy}>
-          <Text style={[styles.kicker, { color: dark ? COLORS.gold : COLORS.sage }]}>
+          <Text style={[styles.kicker, { color: dark ? COLORS.gold : COLORS.metallicSilver }]}>
             FAMILY PLANNING
           </Text>
           <Text style={[styles.title, { color: textPrimary }]}>{insight.title}</Text>

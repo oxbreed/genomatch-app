@@ -50,7 +50,7 @@ export default function ProfileIdentityRibbon({ verified, genotype, onVerify }: 
             onPress={onVerify}
           >
             <LinearGradient colors={[COLORS.gold, '#B8962E']} style={styles.verifyGradient}>
-              <Ionicons name="finger-print" size={16} color={COLORS.forestDeep} />
+              <Ionicons name="finger-print" size={16} color={COLORS.ink} />
               <Text style={styles.verifyText}>Verify now</Text>
             </LinearGradient>
           </Pressable>
@@ -116,11 +116,11 @@ const styles = StyleSheet.create({
   },
   title: {
     ...PROFILE_TYPE.ribbonTitle,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   sub: {
     ...PROFILE_TYPE.ribbonSub,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
     marginTop: 2,
   },
   verifyBtn: {
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
   verifyText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 13,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   pressed: { opacity: 0.9 },
 });

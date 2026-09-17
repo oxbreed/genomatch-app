@@ -20,7 +20,7 @@ export default function GenoInboxRetryPanel({ message, onRetry }: Props) {
       contentStyle={styles.content}
     >
       <View style={styles.iconWrap}>
-        <Ionicons name="cloud-offline-outline" size={22} color={COLORS.forest} />
+        <Ionicons name="cloud-offline-outline" size={22} color={COLORS.hero} />
       </View>
       <Text style={styles.message}>{message}</Text>
       <Pressable
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 15,
     lineHeight: 22,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     textAlign: 'center',
   },
   retryWrap: {
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
   retryText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 15,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   pressed: {
     opacity: 0.9,

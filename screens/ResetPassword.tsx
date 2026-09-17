@@ -236,7 +236,7 @@ export default function ResetPassword({
             accessibilityRole="button"
             accessibilityLabel="Go back to sign in"
           >
-            <Ionicons name="chevron-back" size={18} color={COLORS.forestDeep} />
+            <Ionicons name="chevron-back" size={18} color={COLORS.ink} />
             <Text style={styles.backText}>Back</Text>
           </Pressable>
 
@@ -273,7 +273,7 @@ export default function ResetPassword({
                 hitSlop={8}
               >
                 {resending ? (
-                  <ActivityIndicator color={COLORS.forest} size="small" />
+                  <ActivityIndicator color={COLORS.hero} size="small" />
                 ) : (
                   <Text
                     style={[
@@ -342,7 +342,7 @@ export default function ResetPassword({
             >
               {loading ? (
                 <View style={styles.submitContent}>
-                  <ActivityIndicator color={COLORS.forest} size="small" />
+                  <ActivityIndicator color={COLORS.hero} size="small" />
                   <Text style={styles.submitText}>Updating…</Text>
                 </View>
               ) : (
@@ -398,7 +398,7 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.98 }],
   },
   backText: {
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 14,
     letterSpacing: 0.1,
@@ -409,7 +409,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     fontSize: 34,
     lineHeight: 39,
     letterSpacing: -0.7,
@@ -432,7 +432,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   label: {
-    color: COLORS.forest,
+    color: COLORS.hero,
     fontSize: 14,
     fontWeight: '700',
     marginBottom: 8,
@@ -488,7 +488,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   togglePassText: {
-    color: COLORS.forest,
+    color: COLORS.hero,
     fontSize: 13,
     fontWeight: '700',
     marginBottom: 8,
@@ -517,7 +517,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   submitText: {
-    color: COLORS.forest,
+    color: COLORS.hero,
     fontSize: 17,
     fontWeight: '700',
     letterSpacing: 0.1,
@@ -533,6 +533,6 @@ const styles = StyleSheet.create({
   },
   createBold: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.forest,
+    color: COLORS.hero,
   },
 });

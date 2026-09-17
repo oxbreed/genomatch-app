@@ -35,6 +35,6 @@ const styles = StyleSheet.create({
   text: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 13,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
 });

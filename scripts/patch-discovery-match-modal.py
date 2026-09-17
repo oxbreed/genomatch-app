@@ -108,7 +108,7 @@ OLD_STYLES = re.compile(
     paddingHorizontal: 32,
   \},
   matchCard: \{
-    backgroundColor: COLORS\.forest,
+    backgroundColor: COLORS\.hero,
     borderRadius: 20,
     padding: 40,
     width: '100%',
@@ -150,7 +150,7 @@ OLD_STYLES = re.compile(
   matchContinueText: \{
     fontSize: 17,
     fontWeight: '700',
-    color: COLORS\.forest,
+    color: COLORS\.hero,
   \},
 \}\);""",
     re.MULTILINE,

@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     letterSpacing: 1.4,
     textTransform: 'uppercase',
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
   },
   scroll: {
     paddingHorizontal: 10,
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
   name: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 11,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     textAlign: 'center',
     maxWidth: 68,
   },
@@ -117,6 +117,6 @@ const styles = StyleSheet.create({
     width: 4,
     height: 4,
     borderRadius: 2,
-    backgroundColor: COLORS.forestDeep,
+    backgroundColor: COLORS.ink,
   },
 });

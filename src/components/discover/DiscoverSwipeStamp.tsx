@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
   },
   stampPass: {
     right: 18,
-    borderColor: COLORS.sage,
+    borderColor: COLORS.metallicSilver,
     transform: [{ rotate: '12deg' }],
   },
   stampFill: {
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     color: COLORS.gold,
   },
   stampTextPass: {
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
   },
   stampRule: {
     height: 2,
@@ -84,6 +84,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.gold,
   },
   stampRulePass: {
-    backgroundColor: COLORS.sage,
+    backgroundColor: COLORS.metallicSilver,
   },
 });

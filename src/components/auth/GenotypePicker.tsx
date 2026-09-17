@@ -62,7 +62,7 @@ export default function GenotypePicker({
                   <Ionicons
                     name={item.icon}
                     size={22}
-                    color={isSelected ? item.accent : COLORS.forest}
+                    color={isSelected ? item.accent : COLORS.hero}
                   />
                 </View>
                 <Text style={[styles.genoId, isSelected && { color: item.accent }]}>{item.id}</Text>
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
   label: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 13,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   required: {
     paddingHorizontal: 8,
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
   hint: {
     fontFamily: FONT_FAMILY.gothamBook,
     fontSize: 12,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
     marginTop: 6,
     marginBottom: 12,
     lineHeight: 17,
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
   },
   cardSelected: {
     backgroundColor: COLORS.mint,
-    shadowColor: COLORS.forest,
+    shadowColor: COLORS.hero,
     shadowOpacity: 0.12,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },
@@ -156,13 +156,13 @@ const styles = StyleSheet.create({
   genoId: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 22,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     marginBottom: 2,
   },
   genoName: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 11,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
     textAlign: 'center',
   },
   badge: {

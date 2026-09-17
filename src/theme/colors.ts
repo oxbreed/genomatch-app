@@ -16,9 +16,7 @@ export const CREAM_TINT = '#F0F1F3';
 export const WHITE = '#FFFFFF';
 
 // Backward-compatible aliases. Names are retained so existing imports keep
-// compiling; every value now points at the mirror palette (no forest colors).
-export const FOREST_DEEP = BRAND_BLACK;
-export const FOREST = BRAND_BLACK_SOFT;
+// compiling; every value now points at the mirror palette.
 export const GOLD = LOGO_GOLD;
 export const GOLD_BRIGHT = LOGO_GOLD_BRIGHT;
 export const GOLD_DEEP = LOGO_GOLD_DEEP;
@@ -27,7 +25,6 @@ export const GLOSSY_RED_DEEP = LOGO_RED_DEEP;
 export const GLOSSY_RED_HOT = LOGO_RED_HOT;
 export const INK = BRAND_BLACK;
 export const LINEN = CREAM;
-export const SAGE = METALLIC_SILVER;
 export const MINT = CREAM_TINT;
 
 /** Semantic color tokens — use these in UI code */
@@ -41,8 +38,6 @@ export const COLORS = {
   cream: CREAM,
 
   // Legacy keys retained for compatibility (mapped to mirror palette)
-  forestDeep: BRAND_BLACK,
-  forest: BRAND_BLACK_SOFT,
   gold: LOGO_GOLD,
   goldBright: LOGO_GOLD_BRIGHT,
   goldDeep: LOGO_GOLD_DEEP,
@@ -51,7 +46,6 @@ export const COLORS = {
   glossyRedHot: LOGO_RED_HOT,
   ink: BRAND_BLACK,
   linen: CREAM,
-  sage: METALLIC_SILVER,
   mint: CREAM_TINT,
   white: WHITE,
 
@@ -66,7 +60,7 @@ export const COLORS = {
 
   text: BRAND_BLACK,
   textOnDark: CREAM,
-  textOnForest: CREAM,
+  textOnInk: CREAM,
   textMuted: 'rgba(11, 12, 14, 0.55)',
   textSubtle: 'rgba(11, 12, 14, 0.45)',
 

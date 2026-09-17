@@ -30,7 +30,7 @@ export const DISCOVER_CARD_HEIGHT = getDiscoveryCardHeight(SCREEN_HEIGHT);
 
 function getCompatDotColor(percent: number): string {
   if (percent >= 80) return COLORS.gold;
-  if (percent >= 60) return COLORS.sage;
+  if (percent >= 60) return COLORS.metallicSilver;
   return COLORS.linen;
 }
 
@@ -100,7 +100,7 @@ export default function DiscoverSwipeCard({
         />
       ) : (
         <LinearGradient
-          colors={[COLORS.forestDeep, COLORS.forest]}
+          colors={[COLORS.ink, COLORS.hero]}
           style={[styles.cardMedia, styles.cardNoPhoto]}
         >
           <View style={styles.noPhotoCircle}>
@@ -219,9 +219,9 @@ const styles = StyleSheet.create({
     width: '100%',
     borderRadius: DISCOVERY_CARD_RADIUS,
     overflow: 'hidden',
-    backgroundColor: COLORS.forestDeep,
+    backgroundColor: COLORS.ink,
     ...SHADOWS.glassElevated,
-    shadowColor: COLORS.forest,
+    shadowColor: COLORS.hero,
     shadowOpacity: 0.16,
   },
   swipeProgressTrack: {
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
   noPhotoCaption: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 13,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
   },
   cardGloss: {
     ...StyleSheet.absoluteFill,

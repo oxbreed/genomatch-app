@@ -21,8 +21,8 @@ export default function GenoAuthHeader({
   backLabel = 'Back',
   light = true,
 }: Props) {
-  const titleColor = light ? COLORS.linen : COLORS.forestDeep;
-  const subColor = light ? 'rgba(250, 248, 245, 0.78)' : COLORS.sage;
+  const titleColor = light ? COLORS.linen : COLORS.ink;
+  const subColor = light ? 'rgba(250, 248, 245, 0.78)' : COLORS.metallicSilver;
 
   return (
     <View style={styles.wrap}>
@@ -31,7 +31,7 @@ export default function GenoAuthHeader({
           <Ionicons
             name="chevron-back"
             size={20}
-            color={light ? COLORS.linen : COLORS.forest}
+            color={light ? COLORS.linen : COLORS.hero}
           />
           <Text style={[styles.backText, { color: titleColor }]}>{backLabel}</Text>
         </Pressable>

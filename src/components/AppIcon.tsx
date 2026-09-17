@@ -10,6 +10,6 @@ type AppIconProps = {
   color?: string;
 };
 
-export default function AppIcon({ name, size = 22, color = COLORS.forest }: AppIconProps) {
+export default function AppIcon({ name, size = 22, color = COLORS.hero }: AppIconProps) {
   return <Ionicons name={name} size={size} color={color} />;
 }

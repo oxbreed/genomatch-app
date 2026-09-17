@@ -22,7 +22,7 @@ export default function GenoLegalScreen({ title, subtitle, sections, onBack }: P
 
       <View style={styles.topBar}>
         <GenoGlassIconButton onPress={onBack} accessibilityLabel="Go back">
-          <Ionicons name="chevron-back" size={20} color={COLORS.forestDeep} />
+          <Ionicons name="chevron-back" size={20} color={COLORS.ink} />
         </GenoGlassIconButton>
       </View>
 
@@ -55,13 +55,13 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 17,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     marginBottom: 8,
   },
   sectionBody: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
     lineHeight: 21,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
   },
 });

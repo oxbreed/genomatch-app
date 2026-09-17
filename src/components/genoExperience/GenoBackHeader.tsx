@@ -14,7 +14,7 @@ export default function GenoBackHeader({ title, onBack, right }: Props) {
   return (
     <View style={styles.header}>
       <GenoGlassIconButton onPress={onBack} accessibilityLabel="Go back" size={40}>
-        <Ionicons name="chevron-back" size={20} color={COLORS.forestDeep} />
+        <Ionicons name="chevron-back" size={20} color={COLORS.ink} />
       </GenoGlassIconButton>
       <Text style={styles.title} numberOfLines={1}>
         {title}
@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 17,
     letterSpacing: -0.3,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     textAlign: 'center',
   },
   right: {

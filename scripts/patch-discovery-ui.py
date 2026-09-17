@@ -131,7 +131,7 @@ old_actions = """              <View style={styles.actions}>
                   onPress={handlePass}
                   disabled={showMatch}
                 >
-                  <Ionicons name="close" size={24} color="#8FAF95" />
+                  <Ionicons name="close" size={24} color={COLORS.metallicSilver} />
                 </Pressable>
                 <SuperLikeButton onPress={handleSuperLike} disabled={showMatch} />
                 <Animated.View style={{ transform: [{ scale: likePulseScale }] }}>

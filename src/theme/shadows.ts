@@ -11,28 +11,28 @@ export const RADIUS = {
 
 export const SHADOWS = {
   card: {
-    shadowColor: COLORS.forest,
+    shadowColor: COLORS.hero,
     shadowOpacity: 0.1,
     shadowRadius: 16,
     shadowOffset: { width: 0, height: 6 },
     elevation: 4,
   } satisfies ViewStyle,
   cardElevated: {
-    shadowColor: COLORS.forest,
+    shadowColor: COLORS.hero,
     shadowOpacity: 0.14,
     shadowRadius: 20,
     shadowOffset: { width: 0, height: 10 },
     elevation: 6,
   } satisfies ViewStyle,
   button: {
-    shadowColor: COLORS.forest,
+    shadowColor: COLORS.hero,
     shadowOpacity: 0.18,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },
     elevation: 3,
   } satisfies ViewStyle,
   glass: {
-    shadowColor: COLORS.forestDeep,
+    shadowColor: COLORS.ink,
     shadowOpacity: 0.14,
     shadowRadius: 24,
     shadowOffset: { width: 0, height: 10 },

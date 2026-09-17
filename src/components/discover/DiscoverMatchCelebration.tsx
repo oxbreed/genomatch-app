@@ -34,7 +34,7 @@ function ConfettiBurst({ progress }: { progress: Animated.Value }) {
         angle: (i / CONFETTI_COUNT) * Math.PI * 2,
         dist: 72 + (i % 4) * 18,
         size: 5 + (i % 3) * 2,
-        color: i % 3 === 0 ? COLORS.gold : i % 3 === 1 ? COLORS.sage : COLORS.linen,
+        color: i % 3 === 0 ? COLORS.gold : i % 3 === 1 ? COLORS.metallicSilver : COLORS.linen,
       })),
     []
   );
@@ -241,7 +241,7 @@ export default function DiscoverMatchCelebration({
     <Modal visible={visible} transparent animationType="none" statusBarTranslucent>
       <Animated.View style={[styles.backdrop, { opacity: backdrop }]}>
         <LinearGradient
-          colors={['#061810', 'rgba(11, 12, 14, 0.96)', COLORS.forestDeep]}
+          colors={['#061810', 'rgba(11, 12, 14, 0.96)', COLORS.ink]}
           locations={[0, 0.45, 1]}
           style={StyleSheet.absoluteFill}
         />
@@ -278,7 +278,7 @@ export default function DiscoverMatchCelebration({
           >
             <View style={styles.cardInner}>
               <LinearGradient
-                colors={['#C8102E', '#8E0B20', COLORS.forestDeep]}
+                colors={['#C8102E', '#8E0B20', COLORS.ink]}
                 start={{ x: 0.2, y: 0 }}
                 end={{ x: 0.8, y: 1 }}
                 style={styles.cardGradient}
@@ -362,7 +362,7 @@ export default function DiscoverMatchCelebration({
                             gradient={profile.gradient}
                             avatarUrl={profile.avatarUrl ?? profile.photos[0]}
                             size={68}
-                            noPhotoBackground={COLORS.forestDeep}
+                            noPhotoBackground={COLORS.ink}
                             noPhotoInitialColor={COLORS.linen}
                           />
                         ) : (
@@ -404,7 +404,7 @@ export default function DiscoverMatchCelebration({
                     style={styles.ctaGradient}
                   >
                     <Text style={styles.ctaText}>Continue</Text>
-                    <Ionicons name="arrow-forward" size={20} color={COLORS.forestDeep} />
+                    <Ionicons name="arrow-forward" size={20} color={COLORS.ink} />
                   </LinearGradient>
                 </Pressable>
 
@@ -581,7 +581,7 @@ const styles = StyleSheet.create({
   orbitDotAlt: {
     top: undefined,
     bottom: -4,
-    backgroundColor: COLORS.sage,
+    backgroundColor: COLORS.metallicSilver,
   },
   avatarRow: {
     flexDirection: 'row',
@@ -606,7 +606,7 @@ const styles = StyleSheet.create({
     width: 68,
     height: 68,
     borderRadius: 34,
-    backgroundColor: COLORS.forest,
+    backgroundColor: COLORS.hero,
     borderWidth: 2,
     borderColor: COLORS.gold,
     alignItems: 'center',
@@ -633,7 +633,7 @@ const styles = StyleSheet.create({
   avatarLabel: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 12,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
     maxWidth: 88,
     textAlign: 'center',
   },
@@ -699,7 +699,7 @@ const styles = StyleSheet.create({
   ctaText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 17,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   skipBtn: {
     flexDirection: 'row',

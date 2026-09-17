@@ -11,7 +11,7 @@ type Stats = {
 export default function ProfileStatsStrip({ matches, likesReceived, profileViews }: Stats) {
   return (
     <LinearGradient
-      colors={[COLORS.forestDeep, COLORS.forest]}
+      colors={[COLORS.ink, COLORS.hero]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={styles.wrap}

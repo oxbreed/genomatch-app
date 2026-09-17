@@ -23,7 +23,7 @@ export default function GenoPremiumPanel({ label, icon, children }: Props) {
       contentStyle={styles.panelContent}
     >
       <View style={styles.labelRow}>
-        {icon ? <Ionicons name={icon} size={16} color={COLORS.forest} /> : null}
+        {icon ? <Ionicons name={icon} size={16} color={COLORS.hero} /> : null}
         <Text style={styles.label}>{label}</Text>
       </View>
       {children}
@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 12,
     letterSpacing: 1.2,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
     textTransform: 'uppercase',
   },
 });

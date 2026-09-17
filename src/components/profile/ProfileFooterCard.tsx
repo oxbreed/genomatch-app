@@ -30,7 +30,7 @@ function FooterLink({
     >
       <Text style={[styles.linkText, destructive && styles.linkDestructive]}>{label}</Text>
       {!destructive ? (
-        <Ionicons name="chevron-forward" size={16} color={COLORS.sage} />
+        <Ionicons name="chevron-forward" size={16} color={COLORS.metallicSilver} />
       ) : null}
     </Pressable>
   );
@@ -76,7 +76,7 @@ export default function ProfileFooterCard({
           style={styles.signOutGlass}
           contentStyle={styles.signOutInner}
         >
-          <Ionicons name="log-out-outline" size={18} color={COLORS.forestDeep} />
+          <Ionicons name="log-out-outline" size={18} color={COLORS.ink} />
           <Text style={styles.signOutText}>
             {signingOut ? 'Signing out…' : 'Sign out'}
           </Text>
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
   linkText: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 15,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   linkDestructive: {
     color: COLORS.error,
@@ -149,6 +149,6 @@ const styles = StyleSheet.create({
   signOutText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 15,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
 });

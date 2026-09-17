@@ -261,7 +261,7 @@ export default function DiscoverProfileSheet({
                 </ScrollView>
               ) : (
                 <LinearGradient
-                  colors={[COLORS.forestDeep, COLORS.forest, '#20222A']}
+                  colors={[COLORS.ink, COLORS.hero, '#20222A']}
                   style={styles.heroPhoto}
                 >
                   <View style={styles.noPhotoCircle}>
@@ -423,7 +423,7 @@ const styles = StyleSheet.create({
   },
   hero: {
     height: HERO_HEIGHT,
-    backgroundColor: COLORS.forestDeep,
+    backgroundColor: COLORS.ink,
   },
   heroPhoto: {
     width: SCREEN_WIDTH,
@@ -541,13 +541,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
     letterSpacing: 1.4,
     textTransform: 'uppercase',
-    color: COLORS.forest,
+    color: COLORS.hero,
   },
   bondRisk: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 15,
     lineHeight: 22,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     textAlign: 'center',
     maxWidth: '92%',
   },
@@ -566,7 +566,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     letterSpacing: 1.2,
     textTransform: 'uppercase',
-    color: COLORS.forest,
+    color: COLORS.hero,
     opacity: 0.8,
   },
   infoPanel: {
@@ -582,7 +582,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 16,
     lineHeight: 25,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   detailRow: {
     flexDirection: 'row',
@@ -607,7 +607,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 15,
     lineHeight: 22,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   chipRow: {
     flexDirection: 'row',
@@ -625,12 +625,12 @@ const styles = StyleSheet.create({
   chipText: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   goalValue: {
     fontFamily: FONT_FAMILY.gothamSemiBold,
     fontSize: 18,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     letterSpacing: -0.2,
   },
   scrollSpacer: {

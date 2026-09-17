@@ -7,7 +7,7 @@ type Props = {
   marginVertical?: number;
 };
 
-/** Gold–sage rule with centre bond dot — section break unique to GenoMatch */
+/** Gold–silver rule with centre bond dot — section break unique to GenoMatch */
 export default function GenoBrandDivider({ width = '100%', marginVertical = 16 }: Props) {
   return (
     <View style={[styles.wrap, { width, marginVertical }]}>

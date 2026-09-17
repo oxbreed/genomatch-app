@@ -144,14 +144,14 @@ const styles = StyleSheet.create({
   hint: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
     marginBottom: 8,
   },
   label: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: PROFILE.sectionTitleSize,
     letterSpacing: -0.2,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   labelRow: {
     flexDirection: 'row',
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
   counter: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
   },
   counterWarn: {
     color: COLORS.gold,
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: PROFILE.bodySize,
     lineHeight: 22,
-    color: COLORS.forest,
+    color: COLORS.hero,
   },
   chipRow: {
     flexDirection: 'row',
@@ -202,12 +202,12 @@ const styles = StyleSheet.create({
   chipText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 13,
-    color: COLORS.forest,
+    color: COLORS.hero,
   },
   chipTextActive: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 13,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   goalRow: {
     flexDirection: 'row',
@@ -235,6 +235,6 @@ const styles = StyleSheet.create({
   goalTextActive: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 14,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
 });

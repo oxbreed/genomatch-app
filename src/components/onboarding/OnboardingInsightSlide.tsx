@@ -12,7 +12,7 @@ type Props = {
 
 const ACCENT_COLORS = {
   gold: COLORS.gold,
-  sage: COLORS.sage,
+  metallicSilver: COLORS.metallicSilver,
   mint: COLORS.mint,
 };
 

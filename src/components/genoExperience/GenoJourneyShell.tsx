@@ -20,7 +20,7 @@ type Props = {
 
 /**
  * Unified premium canvas for splash-adjacent flows: onboarding, register, profile setup.
- * Linen backdrop + readable forest typography (fixes low-contrast ivory-on-linen bugs).
+ * Linen backdrop + readable ink typography (fixes low-contrast ivory-on-linen bugs).
  */
 export default function GenoJourneyShell({
   children,
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
   backText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 14,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   pressed: { opacity: 0.88 },
   content: {
@@ -256,13 +256,13 @@ const styles = StyleSheet.create({
   ctaText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 17,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   helper: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 13,
     lineHeight: 19,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
     textAlign: 'center',
   },
   cardOuter: {
@@ -304,13 +304,13 @@ const styles = StyleSheet.create({
     fontSize: 30,
     lineHeight: 36,
     letterSpacing: -0.6,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   heroSubtitle: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 15,
     lineHeight: 23,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
     maxWidth: '96%',
   },
 });

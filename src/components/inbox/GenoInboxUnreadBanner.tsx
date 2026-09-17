@@ -19,7 +19,7 @@ export default function GenoInboxUnreadBanner({ count }: Props) {
       style={styles.wrap}
       contentStyle={styles.inner}
     >
-      <Ionicons name="chatbubble-ellipses" size={14} color={COLORS.forest} />
+      <Ionicons name="chatbubble-ellipses" size={14} color={COLORS.hero} />
       <Text style={styles.text}>
         {count} unread {count === 1 ? 'conversation' : 'conversations'} — tap to jump in
       </Text>
@@ -45,6 +45,6 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
     lineHeight: 17,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
 });
