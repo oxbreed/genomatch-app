@@ -57,7 +57,7 @@ function StepPill({
       <Animated.View style={[styles.pillOuter, { transform: [{ scale }] }]}>
         {active ? (
           <LinearGradient
-            colors={['rgba(212, 168, 67, 0.55)', 'rgba(61, 122, 82, 0.35)']}
+            colors={['rgba(212, 175, 55, 0.55)', 'rgba(200, 16, 46, 0.35)']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.pillGlow}
@@ -114,7 +114,7 @@ export default function StudioStepRail({ steps, activeIndex, onSelect, completed
         onLayout={(e: LayoutChangeEvent) => setTrackWidth(e.nativeEvent.layout.width)}
       >
         <LinearGradient
-          colors={['rgba(13, 40, 24, 0.06)', 'rgba(212, 168, 67, 0.2)', 'rgba(13, 40, 24, 0.06)']}
+          colors={['rgba(13, 40, 24, 0.06)', 'rgba(212, 175, 55, 0.2)', 'rgba(13, 40, 24, 0.06)']}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}
           style={styles.track}
@@ -204,11 +204,11 @@ const styles = StyleSheet.create({
   },
   pillActive: {
     backgroundColor: COLORS.mint,
-    borderColor: 'rgba(212, 168, 67, 0.55)',
+    borderColor: 'rgba(212, 175, 55, 0.55)',
   },
   pillComplete: {
-    borderColor: 'rgba(61, 122, 82, 0.35)',
-    backgroundColor: 'rgba(237, 243, 238, 0.85)',
+    borderColor: 'rgba(200, 16, 46, 0.35)',
+    backgroundColor: 'rgba(240, 241, 243, 0.85)',
   },
   stepBadge: {
     width: 20,
@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.gold,
   },
   stepBadgeComplete: {
-    backgroundColor: 'rgba(61, 122, 82, 0.25)',
+    backgroundColor: 'rgba(200, 16, 46, 0.25)',
   },
   stepBadgeText: {
     fontFamily: FONT_FAMILY.gothamBold,

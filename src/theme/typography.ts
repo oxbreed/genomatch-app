@@ -192,7 +192,7 @@ export const TYPOGRAPHY = {
     ...systemRegular(),
     fontSize: 10,
     letterSpacing: 0.12,
-    color: 'rgba(22, 53, 34, 0.42)',
+    color: 'rgba(11, 12, 14, 0.42)',
   } satisfies TextStyle,
 
   navLabelActive: {

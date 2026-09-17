@@ -38,7 +38,7 @@ export default function StudioSaveDock({ saveState, onDone, busy }: Props) {
   return (
     <View style={styles.dock}>
       <LinearGradient
-        colors={['rgba(245, 239, 230, 0)', 'rgba(245, 239, 230, 0.96)', COLORS.linen]}
+        colors={['rgba(250, 248, 245, 0)', 'rgba(250, 248, 245, 0.96)', COLORS.linen]}
         style={styles.fade}
         pointerEvents="none"
       />
@@ -61,7 +61,7 @@ export default function StudioSaveDock({ saveState, onDone, busy }: Props) {
           accessibilityLabel="Done editing profile"
         >
           <LinearGradient
-            colors={busy ? ['rgba(143, 175, 149, 0.5)', 'rgba(143, 175, 149, 0.35)'] : [COLORS.gold, '#C49A38']}
+            colors={busy ? ['rgba(184, 188, 196, 0.5)', 'rgba(184, 188, 196, 0.35)'] : [COLORS.gold, '#C49A38']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.done}
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     width: 7,
     height: 7,
     borderRadius: 4,
-    backgroundColor: 'rgba(143, 175, 149, 0.5)',
+    backgroundColor: 'rgba(184, 188, 196, 0.5)',
   },
   statusDotLive: {
     backgroundColor: COLORS.gold,

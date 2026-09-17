@@ -80,7 +80,7 @@ export default function FilterSheet({
         <Pressable style={styles.backdropPress} onPress={onClose} />
         <View style={styles.sheet} onStartShouldSetResponder={() => true}>
           <LinearGradient
-            colors={['rgba(212, 168, 67, 0.52)', 'rgba(61, 122, 82, 0.34)', 'rgba(255, 255, 255, 0.18)']}
+            colors={['rgba(212, 175, 55, 0.52)', 'rgba(200, 16, 46, 0.34)', 'rgba(255, 255, 255, 0.18)']}
             style={styles.sheetBorder}
           >
             <GenoGlassSurface
@@ -284,7 +284,7 @@ export default function FilterSheet({
                   onClose();
                 }}
               >
-                <LinearGradient colors={[COLORS.gold, '#C49A3A']} style={styles.applyBtn}>
+                <LinearGradient colors={[COLORS.gold, '#B8962E']} style={styles.applyBtn}>
                   <Text style={styles.applyBtnText}>Apply filters</Text>
                 </LinearGradient>
               </Pressable>

@@ -37,7 +37,7 @@ export default function ProfileHeroChrome({ studio, height, children }: Props) {
         <View style={[styles.hero, { height }]}>
           {children}
           <LinearGradient
-            colors={['rgba(212, 168, 67, 0.45)', 'transparent']}
+            colors={['rgba(212, 175, 55, 0.45)', 'transparent']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.topAccent}
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     overflow: 'hidden',
     borderRadius: RADIUS.xl,
-    backgroundColor: 'rgba(22, 53, 34, 0.82)',
+    backgroundColor: 'rgba(11, 12, 14, 0.82)',
   },
   viewVignette: {
     position: 'absolute',
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     overflow: 'hidden',
     borderRadius: RADIUS.xl - 1.5,
-    backgroundColor: 'rgba(22, 53, 34, 0.82)',
+    backgroundColor: 'rgba(11, 12, 14, 0.82)',
   },
   topAccent: {
     position: 'absolute',

@@ -22,7 +22,7 @@ export default function GenoAuthHeader({
   light = true,
 }: Props) {
   const titleColor = light ? COLORS.linen : COLORS.forestDeep;
-  const subColor = light ? 'rgba(245, 239, 230, 0.78)' : COLORS.sage;
+  const subColor = light ? 'rgba(250, 248, 245, 0.78)' : COLORS.sage;
 
   return (
     <View style={styles.wrap}>
@@ -54,7 +54,7 @@ export default function GenoAuthHeader({
       </View>
 
       <LinearGradient
-        colors={['transparent', COLORS.gold, 'rgba(61, 122, 82, 0.35)', 'transparent']}
+        colors={['transparent', COLORS.gold, 'rgba(200, 16, 46, 0.35)', 'transparent']}
         start={{ x: 0, y: 0.5 }}
         end={{ x: 1, y: 0.5 }}
         style={styles.rule}

@@ -17,16 +17,19 @@ const PRESENCE_CONFIG: Record<
   online: {
     label: 'Online',
     icon: 'radio-button-on',
-    color: '#2E8B57',
-    bg: 'rgba(46, 139, 87, 0.18)',
-    border: 'rgba(46, 139, 87, 0.35)',
+    // Intentional status-green (universal "online" convention), NOT a brand
+    // color. Deliberately kept green and exempt from the forest-hex removal;
+    // #2ECC71 is a standard status green, not the old forest palette.
+    color: '#2ECC71',
+    bg: 'rgba(46, 204, 113, 0.18)',
+    border: 'rgba(46, 204, 113, 0.35)',
   },
   recently_online: {
     label: 'Recently online',
     icon: 'time-outline',
     color: COLORS.sage,
-    bg: 'rgba(143, 175, 149, 0.18)',
-    border: 'rgba(143, 175, 149, 0.35)',
+    bg: 'rgba(184, 188, 196, 0.18)',
+    border: 'rgba(184, 188, 196, 0.35)',
   },
 };
 
@@ -39,7 +42,8 @@ export function PresenceDot({
 }) {
   if (presenceState === 'offline') return null;
 
-  const color = presenceState === 'online' ? '#3DDC84' : COLORS.sage;
+  // Status-green for "online" (UX convention), silver for recently-online.
+  const color = presenceState === 'online' ? '#2ECC71' : COLORS.sage;
 
   return (
     <View
@@ -162,7 +166,8 @@ const styles = StyleSheet.create({
     width: 7,
     height: 7,
     borderRadius: 4,
-    backgroundColor: '#3DDC84',
+    // Status-green "online" dot (UX convention), not a brand color.
+    backgroundColor: '#2ECC71',
   },
   dotRing: {
     alignItems: 'center',
@@ -179,13 +184,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 999,
-    backgroundColor: 'rgba(212, 168, 67, 0.2)',
+    backgroundColor: 'rgba(212, 175, 55, 0.2)',
     borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.4)',
+    borderColor: 'rgba(212, 175, 55, 0.4)',
   },
   newBadgeDark: {
-    backgroundColor: 'rgba(212, 168, 67, 0.28)',
-    borderColor: 'rgba(212, 168, 67, 0.5)',
+    backgroundColor: 'rgba(212, 175, 55, 0.28)',
+    borderColor: 'rgba(212, 175, 55, 0.5)',
   },
   newText: {
     fontFamily: FONT_FAMILY.gothamBold,
@@ -200,14 +205,14 @@ const styles = StyleSheet.create({
     width: 18,
     height: 18,
     borderRadius: 9,
-    backgroundColor: 'rgba(212, 168, 67, 0.2)',
+    backgroundColor: 'rgba(212, 175, 55, 0.2)',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.35)',
+    borderColor: 'rgba(212, 175, 55, 0.35)',
   },
   newCompactDark: {
-    backgroundColor: 'rgba(212, 168, 67, 0.28)',
-    borderColor: 'rgba(212, 168, 67, 0.45)',
+    backgroundColor: 'rgba(212, 175, 55, 0.28)',
+    borderColor: 'rgba(212, 175, 55, 0.45)',
   },
 });

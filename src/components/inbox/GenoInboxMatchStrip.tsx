@@ -49,7 +49,7 @@ export default function GenoInboxMatchStrip({ matches, onOpenMatch }: Props) {
                 {item.profile.name.split(' ')[0]}
               </Text>
               {isNew ? (
-                <LinearGradient colors={[COLORS.gold, '#C49A3A']} style={styles.newDot}>
+                <LinearGradient colors={[COLORS.gold, '#B8962E']} style={styles.newDot}>
                   <View style={styles.newDotInner} />
                 </LinearGradient>
               ) : null}

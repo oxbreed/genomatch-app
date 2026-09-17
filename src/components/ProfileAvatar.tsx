@@ -4,9 +4,9 @@ import { COLORS, getInitials } from '../data/mockData';
 // Brand-safe gradient pairs — no purple, no off-brand colors
 const BRAND_GRADIENTS: [string, string][] = [
   [COLORS.forest, COLORS.forestDeep],
-  [COLORS.forestDeep, '#0A1F12'],
-  ['#1A3D28', '#163522'],
-  ['#2A5438', '#1A3D28'],
+  [COLORS.forestDeep, '#0B0C0E'],
+  ['#15171A', '#0B0C0E'],
+  ['#20222A', '#15171A'],
 ];
 
 function getBrandGradient(name: string): [string, string] {
@@ -56,8 +56,8 @@ export default function ProfileAvatar({
     : size * 0.36;
   const hasPhoto = Boolean(avatarUrl?.trim());
   const initials = getInitials(name);
-  const fallbackBg = noPhotoBackground ?? '#1A3D28';
-  const fallbackInnerBg = noPhotoBackground ?? '#1A3D28';
+  const fallbackBg = noPhotoBackground ?? '#15171A';
+  const fallbackInnerBg = noPhotoBackground ?? '#15171A';
   const initialColor = noPhotoInitialColor ?? '#FFFFFF';
 
   const initialsNode = (
@@ -82,7 +82,7 @@ export default function ProfileAvatar({
           borderRadius: outerRadius,
           backgroundColor: hasPhoto ? COLORS.white : fallbackBg,
           borderWidth: hasPhoto && !isCover ? 2 : 0,
-          borderColor: 'rgba(168, 213, 186, 0.5)',
+          borderColor: 'rgba(184, 188, 196, 0.5)',
         },
       ]}
     >

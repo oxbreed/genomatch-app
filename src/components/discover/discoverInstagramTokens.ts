@@ -8,7 +8,7 @@ export const DISCOVER_IG = {
   photoBarGap: 4,
   photoBarTop: 10,
   photoBarInset: 10,
-  stampLike: '#00D632',
+  stampLike: '#D4AF37',
   stampNope: '#FF3040',
   heartRed: '#FF3040',
   scrim: ['transparent', 'rgba(0,0,0,0.08)', 'rgba(0,0,0,0.55)', 'rgba(0,0,0,0.82)'] as const,

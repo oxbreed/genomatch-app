@@ -221,7 +221,7 @@ export default function SignIn({
                 value={email}
                 onChangeText={setEmail}
                 placeholder="you@example.com"
-                placeholderTextColor="rgba(27, 122, 110, 0.35)"
+                placeholderTextColor="rgba(200, 16, 46, 0.35)"
                 keyboardType="email-address"
                 autoCapitalize="none"
                 autoComplete="email"
@@ -241,7 +241,7 @@ export default function SignIn({
                 value={password}
                 onChangeText={setPassword}
                 placeholder="Your password"
-                placeholderTextColor="rgba(27, 122, 110, 0.35)"
+                placeholderTextColor="rgba(200, 16, 46, 0.35)"
                 secureTextEntry={!showPass}
                 autoComplete="password"
                 textContentType="password"
@@ -277,7 +277,7 @@ export default function SignIn({
                   disabled={loading}
                 >
                   <LinearGradient
-                    colors={[COLORS.gold, '#E8C56A', '#C49A3A']}
+                    colors={[COLORS.gold, '#E5C766', '#B8962E']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     style={styles.submitGradient}
@@ -371,9 +371,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: RADIUS.pill,
-    backgroundColor: 'rgba(212, 168, 67, 0.14)',
+    backgroundColor: 'rgba(212, 175, 55, 0.14)',
     borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.35)',
+    borderColor: 'rgba(212, 175, 55, 0.35)',
     marginBottom: 14,
   },
   brandChipText: {
@@ -417,7 +417,7 @@ const styles = StyleSheet.create({
     height: 54,
     borderRadius: RADIUS.md,
     borderWidth: 1.5,
-    borderColor: 'rgba(27, 122, 110, 0.16)',
+    borderColor: 'rgba(200, 16, 46, 0.16)',
     backgroundColor: GLASS.insetFill,
     paddingHorizontal: 14,
     color: COLORS.forestDeep,
@@ -425,7 +425,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   inputFocused: {
-    borderColor: 'rgba(212, 168, 67, 0.65)',
+    borderColor: 'rgba(212, 175, 55, 0.65)',
     ...SHADOWS.card,
     shadowOpacity: 0.05,
     shadowRadius: 6,
@@ -457,9 +457,9 @@ const styles = StyleSheet.create({
   trustBox: {
     marginTop: 16,
     borderRadius: RADIUS.md,
-    backgroundColor: 'rgba(61, 122, 82, 0.08)',
+    backgroundColor: 'rgba(200, 16, 46, 0.08)',
     borderWidth: 1,
-    borderColor: 'rgba(61, 122, 82, 0.14)',
+    borderColor: 'rgba(200, 16, 46, 0.14)',
     paddingVertical: 12,
     paddingHorizontal: 12,
     flexDirection: 'row',
@@ -470,7 +470,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: 'rgba(61, 122, 82, 0.12)',
+    backgroundColor: 'rgba(200, 16, 46, 0.12)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -521,7 +521,7 @@ const styles = StyleSheet.create({
   },
   createText: {
     fontFamily: FONT_FAMILY.gothamMedium,
-    color: 'rgba(27, 122, 110, 0.65)',
+    color: 'rgba(200, 16, 46, 0.65)',
     fontSize: 14,
   },
   createBold: {
@@ -531,7 +531,7 @@ const styles = StyleSheet.create({
   legalText: {
     textAlign: 'center',
     fontFamily: FONT_FAMILY.gothamMedium,
-    color: 'rgba(27, 122, 110, 0.55)',
+    color: 'rgba(200, 16, 46, 0.55)',
     fontSize: 12,
     lineHeight: 18,
     paddingBottom: 4,

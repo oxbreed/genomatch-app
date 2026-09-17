@@ -102,7 +102,7 @@ export default function ProfileGenotypeVerifyModal({
             <LinearGradient
               colors={
                 !allChecked || verifying
-                  ? ['rgba(143, 175, 149, 0.45)', 'rgba(143, 175, 149, 0.3)']
+                  ? ['rgba(184, 188, 196, 0.45)', 'rgba(184, 188, 196, 0.3)']
                   : [COLORS.gold, '#C49A38']
               }
               style={styles.confirm}
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.xl,
     padding: 24,
     borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.35)',
+    borderColor: 'rgba(212, 175, 55, 0.35)',
   },
   iconWrap: {
     alignSelf: 'center',
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
     height: 22,
     borderRadius: 6,
     borderWidth: 1.5,
-    borderColor: 'rgba(143, 175, 149, 0.65)',
+    borderColor: 'rgba(184, 188, 196, 0.65)',
     backgroundColor: COLORS.white,
     alignItems: 'center',
     justifyContent: 'center',

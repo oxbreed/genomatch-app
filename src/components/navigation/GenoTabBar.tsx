@@ -67,7 +67,7 @@ function TabItem({
         <Ionicons
           name={active ? tab.iconActive : tab.icon}
           size={22}
-          color={active ? COLORS.forestDeep : 'rgba(22, 53, 34, 0.4)'}
+          color={active ? COLORS.forestDeep : 'rgba(11, 12, 14, 0.4)'}
         />
         {tab.badge != null && tab.badge > 0 ? (
           <View style={styles.badge}>
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
     borderRadius: TAB_BAR_RADIUS,
     backgroundColor: GLASS.tabBarIndicator,
     borderWidth: 1,
-    borderColor: 'rgba(212, 168, 67, 0.22)',
+    borderColor: 'rgba(212, 175, 55, 0.22)',
   },
   tabItem: {
     flex: 1,

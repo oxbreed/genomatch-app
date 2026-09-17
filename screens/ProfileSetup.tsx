@@ -96,7 +96,7 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
   const [interests, setInterests] = useState<string[]>([]);
   const [relationshipGoal, setRelationshipGoal] = useState('');
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const [avatarGradient, setAvatarGradient] = useState<[string, string]>(['#074D2E', '#1B7A6E']);
+  const [avatarGradient, setAvatarGradient] = useState<[string, string]>(['#0B0C0E', '#D4AF37']);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
@@ -380,7 +380,7 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
               value={displayName}
               onChangeText={setDisplayName}
               placeholder="How should we call you?"
-              placeholderTextColor="rgba(7, 77, 46, 0.35)"
+              placeholderTextColor="rgba(11, 12, 14, 0.35)"
               autoCapitalize="words"
             />
 
@@ -390,7 +390,7 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
               value={age}
               onChangeText={(text) => setAge(text.replace(/[^0-9]/g, ''))}
               placeholder="18+"
-              placeholderTextColor="rgba(7, 77, 46, 0.35)"
+              placeholderTextColor="rgba(11, 12, 14, 0.35)"
               keyboardType="number-pad"
               maxLength={3}
             />
@@ -423,7 +423,7 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
                 value={city}
                 onChangeText={setCity}
                 placeholder={cityLoading ? 'Detecting your city…' : 'e.g. Lagos, Accra, Abuja'}
-                placeholderTextColor="rgba(7, 77, 46, 0.35)"
+                placeholderTextColor="rgba(11, 12, 14, 0.35)"
                 autoCapitalize="words"
               />
               <Pressable
@@ -456,7 +456,7 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
               value={bio}
               onChangeText={(text) => setBio(text.slice(0, 500))}
               placeholder="What are you passionate about? What kind of connection are you hoping for?"
-              placeholderTextColor="rgba(7, 77, 46, 0.35)"
+              placeholderTextColor="rgba(11, 12, 14, 0.35)"
               multiline
               textAlignVertical="top"
               maxLength={500}
@@ -663,12 +663,12 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
     backgroundColor: COLORS.ivory,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(7, 77, 46, 0.08)',
+    borderBottomColor: 'rgba(11, 12, 14, 0.08)',
   },
   progressTrack: {
     height: 6,
     borderRadius: 3,
-    backgroundColor: 'rgba(168, 213, 186, 0.35)',
+    backgroundColor: 'rgba(184, 188, 196, 0.35)',
     overflow: 'hidden',
     marginBottom: 20,
   },
@@ -690,7 +690,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: 'rgba(168, 213, 186, 0.4)',
+    backgroundColor: 'rgba(184, 188, 196, 0.4)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -703,7 +703,7 @@ const styles = StyleSheet.create({
   stepDotText: {
     fontSize: 12,
     fontWeight: '800',
-    color: 'rgba(7, 77, 46, 0.5)',
+    color: 'rgba(11, 12, 14, 0.5)',
   },
   stepDotTextActive: {
     color: COLORS.white,
@@ -711,7 +711,7 @@ const styles = StyleSheet.create({
   stepLabel: {
     fontSize: 10,
     fontWeight: '600',
-    color: 'rgba(7, 77, 46, 0.45)',
+    color: 'rgba(11, 12, 14, 0.45)',
     textAlign: 'center',
   },
   stepLabelActive: {
@@ -739,7 +739,7 @@ const styles = StyleSheet.create({
   stepSubheading: {
     fontSize: 15,
     lineHeight: 22,
-    color: 'rgba(7, 77, 46, 0.65)',
+    color: 'rgba(11, 12, 14, 0.65)',
     fontWeight: '500',
     marginBottom: 20,
   },
@@ -751,7 +751,7 @@ const styles = StyleSheet.create({
   photoHint: {
     fontSize: 12,
     fontWeight: '600',
-    color: 'rgba(7, 77, 46, 0.5)',
+    color: 'rgba(11, 12, 14, 0.5)',
     textAlign: 'center',
   },
   label: {
@@ -763,7 +763,7 @@ const styles = StyleSheet.create({
   },
   hint: {
     fontSize: 12,
-    color: 'rgba(7, 77, 46, 0.55)',
+    color: 'rgba(11, 12, 14, 0.55)',
     marginTop: -4,
     marginBottom: 10,
     fontWeight: '500',
@@ -816,12 +816,12 @@ const styles = StyleSheet.create({
   },
   genderBtnSelected: {
     borderColor: COLORS.forest,
-    backgroundColor: 'rgba(168, 213, 186, 0.25)',
+    backgroundColor: 'rgba(184, 188, 196, 0.25)',
   },
   genderBtnText: {
     fontSize: 14,
     fontWeight: '700',
-    color: 'rgba(7, 77, 46, 0.6)',
+    color: 'rgba(11, 12, 14, 0.6)',
   },
   genderBtnTextSelected: {
     color: COLORS.forest,
@@ -834,7 +834,7 @@ const styles = StyleSheet.create({
   charCounter: {
     fontSize: 12,
     fontWeight: '600',
-    color: 'rgba(7, 77, 46, 0.5)',
+    color: 'rgba(11, 12, 14, 0.5)',
     marginBottom: 8,
   },
   bioInput: {
@@ -871,7 +871,7 @@ const styles = StyleSheet.create({
   chipText: {
     fontSize: 14,
     fontWeight: '600',
-    color: 'rgba(7, 77, 46, 0.7)',
+    color: 'rgba(11, 12, 14, 0.7)',
   },
   chipTextSelected: {
     color: COLORS.ivory,
@@ -889,7 +889,7 @@ const styles = StyleSheet.create({
   },
   goalCardSelected: {
     borderColor: COLORS.forest,
-    backgroundColor: 'rgba(168, 213, 186, 0.2)',
+    backgroundColor: 'rgba(184, 188, 196, 0.2)',
     shadowColor: COLORS.forest,
     shadowOpacity: 0.12,
     shadowRadius: 10,
@@ -900,7 +900,7 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 16,
-    backgroundColor: 'rgba(168, 213, 186, 0.3)',
+    backgroundColor: 'rgba(184, 188, 196, 0.3)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -922,7 +922,7 @@ const styles = StyleSheet.create({
   goalDescription: {
     fontSize: 13,
     lineHeight: 19,
-    color: 'rgba(7, 77, 46, 0.62)',
+    color: 'rgba(11, 12, 14, 0.62)',
     fontWeight: '500',
   },
   goalCheck: {
@@ -954,7 +954,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 16,
     borderWidth: 1.5,
-    borderColor: 'rgba(7, 77, 46, 0.2)',
+    borderColor: 'rgba(11, 12, 14, 0.2)',
     alignItems: 'center',
     justifyContent: 'center',
   },
