@@ -1,5 +1,5 @@
 import type { DiscoveryProfile, DistanceBand, Genotype, ProfileRow } from '../types/database';
-import { computeCompatibility } from './compatibility';
+import { computeLifestyleMatch } from './lifestyleMatch';
 import { isNewMember, resolvePresenceState } from './presence';
 
 const GRADIENTS: [string, string][] = [
@@ -57,7 +57,11 @@ export function isGenotypeVerified(row: Pick<ProfileRow, 'genotype_verified' | '
 export function mapProfileRow(
   row: ProfileRow,
   viewerGenotype: Genotype | null,
-  options?: { distanceBand?: DistanceBand | null }
+  options?: {
+    distanceBand?: DistanceBand | null;
+    viewerInterests?: readonly string[] | null;
+    viewerRelationshipGoal?: string | null;
+  }
 ): DiscoveryProfile {
   const genotype = row.genotype ?? 'AA';
   const photos = resolveProfilePhotos(row.avatar_url, row.photos);
@@ -68,7 +72,12 @@ export function mapProfileRow(
     city: row.city?.trim() || 'Nearby',
     distanceBand: options?.distanceBand ?? null,
     genotype,
-    compatibility: computeCompatibility(viewerGenotype, genotype),
+    lifestyleMatch: computeLifestyleMatch(
+      options?.viewerInterests,
+      row.interests,
+      options?.viewerRelationshipGoal,
+      row.relationship_goal
+    ),
     bio: row.bio?.trim() || '',
     interests: row.interests ?? [],
     gradient: gradientFromId(row.id),

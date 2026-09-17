@@ -28,7 +28,7 @@ export type MockProfile = {
   age: number;
   city: string;
   genotype: Genotype;
-  compatibility: number;
+  lifestyleMatch: number;
   bio: string;
   interests: string[];
   gradient: [string, string];
@@ -43,7 +43,7 @@ export const MOCK_MATCHES: MockProfile[] = [
     age: 27,
     city: 'Lagos',
     genotype: 'AA',
-    compatibility: 94,
+    lifestyleMatch: 94,
     bio: 'Architect who loves live music and long walks. Looking for someone intentional, kind, and ready for something real.',
     interests: ['Music', 'Travel', 'Art', 'Food'],
     gradient: ['#C8102E', '#15171A'],
@@ -56,7 +56,7 @@ export const MOCK_MATCHES: MockProfile[] = [
     age: 29,
     city: 'Accra',
     genotype: 'AS',
-    compatibility: 87,
+    lifestyleMatch: 87,
     bio: 'Fitness coach and foodie. I value honesty, good conversation, and building a future with the right person.',
     interests: ['Fitness', 'Food', 'Sports', 'Movies'],
     gradient: ['#C8102E', '#8E0B20'],
@@ -69,7 +69,7 @@ export const MOCK_MATCHES: MockProfile[] = [
     age: 25,
     city: 'Abuja',
     genotype: 'SS',
-    compatibility: 78,
+    lifestyleMatch: 78,
     bio: 'Medical student and book lover. Building a life filled with purpose, laughter, and deep connection.',
     interests: ['Reading', 'Movies', 'Nature', 'Food'],
     gradient: ['#A32D2D', '#7B1F1F'],
@@ -82,7 +82,7 @@ export const MOCK_MATCHES: MockProfile[] = [
     age: 30,
     city: 'Nairobi',
     genotype: 'AC',
-    compatibility: 82,
+    lifestyleMatch: 82,
     bio: 'Software engineer who enjoys hiking and photography. Looking for an honest connection built on shared values and laughter.',
     interests: ['Hiking', 'Photography', 'Tech', 'Music'],
     gradient: ['#C8102E', COLORS.forestDeep],
@@ -144,7 +144,7 @@ export function getMockDiscoveryProfiles(viewerCity?: string | null): DiscoveryP
       city: p.city,
       distanceBand: resolveDistanceBandFromCities(originCity, p.city),
       genotype: p.genotype,
-      compatibility: p.compatibility,
+      lifestyleMatch: p.lifestyleMatch,
       bio: p.bio,
       interests: p.interests,
       gradient: p.gradient,

@@ -12,13 +12,14 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { GenoBondMark } from '../../brand';
-import CompatibilityProfileCard from '../genomatch/CompatibilityProfileCard';
+import MatchProfileCard from '../genomatch/MatchProfileCard';
+import GenotypeInfoRow from '../genomatch/GenotypeInfoRow';
 import { GenoGlassBackdrop, GenoGlassSurface } from '../../brand/graphics';
 import ProfileAvatar from '../ProfileAvatar';
 import VerifiedBadge from '../VerifiedBadge';
 import { getPrimaryPhotoUri } from '../../lib/profilePhotos';
 import { FONT_FAMILY, COLORS, RADIUS, SHADOWS } from '../../theme';
-import type { DiscoveryProfile } from '../../types/database';
+import type { DiscoveryProfile, Genotype } from '../../types/database';
 
 type ViewerSnapshot = {
   name: string;
@@ -33,6 +34,7 @@ type Props = {
   matchName: string;
   profile?: DiscoveryProfile | null;
   viewer?: ViewerSnapshot | null;
+  viewerGenotype?: Genotype | null;
   onContinue: () => void;
   onSendMessage?: () => void;
 };
@@ -78,6 +80,7 @@ export default function DiscoverMatchModal({
   matchName,
   profile,
   viewer,
+  viewerGenotype,
   onContinue,
   onSendMessage,
 }: Props) {
@@ -208,8 +211,8 @@ export default function DiscoverMatchModal({
 
                 {profile ? (
                   <View style={styles.compatCardWrap}>
-                    <CompatibilityProfileCard
-                      percent={profile.compatibility}
+                    <MatchProfileCard
+                      percent={profile.lifestyleMatch}
                       theirTraits={profile.interests}
                       onViewReport={() => {
                         void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -217,6 +220,12 @@ export default function DiscoverMatchModal({
                       }}
                       ctaLabel="View Full Report"
                     />
+                    <View style={styles.genotypeInfoWrap}>
+                      <GenotypeInfoRow
+                        viewerGenotype={viewerGenotype ?? null}
+                        candidateGenotype={profile.genotype}
+                      />
+                    </View>
                     <Text style={styles.compatDisclaimer} numberOfLines={2}>
                       Informational only — not medical advice.
                     </Text>
@@ -419,6 +428,11 @@ const styles = StyleSheet.create({
   compatCardWrap: {
     width: '100%',
     marginTop: 4,
+  },
+  genotypeInfoWrap: {
+    width: '100%',
+    paddingHorizontal: 8,
+    marginTop: 6,
   },
   compatDisclaimer: {
     fontSize: 10,
