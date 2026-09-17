@@ -10,4 +10,5 @@ export const AUTH_GENOTYPE_OPTIONS: GenotypeOption[] = [
   { id: 'AS', icon: 'ellipse-outline' as IonName, name: 'Sickle cell trait', accent: COLORS.sage },
   { id: 'SS', icon: 'ellipse-outline' as IonName, name: 'Sickle cell disease', accent: COLORS.sage },
   { id: 'AC', icon: 'ellipse-outline' as IonName, name: 'Hemoglobin AC', accent: COLORS.sage },
+  { id: 'SC', icon: 'ellipse-outline' as IonName, name: 'Hemoglobin SC', accent: COLORS.sage },
 ];

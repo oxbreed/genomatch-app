@@ -41,12 +41,17 @@ export function getGenotypeRiskShort(
     AAAA: 'Very low risk',
     AAAS: 'Low risk',
     AAAC: 'Low risk',
+    AASC: 'Low risk',
     AASS: 'Elevated risk',
     ASAS: 'Moderate risk',
     ACAS: 'Moderate risk',
     ACSS: 'Higher risk',
+    ASSC: 'Higher risk',
     ASSS: 'Higher risk',
     ACAC: 'Moderate risk',
+    ACSC: 'Higher risk',
+    SCSC: 'Higher risk',
+    SCSS: 'Higher risk',
     SSSS: 'Higher risk',
   };
   return riskByPair[genotypePairKey(viewerGenotype, candidateGenotype)] ?? null;
@@ -107,6 +112,50 @@ const FAMILY_PLANNING_BY_PAIR: Record<string, Omit<FamilyPlanningInsight, 'pairL
     summary: 'Every child from this pairing would have HbSC disease, a form of sickle cell disease.',
     detail:
       'One partner is AC and one is SS. Each child inherits an S gene from one parent and a C gene from the other.',
+    icon: 'medical-outline',
+  },
+  AASC: {
+    tier: 'low_risk',
+    title: 'Every child would be a carrier',
+    summary:
+      'Children from this pairing would not have a sickle cell disorder. Each would be either AS or AC.',
+    detail:
+      'One partner is AA and one is SC. The AA partner can only pass on an A gene, so no child can inherit two affected genes.',
+    icon: 'information-circle-outline',
+  },
+  ACSC: {
+    tier: 'counseling',
+    title: 'Genetic counseling recommended',
+    summary:
+      'Each child has a 25% chance of HbSC disease and a 25% chance of hemoglobin C disease. The rest would be carriers.',
+    detail:
+      'One partner is AC and one is SC. The C gene is passed by both sides, so hemoglobin C disease is on the table alongside HbSC.',
+    icon: 'medical-outline',
+  },
+  ASSC: {
+    tier: 'counseling',
+    title: 'Higher risk — seek counseling',
+    summary:
+      'Each child has a 25% chance of HbSS disease and a 25% chance of HbSC disease. The other half would be carriers.',
+    detail:
+      'One partner is AS and one is SC. Both can pass on an S gene, so a child can inherit two affected genes in more than one combination.',
+    icon: 'medical-outline',
+  },
+  SCSC: {
+    tier: 'counseling',
+    title: 'Specialist support advised',
+    summary:
+      'Each child has a 25% chance of HbSS disease, a 50% chance of HbSC disease and a 25% chance of hemoglobin C disease.',
+    detail:
+      'Both partners have HbSC disease, so every child inherits an affected gene from each side. Severity varies by combination.',
+    icon: 'medical-outline',
+  },
+  SCSS: {
+    tier: 'counseling',
+    title: 'Specialist support advised',
+    summary: 'Each child has a 50% chance of HbSS disease and a 50% chance of HbSC disease.',
+    detail:
+      'One partner is SC and one is SS. The SS partner can only pass on an S gene, so every child inherits at least one.',
     icon: 'medical-outline',
   },
   ASSS: {

@@ -212,7 +212,7 @@ export async function ensureUserProfile(): Promise<ProfileRow | null> {
     id: user.id,
     email: user.email ?? null,
     genotype:
-      metaGenotype && ['AA', 'AS', 'SS', 'AC'].includes(metaGenotype)
+      metaGenotype && ['AA', 'AS', 'SS', 'AC', 'SC'].includes(metaGenotype)
         ? metaGenotype
         : null,
   };

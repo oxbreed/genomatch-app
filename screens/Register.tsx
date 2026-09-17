@@ -35,6 +35,7 @@ const GENOTYPES: { id: string; icon: IonName; name: string; accent: string }[] =
   { id: 'AS', icon: 'ellipse-outline', name: 'Sickle cell trait', accent: COLORS.sage },
   { id: 'SS', icon: 'ellipse-outline', name: 'Sickle cell disease', accent: COLORS.sage },
   { id: 'AC', icon: 'ellipse-outline', name: 'Hemoglobin AC', accent: COLORS.sage },
+  { id: 'SC', icon: 'ellipse-outline', name: 'Hemoglobin SC', accent: COLORS.sage },
 ];
 
 export default function Register({
