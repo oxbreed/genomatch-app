@@ -15,29 +15,13 @@ export type FamilyPlanningInsight = {
   icon: IonName;
 };
 
-/** Genotype-aware compatibility score (0–100) for West African sickle-cell context. */
-export function computeCompatibility(
-  viewer: Genotype | null,
-  candidate: Genotype | null
-): number {
-  if (!viewer || !candidate) return 72;
-
-  const pair = [viewer, candidate].sort().join('');
-
-  const scores: Record<string, number> = {
-    AAAA: 98,
-    AAAS: 88,
-    AAAC: 90,
-    AASS: 45,
-    ASAS: 72,
-    ASAC: 78,
-    ASSS: 38,
-    ACAC: 75,
-    ACCC: 70,
-    SSSS: 30,
-  };
-
-  return scores[pair] ?? 65;
+/**
+ * Canonical key for an unordered genotype pair.
+ * `AS`+`AC` and `AC`+`AS` both produce `ACAS`. Every lookup table must use
+ * this helper's output; hand-written keys in the wrong order miss silently.
+ */
+export function genotypePairKey(a: Genotype, b: Genotype): string {
+  return [a, b].sort().join('');
 }
 
 /**
@@ -51,21 +35,21 @@ export function getGenotypeRiskShort(
   viewerGenotype: Genotype | null,
   candidateGenotype: Genotype
 ): string | null {
-  const viewer = viewerGenotype ?? 'AA';
-  const pairKey = [viewer, candidateGenotype].sort().join('');
+  if (!viewerGenotype) return null;
+
   const riskByPair: Record<string, string> = {
     AAAA: 'Very low risk',
     AAAS: 'Low risk',
     AAAC: 'Low risk',
     AASS: 'Elevated risk',
     ASAS: 'Moderate risk',
-    ASAC: 'Moderate risk',
+    ACAS: 'Moderate risk',
+    ACSS: 'Higher risk',
     ASSS: 'Higher risk',
     ACAC: 'Moderate risk',
-    ACCC: 'Moderate risk',
     SSSS: 'Higher risk',
   };
-  return riskByPair[pairKey] ?? null;
+  return riskByPair[genotypePairKey(viewerGenotype, candidateGenotype)] ?? null;
 }
 
 const FAMILY_PLANNING_BY_PAIR: Record<string, Omit<FamilyPlanningInsight, 'pairLabel'>> = {
@@ -109,13 +93,21 @@ const FAMILY_PLANNING_BY_PAIR: Record<string, Omit<FamilyPlanningInsight, 'pairL
       'Both partners carry the sickle cell trait (AS). Professional screening and counseling are advised before starting a family.',
     icon: 'medical-outline',
   },
-  ASAC: {
+  ACAS: {
     tier: 'awareness',
     title: 'Moderate awareness needed',
     summary: 'Children may be carriers; some risk of sickle cell disease exists.',
     detail:
       'Both partners carry hemoglobin variants (AS × AC). Speak with a counselor to understand your options.',
     icon: 'information-circle-outline',
+  },
+  ACSS: {
+    tier: 'counseling',
+    title: 'Every child would have sickle cell disease',
+    summary: 'Every child from this pairing would have HbSC disease, a form of sickle cell disease.',
+    detail:
+      'One partner is AC and one is SS. Each child inherits an S gene from one parent and a C gene from the other.',
+    icon: 'medical-outline',
   },
   ASSS: {
     tier: 'counseling',
@@ -131,14 +123,6 @@ const FAMILY_PLANNING_BY_PAIR: Record<string, Omit<FamilyPlanningInsight, 'pairL
     summary: 'Children may inherit hemoglobin variants; counseling can clarify outcomes.',
     detail:
       'Both partners are AC carriers. A pre-marital or pre-conception screen helps you plan with confidence.',
-    icon: 'information-circle-outline',
-  },
-  ACCC: {
-    tier: 'awareness',
-    title: 'Awareness recommended',
-    summary: 'Hemoglobin variants on both sides — outcomes vary by exact genotype.',
-    detail:
-      'This pairing benefits from professional genetic guidance before family planning decisions.',
     icon: 'information-circle-outline',
   },
   SSSS: {
@@ -157,7 +141,7 @@ export function getFamilyPlanningInsight(
   candidateGenotype: Genotype
 ): FamilyPlanningInsight {
   const viewer = viewerGenotype ?? 'AA';
-  const pairKey = [viewer, candidateGenotype].sort().join('');
+  const pairKey = genotypePairKey(viewer, candidateGenotype);
   const pairLabel = `${viewer} × ${candidateGenotype}`;
   const fallback: Omit<FamilyPlanningInsight, 'pairLabel'> = {
     tier: 'awareness',
