@@ -278,7 +278,7 @@ export default function ChatScreen({ matchId, profile, userId: userIdProp, onBac
         contentStyle={styles.header}
       >
         <GenoGlassIconButton onPress={onBack} accessibilityLabel="Go back" size={40}>
-          <Ionicons name="chevron-back" size={20} color={COLORS.forestDeep} />
+          <Ionicons name="chevron-back" size={20} color={COLORS.ink} />
         </GenoGlassIconButton>
         <Pressable
           style={({ pressed }) => [styles.headerProfileTap, pressed && styles.headerIconBtnPressed]}
@@ -290,7 +290,7 @@ export default function ChatScreen({ matchId, profile, userId: userIdProp, onBac
               gradient={profile.gradient}
               avatarUrl={profile.avatarUrl ?? profile.photos[0]}
               size={42}
-              noPhotoBackground={COLORS.forest}
+              noPhotoBackground={COLORS.hero}
               noPhotoInitialColor={COLORS.linen}
             />
           ) : (
@@ -312,14 +312,14 @@ export default function ChatScreen({ matchId, profile, userId: userIdProp, onBac
           accessibilityLabel="View profile"
           size={40}
         >
-          <Ionicons name="person-circle-outline" size={20} color={COLORS.forestDeep} />
+          <Ionicons name="person-circle-outline" size={20} color={COLORS.ink} />
         </GenoGlassIconButton>
         <GenoGlassIconButton
           onPress={() => setShowModerationSheet(true)}
           accessibilityLabel="Report or block"
           size={40}
         >
-          <Ionicons name="ellipsis-vertical" size={18} color={COLORS.forestDeep} />
+          <Ionicons name="ellipsis-vertical" size={18} color={COLORS.ink} />
         </GenoGlassIconButton>
       </GenoGlassSurface>
 
@@ -458,7 +458,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 17,
     letterSpacing: -0.2,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   chatMeta: {
     fontFamily: FONT_FAMILY.gothamMedium,
@@ -469,7 +469,7 @@ const styles = StyleSheet.create({
   typingMeta: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
     fontStyle: 'italic',
     marginTop: 2,
   },
@@ -506,7 +506,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 13,
-    color: COLORS.forest,
+    color: COLORS.hero,
     textAlign: 'center',
     lineHeight: 19,
     backgroundColor: COLORS.chipFill,
@@ -541,7 +541,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 16,
-    color: COLORS.forest,
+    color: COLORS.hero,
   },
   sendBtnWrap: {
     borderRadius: RADIUS.md,
@@ -566,6 +566,6 @@ const styles = StyleSheet.create({
   sendBtnText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 15,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
 });

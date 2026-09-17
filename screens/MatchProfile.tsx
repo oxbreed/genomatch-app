@@ -89,7 +89,7 @@ export default function MatchProfile({ match, onBack, onSendMessage }: MatchProf
       accessibilityLabel="Report or block"
       size={40}
     >
-      <Ionicons name="ellipsis-vertical" size={18} color={COLORS.forestDeep} />
+      <Ionicons name="ellipsis-vertical" size={18} color={COLORS.ink} />
     </GenoGlassIconButton>
   );
 
@@ -170,7 +170,7 @@ export default function MatchProfile({ match, onBack, onSendMessage }: MatchProf
             </View>
 
             <View style={styles.matchBadge}>
-              <Ionicons name="heart" size={12} color={COLORS.forestDeep} />
+              <Ionicons name="heart" size={12} color={COLORS.ink} />
               <Text style={styles.matchBadgeText}>Mutual match</Text>
             </View>
           </View>
@@ -218,7 +218,7 @@ export default function MatchProfile({ match, onBack, onSendMessage }: MatchProf
               onPress={handleSend}
             >
               <LinearGradient
-                colors={[COLORS.forest, COLORS.forestDeep]}
+                colors={[COLORS.hero, COLORS.ink]}
                 start={{ x: 0, y: 0.5 }}
                 end={{ x: 1, y: 0.5 }}
                 style={styles.messageBtn}
@@ -276,12 +276,12 @@ const styles = StyleSheet.create({
     fontSize: 10,
     letterSpacing: 1.2,
     textTransform: 'uppercase',
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
   },
   displayName: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 26,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     textAlign: 'center',
     letterSpacing: -0.5,
   },
@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     letterSpacing: 1,
     textTransform: 'uppercase',
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   familyFrame: {
     marginTop: 2,

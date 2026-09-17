@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: 22,
     overflow: 'hidden',
-    backgroundColor: COLORS.forestDeep,
+    backgroundColor: COLORS.ink,
     margin: 2,
   },
   cTL: { position: 'absolute', top: 10, left: 10, zIndex: 6 },

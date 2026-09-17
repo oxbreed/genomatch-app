@@ -76,7 +76,7 @@ export default function LifestyleBadges(props: Props) {
           <Ionicons
             name={item.icon}
             size={compact ? 12 : 13}
-            color={dark ? COLORS.gold : COLORS.forest}
+            color={dark ? COLORS.gold : COLORS.hero}
           />
           <Text
             style={[styles.label, compact && styles.labelCompact, dark && styles.labelDark]}
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
   label: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     maxWidth: 140,
   },
   labelCompact: {

@@ -33,7 +33,7 @@ export default function ProfileStatGems({ matches, likesReceived, profileViews }
           <View key={stat.label} style={styles.gemWrap}>
             {index > 0 ? <View style={styles.divider} /> : null}
             <View style={styles.gem}>
-              <Ionicons name={stat.icon} size={15} color={COLORS.sage} />
+              <Ionicons name={stat.icon} size={15} color={COLORS.metallicSilver} />
               <Text style={styles.value}>{stat.value}</Text>
               <Text style={styles.label}>{stat.label}</Text>
             </View>
@@ -70,11 +70,11 @@ const styles = StyleSheet.create({
   },
   value: {
     ...PROFILE_TYPE.statValue,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   label: {
     ...PROFILE_TYPE.statLabel,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
     textAlign: 'center',
   },
 });

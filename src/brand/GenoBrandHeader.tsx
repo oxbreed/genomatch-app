@@ -88,13 +88,13 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 28,
     letterSpacing: -0.5,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   subtitle: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
     lineHeight: 20,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
     marginTop: 2,
   },
   right: {

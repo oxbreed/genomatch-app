@@ -68,7 +68,7 @@ export default function DiscoverActionDock({
     return (
       <View style={[styles.actions, styles.actionsGlass, style]}>
         <GlassCircle size={50} onPress={onPass} disabled={disabled} accessibilityLabel="Pass profile">
-          <Ionicons name="close" size={24} color={COLORS.sage} />
+          <Ionicons name="close" size={24} color={COLORS.metallicSilver} />
         </GlassCircle>
 
         <GlassCircle
@@ -101,7 +101,7 @@ export default function DiscoverActionDock({
                   colors={[COLORS.gold, '#B8962E']}
                   style={styles.likeGlassGradient}
                 >
-                  <Ionicons name="heart" size={26} color={COLORS.forestDeep} />
+                  <Ionicons name="heart" size={26} color={COLORS.ink} />
                 </LinearGradient>
               </GenoGlassSurface>
             </View>
@@ -123,7 +123,7 @@ export default function DiscoverActionDock({
         disabled={disabled}
         accessibilityLabel="Pass"
       >
-        <Ionicons name="close" size={overlay ? 30 : 26} color={COLORS.sage} />
+        <Ionicons name="close" size={overlay ? 30 : 26} color={COLORS.metallicSilver} />
       </Pressable>
 
       <Pressable
@@ -156,7 +156,7 @@ export default function DiscoverActionDock({
           accessibilityLabel="Like"
         >
           <LinearGradient colors={[COLORS.gold, '#B8962E']} style={styles.likeBtnGradient}>
-            <Ionicons name="heart" size={overlay ? 32 : 28} color={COLORS.forestDeep} />
+            <Ionicons name="heart" size={overlay ? 32 : 28} color={COLORS.ink} />
           </LinearGradient>
         </Pressable>
       </Animated.View>
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderWidth: 1.5,
     borderColor: 'rgba(184, 188, 196, 0.45)',
-    shadowColor: COLORS.forestDeep,
+    shadowColor: COLORS.ink,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.08,
     shadowRadius: 8,

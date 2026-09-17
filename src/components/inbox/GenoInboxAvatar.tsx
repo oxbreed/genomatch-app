@@ -9,8 +9,8 @@ import { INBOX } from './inboxTokens';
 
 function brandGradient(name: string): [string, string] {
   const pairs: [string, string][] = [
-    [COLORS.forest, COLORS.forestDeep],
-    [COLORS.forestDeep, '#0B0C0E'],
+    [COLORS.hero, COLORS.ink],
+    [COLORS.ink, '#0B0C0E'],
   ];
   return pairs[name.charCodeAt(0) % pairs.length]!;
 }
@@ -48,7 +48,7 @@ export default function GenoInboxAvatar({
               gradient={gradient ?? brandGradient(name)}
               avatarUrl={url}
               size={size}
-              noPhotoBackground={COLORS.forestDeep}
+              noPhotoBackground={COLORS.ink}
               noPhotoInitialColor={COLORS.linen}
             />
           ) : (
@@ -116,6 +116,6 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: COLORS.forestDeep,
+    backgroundColor: COLORS.ink,
   },
 });

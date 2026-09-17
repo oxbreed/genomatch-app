@@ -2,7 +2,7 @@
 
 Expo SDK 57 dating app (`ng.genomatch.app`). This repo is the mobile client only. The marketing site and admin app live elsewhere.
 
-Two palettes exist in product work (forest UI vs a glossy red mark). Neither is ratified here. Do not “fix” colours as part of setup.
+Two palettes exist in product work (ink/hero UI vs a glossy red mark). Neither is ratified here. Do not “fix” colours as part of setup.
 
 ## Requirements
 

@@ -4,14 +4,14 @@ import { COLORS, GLASS } from '../../theme';
 export const GENO_VISUAL = {
   helix: {
     goldStroke: COLORS.gold,
-    forestStroke: COLORS.forest,
+    heroStroke: COLORS.hero,
     nodeGold: COLORS.gold,
-    nodeForest: COLORS.verified,
+    nodeInk: COLORS.verified,
     opacity: { subtle: 0.14, medium: 0.22, rich: 0.32 },
   },
   chrome: {
     topRule: [COLORS.gold, 'rgba(200, 16, 46, 0.45)', 'transparent'] as [string, string, string],
-    topRuleForest: [COLORS.gold, COLORS.verified, 'transparent'] as [string, string, string],
+    topRuleInk: [COLORS.gold, COLORS.verified, 'transparent'] as [string, string, string],
     washLinen: ['rgba(212, 175, 55, 0.12)', 'transparent', COLORS.linen] as [string, string, string],
     washMint: ['rgba(240, 241, 243, 0.92)', 'rgba(212, 175, 55, 0.06)', COLORS.linen] as [
       string,
@@ -102,4 +102,4 @@ export const GENO_VISUAL = {
   },
 } as const;
 
-export type GenoChromeVariant = 'linen' | 'mint' | 'forest' | 'discover';
+export type GenoChromeVariant = 'linen' | 'mint' | 'ink' | 'discover';

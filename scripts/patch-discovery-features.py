@@ -97,7 +97,7 @@ if "filterBadge:" not in text and "filterBtn:" in text:
   filterBadgeText: {
     fontFamily: 'Satoshi-Bold',
     fontSize: 10,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   filterBtn: {""",
         1,

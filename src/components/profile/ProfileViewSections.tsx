@@ -118,11 +118,11 @@ const styles = StyleSheet.create({
   },
   blockLabel: {
     ...PROFILE_TYPE.blockLabel,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
   },
   bioText: {
     ...PROFILE_TYPE.body,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   placeholder: {
     color: COLORS.textMuted,
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
   },
   chipText: {
     ...PROFILE_TYPE.chip,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   emptyHint: {
     ...PROFILE_TYPE.bodyMedium,
@@ -161,6 +161,6 @@ const styles = StyleSheet.create({
   },
   goalText: {
     ...PROFILE_TYPE.goal,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
 });

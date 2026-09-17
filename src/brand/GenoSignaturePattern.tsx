@@ -20,7 +20,7 @@ export function GenoSignaturePattern({ width, height, opacity = 1 }: Props) {
       />
       <Path
         d="M40 160 C80 260, 120 60, 160 160 S240 260, 280 60, 320 160"
-        stroke={COLORS.forest}
+        stroke={COLORS.hero}
         strokeWidth={1.2}
         fill="none"
         strokeOpacity={0.28}

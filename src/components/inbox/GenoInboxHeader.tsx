@@ -171,14 +171,14 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamSemiBold,
     fontSize: INBOX.headerTitleSize,
     letterSpacing: -0.4,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     flexShrink: 1,
   },
   subtitle: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: INBOX.headerSubtitleSize,
     lineHeight: 18,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
     marginTop: 1,
   },
   rule: {

@@ -39,7 +39,7 @@ OLD_HEADER = """        <View style={styles.header}>
               onPress={() => setShowFilterSheet(true)}
               accessibilityLabel="Filter discovery profiles"
             >
-              <Ionicons name="options-outline" size={24} color={COLORS.forest} />
+              <Ionicons name="options-outline" size={24} color={COLORS.hero} />
               {filtersActive ? (
                 <View style={styles.filterBadge}>
                   <Text style={styles.filterBadgeText}>

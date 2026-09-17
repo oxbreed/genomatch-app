@@ -48,7 +48,7 @@ export default function ProfileEditBanner() {
           <Text style={styles.title}>Editing your bond profile</Text>
           <Text style={styles.sub}>Changes apply when you tap Save</Text>
         </View>
-        <Ionicons name="create-outline" size={22} color={COLORS.forestDeep} />
+        <Ionicons name="create-outline" size={22} color={COLORS.ink} />
       </LinearGradient>
     </Animated.View>
   );
@@ -76,11 +76,11 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 16,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   sub: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
   },
 });

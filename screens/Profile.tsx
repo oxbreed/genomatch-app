@@ -960,12 +960,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(220, 80, 60, 0.1)',
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
-    color: COLORS.forest,
+    color: COLORS.hero,
   },
   emptyText: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 16,
-    color: COLORS.forest,
+    color: COLORS.hero,
     textAlign: 'center',
   },
   retryBtn: {
@@ -975,11 +975,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: COLORS.gold,
   },
-  retryText: { fontFamily: FONT_FAMILY.gothamBold, fontSize: 15, color: COLORS.forest },
+  retryText: { fontFamily: FONT_FAMILY.gothamBold, fontSize: 15, color: COLORS.hero },
   loadingText: {
     marginTop: 16,
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
   },
 });

@@ -115,7 +115,7 @@ export default function ReportBlockSheet({
                 onPress={() => setStep('reasons')}
                 disabled={loading}
               >
-                <Ionicons name="flag-outline" size={22} color={COLORS.forest} />
+                <Ionicons name="flag-outline" size={22} color={COLORS.hero} />
                 <Text style={styles.optionText}>Report {displayName}</Text>
                 <Ionicons name="chevron-forward" size={20} color={COLORS.textSubtle} />
               </Pressable>
@@ -125,7 +125,7 @@ export default function ReportBlockSheet({
                 disabled={loading}
               >
                 {loading ? (
-                  <ActivityIndicator color={COLORS.forest} size="small" />
+                  <ActivityIndicator color={COLORS.hero} size="small" />
                 ) : (
                   <Ionicons name="ban-outline" size={22} color={COLORS.error} />
                 )}
@@ -143,7 +143,7 @@ export default function ReportBlockSheet({
           {step === 'reasons' && (
             <>
               <Pressable style={styles.backRow} onPress={() => setStep('menu')} disabled={loading}>
-                <Ionicons name="chevron-back" size={22} color={COLORS.forest} />
+                <Ionicons name="chevron-back" size={22} color={COLORS.hero} />
                 <Text style={styles.backLabel}>Back</Text>
               </Pressable>
               <Text style={styles.sheetTitle}>Report {displayName}</Text>
@@ -160,7 +160,7 @@ export default function ReportBlockSheet({
               ))}
               {error ? <Text style={styles.errorText}>{error}</Text> : null}
               {loading ? (
-                <ActivityIndicator style={styles.loader} color={COLORS.forest} />
+                <ActivityIndicator style={styles.loader} color={COLORS.hero} />
               ) : null}
             </>
           )}
@@ -168,7 +168,7 @@ export default function ReportBlockSheet({
           {step === 'success' && (
             <>
               <View style={styles.successIconWrap}>
-                <Ionicons name="checkmark-circle" size={48} color={COLORS.forest} />
+                <Ionicons name="checkmark-circle" size={48} color={COLORS.hero} />
               </View>
               <Text style={styles.successText}>{successMessage}</Text>
               <Pressable style={styles.doneBtnWrap} onPress={handleDone}>
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
   sheetTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: COLORS.forest,
+    color: COLORS.hero,
     letterSpacing: -0.3,
     marginBottom: 16,
   },
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.forest,
+    color: COLORS.hero,
   },
   optionDanger: {
     color: COLORS.error,
@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
   reasonText: {
     fontSize: 15,
     fontWeight: '500',
-    color: COLORS.forest,
+    color: COLORS.hero,
   },
   backRow: {
     flexDirection: 'row',
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
   backLabel: {
     fontSize: 15,
     fontWeight: '600',
-    color: COLORS.forest,
+    color: COLORS.hero,
   },
   cancelBtn: {
     marginTop: 8,
@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     lineHeight: 24,
-    color: COLORS.forest,
+    color: COLORS.hero,
     textAlign: 'center',
     marginBottom: 20,
   },
@@ -321,6 +321,6 @@ const styles = StyleSheet.create({
   doneBtnText: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.forest,
+    color: COLORS.hero,
   },
 });

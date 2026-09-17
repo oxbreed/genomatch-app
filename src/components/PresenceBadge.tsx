@@ -18,8 +18,8 @@ const PRESENCE_CONFIG: Record<
     label: 'Online',
     icon: 'radio-button-on',
     // Intentional status-green (universal "online" convention), NOT a brand
-    // color. Deliberately kept green and exempt from the forest-hex removal;
-    // #2ECC71 is a standard status green, not the old forest palette.
+    // color. Deliberately kept green and exempt from the legacy-hex removal;
+    // #2ECC71 is a standard status green, not the mirror brand palette.
     color: '#2ECC71',
     bg: 'rgba(46, 204, 113, 0.18)',
     border: 'rgba(46, 204, 113, 0.35)',
@@ -27,7 +27,7 @@ const PRESENCE_CONFIG: Record<
   recently_online: {
     label: 'Recently online',
     icon: 'time-outline',
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
     bg: 'rgba(184, 188, 196, 0.18)',
     border: 'rgba(184, 188, 196, 0.35)',
   },
@@ -43,7 +43,7 @@ export function PresenceDot({
   if (presenceState === 'offline') return null;
 
   // Status-green for "online" (UX convention), silver for recently-online.
-  const color = presenceState === 'online' ? '#2ECC71' : COLORS.sage;
+  const color = presenceState === 'online' ? '#2ECC71' : COLORS.metallicSilver;
 
   return (
     <View
@@ -75,14 +75,14 @@ export function NewMemberBadge({ compact, dark }: { compact?: boolean; dark?: bo
   if (compact) {
     return (
       <View style={[styles.newCompact, dark && styles.newCompactDark]}>
-        <Ionicons name="sparkles" size={10} color={dark ? COLORS.gold : COLORS.forestDeep} />
+        <Ionicons name="sparkles" size={10} color={dark ? COLORS.gold : COLORS.ink} />
       </View>
     );
   }
 
   return (
     <View style={[styles.newBadge, dark && styles.newBadgeDark]}>
-      <Ionicons name="sparkles" size={11} color={dark ? COLORS.gold : COLORS.forestDeep} />
+      <Ionicons name="sparkles" size={11} color={dark ? COLORS.gold : COLORS.ink} />
       <Text style={[styles.newText, dark && styles.newTextDark]}>New</Text>
     </View>
   );
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 10,
     letterSpacing: 0.3,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   newTextDark: {
     color: COLORS.gold,

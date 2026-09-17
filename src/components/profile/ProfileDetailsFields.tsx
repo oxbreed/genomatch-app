@@ -269,11 +269,11 @@ const styles = StyleSheet.create({
   fieldCopy: { flex: 1, gap: 2 },
   label: {
     ...PROFILE_TYPE.sectionTitle,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   hint: {
     ...PROFILE_TYPE.sectionHint,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
   },
   valuePill: {
     paddingHorizontal: 10,
@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
   valuePillText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 11,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   heightScroll: {
     gap: 8,
@@ -309,12 +309,12 @@ const styles = StyleSheet.create({
   heightChipText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 13,
-    color: COLORS.forest,
+    color: COLORS.hero,
   },
   heightChipTextActive: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 13,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   customRow: {
     flexDirection: 'row',
@@ -332,12 +332,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 15,
-    color: COLORS.forest,
+    color: COLORS.hero,
   },
   customHint: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
   },
   religionGrid: {
     flexDirection: 'row',
@@ -372,7 +372,7 @@ const styles = StyleSheet.create({
   religionTextActive: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 13,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     textAlign: 'center',
   },
 });

@@ -6,7 +6,7 @@ type IonName = ComponentProps<typeof Ionicons>['name'];
 export type OnboardingInsight = {
   id: string;
   icon: IonName;
-  accent: 'gold' | 'sage' | 'mint';
+  accent: 'gold' | 'metallicSilver' | 'mint';
   kicker: string;
   title: string;
   body: string;
@@ -30,7 +30,7 @@ export const ONBOARDING_INSIGHTS: OnboardingInsight[] = [
   {
     id: 'profiles',
     icon: 'heart-outline',
-    accent: 'sage',
+    accent: 'metallicSilver',
     kicker: 'DEEPER SIGNALS',
     title: 'Profiles that feel human',
     body:

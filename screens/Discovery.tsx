@@ -792,13 +792,13 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
         <View style={styles.deckArea}>
           {loading ? (
             <View style={styles.loadingState}>
-              <ActivityIndicator size="large" color={COLORS.forest} />
+              <ActivityIndicator size="large" color={COLORS.hero} />
               <Text style={styles.loadingText}>Finding compatible profiles...</Text>
             </View>
           ) : loadError ? (
             <View style={styles.emptyState}>
               <View style={styles.emptyIconWrap}>
-                <Ionicons name="alert-circle-outline" size={28} color={COLORS.forest} />
+                <Ionicons name="alert-circle-outline" size={28} color={COLORS.hero} />
               </View>
               <Text style={styles.emptyTitle}>{loadError}</Text>
               <Pressable style={styles.retryBtn} onPress={loadProfiles}>
@@ -847,7 +847,7 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
               >
                 <View style={styles.seenAllCard}>
                   <View style={styles.seenAllIconWrap}>
-                    <Ionicons name="checkmark-done-outline" size={28} color={COLORS.forestDeep} />
+                    <Ionicons name="checkmark-done-outline" size={28} color={COLORS.ink} />
                   </View>
                   <Text style={styles.seenAllTitle}>You're all caught up!</Text>
                   <Text style={styles.seenAllSubtext}>{deckEmptyHint}</Text>
@@ -866,7 +866,7 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
                       }}
                     >
                       <View style={styles.resetPassesBtn}>
-                        <Ionicons name="return-up-back-outline" size={18} color={COLORS.forestDeep} />
+                        <Ionicons name="return-up-back-outline" size={18} color={COLORS.ink} />
                         <Text style={styles.refreshBtnText}>
                           {clearingPasses ? 'Resetting…' : 'Show passed profiles again'}
                         </Text>
@@ -886,7 +886,7 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
                       end={{ x: 1, y: 0.5 }}
                       style={styles.refreshBtn}
                     >
-                      <Ionicons name="refresh" size={18} color={COLORS.forestDeep} />
+                      <Ionicons name="refresh" size={18} color={COLORS.ink} />
                       <Text style={styles.refreshBtnText}>Refresh</Text>
                     </LinearGradient>
                   </Pressable>
@@ -1113,7 +1113,7 @@ const styles = StyleSheet.create({
   filterBadgeText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 10,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   filterDot: {
     position: 'absolute',
@@ -1246,7 +1246,7 @@ const styles = StyleSheet.create({
   superLikeToastText: {
     fontSize: 15,
     fontWeight: '700',
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     textAlign: 'center',
   },
   superLikeBtnWrap: {
@@ -1300,7 +1300,7 @@ const styles = StyleSheet.create({
   noPhotoCaption: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 13,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
     marginTop: 10,
     textAlign: 'center',
   },
@@ -1374,7 +1374,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
     fontWeight: '500',
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
   },
   cardBio: {
     fontFamily: FONT_FAMILY.gothamMedium,
@@ -1461,7 +1461,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 15,
     fontWeight: '700',
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     letterSpacing: -0.2,
   },
   matchPillLabel: {
@@ -1500,7 +1500,7 @@ const styles = StyleSheet.create({
   },
   stampNope: {
     right: 24,
-    borderColor: COLORS.sage,
+    borderColor: COLORS.metallicSilver,
     transform: [{ rotate: '15deg' }],
   },
   stampLikeText: {
@@ -1511,7 +1511,7 @@ const styles = StyleSheet.create({
   stampNopeText: {
     fontSize: 32,
     fontWeight: '900',
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
   },
   superLikeBtn: {
     width: 52,
@@ -1520,7 +1520,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: COLORS.forestDeep,
+    shadowColor: COLORS.ink,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 8,
@@ -1537,7 +1537,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: COLORS.forestDeep,
+    shadowColor: COLORS.ink,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 8,
@@ -1550,7 +1550,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.gold,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: COLORS.forestDeep,
+    shadowColor: COLORS.ink,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 8,
@@ -1586,7 +1586,7 @@ const styles = StyleSheet.create({
   },
   retryBtn: {
     marginTop: 16,
-    backgroundColor: COLORS.forest,
+    backgroundColor: COLORS.hero,
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 12,
@@ -1635,7 +1635,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     lineHeight: 30,
     letterSpacing: -0.4,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     textAlign: 'center',
     marginBottom: 10,
   },
@@ -1643,7 +1643,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 15,
     lineHeight: 22,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
     textAlign: 'center',
     marginBottom: 24,
     maxWidth: 280,
@@ -1682,7 +1682,7 @@ const styles = StyleSheet.create({
   refreshBtnText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 16,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   emptyState: {
     flex: 1,

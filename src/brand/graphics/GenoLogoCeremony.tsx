@@ -99,8 +99,8 @@ export default function GenoLogoCeremony({
     };
   }, [floatRange, logoFloat, logoPulse, subtle]);
 
-  const textColor = tone === 'light' ? COLORS.linen : COLORS.forestDeep;
-  const subColor = tone === 'light' ? COLORS.sage : COLORS.sage;
+  const textColor = tone === 'light' ? COLORS.linen : COLORS.ink;
+  const subColor = tone === 'light' ? COLORS.metallicSilver : COLORS.metallicSilver;
 
   return (
     <View style={[styles.wrap, { width: halo, height: halo }, style]}>

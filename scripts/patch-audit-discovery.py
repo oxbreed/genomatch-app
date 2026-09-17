@@ -29,7 +29,7 @@ if "headerDivider" not in text:
 
 # Loading indicator gold
 text = text.replace(
-    '<ActivityIndicator size="large" color={COLORS.forest} />',
+    '<ActivityIndicator size="large" color={COLORS.hero} />',
     '<ActivityIndicator size="large" color={COLORS.gold} />',
     1,
 )
@@ -95,8 +95,8 @@ replacements = [
     height: CARD_HEIGHT,
     borderRadius: RADIUS.md,
     overflow: 'hidden',
-    backgroundColor: COLORS.forest,
-    shadowColor: COLORS.forestDeep,
+    backgroundColor: COLORS.hero,
+    shadowColor: COLORS.ink,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.14,
     shadowRadius: 16,
@@ -107,7 +107,7 @@ replacements = [
     height: CARD_HEIGHT,
     borderRadius: RADIUS.md,
     overflow: 'hidden',
-    backgroundColor: COLORS.forest,
+    backgroundColor: COLORS.hero,
     ...SHADOWS.card,
   },""",
     ),
@@ -150,7 +150,7 @@ replacements = [
   matchPillText: {
     fontSize: 13,
     fontWeight: '700',
-    color: COLORS.forest,
+    color: COLORS.hero,
   },""",
         """  matchPill: {
     backgroundColor: COLORS.gold,
@@ -161,7 +161,7 @@ replacements = [
   matchPillText: {
     fontFamily: 'Satoshi-Bold',
     fontSize: 16,
-    color: COLORS.forest,
+    color: COLORS.hero,
   },""",
     ),
     (

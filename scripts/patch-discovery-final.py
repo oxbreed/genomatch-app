@@ -154,7 +154,7 @@ NEW_CHAT_BTN = """            <Pressable
               ]}
               onPress={() => setShowModerationSheet(true)}
             >
-              <Ionicons name="shield-outline" size={18} color={COLORS.sage} />
+              <Ionicons name="shield-outline" size={18} color={COLORS.metallicSilver} />
               <Text style={styles.profileSheetSafetyText}>Report or block</Text>
             </Pressable>
             <Pressable
@@ -211,7 +211,7 @@ if "profileSheetSafetyBtn" not in text:
   profileSheetSafetyText: {
     fontFamily: 'Satoshi-Medium',
     fontSize: 14,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
   },
   profileSheetChatBtn: {""",
         1,

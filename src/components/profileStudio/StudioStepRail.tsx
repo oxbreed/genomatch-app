@@ -66,7 +66,7 @@ function StepPill({
         <View style={[styles.pill, active && styles.pillActive, complete && !active && styles.pillComplete]}>
           <View style={[styles.stepBadge, active && styles.stepBadgeActive, complete && styles.stepBadgeComplete]}>
             {complete ? (
-              <Ionicons name="checkmark" size={11} color={COLORS.forestDeep} />
+              <Ionicons name="checkmark" size={11} color={COLORS.ink} />
             ) : (
               <Text style={[styles.stepBadgeText, active && styles.stepBadgeTextActive]}>
                 {index + 1}
@@ -76,7 +76,7 @@ function StepPill({
           <Ionicons
             name={step.icon}
             size={15}
-            color={active ? COLORS.forestDeep : COLORS.sage}
+            color={active ? COLORS.ink : COLORS.metallicSilver}
           />
           <Text style={[styles.pillLabel, active && styles.pillLabelActive]}>{step.label}</Text>
         </View>
@@ -227,18 +227,18 @@ const styles = StyleSheet.create({
   stepBadgeText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 10,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
   },
   stepBadgeTextActive: {
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   pillLabel: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
   },
   pillLabelActive: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
 });

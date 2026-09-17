@@ -68,10 +68,10 @@ export default function PhotoGrid({
             disabled={uploading}
           >
             {uploading ? (
-              <ActivityIndicator color={COLORS.forest} size="small" />
+              <ActivityIndicator color={COLORS.hero} size="small" />
             ) : (
               <>
-                <Ionicons name="add" size={28} color={COLORS.forest} />
+                <Ionicons name="add" size={28} color={COLORS.hero} />
                 <Text style={styles.addText}>Add Photo</Text>
               </>
             )}
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     letterSpacing: 1.1,
     textTransform: 'uppercase',
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
     marginBottom: 10,
     paddingHorizontal: H_PADDING,
   },
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
   mainBadgeText: {
     fontSize: 10,
     fontWeight: '700',
-    color: COLORS.forest,
+    color: COLORS.hero,
   },
   deleteBtn: {
     position: 'absolute',
@@ -165,6 +165,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
     fontSize: 11,
     fontWeight: '600',
-    color: COLORS.forest,
+    color: COLORS.hero,
   },
 });

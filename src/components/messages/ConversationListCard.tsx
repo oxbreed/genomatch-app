@@ -94,12 +94,12 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: INBOX.nameSize + 1,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     letterSpacing: -0.3,
   },
   nameUnread: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   newPill: {
     paddingHorizontal: 8,
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     fontSize: 9,
     letterSpacing: 0.8,
     textTransform: 'uppercase',
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   compatPill: {
     paddingHorizontal: 8,
@@ -124,10 +124,10 @@ const styles = StyleSheet.create({
   pct: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: INBOX.pctSize,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
   },
   pctHigh: {
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   time: {
     fontFamily: FONT_FAMILY.gothamMedium,
@@ -144,6 +144,6 @@ const styles = StyleSheet.create({
   },
   previewUnread: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.forest,
+    color: COLORS.hero,
   },
 });

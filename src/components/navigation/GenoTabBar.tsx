@@ -67,7 +67,7 @@ function TabItem({
         <Ionicons
           name={active ? tab.iconActive : tab.icon}
           size={22}
-          color={active ? COLORS.forestDeep : 'rgba(11, 12, 14, 0.4)'}
+          color={active ? COLORS.ink : 'rgba(11, 12, 14, 0.4)'}
         />
         {tab.badge != null && tab.badge > 0 ? (
           <View style={styles.badge}>
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     borderRadius: TAB_BAR_RADIUS,
     ...Platform.select({
       ios: {
-        shadowColor: COLORS.forestDeep,
+        shadowColor: COLORS.ink,
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.1,
         shadowRadius: 24,
@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
   badgeText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 9,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   tabLabel: {
     ...TYPOGRAPHY.navLabel,

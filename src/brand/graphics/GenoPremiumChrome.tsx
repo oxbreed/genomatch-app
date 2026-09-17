@@ -23,7 +23,7 @@ export default function GenoPremiumChrome({
 }: Props) {
   const drift = useRef(new Animated.Value(0)).current;
   const pulse = useRef(new Animated.Value(0.8)).current;
-  const isForest = variant === 'forest';
+  const isInk = variant === 'ink';
   const isDiscover = variant === 'discover';
 
   useEffect(() => {
@@ -80,7 +80,7 @@ export default function GenoPremiumChrome({
         ? GENO_VISUAL.chrome.washDiscover
         : GENO_VISUAL.chrome.washLinen;
 
-  const helixOpacity = isForest
+  const helixOpacity = isInk
     ? GENO_VISUAL.helix.opacity.rich
     : isDiscover
       ? GENO_VISUAL.helix.opacity.medium
@@ -89,7 +89,7 @@ export default function GenoPremiumChrome({
   return (
     <View style={styles.wrap} pointerEvents="none">
       <LinearGradient colors={washColors} style={StyleSheet.absoluteFill} />
-      <GenoGlowField variant={isForest ? 'forest' : 'linen'} />
+      <GenoGlowField variant={isInk ? 'ink' : 'linen'} />
 
       <Animated.View
         style={[
@@ -115,11 +115,11 @@ export default function GenoPremiumChrome({
       <Animated.View style={[styles.bondMark, { opacity: pulse }]}>
         <GenoBondMark
           size={isDiscover ? GENO_VISUAL.sizes.bondMarkSm : GENO_VISUAL.sizes.bondMarkMd}
-          opacity={isForest ? 0.18 : 0.12}
+          opacity={isInk ? 0.18 : 0.12}
         />
       </Animated.View>
 
-      <GenoSparkCeremony variant={isForest ? 'forest' : 'linen'} />
+      <GenoSparkCeremony variant={isInk ? 'ink' : 'linen'} />
     </View>
   );
 }

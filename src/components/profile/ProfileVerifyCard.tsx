@@ -28,7 +28,7 @@ export default function ProfileVerifyCard({ genotype, onVerify }: Props) {
             onPress={onVerify}
           >
             <LinearGradient
-              colors={[COLORS.forestDeep, COLORS.forest]}
+              colors={[COLORS.ink, COLORS.hero]}
               style={styles.btnGradient}
             >
               <Ionicons name="shield-checkmark" size={18} color={COLORS.linen} />
@@ -52,14 +52,14 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: PROFILE.sectionTitleSize,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     letterSpacing: -0.2,
   },
   body: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: PROFILE.metaSize,
     lineHeight: 16,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
   },
   btn: { borderRadius: 12, overflow: 'hidden', alignSelf: 'flex-start' },
   btnGradient: {

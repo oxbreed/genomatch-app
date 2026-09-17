@@ -31,7 +31,7 @@ function HelixDecor({ opacity }: { opacity: number }) {
       />
       <Path
         d="M20 70 C60 120, 100 20, 140 70 S220 120, 260 70 S340 20, 380 70"
-        stroke={COLORS.forest}
+        stroke={COLORS.hero}
         strokeWidth={1.2}
         fill="none"
         strokeOpacity={0.25}

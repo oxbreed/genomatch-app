@@ -3,13 +3,13 @@ import { Animated, Easing, StyleSheet, View } from 'react-native';
 import { COLORS } from '../../theme';
 
 type Props = {
-  variant?: 'linen' | 'forest';
+  variant?: 'linen' | 'ink';
 };
 
-/** Soft brand orbs — gold + verified sage, slow breathe */
+/** Soft brand orbs — gold + verified silver, slow breathe */
 export default function GenoGlowField({ variant = 'linen' }: Props) {
   const breathe = useRef(new Animated.Value(0)).current;
-  const isForest = variant === 'forest';
+  const isInk = variant === 'ink';
 
   useEffect(() => {
     const loop = Animated.loop(
@@ -36,9 +36,9 @@ export default function GenoGlowField({ variant = 'linen' }: Props) {
     inputRange: [0, 1],
     outputRange: [1, 1.08],
   });
-  const sageOpacity = breathe.interpolate({
+  const silverOpacity = breathe.interpolate({
     inputRange: [0, 1],
-    outputRange: [isForest ? 0.1 : 0.06, isForest ? 0.16 : 0.1],
+    outputRange: [isInk ? 0.1 : 0.06, isInk ? 0.16 : 0.1],
   });
 
   return (
@@ -47,12 +47,12 @@ export default function GenoGlowField({ variant = 'linen' }: Props) {
         style={[
           styles.orbGold,
           {
-            opacity: isForest ? 0.14 : 0.09,
+            opacity: isInk ? 0.14 : 0.09,
             transform: [{ scale: goldScale }],
           },
         ]}
       />
-      <Animated.View style={[styles.orbSage, { opacity: sageOpacity }]} />
+      <Animated.View style={[styles.orbSilver, { opacity: silverOpacity }]} />
     </View>
   );
 }
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     right: -90,
     backgroundColor: COLORS.gold,
   },
-  orbSage: {
+  orbSilver: {
     position: 'absolute',
     width: 300,
     height: 300,

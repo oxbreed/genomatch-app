@@ -15,7 +15,7 @@ export default function GenoCompatRing({ percent, size = 88 }: Props) {
   const breathe = useRef(new Animated.Value(1)).current;
 
   const high = percent >= 80;
-  const accent = high ? COLORS.gold : COLORS.sage;
+  const accent = high ? COLORS.gold : COLORS.metallicSilver;
 
   useEffect(() => {
     Animated.loop(
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     fontSize: 9,
     letterSpacing: 1.2,
     textTransform: 'uppercase',
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
     marginTop: 1,
   },
 });

@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { COLORS } from '../theme';
 
 const BADGE_BG = COLORS.mint;
-const BADGE_TEXT = COLORS.forestDeep;
+const BADGE_TEXT = COLORS.ink;
 const BADGE_BORDER = 'rgba(11, 12, 14, 0.12)';
 
 export default function GenotypeBadge({ genotype }: { genotype: string }) {

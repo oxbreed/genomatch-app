@@ -49,11 +49,11 @@ const styles = StyleSheet.create({
   },
   kicker: {
     ...PROFILE_TYPE.sectionKicker,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
   },
   title: {
     ...PROFILE_TYPE.sectionTitle,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   barTrack: {
     height: 3,

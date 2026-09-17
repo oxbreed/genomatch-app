@@ -51,7 +51,7 @@ export default function GenoRemotePhoto({
     <View style={[styles.wrap, style]}>
       {!loaded ? (
         <LinearGradient
-          colors={[COLORS.forestDeep, COLORS.forest, '#20222A']}
+          colors={[COLORS.ink, COLORS.hero, '#20222A']}
           style={StyleSheet.absoluteFill}
         />
       ) : null}
@@ -72,6 +72,6 @@ export default function GenoRemotePhoto({
 const styles = StyleSheet.create({
   wrap: {
     overflow: 'hidden',
-    backgroundColor: COLORS.forestDeep,
+    backgroundColor: COLORS.ink,
   },
 });

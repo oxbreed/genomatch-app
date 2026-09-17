@@ -31,11 +31,11 @@ import TermsOfService from './TermsOfService';
 type IonName = ComponentProps<typeof Ionicons>['name'];
 
 const GENOTYPES: { id: string; icon: IonName; name: string; accent: string }[] = [
-  { id: 'AA', icon: 'ellipse-outline', name: 'Hemoglobin AA', accent: COLORS.sage },
-  { id: 'AS', icon: 'ellipse-outline', name: 'Sickle cell trait', accent: COLORS.sage },
-  { id: 'SS', icon: 'ellipse-outline', name: 'Sickle cell disease', accent: COLORS.sage },
-  { id: 'AC', icon: 'ellipse-outline', name: 'Hemoglobin AC', accent: COLORS.sage },
-  { id: 'SC', icon: 'ellipse-outline', name: 'Hemoglobin SC', accent: COLORS.sage },
+  { id: 'AA', icon: 'ellipse-outline', name: 'Hemoglobin AA', accent: COLORS.metallicSilver },
+  { id: 'AS', icon: 'ellipse-outline', name: 'Sickle cell trait', accent: COLORS.metallicSilver },
+  { id: 'SS', icon: 'ellipse-outline', name: 'Sickle cell disease', accent: COLORS.metallicSilver },
+  { id: 'AC', icon: 'ellipse-outline', name: 'Hemoglobin AC', accent: COLORS.metallicSilver },
+  { id: 'SC', icon: 'ellipse-outline', name: 'Hemoglobin SC', accent: COLORS.metallicSilver },
 ];
 
 export default function Register({
@@ -226,7 +226,7 @@ export default function Register({
             accessibilityRole="button"
             accessibilityLabel="Go back"
           >
-            <Ionicons name="chevron-back" size={18} color={COLORS.forestDeep} />
+            <Ionicons name="chevron-back" size={18} color={COLORS.ink} />
             <Text style={styles.backText}>Back</Text>
           </Pressable>
 
@@ -318,7 +318,7 @@ export default function Register({
                           <Ionicons
                             name={item.icon}
                             size={22}
-                            color={isSelected ? item.accent : COLORS.forest}
+                            color={isSelected ? item.accent : COLORS.hero}
                           />
                         </View>
                         <Text style={[styles.genoId, isSelected && { color: item.accent }]}>
@@ -401,7 +401,7 @@ export default function Register({
                   >
                     {loading ? (
                       <View style={styles.submitContent}>
-                        <ActivityIndicator color={COLORS.forestDeep} size="small" />
+                        <ActivityIndicator color={COLORS.ink} size="small" />
                         <Text style={styles.submitText}>Creating account…</Text>
                       </View>
                     ) : (
@@ -477,7 +477,7 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.98 }],
   },
   backText: {
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 14,
     letterSpacing: 0.1,
@@ -507,7 +507,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     fontSize: 32,
     lineHeight: 38,
     letterSpacing: -0.8,
@@ -523,7 +523,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.forest,
+    color: COLORS.hero,
     fontSize: 14,
     marginBottom: 8,
     marginTop: 14,
@@ -539,7 +539,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(200, 16, 46, 0.16)',
     backgroundColor: GLASS.insetFill,
     paddingHorizontal: 14,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 16,
   },
@@ -558,7 +558,7 @@ const styles = StyleSheet.create({
   },
   togglePassText: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.forest,
+    color: COLORS.hero,
     fontSize: 13,
     marginBottom: 8,
     opacity: 0.8,
@@ -630,7 +630,7 @@ const styles = StyleSheet.create({
   genoId: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 22,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     marginBottom: 2,
     letterSpacing: -0.3,
   },
@@ -678,7 +678,7 @@ const styles = StyleSheet.create({
   privacyText: {
     flex: 1,
     fontFamily: FONT_FAMILY.gothamMedium,
-    color: COLORS.forest,
+    color: COLORS.hero,
     fontSize: 12,
     lineHeight: 18,
   },
@@ -705,13 +705,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   ageConfirmBoxChecked: {
-    borderColor: COLORS.forest,
-    backgroundColor: COLORS.forest,
+    borderColor: COLORS.hero,
+    backgroundColor: COLORS.hero,
   },
   ageConfirmText: {
     flex: 1,
     fontFamily: FONT_FAMILY.gothamMedium,
-    color: COLORS.forest,
+    color: COLORS.hero,
     fontSize: 13,
     lineHeight: 18,
   },
@@ -736,7 +736,7 @@ const styles = StyleSheet.create({
   successText: {
     flex: 1,
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.forest,
+    color: COLORS.hero,
     fontSize: 14,
     lineHeight: 21,
   },
@@ -764,7 +764,7 @@ const styles = StyleSheet.create({
   },
   submitText: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     fontSize: 17,
     letterSpacing: 0.1,
   },
@@ -779,7 +779,7 @@ const styles = StyleSheet.create({
   },
   signInBold: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.forest,
+    color: COLORS.hero,
   },
   legalText: {
     textAlign: 'center',
@@ -791,7 +791,7 @@ const styles = StyleSheet.create({
   },
   legalLink: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.forest,
+    color: COLORS.hero,
     textDecorationLine: 'underline',
   },
 });

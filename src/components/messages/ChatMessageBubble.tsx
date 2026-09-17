@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   bubbleSent: {
-    backgroundColor: COLORS.forest,
+    backgroundColor: COLORS.hero,
     borderBottomRightRadius: 6,
   },
   bubbleReceived: {
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 15,
     lineHeight: 21,
-    color: COLORS.forest,
+    color: COLORS.hero,
   },
   bubbleTextSent: {
     color: COLORS.linen,

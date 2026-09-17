@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 22,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     marginBottom: 12,
     textAlign: 'center',
   },
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 15,
     lineHeight: 22,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
     textAlign: 'center',
     marginBottom: 16,
   },
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   button: {
-    backgroundColor: COLORS.forestDeep,
+    backgroundColor: COLORS.ink,
     paddingHorizontal: 28,
     paddingVertical: 14,
     borderRadius: RADIUS.md,

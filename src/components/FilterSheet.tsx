@@ -124,7 +124,7 @@ export default function FilterSheet({
                 style={styles.previewGlass}
                 contentStyle={styles.previewBar}
               >
-                <Ionicons name="people-outline" size={18} color={COLORS.forest} />
+                <Ionicons name="people-outline" size={18} color={COLORS.hero} />
                 <Text style={styles.previewText}>
                   {previewCount} profile{previewCount === 1 ? '' : 's'} match these filters
                 </Text>
@@ -169,7 +169,7 @@ export default function FilterSheet({
                   <Switch
                     value={draft.verifiedOnly}
                     onValueChange={(verifiedOnly) => setDraft((d) => ({ ...d, verifiedOnly }))}
-                    trackColor={{ false: COLORS.border, true: COLORS.sage }}
+                    trackColor={{ false: COLORS.border, true: COLORS.metallicSilver }}
                     thumbColor={draft.verifiedOnly ? COLORS.gold : COLORS.white}
                   />
                 </View>
@@ -351,7 +351,7 @@ const styles = StyleSheet.create({
   sheetTitle: {
     fontFamily: FONT_FAMILY.gothamSemiBold,
     fontSize: 22,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     letterSpacing: -0.3,
   },
   countPill: {
@@ -366,7 +366,7 @@ const styles = StyleSheet.create({
   countText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 13,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   previewGlass: {
     marginBottom: 10,
@@ -382,7 +382,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 13,
-    color: COLORS.forest,
+    color: COLORS.hero,
   },
   scroll: { maxHeight: 380 },
   scrollContent: { paddingBottom: 8 },
@@ -397,7 +397,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     letterSpacing: 1.2,
     textTransform: 'uppercase',
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
     marginTop: 12,
     marginBottom: 8,
   },
@@ -421,7 +421,7 @@ const styles = StyleSheet.create({
   },
   toggleChipTextActive: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   verifyRow: {
     flexDirection: 'row',
@@ -446,7 +446,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 16,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   ageRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   ageInput: { flex: 1 },
@@ -475,20 +475,20 @@ const styles = StyleSheet.create({
   },
   goalChipTextActive: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   applyWrap: { marginTop: 16, borderRadius: 14, overflow: 'hidden' },
   applyBtn: { paddingVertical: 15, alignItems: 'center' },
   applyBtnText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 16,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   resetBtn: { marginTop: 12, alignItems: 'center', paddingVertical: 8 },
   resetBtnText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 15,
-    color: COLORS.forest,
+    color: COLORS.hero,
   },
   pressed: { opacity: 0.92 },
 });

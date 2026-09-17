@@ -186,7 +186,7 @@ export default function Matches({ isActive, onStartChat, onImmersiveChange }: Ma
                   setRefreshing(true);
                   loadMatches(true);
                 }}
-                tintColor={COLORS.forest}
+                tintColor={COLORS.hero}
               />
             }
             ListHeaderComponent={
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
   loadingText: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
   },
   listWrap: { flex: 1 },
   list: { paddingTop: 4, paddingBottom: TAB_SCENE_BOTTOM_PADDING },

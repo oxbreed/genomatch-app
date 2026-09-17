@@ -22,7 +22,7 @@ export default function ProfileStudioCTA({ percent, onPress }: Props) {
       <GenoCardFrame showWatermark={false} style={styles.frame}>
         <View style={styles.inner}>
           <View style={styles.icon}>
-            <Ionicons name="color-wand-outline" size={18} color={COLORS.forestDeep} />
+            <Ionicons name="color-wand-outline" size={18} color={COLORS.ink} />
           </View>
           <View style={styles.copy}>
             <Text style={styles.title}>
@@ -35,7 +35,7 @@ export default function ProfileStudioCTA({ percent, onPress }: Props) {
             </Text>
           </View>
           <View style={styles.chevron}>
-            <Ionicons name="chevron-forward" size={18} color={COLORS.sage} />
+            <Ionicons name="chevron-forward" size={18} color={COLORS.metallicSilver} />
           </View>
         </View>
       </GenoCardFrame>
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
   },
   title: {
     ...PROFILE_TYPE.ctaTitle,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   sub: {
     ...PROFILE_TYPE.ctaSub,

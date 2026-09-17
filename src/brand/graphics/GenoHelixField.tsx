@@ -28,7 +28,7 @@ export default function GenoHelixField({ width, height, opacity = 1 }: Props) {
       />
       <Path
         d="M24 160 C64 272, 104 48, 144 160 S224 272, 264 48 S344 48, 384 160"
-        stroke={GENO_VISUAL.helix.forestStroke}
+        stroke={GENO_VISUAL.helix.heroStroke}
         strokeWidth={1.4 * scale}
         fill="none"
         strokeOpacity={0.3}
@@ -63,7 +63,7 @@ export default function GenoHelixField({ width, height, opacity = 1 }: Props) {
           fillOpacity={0.5}
         />
       ))}
-      <Circle cx={200} cy={160} r={6} fill={COLORS.forestDeep} fillOpacity={0.15} />
+      <Circle cx={200} cy={160} r={6} fill={COLORS.ink} fillOpacity={0.15} />
       <Circle cx={200} cy={160} r={2.5} fill={COLORS.gold} fillOpacity={0.55} />
     </Svg>
   );

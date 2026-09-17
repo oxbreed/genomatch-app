@@ -40,7 +40,7 @@ export default function AuthPrimaryButton({
         >
           {loading ? (
             <View style={styles.loadingRow}>
-              <ActivityIndicator color={COLORS.forestDeep} size="small" />
+              <ActivityIndicator color={COLORS.ink} size="small" />
               <Text style={styles.text}>{loadingLabel}</Text>
             </View>
           ) : (
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
   text: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 17,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     letterSpacing: 0.2,
   },
 });

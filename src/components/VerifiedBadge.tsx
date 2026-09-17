@@ -12,14 +12,14 @@ export default function VerifiedBadge({ compact, label = 'Self-verified' }: Prop
   if (compact) {
     return (
       <View style={styles.compact}>
-        <Ionicons name="shield-checkmark" size={11} color={COLORS.forestDeep} />
+        <Ionicons name="shield-checkmark" size={11} color={COLORS.ink} />
       </View>
     );
   }
 
   return (
     <View style={styles.badge}>
-      <Ionicons name="shield-checkmark" size={12} color={COLORS.forestDeep} />
+      <Ionicons name="shield-checkmark" size={12} color={COLORS.ink} />
       <Text style={styles.text}>{label}</Text>
     </View>
   );
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 10,
     letterSpacing: 0.3,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   compact: {
     width: 18,

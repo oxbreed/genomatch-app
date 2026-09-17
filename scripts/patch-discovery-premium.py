@@ -145,7 +145,7 @@ old_header_block = """      <View style={styles.screenRoot}>
               onPress={() => setShowFilterSheet(true)}
               accessibilityLabel="Filter discovery profiles"
             >
-              <Ionicons name="options-outline" size={24} color={COLORS.forest} />
+              <Ionicons name="options-outline" size={24} color={COLORS.hero} />
               {filtersActive ? <View style={styles.filterDot} /> : null}
             </Pressable>
           </View>
@@ -182,7 +182,7 @@ new_header_block = """      <View style={styles.screenRoot}>
               end={{ x: 1, y: 0.5 }}
               style={styles.superLikeToastGradient}
             >
-              <Ionicons name="star" size={16} color={COLORS.forestDeep} />
+              <Ionicons name="star" size={16} color={COLORS.ink} />
               <Text style={styles.superLikeToastText}>Super Liked</Text>
             </LinearGradient>
           </Animated.View>
@@ -202,7 +202,7 @@ new_header_block = """      <View style={styles.screenRoot}>
               onPress={() => setShowFilterSheet(true)}
               accessibilityLabel="Filter discovery profiles"
             >
-              <Ionicons name="options-outline" size={22} color={COLORS.forestDeep} />
+              <Ionicons name="options-outline" size={22} color={COLORS.ink} />
               {activeFilterCount > 0 ? (
                 <View style={styles.filterBadge}>
                   <Text style={styles.filterBadgeText}>{activeFilterCount}</Text>
@@ -297,7 +297,7 @@ old_actions = """              <DiscoverActionDock
                   onPress={handlePass}
                   disabled={showMatch}
                 >
-                  <Ionicons name="close" size={24} color="#8FAF95" />
+                  <Ionicons name="close" size={24} color={COLORS.metallicSilver} />
                 </Pressable>
                 <SuperLikeButton onPress={handleSuperLike} disabled={showMatch} />
                 <Animated.View style={{ transform: [{ scale: likePulseScale }] }}>
@@ -474,7 +474,7 @@ text = text.replace(
   filterBadgeText: {
     fontFamily: 'Satoshi-Bold',
     fontSize: 10,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   picksSection: {
     paddingHorizontal: 20,
@@ -492,7 +492,7 @@ text = text.replace(
     fontSize: 12,
     letterSpacing: 1.2,
     textTransform: 'uppercase',
-    color: COLORS.forest,
+    color: COLORS.hero,
   },
   picksScroll: {
     gap: 10,
@@ -517,7 +517,7 @@ text = text.replace(
   pickName: {
     fontFamily: 'Satoshi-Bold',
     fontSize: 13,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
   },
   pickCompat: {
     fontFamily: 'Satoshi-Medium',
@@ -626,7 +626,7 @@ text = text.replace(
 )
 text = text.replace(
     "    color: COLORS.linen,\n    fontWeight: '700',\n    fontSize: 15,\n  },\n  superLikeToast: {",
-    "    fontFamily: 'Satoshi-Bold',\n    fontSize: 14,\n    color: COLORS.forestDeep,\n  },\n  superLikeToastDup: {",
+    "    fontFamily: 'Satoshi-Bold',\n    fontSize: 14,\n    color: COLORS.ink,\n  },\n  superLikeToastDup: {",
     1,
 )
 text = re.sub(r"  superLikeToastDup: \{[^}]+\},\n  superLikeToastGradient: \{[^}]+\},\n", "", text, count=1)

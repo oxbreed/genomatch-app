@@ -5,12 +5,12 @@ import { COLORS } from '../../theme';
 import { GENO_VISUAL } from './genoVisualTokens';
 
 type Props = {
-  variant?: 'linen' | 'forest';
+  variant?: 'linen' | 'ink';
 };
 
 /** Gold ceremony line with micro bond sparks — top of every premium screen */
 export default function GenoSparkCeremony({ variant = 'linen' }: Props) {
-  const colors = variant === 'forest' ? GENO_VISUAL.chrome.topRuleForest : GENO_VISUAL.chrome.topRule;
+  const colors = variant === 'ink' ? GENO_VISUAL.chrome.topRuleInk : GENO_VISUAL.chrome.topRule;
 
   return (
     <View style={styles.wrap} pointerEvents="none">

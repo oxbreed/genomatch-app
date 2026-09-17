@@ -74,7 +74,7 @@ export default function IdentityVerification() {
         <GenoPremiumChrome variant="linen" />
         <StatusBar style="dark" />
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color={COLORS.forest} />
+          <ActivityIndicator size="large" color={COLORS.hero} />
         </View>
       </View>
     );
@@ -88,7 +88,7 @@ export default function IdentityVerification() {
         <View style={styles.centered}>
           <View style={styles.permissionCard}>
             <View style={styles.permissionIconWrap}>
-              <Ionicons name="camera-outline" size={28} color={COLORS.forest} />
+              <Ionicons name="camera-outline" size={28} color={COLORS.hero} />
             </View>
             <Text style={styles.title}>Camera access needed</Text>
             <Text style={styles.subtitle}>
@@ -117,7 +117,7 @@ export default function IdentityVerification() {
         <View style={styles.centered}>
           <View style={styles.permissionCard}>
             <View style={[styles.permissionIconWrap, styles.successIconWrap]}>
-              <Ionicons name="checkmark-circle" size={32} color={COLORS.forest} />
+              <Ionicons name="checkmark-circle" size={32} color={COLORS.hero} />
             </View>
             <Text style={styles.title}>Submitted — we'll review it shortly</Text>
             <Text style={styles.subtitle}>
@@ -169,7 +169,7 @@ export default function IdentityVerification() {
               <LinearGradient colors={[COLORS.gold, '#C49A38']} style={styles.primaryBtn}>
                 {submitting ? (
                   <View style={styles.submittingRow}>
-                    <ActivityIndicator color={COLORS.forest} size="small" />
+                    <ActivityIndicator color={COLORS.hero} size="small" />
                     <Text style={styles.primaryBtnText}>Submitting…</Text>
                   </View>
                 ) : (
@@ -217,7 +217,7 @@ export default function IdentityVerification() {
           disabled={!cameraReady || capturing}
         >
           {capturing ? (
-            <ActivityIndicator color={COLORS.forest} />
+            <ActivityIndicator color={COLORS.hero} />
           ) : (
             <View style={styles.captureBtnInner} />
           )}
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 26,
     fontWeight: '800',
-    color: COLORS.forest,
+    color: COLORS.hero,
     letterSpacing: -0.5,
     textAlign: 'center',
   },
@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
     minHeight: 360,
     borderRadius: RADIUS.lg,
     overflow: 'hidden',
-    backgroundColor: COLORS.forestDeep,
+    backgroundColor: COLORS.ink,
     marginBottom: 24,
   },
   camera: {
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
     minHeight: 360,
     borderRadius: RADIUS.lg,
     overflow: 'hidden',
-    backgroundColor: COLORS.forestDeep,
+    backgroundColor: COLORS.ink,
     marginBottom: 20,
   },
   previewImage: {
@@ -324,7 +324,7 @@ const styles = StyleSheet.create({
     height: 76,
     borderRadius: 38,
     borderWidth: 4,
-    borderColor: COLORS.forest,
+    borderColor: COLORS.hero,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: COLORS.white,
@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
     width: 58,
     height: 58,
     borderRadius: 29,
-    backgroundColor: COLORS.forest,
+    backgroundColor: COLORS.hero,
   },
   actionsRow: {
     flexDirection: 'row',
@@ -354,7 +354,7 @@ const styles = StyleSheet.create({
   secondaryBtnText: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.forest,
+    color: COLORS.hero,
   },
   primaryBtnWrap: {
     borderRadius: RADIUS.md,
@@ -373,7 +373,7 @@ const styles = StyleSheet.create({
   primaryBtnText: {
     fontSize: 16,
     fontWeight: '800',
-    color: COLORS.forest,
+    color: COLORS.hero,
   },
   submittingRow: {
     flexDirection: 'row',

@@ -22,7 +22,7 @@ old_header = """        <View style={styles.header}>
               onPress={() => setShowFilterSheet(true)}
               accessibilityLabel="Filter discovery profiles"
             >
-              <Ionicons name="options-outline" size={24} color={COLORS.forest} />
+              <Ionicons name="options-outline" size={24} color={COLORS.hero} />
               {filtersActive ? (
                 <View style={styles.filterBadge}>
                   <Text style={styles.filterBadgeText}>
@@ -51,7 +51,7 @@ new_header = """        <GenoDiscoverHeader
               onPress={() => setShowFilterSheet(true)}
               accessibilityLabel="Filter discovery profiles"
             >
-              <Ionicons name="options-outline" size={22} color={COLORS.forestDeep} />
+              <Ionicons name="options-outline" size={22} color={COLORS.ink} />
               {filtersActive ? (
                 <View style={styles.filterBadge}>
                   <Text style={styles.filterBadgeText}>

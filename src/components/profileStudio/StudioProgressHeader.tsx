@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 16,
-    color: COLORS.forestDeep,
+    color: COLORS.ink,
     letterSpacing: -0.2,
   },
   badge: {
@@ -119,6 +119,6 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
     lineHeight: 17,
-    color: COLORS.sage,
+    color: COLORS.metallicSilver,
   },
 });

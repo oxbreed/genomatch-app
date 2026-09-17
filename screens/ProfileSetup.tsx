@@ -432,9 +432,9 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
                 disabled={cityLoading}
               >
                 {cityLoading ? (
-                  <ActivityIndicator color={COLORS.forest} size="small" />
+                  <ActivityIndicator color={COLORS.hero} size="small" />
                 ) : (
-                  <Ionicons name="locate" size={20} color={COLORS.forestDeep} />
+                  <Ionicons name="locate" size={20} color={COLORS.ink} />
                 )}
               </Pressable>
             </View>
@@ -498,7 +498,7 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
                   style={[styles.goalCard, selected && styles.goalCardSelected]}
                 >
                   <View style={styles.goalIconWrap}>
-                    <Ionicons name={goal.icon} size={26} color={COLORS.forest} />
+                    <Ionicons name={goal.icon} size={26} color={COLORS.hero} />
                   </View>
                   <View style={styles.goalTextWrap}>
                     <Text style={[styles.goalTitle, selected && styles.goalTitleSelected]}>
@@ -632,7 +632,7 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
               >
                 {saving ? (
                   <View style={styles.ctaInner}>
-                    <ActivityIndicator color={COLORS.forest} size="small" />
+                    <ActivityIndicator color={COLORS.hero} size="small" />
                     <Text style={styles.ctaText}>Saving...</Text>
                   </View>
                 ) : (
@@ -675,7 +675,7 @@ const styles = StyleSheet.create({
   progressFill: {
     height: '100%',
     borderRadius: 3,
-    backgroundColor: COLORS.forest,
+    backgroundColor: COLORS.hero,
   },
   stepIndicatorRow: {
     flexDirection: 'row',
@@ -695,10 +695,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   stepDotActive: {
-    backgroundColor: COLORS.forest,
+    backgroundColor: COLORS.hero,
   },
   stepDotDone: {
-    backgroundColor: COLORS.sage,
+    backgroundColor: COLORS.metallicSilver,
   },
   stepDotText: {
     fontSize: 12,
@@ -715,7 +715,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   stepLabelActive: {
-    color: COLORS.forest,
+    color: COLORS.hero,
     fontWeight: '800',
   },
   scroll: {
@@ -732,7 +732,7 @@ const styles = StyleSheet.create({
   stepHeading: {
     fontSize: 28,
     fontWeight: '800',
-    color: COLORS.forest,
+    color: COLORS.hero,
     letterSpacing: -0.6,
     marginBottom: 6,
   },
@@ -757,7 +757,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '700',
-    color: COLORS.forest,
+    color: COLORS.hero,
     marginTop: 14,
     marginBottom: 8,
   },
@@ -815,7 +815,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   genderBtnSelected: {
-    borderColor: COLORS.forest,
+    borderColor: COLORS.hero,
     backgroundColor: 'rgba(184, 188, 196, 0.25)',
   },
   genderBtnText: {
@@ -824,7 +824,7 @@ const styles = StyleSheet.create({
     color: 'rgba(11, 12, 14, 0.6)',
   },
   genderBtnTextSelected: {
-    color: COLORS.forest,
+    color: COLORS.hero,
   },
   bioHeader: {
     flexDirection: 'row',
@@ -865,8 +865,8 @@ const styles = StyleSheet.create({
     backgroundColor: GLASS.insetFill,
   },
   chipSelected: {
-    borderColor: COLORS.forest,
-    backgroundColor: COLORS.forest,
+    borderColor: COLORS.hero,
+    backgroundColor: COLORS.hero,
   },
   chipText: {
     fontSize: 14,
@@ -888,9 +888,9 @@ const styles = StyleSheet.create({
     gap: 14,
   },
   goalCardSelected: {
-    borderColor: COLORS.forest,
+    borderColor: COLORS.hero,
     backgroundColor: 'rgba(184, 188, 196, 0.2)',
-    shadowColor: COLORS.forest,
+    shadowColor: COLORS.hero,
     shadowOpacity: 0.12,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },
@@ -913,11 +913,11 @@ const styles = StyleSheet.create({
   goalTitle: {
     fontSize: 17,
     fontWeight: '800',
-    color: COLORS.forest,
+    color: COLORS.hero,
     marginBottom: 4,
   },
   goalTitleSelected: {
-    color: COLORS.forest,
+    color: COLORS.hero,
   },
   goalDescription: {
     fontSize: 13,
@@ -929,7 +929,7 @@ const styles = StyleSheet.create({
     width: 26,
     height: 26,
     borderRadius: 13,
-    backgroundColor: COLORS.forest,
+    backgroundColor: COLORS.hero,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -961,7 +961,7 @@ const styles = StyleSheet.create({
   backBtnText: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.forest,
+    color: COLORS.hero,
   },
   ctaWrap: {
     flex: 1,
@@ -990,7 +990,7 @@ const styles = StyleSheet.create({
   ctaText: {
     fontSize: 17,
     fontWeight: '800',
-    color: COLORS.forest,
+    color: COLORS.hero,
   },
   error: {
     color: '#A32D2D',
