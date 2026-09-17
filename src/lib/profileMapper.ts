@@ -3,7 +3,7 @@ import { computeCompatibility } from './compatibility';
 import { isNewMember, resolvePresenceState } from './presence';
 
 const GRADIENTS: [string, string][] = [
-  ['#2A5C40', '#0D2818'],
+  ['#2A5C40', '#163522'],
   ['#3D7A52', '#1A3D28'],
   ['#185FA5', '#0D47A1'],
   ['#6A4C93', '#4A2C6A'],

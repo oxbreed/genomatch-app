@@ -18,9 +18,9 @@ export default function ProfileVerifyCard({ genotype, onVerify }: Props) {
       <View style={styles.inner}>
         <GenoBondMark size={32} opacity={0.88} />
         <View style={styles.copy}>
-          <Text style={styles.title}>Verify you&apos;re real</Text>
+          <Text style={styles.title}>Confirm your genotype</Text>
           <Text style={styles.body}>
-            Confirm your {genotype} genotype so matches know your profile is authentic.{' '}
+            Attest your {genotype} genotype so matches know you completed in-app confirmation.{' '}
             {GENOTYPE_VERIFY_DISCLAIMER}
           </Text>
           <Pressable

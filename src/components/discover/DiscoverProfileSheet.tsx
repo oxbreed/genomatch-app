@@ -382,15 +382,15 @@ export default function DiscoverProfileSheet({
 
 const styles = StyleSheet.create({
   overlayRoot: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     zIndex: 80,
     justifyContent: 'flex-end',
   },
   backdropPress: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   backdropWash: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: COLORS.linen,
   },
   sheet: {
@@ -433,10 +433,10 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   heroGlossTop: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   heroGlossBottom: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   photoBars: {
     position: 'absolute',

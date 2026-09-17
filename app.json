@@ -7,22 +7,8 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
     "description": "GenoMatch is the world's first genotype-aware dating app. Find compatible partners based on AA, AS, SS, AC genotype matching.",
-    "primaryColor": "#0D2818",
-    "fonts": [
-      "./assets/fonts/ClashDisplay-Semibold.otf",
-      "./assets/fonts/ClashDisplay-Medium.otf",
-      "./assets/fonts/ClashDisplay-Regular.otf",
-      "./assets/fonts/Satoshi-Regular.otf",
-      "./assets/fonts/Satoshi-Medium.otf",
-      "./assets/fonts/Satoshi-Bold.otf"
-    ],
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#0D2818"
-    },
+    "primaryColor": "#163522",
     "runtimeVersion": {
       "policy": "appVersion"
     },
@@ -34,23 +20,29 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "ng.genomatch.app",
-      "buildNumber": "1",
+      "associatedDomains": [
+        "applinks:genomatch.app",
+        "applinks:www.genomatch.app"
+      ],
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
+        "NSCameraUsageDescription": "GenoMatch uses your camera to take a live selfie for photo review.",
         "NSPhotoLibraryUsageDescription": "GenoMatch needs access to your photos so you can upload a profile picture.",
         "NSLocationWhenInUseUsageDescription": "GenoMatch uses your location to set your city on your profile and improve nearby matching.",
-        "UIBackgroundModes": ["remote-notification"]
+        "UIBackgroundModes": [
+          "remote-notification"
+        ]
       }
     },
     "android": {
       "package": "ng.genomatch.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#0D2818"
+        "backgroundColor": "#163522"
       },
-      "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "permissions": [
+        "android.permission.CAMERA",
         "android.permission.READ_MEDIA_IMAGES",
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.ACCESS_COARSE_LOCATION",
@@ -73,6 +65,7 @@
           "photosPermission": "GenoMatch needs access to your photos so you can upload a profile picture."
         }
       ],
+      "expo-font",
       "expo-secure-store",
       [
         "expo-location",
@@ -85,24 +78,29 @@
         "expo-notifications",
         {
           "icon": "./assets/icon.png",
-          "color": "#0D2818",
+          "color": "#163522",
           "defaultChannel": "messages",
           "sounds": []
         }
       ],
       [
-        "expo-font",
+        "expo-splash-screen",
         {
-          "fonts": [
-            "./assets/fonts/ClashDisplay-Semibold.otf",
-            "./assets/fonts/ClashDisplay-Medium.otf",
-            "./assets/fonts/ClashDisplay-Regular.otf",
-            "./assets/fonts/Satoshi-Regular.otf",
-            "./assets/fonts/Satoshi-Medium.otf",
-            "./assets/fonts/Satoshi-Bold.otf"
-          ]
+          "image": "./assets/splash-icon.png",
+          "backgroundColor": "#0B0B0D",
+          "resizeMode": "contain",
+          "imageWidth": 200
         }
-      ]
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "GenoMatch uses your camera to take a live selfie for photo review.",
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
+      ],
+      "expo-status-bar"
     ]
   }
 }

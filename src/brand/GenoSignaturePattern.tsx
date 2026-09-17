@@ -39,40 +39,6 @@ export function GenoSignaturePattern({ width, height, opacity = 1 }: Props) {
   );
 }
 
-/** Corner infinity bond — echoes GenoMatchLogo */
-export function GenoBondMark({ size = 48, opacity = 1 }: { size?: number; opacity?: number }) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 100 100" fill="none" opacity={opacity}>
-      <Path
-        d="M50 50 C50 50 32 42 27 32 C22 22 27 16 35 16 C43 16 50 26 50 32"
-        stroke={COLORS.sage}
-        strokeWidth={4}
-        fill="none"
-        strokeLinecap="round"
-      />
-      <Path
-        d="M50 32 C50 26 57 16 65 16 C73 16 78 22 73 32 C68 42 50 50 50 50"
-        stroke={COLORS.sage}
-        strokeWidth={4}
-        fill="none"
-        strokeLinecap="round"
-      />
-      <Path
-        d="M50 50 C50 50 32 58 27 68 C22 78 27 84 35 84 C43 84 50 74 50 68"
-        stroke={COLORS.gold}
-        strokeWidth={4}
-        fill="none"
-        strokeLinecap="round"
-      />
-      <Path
-        d="M50 68 C50 74 57 84 65 84 C73 84 78 78 73 68 C68 58 50 50 50 50"
-        stroke={COLORS.gold}
-        strokeWidth={4}
-        fill="none"
-        strokeLinecap="round"
-      />
-      <Circle cx={50} cy={50} r={8} fill={COLORS.forestDeep} stroke={COLORS.gold} strokeWidth={1.5} />
-      <Circle cx={50} cy={50} r={3} fill={COLORS.gold} />
-    </Svg>
-  );
-}
+export { GenoBondMark } from './GenoBondMark';
+
+

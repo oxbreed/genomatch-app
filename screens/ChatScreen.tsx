@@ -561,11 +561,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 18,
     paddingVertical: 10,
-    backgroundColor: '#D4A843',
+    backgroundColor: COLORS.gold,
   },
   sendBtnText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 15,
-    color: '#0D2818',
+    color: COLORS.forestDeep,
   },
 });

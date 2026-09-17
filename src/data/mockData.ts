@@ -5,9 +5,9 @@ export { COLORS, TYPOGRAPHY, RADIUS, SHADOWS } from '../theme';
 import { COLORS } from '../theme';
 
 const GENOTYPE_BADGE_STYLE = {
-  bg: '#EDF3EE',
-  text: '#0D2818',
-  border: 'rgba(13, 40, 24, 0.12)',
+  bg: COLORS.mint,
+  text: COLORS.forestDeep,
+  border: 'rgba(22, 53, 34, 0.12)',
 } as const;
 
 export const GENOTYPE_STYLES: Record<
@@ -85,7 +85,7 @@ export const MOCK_MATCHES: MockProfile[] = [
     compatibility: 82,
     bio: 'Software engineer who enjoys hiking and photography. Looking for an honest connection built on shared values and laughter.',
     interests: ['Hiking', 'Photography', 'Tech', 'Music'],
-    gradient: ['#1B5E20', '#0D2818'],
+    gradient: ['#1B5E20', COLORS.forestDeep],
     photoUrl: 'https://genomatch.app/demo/demo-amani.png',
     lastMessageAt: '3d ago',
   },

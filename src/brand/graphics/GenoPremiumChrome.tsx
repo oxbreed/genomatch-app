@@ -126,7 +126,7 @@ export default function GenoPremiumChrome({
 
 const styles = StyleSheet.create({
   wrap: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     overflow: 'hidden',
     backgroundColor: COLORS.linen,
   },

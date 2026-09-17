@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     zIndex: 4,
   },
   line: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     height: 2,
   },
   sparks: {

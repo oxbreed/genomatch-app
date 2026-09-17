@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.gold,
   },
   center: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     alignItems: 'center',
     justifyContent: 'center',
   },

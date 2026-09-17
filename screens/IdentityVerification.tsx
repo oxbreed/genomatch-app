@@ -92,8 +92,8 @@ export default function IdentityVerification() {
             </View>
             <Text style={styles.title}>Camera access needed</Text>
             <Text style={styles.subtitle}>
-              We need your front camera to take a live selfie for identity verification. Gallery
-              photos are not accepted.
+              We need your front camera to take a live selfie for photo review. Gallery
+              photos are not accepted. This is not a government ID check.
             </Text>
             <Pressable
               style={({ pressed }) => [styles.primaryBtnWrap, pressed && styles.pressed]}
@@ -121,7 +121,8 @@ export default function IdentityVerification() {
             </View>
             <Text style={styles.title}>Submitted — we'll review it shortly</Text>
             <Text style={styles.subtitle}>
-              Our team will verify your selfie manually. You'll be notified once review is complete.
+              Our team will review your selfie. You'll be notified when that review is complete.
+              This is a photo check, not a government identity document.
             </Text>
           </View>
         </View>
@@ -286,14 +287,14 @@ const styles = StyleSheet.create({
     minHeight: 360,
     borderRadius: RADIUS.lg,
     overflow: 'hidden',
-    backgroundColor: '#0D2818',
+    backgroundColor: COLORS.forestDeep,
     marginBottom: 24,
   },
   camera: {
     flex: 1,
   },
   cameraOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -310,7 +311,7 @@ const styles = StyleSheet.create({
     minHeight: 360,
     borderRadius: RADIUS.lg,
     overflow: 'hidden',
-    backgroundColor: '#0D2818',
+    backgroundColor: COLORS.forestDeep,
     marginBottom: 20,
   },
   previewImage: {
@@ -380,7 +381,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   error: {
-    color: '#A32D2D',
+    color: COLORS.error,
     fontSize: 13,
     fontWeight: '600',
     textAlign: 'center',

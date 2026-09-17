@@ -161,7 +161,7 @@ export default function FilterSheet({
 
                 <View style={styles.verifyRow}>
                   <View style={styles.verifyCopy}>
-                    <Text style={styles.sectionLabel}>Verified members only</Text>
+                    <Text style={styles.sectionLabel}>Self-verified members only</Text>
                     <Text style={styles.verifyHint}>
                       Show profiles that confirmed their genotype
                     </Text>
@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   backdropPress: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   sheet: {
     maxHeight: '90%',
