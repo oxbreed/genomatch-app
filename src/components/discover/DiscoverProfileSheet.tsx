@@ -20,6 +20,7 @@ import DiscoverActionDock from './DiscoverActionDock';
 import VerifiedBadge from '../VerifiedBadge';
 import GenotypeBadge from '../GenotypeBadge';
 import FamilyPlanningCard from '../FamilyPlanningCard';
+import GenotypeInfoRow from '../genomatch/GenotypeInfoRow';
 import PresenceBadge from '../PresenceBadge';
 import LocationLine from '../LocationLine';
 import {
@@ -28,7 +29,6 @@ import {
   RELIGION_LABELS,
   formatHeightCm,
 } from '../../lib/profileDetails';
-import { getGenotypeRiskShort } from '../../lib/compatibility';
 import { GENO_TAB_BAR_HEIGHT } from '../navigation/tabBarLayout';
 import { COLORS, getInitials, RELATIONSHIP_GOAL_LABELS } from '../../data/mockData';
 import { FONT_FAMILY, MOTION, RADIUS, SHADOWS } from '../../theme';
@@ -136,7 +136,6 @@ export default function DiscoverProfileSheet({
   const [photoIndex, setPhotoIndex] = useState(0);
   const scrollAtTop = useRef(true);
   const photoScrollRef = useRef<ScrollView>(null);
-  const genotypeRisk = profile ? getGenotypeRiskShort(viewerGenotype, profile.genotype) : null;
 
   const gallery = useMemo(() => {
     if (!profile) return [] as string[];
@@ -316,11 +315,17 @@ export default function DiscoverProfileSheet({
                   <Text style={styles.bondKicker}>Lifestyle match</Text>
                 </View>
                 <GenoCompatRing percent={profile.lifestyleMatch} size={88} />
-                {genotypeRisk ? (
-                  <Text style={styles.bondRisk}>Genotype: {genotypeRisk}</Text>
-                ) : null}
-                <Text style={styles.bondDisclaimer}>Informational only — not medical advice.</Text>
               </View>
+
+              {!hideGenotype ? (
+                <View style={styles.genotypeInfoWrap}>
+                  <GenotypeInfoRow
+                    viewerGenotype={viewerGenotype}
+                    candidateGenotype={profile.genotype}
+                  />
+                </View>
+              ) : null}
+              <Text style={styles.bondDisclaimer}>Informational only — not medical advice.</Text>
 
               {profile.bio?.trim() ? (
                 <InfoSection title="About">
@@ -543,13 +548,9 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     color: COLORS.hero,
   },
-  bondRisk: {
-    fontFamily: FONT_FAMILY.gothamMedium,
-    fontSize: 15,
-    lineHeight: 22,
-    color: COLORS.ink,
-    textAlign: 'center',
-    maxWidth: '92%',
+  genotypeInfoWrap: {
+    width: '100%',
+    paddingHorizontal: 4,
   },
   bondDisclaimer: {
     fontFamily: FONT_FAMILY.gothamBook,

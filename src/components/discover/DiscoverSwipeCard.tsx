@@ -20,7 +20,6 @@ import GenotypeBadge from '../GenotypeBadge';
 import LocationLine from '../LocationLine';
 import { COLORS, getInitials } from '../../data/mockData';
 import { FONT_FAMILY, SHADOWS } from '../../theme';
-import { getGenotypeRiskShort } from '../../lib/compatibility';
 import type { DiscoveryProfile, Genotype } from '../../types/database';
 import DiscoverMatchPill from './DiscoverMatchPill';
 import { DISCOVER_GLASS_ICON, discoverGlassType } from './discoverGlassType';
@@ -50,7 +49,6 @@ export default function DiscoverSwipeCard({
   profile,
   swipeIndex,
   totalProfiles,
-  viewerGenotype,
   hideGenotype = false,
   progressFillWidth,
   height = DISCOVER_CARD_HEIGHT,
@@ -65,7 +63,6 @@ export default function DiscoverSwipeCard({
   const [photoIndex, setPhotoIndex] = useState(0);
   const hasMultiple = gallery.length > 1;
   const currentUri = gallery[photoIndex] ?? gallery[0];
-  const riskShort = getGenotypeRiskShort(viewerGenotype ?? null, profile.genotype);
 
   useEffect(() => {
     setPhotoIndex(0);
@@ -118,13 +115,13 @@ export default function DiscoverSwipeCard({
       />
 
       <LinearGradient
-        colors={['rgba(13, 40, 24, 0.22)', 'transparent']}
+        colors={['rgba(11, 12, 14, 0.22)', 'transparent']}
         style={styles.cardTopShade}
         pointerEvents="none"
       />
 
       <LinearGradient
-        colors={['transparent', 'rgba(13, 40, 24, 0.5)', 'rgba(13, 40, 24, 0.88)']}
+        colors={['transparent', 'rgba(11, 12, 14, 0.5)', 'rgba(11, 12, 14, 0.88)']}
         locations={[0, 0.45, 1]}
         style={styles.cardBottomShade}
         pointerEvents="none"
@@ -167,11 +164,6 @@ export default function DiscoverSwipeCard({
             {profile.lifestyleMatch}% match
           </Text>
         </View>
-        {riskShort ? (
-          <Text style={styles.genotypeRisk} numberOfLines={1}>
-            Genotype: {riskShort}
-          </Text>
-        ) : null}
       </Pressable>
 
       {onExpand ? (
@@ -340,13 +332,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 17,
     color: 'rgba(250, 248, 245, 0.9)',
-  },
-  genotypeRisk: {
-    fontFamily: FONT_FAMILY.gothamBook,
-    fontSize: 11,
-    lineHeight: 15,
-    color: 'rgba(250, 248, 245, 0.7)',
-    marginTop: 1,
   },
   expandHintWrap: {
     position: 'absolute',
