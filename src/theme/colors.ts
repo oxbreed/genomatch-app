@@ -27,6 +27,38 @@ export const INK = BRAND_BLACK;
 export const LINEN = CREAM;
 export const MINT = CREAM_TINT;
 
+/** Backup mirror-chrome names → canonical palette (same pattern as forest/sage). */
+export const LOGO_RED_BRIGHT = LOGO_RED_HOT;
+export const METALLIC_GRAPHITE = BRAND_BLACK_SOFT;
+export const METALLIC_SLATE = BRAND_BLACK_SOFT;
+export const METALLIC_STEEL = METALLIC_SILVER;
+
+const CREAM_RGB = '250, 248, 245';
+const RED_RGB = '200, 16, 46';
+const GOLD_RGB = '212, 175, 55';
+const SILVER_RGB = '184, 188, 196';
+const CHROME_RGB = '212, 216, 224';
+
+export function redAlpha(opacity: number): string {
+  return `rgba(${RED_RGB}, ${opacity})`;
+}
+
+export function goldAlpha(opacity: number): string {
+  return `rgba(${GOLD_RGB}, ${opacity})`;
+}
+
+export function creamAlpha(opacity: number): string {
+  return `rgba(${CREAM_RGB}, ${opacity})`;
+}
+
+export function silverAlpha(opacity: number): string {
+  return `rgba(${SILVER_RGB}, ${opacity})`;
+}
+
+export function chromeAlpha(opacity: number): string {
+  return `rgba(${CHROME_RGB}, ${opacity})`;
+}
+
 /** Semantic color tokens — use these in UI code */
 export const COLORS = {
   // Brand
@@ -35,6 +67,8 @@ export const COLORS = {
   brandBlack: BRAND_BLACK,
   metallicSilver: METALLIC_SILVER,
   metallicChrome: METALLIC_CHROME,
+  metallicGraphite: BRAND_BLACK_SOFT,
+  metallicSlate: BRAND_BLACK_SOFT,
   cream: CREAM,
 
   // Legacy keys retained for compatibility (mapped to mirror palette)
@@ -69,6 +103,7 @@ export const COLORS = {
   borderOnDark: 'rgba(250, 248, 245, 0.12)',
 
   chip: CREAM_TINT,
+  chipSolid: BRAND_BLACK_SOFT,
   chipFill: 'rgba(240, 241, 243, 0.85)',
   cta: LOGO_GOLD,
   overlay: 'rgba(11, 12, 14, 0.72)',
@@ -134,4 +169,32 @@ export const GLASS = {
   insetBorder: 'rgba(255, 255, 255, 0.72)',
   insetActiveFill: 'rgba(212, 175, 55, 0.2)',
   insetActiveBorder: 'rgba(212, 175, 55, 0.55)',
+} as const;
+
+export const MIRROR_GRADIENTS = {
+  cta: [LOGO_RED_HOT, LOGO_RED, LOGO_RED_DEEP] as const,
+  ctaSheen: [chromeAlpha(0.42), chromeAlpha(0.12), 'transparent'] as const,
+  ctaStreak: ['transparent', chromeAlpha(0.35), 'transparent'] as const,
+  ctaRim: [chromeAlpha(0.28), silverAlpha(0.08), 'transparent'] as const,
+  goldCta: [LOGO_GOLD_BRIGHT, LOGO_GOLD, LOGO_GOLD_DEEP] as const,
+  goldSheen: [chromeAlpha(0.35), chromeAlpha(0.08), 'transparent'] as const,
+  ribbonBlend: [LOGO_RED, LOGO_RED_HOT, LOGO_GOLD, LOGO_GOLD_BRIGHT] as const,
+  ribbonBlendSheen: [chromeAlpha(0.35), chromeAlpha(0.12), 'transparent'] as const,
+  onboardingCta: [LOGO_RED_HOT, LOGO_RED, LOGO_RED_DEEP] as const,
+  onboardingCtaSheen: [chromeAlpha(0.22), chromeAlpha(0.06), 'transparent'] as const,
+  chromeGloss: [chromeAlpha(0.2), silverAlpha(0.06), 'transparent'] as const,
+} as const;
+
+export const MIRROR_RED_TEXT = {
+  color: LOGO_RED_HOT,
+  textShadowColor: redAlpha(0.45),
+  textShadowOffset: { width: 0, height: 0 },
+  textShadowRadius: 10,
+} as const;
+
+export const ACCENT_GOLD_TEXT = {
+  color: LOGO_GOLD,
+  textShadowColor: goldAlpha(0.4),
+  textShadowOffset: { width: 0, height: 0 },
+  textShadowRadius: 8,
 } as const;

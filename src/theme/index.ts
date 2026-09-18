@@ -9,14 +9,26 @@ import {
 export {
   COLORS,
   GLASS,
+  MIRROR_GRADIENTS,
+  MIRROR_RED_TEXT,
+  ACCENT_GOLD_TEXT,
+  redAlpha,
+  goldAlpha,
+  creamAlpha,
+  silverAlpha,
+  chromeAlpha,
   LOGO_RED,
   LOGO_RED_DEEP,
   LOGO_RED_HOT,
+  LOGO_RED_BRIGHT,
   LOGO_GOLD,
   LOGO_GOLD_BRIGHT,
   LOGO_GOLD_DEEP,
   BRAND_BLACK,
   BRAND_BLACK_SOFT,
+  METALLIC_GRAPHITE,
+  METALLIC_SLATE,
+  METALLIC_STEEL,
   METALLIC_SILVER,
   METALLIC_CHROME,
   CREAM,
@@ -34,6 +46,8 @@ export { TYPOGRAPHY, FONT_FAMILY, FONT_ROLE, SYSTEM_FONT } from './typography';
 export { RADIUS, SHADOWS } from './shadows';
 export { SCENE } from './sceneLayout';
 export { MOTION } from './motion';
+export type { MirrorActionKind, MirrorIconTone } from './mirrorActions';
+export { MIRROR_ACTION, mirrorActionShadow } from './mirrorActions';
 
 /**
  * Load with `useFonts(FONTS_TO_LOAD)` in App.tsx before rendering UI.

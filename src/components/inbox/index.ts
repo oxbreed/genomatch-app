@@ -8,4 +8,5 @@ export { default as GenoInboxRetryPanel } from './GenoInboxRetryPanel';
 export { default as GenoInboxNewBanner } from './GenoInboxNewBanner';
 export { default as GenoInboxUnreadBanner } from './GenoInboxUnreadBanner';
 export { default as GenoInboxMatchStrip } from './GenoInboxMatchStrip';
+export { default as GenoInboxMirrorPill } from './GenoInboxMirrorPill';
 export { default as GenoGlassIconButton } from './GenoGlassIconButton';
