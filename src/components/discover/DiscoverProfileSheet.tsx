@@ -317,12 +317,14 @@ export default function DiscoverProfileSheet({
                 <GenoCompatRing percent={profile.lifestyleMatch} size={88} />
               </View>
 
-              <View style={styles.genotypeInfoWrap}>
-                <GenotypeInfoRow
-                  viewerGenotype={viewerGenotype}
-                  candidateGenotype={profile.genotype}
-                />
-              </View>
+              {!hideGenotype ? (
+                <View style={styles.genotypeInfoWrap}>
+                  <GenotypeInfoRow
+                    viewerGenotype={viewerGenotype}
+                    candidateGenotype={profile.genotype}
+                  />
+                </View>
+              ) : null}
               <Text style={styles.bondDisclaimer}>Informational only — not medical advice.</Text>
 
               {profile.bio?.trim() ? (
