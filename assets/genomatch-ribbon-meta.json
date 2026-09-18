@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "matteColor": "transparent",
+  "nativeWidth": 326,
+  "nativeHeight": 326,
+  "aspect": 1.0,
+  "exportScale": 4,
+  "fps": 24.0,
+  "frames": 81,
+  "loopEndFrame": 80,
+  "logoWidthFraction": 0.76,
+  "minLogoWidth": 260,
+  "maxLogoWidth": 288,
+  "animatedScale": 1,
+  "animatedPixelWidth": 326,
+  "animatedPixelHeight": 326
+}

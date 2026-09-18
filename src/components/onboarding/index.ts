@@ -1,3 +1,15 @@
 export { default as GenoOnboardingFlow } from './GenoOnboardingFlow';
 export type { GenoOnboardingSlide } from './GenoOnboardingFlow';
 export { default as GenoSplashScreen } from './GenoSplashScreen';
+export { default as GenoRibbonLogoAnimated } from './GenoRibbonLogoAnimated';
+export { default as GenoOnboardingHeroCluster } from './GenoOnboardingHeroCluster';
+export { default as GenoOnboardingAgeGate } from './GenoOnboardingAgeGate';
+export { default as GenoOnboardingProgress } from './GenoOnboardingProgress';
+export { default as GenoOnboardingSlideIcon } from './GenoOnboardingSlideIcon';
+export { default as GenoOnboardingSlidePage } from './GenoOnboardingSlidePage';
+export { default as GenoOnboardingTagline } from './GenoOnboardingTagline';
+export { default as GenoOnboardingTrustShield } from './GenoOnboardingTrustShield';
+export { default as GenoPremiumOnboardingBackdrop } from './GenoPremiumOnboardingBackdrop';
+export { default as GenoMetallicShimmerBand } from './GenoMetallicShimmerBand';
+export { default as GenoMetallicText } from './GenoMetallicText';
+export { default as GenoWordmark } from './GenoWordmark';
