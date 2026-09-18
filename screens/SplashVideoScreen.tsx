@@ -1,20 +1,29 @@
-import { useEffect, useRef } from 'react';
-import { Animated, Easing, StyleSheet, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Animated, Easing, StyleSheet, View } from 'react-native';
 import { useEventListener } from 'expo';
 import { useVideoPlayer, VideoView } from 'expo-video';
-import { BRAND_BLACK } from '../src/theme';
+import { BRAND_BLACK, LOGO_GOLD } from '../src/theme';
 
 type Props = {
-  onComplete: () => void;
+  /** Still loading fonts or session — keep splash visible with spinner */
+  bootstrapping?: boolean;
+  /** When false, splash waits after the video (or fallback) before fading out */
+  readyToExit?: boolean;
+  onFinish: () => void;
 };
 
-const SPLASH_FALLBACK_MS = 6200;
+const VIDEO_FALLBACK_MS = 6200;
 const FADE_OUT_MS = 300;
 const splashVideo = require('../assets/videos/genomatch-splash-dark.mp4');
 
-export default function SplashVideoScreen({ onComplete }: Props) {
+export default function SplashVideoScreen({
+  bootstrapping = false,
+  readyToExit = true,
+  onFinish,
+}: Props) {
   const opacity = useRef(new Animated.Value(1)).current;
-  const didFinishRef = useRef(false);
+  const exitStarted = useRef(false);
+  const [videoComplete, setVideoComplete] = useState(false);
 
   const player = useVideoPlayer(splashVideo, (instance) => {
     instance.loop = false;
@@ -22,25 +31,29 @@ export default function SplashVideoScreen({ onComplete }: Props) {
     instance.play();
   });
 
-  const finish = () => {
-    if (didFinishRef.current) return;
-    didFinishRef.current = true;
+  const markVideoComplete = () => {
+    setVideoComplete(true);
+  };
+
+  useEventListener(player, 'playToEnd', markVideoComplete);
+
+  useEffect(() => {
+    const timeout = setTimeout(markVideoComplete, VIDEO_FALLBACK_MS);
+    return () => clearTimeout(timeout);
+  }, []);
+
+  useEffect(() => {
+    if (!videoComplete || !readyToExit || exitStarted.current) return;
+    exitStarted.current = true;
     Animated.timing(opacity, {
       toValue: 0,
       duration: FADE_OUT_MS,
       easing: Easing.out(Easing.cubic),
       useNativeDriver: true,
-    }).start(() => {
-      onComplete();
+    }).start(({ finished }) => {
+      if (finished) onFinish();
     });
-  };
-
-  useEventListener(player, 'playToEnd', finish);
-
-  useEffect(() => {
-    const timeout = setTimeout(finish, SPLASH_FALLBACK_MS);
-    return () => clearTimeout(timeout);
-  }, []);
+  }, [onFinish, opacity, readyToExit, videoComplete]);
 
   return (
     <Animated.View style={[styles.root, { opacity }]}>
@@ -52,6 +65,9 @@ export default function SplashVideoScreen({ onComplete }: Props) {
           nativeControls={false}
         />
       </View>
+      {bootstrapping ? (
+        <ActivityIndicator style={styles.spinner} size="small" color={LOGO_GOLD} />
+      ) : null}
     </Animated.View>
   );
 }
@@ -69,5 +85,10 @@ const styles = StyleSheet.create({
   video: {
     width: '100%',
     height: '100%',
+  },
+  spinner: {
+    position: 'absolute',
+    bottom: 72,
+    alignSelf: 'center',
   },
 });
