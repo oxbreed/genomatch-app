@@ -1,5 +1,5 @@
 export { default as GenoOnboardingFlow } from './GenoOnboardingFlow';
-export type { GenoOnboardingSlide } from './GenoOnboardingFlow';
+export type { GenoOnboardingSlide } from './onboardingSlides';
 export { default as GenoSplashScreen } from './GenoSplashScreen';
 export { default as GenoRibbonLogoAnimated } from './GenoRibbonLogoAnimated';
 export { default as GenoOnboardingHeroCluster } from './GenoOnboardingHeroCluster';
