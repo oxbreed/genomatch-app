@@ -27,7 +27,6 @@ import { FONT_FAMILY, COLORS, MOTION } from '../src/theme';
 import type {
   ConversationPreview,
   DiscoveryProfile,
-  Genotype,
   MatchWithProfile,
 } from '../src/types/database';
 import { fetchMatches, unmatchByMatchId } from '../src/lib/matches';
@@ -42,7 +41,6 @@ type MatchesProps = {
 export default function Matches({ isActive, onStartChat, onImmersiveChange }: MatchesProps) {
   const [matches, setMatches] = useState<MatchWithProfile[]>([]);
   const [conversations, setConversations] = useState<ConversationPreview[]>([]);
-  const [viewerGenotype, setViewerGenotype] = useState<Genotype | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
@@ -70,13 +68,12 @@ export default function Matches({ isActive, onStartChat, onImmersiveChange }: Ma
     setError('');
     try {
       await logAuthState('Matches.load');
-      const [{ matches: rows, viewerGenotype: viewer }, convos] = await Promise.all([
+      const [{ matches: rows }, convos] = await Promise.all([
         fetchMatches(),
         fetchConversations(),
       ]);
       setMatches(rows);
       setConversations(convos);
-      setViewerGenotype(viewer);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not load matches');
     } finally {
@@ -195,7 +192,6 @@ export default function Matches({ isActive, onStartChat, onImmersiveChange }: Ma
             renderItem={({ item }) => (
               <MatchListCard
                 item={item}
-                viewerGenotype={viewerGenotype}
                 onOpenProfile={() => setSelectedMatch(item)}
                 onStartChat={() => {
                   void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);

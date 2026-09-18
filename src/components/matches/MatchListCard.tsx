@@ -8,11 +8,9 @@ import {
 } from '../inbox';
 import { FONT_FAMILY, COLORS } from '../../theme';
 import type { MatchWithProfile } from '../../types/database';
-import type { Genotype } from '../../types/database';
 import VerifiedBadge from '../VerifiedBadge';
 import PresenceBadge from '../PresenceBadge';
 import { formatLocationLine } from '../../lib/distanceBands';
-import { getGenotypeRiskShort } from '../../lib/compatibility';
 
 const NEW_MATCH_MS = 72 * 60 * 60 * 1000;
 
@@ -22,7 +20,6 @@ export function isRecentMatch(matchedAt: string): boolean {
 
 type Props = {
   item: MatchWithProfile;
-  viewerGenotype: Genotype | null;
   onOpenProfile: () => void;
   onStartChat: () => void;
   onUnmatch: () => void;
@@ -30,21 +27,16 @@ type Props = {
 
 export default function MatchListCard({
   item,
-  viewerGenotype,
   onOpenProfile,
   onStartChat,
   onUnmatch,
 }: Props) {
   const { profile } = item;
-  const riskShort = getGenotypeRiskShort(viewerGenotype, profile.genotype);
   const compatHigh = profile.lifestyleMatch >= 80;
   const isNew = isRecentMatch(item.matchedAt);
-  const locationLine = profile.city
+  const summaryText = profile.city
     ? formatLocationLine(profile.city, profile.distanceBand)
     : '';
-  const summaryText = [riskShort ? `Genotype: ${riskShort}` : '', locationLine]
-    .filter(Boolean)
-    .join(' · ');
 
   return (
     <GenoInboxCardShell
@@ -91,9 +83,11 @@ export default function MatchListCard({
               </Text>
             </LinearGradient>
           </View>
-          <Text style={styles.summary} numberOfLines={1}>
-            {summaryText}
-          </Text>
+          {summaryText ? (
+            <Text style={styles.summary} numberOfLines={1}>
+              {summaryText}
+            </Text>
+          ) : null}
         </>
       }
       actions={
