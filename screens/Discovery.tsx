@@ -48,9 +48,7 @@ import ReportBlockSheet from '../src/components/ReportBlockSheet';
 import { COLORS, RADIUS, SHADOWS, TYPOGRAPHY, getMockDiscoveryProfiles } from '../src/data/mockData';
 import {
   fetchDiscoveryProfiles,
-  getViewerProfileSnapshot,
   type DiscoveryDeckStats,
-  type ViewerProfileSnapshot,
 } from '../src/lib/profiles';
 import { clearMyPasses, recordLike, recordPass } from '../src/lib/likes';
 import { formatSecurityError } from '../src/lib/security';
@@ -117,7 +115,6 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
   const [matchedName, setMatchedName] = useState('');
   const [matchedProfile, setMatchedProfile] = useState<DiscoveryProfile | null>(null);
   const [matchedMatchId, setMatchedMatchId] = useState<string | null>(null);
-  const [viewerSnapshot, setViewerSnapshot] = useState<ViewerProfileSnapshot | null>(null);
   const [actionError, setActionError] = useState('');
   const [deckColumnHeight, setDeckColumnHeight] = useState(0);
   const [usingMockFallback, setUsingMockFallback] = useState(false);
@@ -140,13 +137,9 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
     setLoadError('');
     setLoading(true);
     try {
-      const [{ profiles: rows, viewerGenotype: loadedViewerGenotype, deckStats: stats }, viewer] =
-        await Promise.all([
-          fetchDiscoveryProfiles(),
-          getViewerProfileSnapshot(),
-        ]);
+      const { profiles: rows, viewerGenotype: loadedViewerGenotype, deckStats: stats } =
+        await fetchDiscoveryProfiles();
       setViewerGenotype(loadedViewerGenotype);
-      setViewerSnapshot(viewer);
       setDeckStats(stats);
       if (rows.length > 0) {
         setAllProfiles(rows);
@@ -161,8 +154,6 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
       }
       setIndex(0);
     } catch (err) {
-      const viewer = await getViewerProfileSnapshot().catch(() => null);
-      setViewerSnapshot(viewer);
       setAllProfiles([]);
       setUsingMockFallback(false);
       setDeckStats(null);
