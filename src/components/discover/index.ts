@@ -8,3 +8,7 @@ export { default as DiscoverSwipeCard, DISCOVER_CARD_HEIGHT } from './DiscoverSw
 export { default as DiscoverSwipeStamp } from './DiscoverSwipeStamp';
 export { default as GenoDiscoverHeader } from './GenoDiscoverHeader';
 export { default as DiscoverProfileSheet } from './DiscoverProfileSheet';
+export { default as DiscoverPremiumSection } from './DiscoverPremiumSection';
+export { default as DiscoverDetailRows } from './DiscoverDetailRows';
+export { default as DiscoverInterestChips } from './DiscoverInterestChips';
+export { DISCOVER_PREMIUM, premiumCard, premiumSectionTitle } from './discoverPremium';

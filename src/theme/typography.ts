@@ -202,4 +202,27 @@ export const TYPOGRAPHY = {
     letterSpacing: 0.12,
     color: COLORS.ink,
   } satisfies TextStyle,
+
+  /** Backup mirror-chrome aliases */
+  sectionLabel: {
+    ...gothamMedium(),
+    fontSize: 12,
+    letterSpacing: 1.1,
+    textTransform: 'uppercase',
+    color: COLORS.metallicSilver,
+  } satisfies TextStyle,
+
+  serifTitle: {
+    ...marketingExtrabold(),
+    fontSize: 22,
+    letterSpacing: -0.3,
+    color: COLORS.linen,
+  } satisfies TextStyle,
+
+  chip: {
+    ...gothamMedium(),
+    fontSize: 13,
+    letterSpacing: 0.2,
+    color: COLORS.ink,
+  } satisfies TextStyle,
 } as const;
