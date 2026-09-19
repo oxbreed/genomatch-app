@@ -17,6 +17,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { GenoBondMark } from '../../brand';
 import GenoCompatRing from '../genomatch/GenoCompatRing';
 import DiscoverActionDock from './DiscoverActionDock';
+import DiscoverDetailRows from './DiscoverDetailRows';
+import DiscoverInterestChips from './DiscoverInterestChips';
 import VerifiedBadge from '../VerifiedBadge';
 import GenotypeBadge from '../GenotypeBadge';
 import FamilyPlanningCard from '../FamilyPlanningCard';
@@ -65,25 +67,6 @@ function InfoSection({ title, children }: { title: string; children: ReactNode }
     <View style={styles.infoSection}>
       <Text style={styles.infoTitle}>{title}</Text>
       <View style={styles.infoPanel}>{children}</View>
-    </View>
-  );
-}
-
-function DetailRow({
-  icon,
-  label,
-  isLast,
-}: {
-  icon: keyof typeof Ionicons.glyphMap;
-  label: string;
-  isLast?: boolean;
-}) {
-  return (
-    <View style={[styles.detailRow, !isLast && styles.detailRowBorder]}>
-      <View style={styles.detailIconWrap}>
-        <Ionicons name={icon} size={15} color={COLORS.gold} />
-      </View>
-      <Text style={styles.detailText}>{label}</Text>
     </View>
   );
 }
@@ -341,26 +324,13 @@ export default function DiscoverProfileSheet({
 
               {detailRows.length > 0 ? (
                 <InfoSection title="Details">
-                  {detailRows.map((row, index) => (
-                    <DetailRow
-                      key={`${row.icon}-${row.label}`}
-                      icon={row.icon}
-                      label={row.label}
-                      isLast={index === detailRows.length - 1}
-                    />
-                  ))}
+                  <DiscoverDetailRows rows={detailRows} />
                 </InfoSection>
               ) : null}
 
               {profile.interests.length > 0 ? (
                 <InfoSection title="Interests">
-                  <View style={styles.chipRow}>
-                    {profile.interests.map((interest) => (
-                      <View key={interest} style={styles.chip}>
-                        <Text style={styles.chipText}>{interest}</Text>
-                      </View>
-                    ))}
-                  </View>
+                  <DiscoverInterestChips interests={profile.interests} selectable />
                 </InfoSection>
               ) : null}
 
@@ -583,49 +553,6 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 16,
     lineHeight: 25,
-    color: COLORS.ink,
-  },
-  detailRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingVertical: 10,
-  },
-  detailRowBorder: {
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: 'rgba(13, 40, 24, 0.08)',
-  },
-  detailIconWrap: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: 'rgba(212, 175, 55, 0.12)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  detailText: {
-    flex: 1,
-    fontFamily: FONT_FAMILY.gothamMedium,
-    fontSize: 15,
-    lineHeight: 22,
-    color: COLORS.ink,
-  },
-  chipRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  chip: {
-    paddingHorizontal: 14,
-    paddingVertical: 9,
-    borderRadius: RADIUS.pill,
-    backgroundColor: COLORS.mint,
-    borderWidth: 1,
-    borderColor: 'rgba(13, 40, 24, 0.1)',
-  },
-  chipText: {
-    fontFamily: FONT_FAMILY.gothamMedium,
-    fontSize: 14,
     color: COLORS.ink,
   },
   goalValue: {
