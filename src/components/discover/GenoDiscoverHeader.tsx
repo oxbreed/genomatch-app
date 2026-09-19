@@ -14,7 +14,7 @@ export default function GenoDiscoverHeader({ subtitle, right }: Props) {
   return (
     <View style={styles.wrap}>
       <GenoGlassSurface
-        variant="light"
+        variant="dark"
         borderRadius={RADIUS.xl}
         shadow="glassFloat"
         showTopRule
@@ -24,7 +24,7 @@ export default function GenoDiscoverHeader({ subtitle, right }: Props) {
         contentStyle={styles.glassInner}
       >
         <View style={styles.row}>
-          <GenoLogoCeremony variant="mark" tone="dark" style={styles.mark} />
+          <GenoLogoCeremony variant="mark" tone="light" style={styles.mark} />
           <View style={styles.copy}>
             <View style={styles.titleRow}>
               <View style={styles.titleBlock}>
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamSemiBold,
     fontSize: 19,
     letterSpacing: -0.35,
-    color: COLORS.ink,
+    color: COLORS.linen,
   },
   subtitle: {
     fontFamily: FONT_FAMILY.gothamMedium,

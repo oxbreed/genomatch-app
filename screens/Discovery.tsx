@@ -25,7 +25,7 @@ import FilterSheet, {
 } from '../src/components/FilterSheet';
 import {
   DiscoverActionDock,
-  DiscoverMatchModal,
+  DiscoverMatchCelebration,
   DiscoverProfileSheet,
   DiscoverSwipeCard,
   DiscoverSwipeStamp,
@@ -55,7 +55,7 @@ import {
 import { clearMyPasses, recordLike, recordPass } from '../src/lib/likes';
 import { formatSecurityError } from '../src/lib/security';
 import { getMatchIdForProfile } from '../src/lib/matches';
-import { FONT_FAMILY, MOTION } from '../src/theme';
+import { BRAND_BLACK, FONT_FAMILY, MOTION } from '../src/theme';
 import type { DiscoveryProfile, Genotype } from '../src/types/database';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -744,7 +744,7 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
   return (
     <View style={styles.container}>
       <GenoPremiumChrome variant="discover" />
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
 
       <View style={styles.screenRoot}>
         {superLikeToast ? (
@@ -792,7 +792,7 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
         <View style={styles.deckArea}>
           {loading ? (
             <View style={styles.loadingState}>
-              <ActivityIndicator size="large" color={COLORS.hero} />
+              <ActivityIndicator size="large" color={COLORS.gold} />
               <Text style={styles.loadingText}>Finding compatible profiles...</Text>
             </View>
           ) : loadError ? (
@@ -1046,12 +1046,10 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
         />
       ) : null}
 
-      <DiscoverMatchModal
+      <DiscoverMatchCelebration
         visible={showMatch}
         matchName={matchedName}
         profile={matchedProfile}
-        viewer={viewerSnapshot}
-        viewerGenotype={viewerGenotype}
         onContinue={dismissMatchOverlay}
         onSendMessage={() => { void handleSendMessageFromMatch(); }}
       />
@@ -1062,7 +1060,7 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.linen,
+    backgroundColor: BRAND_BLACK,
   },
   screenRoot: {
     flex: 1,
@@ -1581,7 +1579,7 @@ const styles = StyleSheet.create({
   loadingText: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 15,
-    color: 'rgba(13, 40, 24, 0.6)',
+    color: COLORS.metallicSilver,
     fontWeight: '600',
   },
   retryBtn: {
