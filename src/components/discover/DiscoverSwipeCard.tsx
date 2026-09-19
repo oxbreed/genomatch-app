@@ -18,6 +18,7 @@ import {
 } from '../../components/navigation/tabBarLayout';
 import GenotypeBadge from '../GenotypeBadge';
 import LocationLine from '../LocationLine';
+import PresenceBadge from '../PresenceBadge';
 import { COLORS, getInitials } from '../../data/mockData';
 import { FONT_FAMILY, SHADOWS } from '../../theme';
 import type { DiscoveryProfile, Genotype } from '../../types/database';
@@ -152,6 +153,16 @@ export default function DiscoverSwipeCard({
         </View>
 
         <LocationLine city={profile.city} distanceBand={profile.distanceBand} dark />
+
+        {(profile.presenceState !== 'offline' || profile.isNewMember) ? (
+          <View style={styles.presenceRow}>
+            <PresenceBadge
+              presenceState={profile.presenceState}
+              isNewMember={profile.isNewMember}
+              dark
+            />
+          </View>
+        ) : null}
 
         <View style={styles.compatRow}>
           <View
@@ -319,6 +330,9 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     gap: 8,
     marginTop: 4,
+  },
+  presenceRow: {
+    marginTop: 8,
   },
   compatDot: {
     width: 7,
