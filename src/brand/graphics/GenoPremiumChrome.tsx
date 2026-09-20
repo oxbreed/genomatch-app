@@ -25,6 +25,7 @@ export default function GenoPremiumChrome({
   const pulse = useRef(new Animated.Value(0.8)).current;
   const isInk = variant === 'ink';
   const isDiscover = variant === 'discover';
+  const isDarkChrome = isInk || isDiscover;
 
   useEffect(() => {
     if (!animated) return;
@@ -76,20 +77,21 @@ export default function GenoPremiumChrome({
   const washColors =
     variant === 'mint'
       ? GENO_VISUAL.chrome.washMint
-      : isDiscover
+      : isDarkChrome
         ? GENO_VISUAL.chrome.washDiscover
         : GENO_VISUAL.chrome.washLinen;
 
-  const helixOpacity = isInk
+  const helixOpacity = isDarkChrome
     ? GENO_VISUAL.helix.opacity.rich
-    : isDiscover
-      ? GENO_VISUAL.helix.opacity.medium
-      : GENO_VISUAL.helix.opacity.subtle;
+    : GENO_VISUAL.helix.opacity.subtle;
 
   return (
-    <View style={styles.wrap} pointerEvents="none">
+    <View
+      style={[styles.wrap, { backgroundColor: isDarkChrome ? COLORS.ink : COLORS.linen }]}
+      pointerEvents="none"
+    >
       <LinearGradient colors={washColors} style={StyleSheet.absoluteFill} />
-      <GenoGlowField variant={isInk ? 'ink' : 'linen'} />
+      <GenoGlowField variant={isDarkChrome ? 'ink' : 'linen'} />
 
       <Animated.View
         style={[
@@ -115,11 +117,11 @@ export default function GenoPremiumChrome({
       <Animated.View style={[styles.bondMark, { opacity: pulse }]}>
         <GenoBondMark
           size={isDiscover ? GENO_VISUAL.sizes.bondMarkSm : GENO_VISUAL.sizes.bondMarkMd}
-          opacity={isInk ? 0.18 : 0.12}
+          opacity={isDarkChrome ? 0.18 : 0.12}
         />
       </Animated.View>
 
-      <GenoSparkCeremony variant={isInk ? 'ink' : 'linen'} />
+      <GenoSparkCeremony variant={isDarkChrome ? 'ink' : 'linen'} />
     </View>
   );
 }
@@ -128,7 +130,6 @@ const styles = StyleSheet.create({
   wrap: {
     ...StyleSheet.absoluteFill,
     overflow: 'hidden',
-    backgroundColor: COLORS.linen,
   },
   helixTop: {
     position: 'absolute',

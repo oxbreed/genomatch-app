@@ -25,7 +25,7 @@ import FilterSheet, {
 } from '../src/components/FilterSheet';
 import {
   DiscoverActionDock,
-  DiscoverMatchModal,
+  DiscoverMatchCelebration,
   DiscoverProfileSheet,
   DiscoverSwipeCard,
   DiscoverSwipeStamp,
@@ -48,14 +48,12 @@ import ReportBlockSheet from '../src/components/ReportBlockSheet';
 import { COLORS, RADIUS, SHADOWS, TYPOGRAPHY, getMockDiscoveryProfiles } from '../src/data/mockData';
 import {
   fetchDiscoveryProfiles,
-  getViewerProfileSnapshot,
   type DiscoveryDeckStats,
-  type ViewerProfileSnapshot,
 } from '../src/lib/profiles';
 import { clearMyPasses, recordLike, recordPass } from '../src/lib/likes';
 import { formatSecurityError } from '../src/lib/security';
 import { getMatchIdForProfile } from '../src/lib/matches';
-import { FONT_FAMILY, MOTION } from '../src/theme';
+import { BRAND_BLACK, FONT_FAMILY, MOTION } from '../src/theme';
 import type { DiscoveryProfile, Genotype } from '../src/types/database';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -117,7 +115,6 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
   const [matchedName, setMatchedName] = useState('');
   const [matchedProfile, setMatchedProfile] = useState<DiscoveryProfile | null>(null);
   const [matchedMatchId, setMatchedMatchId] = useState<string | null>(null);
-  const [viewerSnapshot, setViewerSnapshot] = useState<ViewerProfileSnapshot | null>(null);
   const [actionError, setActionError] = useState('');
   const [deckColumnHeight, setDeckColumnHeight] = useState(0);
   const [usingMockFallback, setUsingMockFallback] = useState(false);
@@ -140,13 +137,9 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
     setLoadError('');
     setLoading(true);
     try {
-      const [{ profiles: rows, viewerGenotype: loadedViewerGenotype, deckStats: stats }, viewer] =
-        await Promise.all([
-          fetchDiscoveryProfiles(),
-          getViewerProfileSnapshot(),
-        ]);
+      const { profiles: rows, viewerGenotype: loadedViewerGenotype, deckStats: stats } =
+        await fetchDiscoveryProfiles();
       setViewerGenotype(loadedViewerGenotype);
-      setViewerSnapshot(viewer);
       setDeckStats(stats);
       if (rows.length > 0) {
         setAllProfiles(rows);
@@ -161,8 +154,6 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
       }
       setIndex(0);
     } catch (err) {
-      const viewer = await getViewerProfileSnapshot().catch(() => null);
-      setViewerSnapshot(viewer);
       setAllProfiles([]);
       setUsingMockFallback(false);
       setDeckStats(null);
@@ -744,7 +735,7 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
   return (
     <View style={styles.container}>
       <GenoPremiumChrome variant="discover" />
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
 
       <View style={styles.screenRoot}>
         {superLikeToast ? (
@@ -792,7 +783,7 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
         <View style={styles.deckArea}>
           {loading ? (
             <View style={styles.loadingState}>
-              <ActivityIndicator size="large" color={COLORS.hero} />
+              <ActivityIndicator size="large" color={COLORS.gold} />
               <Text style={styles.loadingText}>Finding compatible profiles...</Text>
             </View>
           ) : loadError ? (
@@ -1046,12 +1037,10 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
         />
       ) : null}
 
-      <DiscoverMatchModal
+      <DiscoverMatchCelebration
         visible={showMatch}
         matchName={matchedName}
         profile={matchedProfile}
-        viewer={viewerSnapshot}
-        viewerGenotype={viewerGenotype}
         onContinue={dismissMatchOverlay}
         onSendMessage={() => { void handleSendMessageFromMatch(); }}
       />
@@ -1062,7 +1051,7 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.linen,
+    backgroundColor: BRAND_BLACK,
   },
   screenRoot: {
     flex: 1,
@@ -1581,7 +1570,7 @@ const styles = StyleSheet.create({
   loadingText: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 15,
-    color: 'rgba(13, 40, 24, 0.6)',
+    color: COLORS.metallicSilver,
     fontWeight: '600',
   },
   retryBtn: {

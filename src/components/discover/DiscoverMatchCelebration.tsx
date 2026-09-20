@@ -25,6 +25,7 @@ type Props = {
   matchName: string;
   profile?: DiscoveryProfile | null;
   onContinue: () => void;
+  onSendMessage?: () => void;
 };
 
 function ConfettiBurst({ progress }: { progress: Animated.Value }) {
@@ -85,6 +86,7 @@ export default function DiscoverMatchCelebration({
   matchName,
   profile,
   onContinue,
+  onSendMessage,
 }: Props) {
   const backdrop = useRef(new Animated.Value(0)).current;
   const cardScale = useRef(new Animated.Value(0.82)).current;
@@ -410,7 +412,13 @@ export default function DiscoverMatchCelebration({
 
                 <Pressable
                   style={({ pressed }) => [styles.skipBtn, pressed && styles.skipBtnPressed]}
-                  onPress={onContinue}
+                  onPress={() => {
+                    if (onSendMessage) {
+                      onSendMessage();
+                      return;
+                    }
+                    onContinue();
+                  }}
                 >
                   <Ionicons name="chatbubble-outline" size={16} color={COLORS.gold} />
                   <Text style={styles.skipText}>Send a message</Text>

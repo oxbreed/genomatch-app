@@ -21,7 +21,7 @@ export const GENO_VISUAL = {
     washDiscover: [
       'rgba(212, 175, 55, 0.14)',
       'transparent',
-      'rgba(240, 241, 243, 0.35)',
+      COLORS.ink,
     ] as [string, string, string],
     cardBorder: [
       'rgba(212, 175, 55, 0.5)',
