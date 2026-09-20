@@ -68,6 +68,7 @@ import { getVerificationEligibility, type VerificationProfileInput } from '../sr
 import { formatSecurityError } from '../src/lib/security';
 import { supabase } from '../src/lib/supabase';
 import { parseProfilePronoun, type ProfilePronoun } from '../src/lib/profilePronouns';
+import type { DiscoveryProfile, Genotype, ProfileRow } from '../src/types/database';
 
 const HERO_HEIGHT = 288;
 const HERO_HEIGHT_STUDIO = 200;

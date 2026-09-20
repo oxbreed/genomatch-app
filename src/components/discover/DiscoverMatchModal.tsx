@@ -449,7 +449,7 @@ const styles = StyleSheet.create({
     color: COLORS.verified,
   },
   compatDisclaimer: {
-    ...TYPOGRAPHY.disclaimer,
+    ...TYPOGRAPHY.caption,
     textAlign: 'center',
     marginBottom: 20,
     paddingHorizontal: 16,
