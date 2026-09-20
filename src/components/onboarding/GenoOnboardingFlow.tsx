@@ -1,220 +1,243 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Animated,
-  Dimensions,
-  Easing,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   View,
+  useWindowDimensions,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import type { ComponentProps } from 'react';
 import * as Haptics from 'expo-haptics';
-import { GenoPremiumChrome, GenoGlassSurface, GenoHelixField } from '../../brand/graphics';
-import { GenoBondMark } from '../../brand';
-import GenoMatchLogo from '../GenoMatchLogo';
-import { FONT_FAMILY, COLORS, RADIUS } from '../../theme';
-
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-
-type IonName = ComponentProps<typeof Ionicons>['name'];
-
-export type GenoOnboardingSlide = {
-  icon: IonName;
-  title: string;
-  subtitle: string;
-  body: string;
-};
+import {
+  BRAND_BLACK,
+  COLORS,
+  LOGO_RED,
+  LOGO_RED_HOT,
+  TYPOGRAPHY,
+} from '../../theme';
+import GenoOnboardingAgeGate from './GenoOnboardingAgeGate';
+import GenoOnboardingProgress from './GenoOnboardingProgress';
+import GenoOnboardingSlidePage from './GenoOnboardingSlidePage';
+import GenoPremiumOnboardingBackdrop from './GenoPremiumOnboardingBackdrop';
+import GenoRibbonLogoAnimated from './GenoRibbonLogoAnimated';
+import GenoWordmark from './GenoWordmark';
+import { GENO_ONBOARDING_SLIDES } from './onboardingSlides';
+import {
+  ONBOARDING_AGE_SLOT_HEIGHT,
+  ONBOARDING_BOTTOM_PAD,
+  ONBOARDING_CTA_HEIGHT,
+  ONBOARDING_CTA_WIDTH,
+  ONBOARDING_FOOTER_MIN_HEIGHT,
+  ONBOARDING_H_PAD,
+  ONBOARDING_TOP_PAD,
+} from './onboardingLayout';
 
 type Props = {
-  slides: GenoOnboardingSlide[];
   onFinish: () => void;
+  onSignIn?: () => void;
   lastCtaLabel?: string;
 };
 
+const SLIDE_COUNT = GENO_ONBOARDING_SLIDES.length;
+
+function clampSlide(index: number) {
+  return Math.max(0, Math.min(SLIDE_COUNT - 1, index));
+}
+
 export default function GenoOnboardingFlow({
-  slides,
   onFinish,
+  onSignIn,
   lastCtaLabel = 'Create your profile',
 }: Props) {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const layerOpacity = useRef(new Animated.Value(0)).current;
-  const layerY = useRef(new Animated.Value(24)).current;
-  const carouselX = useRef(new Animated.Value(0)).current;
+  const { width: screenWidth } = useWindowDimensions();
+  const [slide, setSlide] = useState(0);
+  const [ageConfirmed, setAgeConfirmed] = useState(false);
+  const [ageNudge, setAgeNudge] = useState(false);
+
+  const scrollRef = useRef<ScrollView>(null);
+  const slideRef = useRef(0);
   const ctaScale = useRef(new Animated.Value(1)).current;
-  const iconPulse = useRef(new Animated.Value(1)).current;
 
-  useEffect(() => {
-    Animated.parallel([
-      Animated.timing(layerOpacity, {
-        toValue: 1,
-        duration: 600,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
-      }),
-      Animated.timing(layerY, {
-        toValue: 0,
-        duration: 600,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
-      }),
-    ]).start();
-
-    const pulse = Animated.loop(
-      Animated.sequence([
-        Animated.timing(iconPulse, {
-          toValue: 1.05,
-          duration: 1200,
-          easing: Easing.inOut(Easing.sin),
-          useNativeDriver: true,
-        }),
-        Animated.timing(iconPulse, {
-          toValue: 1,
-          duration: 1200,
-          easing: Easing.inOut(Easing.sin),
-          useNativeDriver: true,
-        }),
-      ])
-    );
-    pulse.start();
-    return () => pulse.stop();
-  }, [iconPulse, layerOpacity, layerY]);
+  const isLast = slide === SLIDE_COUNT - 1;
 
   const ctaLabel = useMemo(
-    () => (currentSlide === slides.length - 1 ? lastCtaLabel : 'Continue'),
-    [currentSlide, lastCtaLabel, slides.length]
+    () => (isLast ? lastCtaLabel : 'Continue'),
+    [isLast, lastCtaLabel]
   );
 
-  const goToSlide = (index: number) => {
-    setCurrentSlide(index);
-    Animated.timing(carouselX, {
-      toValue: -index * SCREEN_WIDTH,
-      duration: 480,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: true,
-    }).start();
-  };
+  useEffect(() => {
+    slideRef.current = slide;
+  }, [slide]);
+
+  const goToSlide = useCallback(
+    (index: number) => {
+      const next = clampSlide(index);
+      if (next === slideRef.current) return;
+      setAgeNudge(false);
+      setSlide(next);
+      scrollRef.current?.scrollTo({ x: next * screenWidth, animated: true });
+    },
+    [screenWidth]
+  );
+
+  const resolveSlideFromOffset = useCallback(
+    (offsetX: number) => clampSlide(Math.round(offsetX / screenWidth)),
+    [screenWidth]
+  );
+
+  const onScrollSettled = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const next = resolveSlideFromOffset(event.nativeEvent.contentOffset.x);
+      if (next !== slideRef.current) {
+        setAgeNudge(false);
+        setSlide(next);
+      }
+    },
+    [resolveSlideFromOffset]
+  );
 
   const onContinue = () => {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    if (currentSlide === slides.length - 1) {
-      onFinish();
+    if (!isLast) {
+      goToSlide(slide + 1);
       return;
     }
-    goToSlide(Math.min(currentSlide + 1, slides.length - 1));
+    if (!ageConfirmed) {
+      setAgeNudge(true);
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+      return;
+    }
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    onFinish();
   };
 
   const skipToEnd = () => {
     void Haptics.selectionAsync();
-    goToSlide(slides.length - 1);
+    goToSlide(SLIDE_COUNT - 1);
   };
+
+  const ctaReady = !isLast || ageConfirmed;
 
   return (
     <View style={styles.root}>
-      <GenoPremiumChrome variant="ink" />
       <StatusBar style="light" />
+      <GenoPremiumOnboardingBackdrop />
 
-      <View style={styles.helixDecor} pointerEvents="none">
-        <GenoHelixField width={280} height={100} opacity={0.18} />
-      </View>
-
-      <Animated.View
-        style={[
-          styles.layer,
-          { opacity: layerOpacity, transform: [{ translateY: layerY }] },
-        ]}
-      >
-        <View style={styles.topBar}>
+      <View style={styles.shell}>
+        <View style={[styles.header, { paddingTop: ONBOARDING_TOP_PAD }]}>
           <View style={styles.brandRow}>
-            <GenoMatchLogo size={36} />
-            <GenoBondMark size={24} opacity={0.9} />
+            <GenoRibbonLogoAnimated width={40} height={40} variant="static" />
+            <GenoWordmark />
           </View>
-          <Pressable onPress={skipToEnd} hitSlop={12}>
-            <Text style={styles.skip}>Skip</Text>
-          </Pressable>
-        </View>
-
-        <Animated.View style={[styles.track, { transform: [{ translateX: carouselX }] }]}>
-          {slides.map((slide) => (
-            <View key={slide.title} style={styles.slide}>
-              <LinearGradient
-                colors={['rgba(212, 175, 55, 0.35)', 'rgba(200, 16, 46, 0.25)']}
-                style={styles.slideCardBorder}
-              >
-                <GenoGlassSurface
-                  variant="dark"
-                  borderRadius={RADIUS.xl}
-                  shadow="glassFloat"
-                  showTopRule
-                  showSheen
-                  intensity={56}
-                  style={styles.slideCardGlass}
-                  contentStyle={styles.slideCard}
-                >
-                  <Animated.View style={{ transform: [{ scale: iconPulse }] }}>
-                    <GenoGlassSurface
-                      variant="dark"
-                      borderRadius={44}
-                      shadow="glass"
-                      intensity={48}
-                      contentStyle={styles.iconOrb}
-                    >
-                      <Ionicons name={slide.icon} size={40} color={COLORS.gold} />
-                    </GenoGlassSurface>
-                  </Animated.View>
-                  <Text style={styles.slideKicker}>{slide.subtitle}</Text>
-                  <Text style={styles.slideTitle}>{slide.title}</Text>
-                  <Text style={styles.slideBody}>{slide.body}</Text>
-                </GenoGlassSurface>
-              </LinearGradient>
-            </View>
-          ))}
-        </Animated.View>
-
-        <View style={styles.footer}>
-          <View style={styles.dots}>
-            {slides.map((slide, index) => (
-              <Pressable
-                key={slide.title}
-                onPress={() => goToSlide(index)}
-                style={[styles.dot, index === currentSlide && styles.dotActive]}
-              />
-            ))}
-          </View>
-
-          <Animated.View style={{ transform: [{ scale: ctaScale }] }}>
+          {!isLast ? (
             <Pressable
-              onPressIn={() =>
-                Animated.spring(ctaScale, {
-                  toValue: 0.97,
-                  useNativeDriver: true,
-                }).start()
-              }
-              onPressOut={() =>
-                Animated.spring(ctaScale, {
-                  toValue: 1,
-                  useNativeDriver: true,
-                }).start()
-              }
-              onPress={onContinue}
+              onPress={skipToEnd}
+              hitSlop={14}
+              accessibilityRole="button"
+              accessibilityLabel="Skip to last step"
             >
-              <LinearGradient colors={[COLORS.gold, '#B8962E']} style={styles.cta}>
-                <Text style={styles.ctaText}>{ctaLabel}</Text>
-                <Ionicons name="arrow-forward" size={18} color={COLORS.ink} />
-              </LinearGradient>
+              <Text style={styles.skip}>Skip</Text>
             </Pressable>
-          </Animated.View>
-
-          <Text style={styles.helper}>
-            {currentSlide === slides.length - 1
-              ? 'Join thousands building intentional, genotype-aware love stories.'
-              : `${currentSlide + 1} of ${slides.length} — your premium bond journey`}
-          </Text>
+          ) : (
+            <View style={styles.headerSpacer} />
+          )}
         </View>
-      </Animated.View>
+
+        <ScrollView
+          ref={scrollRef}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          bounces={false}
+          decelerationRate="fast"
+          scrollEventThrottle={16}
+          onMomentumScrollEnd={onScrollSettled}
+          onScrollEndDrag={onScrollSettled}
+          style={styles.pager}
+          contentContainerStyle={styles.pagerContent}
+        >
+          {GENO_ONBOARDING_SLIDES.map((item, index) => (
+            <GenoOnboardingSlidePage
+              key={item.kicker}
+              slide={item}
+              width={screenWidth}
+              showSwipeHint={index === 0 && slide === 0}
+            />
+          ))}
+        </ScrollView>
+
+        <View style={[styles.footer, { minHeight: ONBOARDING_FOOTER_MIN_HEIGHT }]}>
+          <LinearGradient
+            colors={['transparent', BRAND_BLACK]}
+            style={styles.footerFade}
+            pointerEvents="none"
+          />
+
+          <View style={[styles.footerInner, { paddingBottom: ONBOARDING_BOTTOM_PAD }]}>
+            <GenoOnboardingProgress
+              total={SLIDE_COUNT}
+              current={slide}
+              onSelect={goToSlide}
+            />
+
+            <View
+              style={[
+                styles.ageSlot,
+                { height: isLast ? ONBOARDING_AGE_SLOT_HEIGHT : 0 },
+              ]}
+            >
+              {isLast ? (
+                <GenoOnboardingAgeGate
+                  confirmed={ageConfirmed}
+                  onToggle={() => {
+                    setAgeConfirmed((v) => !v);
+                    setAgeNudge(false);
+                  }}
+                  showHelper={ageNudge}
+                />
+              ) : null}
+            </View>
+
+            <Animated.View style={[styles.ctaWrap, { transform: [{ scale: ctaScale }] }]}>
+              <Pressable
+                onPressIn={() =>
+                  Animated.spring(ctaScale, { toValue: 0.98, useNativeDriver: true }).start()
+                }
+                onPressOut={() =>
+                  Animated.spring(ctaScale, { toValue: 1, useNativeDriver: true }).start()
+                }
+                onPress={onContinue}
+                disabled={isLast && !ageConfirmed}
+                accessibilityRole="button"
+                accessibilityState={{ disabled: isLast && !ageConfirmed }}
+                style={[styles.ctaOuter, !ctaReady && styles.ctaOuterMuted]}
+              >
+                <View style={styles.cta}>
+                  <View style={styles.ctaInner}>
+                    <Text style={styles.ctaText}>{ctaLabel}</Text>
+                    {!isLast ? (
+                      <Ionicons name="arrow-forward" size={18} color={COLORS.white} />
+                    ) : null}
+                  </View>
+                </View>
+              </Pressable>
+            </Animated.View>
+
+            {onSignIn ? (
+              <Pressable onPress={onSignIn} hitSlop={12} style={styles.signInRow}>
+                <Text style={styles.signInText}>Already have an account? </Text>
+                <Text style={styles.signInLink}>Sign in</Text>
+              </Pressable>
+            ) : null}
+          </View>
+        </View>
+      </View>
     </View>
   );
 }
@@ -222,121 +245,111 @@ export default function GenoOnboardingFlow({
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: COLORS.ink,
+    backgroundColor: BRAND_BLACK,
   },
-  helixDecor: {
-    position: 'absolute',
-    top: 80,
-    right: -40,
-    zIndex: 1,
-  },
-  layer: {
+  shell: {
     flex: 1,
-    paddingTop: 56,
-    paddingBottom: 32,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: ONBOARDING_H_PAD,
+    minHeight: 40,
     zIndex: 2,
   },
-  topBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    marginBottom: 8,
+  headerSpacer: {
+    width: 44,
   },
   brandRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 8,
   },
   skip: {
-    fontFamily: FONT_FAMILY.gothamBold,
+    ...TYPOGRAPHY.bodyStrong,
     fontSize: 14,
     color: 'rgba(250, 248, 245, 0.7)',
   },
-  track: {
-    flexDirection: 'row',
+  pager: {
     flex: 1,
   },
-  slide: {
-    width: SCREEN_WIDTH,
-    paddingHorizontal: 20,
-    justifyContent: 'center',
-  },
-  slideCardBorder: {
-    borderRadius: 28,
-    padding: 2,
-  },
-  slideCardGlass: {
-    overflow: 'hidden',
-  },
-  slideCard: {
-    padding: 28,
-  },
-  iconOrb: {
-    width: 88,
-    height: 88,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 20,
-  },
-  slideKicker: {
-    fontFamily: FONT_FAMILY.marketingExtrabold,
-    fontSize: 11,
-    letterSpacing: 2.2,
-    color: COLORS.gold,
-    marginBottom: 8,
-  },
-  slideTitle: {
-    fontFamily: FONT_FAMILY.marketingExtrabold,
-    fontSize: 32,
-    lineHeight: 38,
-    color: COLORS.linen,
-    letterSpacing: -0.45,
-    marginBottom: 12,
-  },
-  slideBody: {
-    fontFamily: FONT_FAMILY.gothamBook,
-    fontSize: 16,
-    lineHeight: 24,
-    color: 'rgba(250, 248, 245, 0.8)',
+  pagerContent: {
+    alignItems: 'stretch',
   },
   footer: {
-    paddingHorizontal: 24,
+    position: 'relative',
   },
-  dots: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 20,
+  footerFade: {
+    position: 'absolute',
+    top: -48,
+    left: 0,
+    right: 0,
+    height: 48,
   },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: 'rgba(250, 248, 245, 0.25)',
+  footerInner: {
+    paddingHorizontal: ONBOARDING_H_PAD,
+    paddingTop: 10,
+    gap: 14,
+    alignItems: 'center',
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: 'rgba(255, 255, 255, 0.06)',
+    backgroundColor: BRAND_BLACK,
   },
-  dotActive: {
-    width: 28,
-    backgroundColor: COLORS.gold,
+  ageSlot: {
+    width: '100%',
+    overflow: 'hidden',
+  },
+  ctaWrap: {
+    width: ONBOARDING_CTA_WIDTH,
+    maxWidth: '100%',
+  },
+  ctaOuter: {
+    width: '100%',
+    borderRadius: 999,
+    overflow: 'hidden',
+    shadowColor: LOGO_RED,
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 6,
+  },
+  ctaOuterMuted: {
+    opacity: 0.5,
   },
   cta: {
+    height: ONBOARDING_CTA_HEIGHT,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 28,
+    borderRadius: 999,
+    backgroundColor: LOGO_RED,
+  },
+  ctaInner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  ctaText: {
+    ...TYPOGRAPHY.button,
+    fontSize: 17,
+    color: COLORS.linen,
+  },
+  signInRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    height: 58,
-    borderRadius: 16,
+    flexWrap: 'wrap',
+    marginTop: -2,
   },
-  ctaText: {
-    fontFamily: FONT_FAMILY.gothamBold,
-    fontSize: 17,
-    color: COLORS.ink,
+  signInText: {
+    ...TYPOGRAPHY.body,
+    fontSize: 14,
+    color: 'rgba(250, 248, 245, 0.7)',
   },
-  helper: {
-    fontFamily: FONT_FAMILY.gothamMedium,
-    fontSize: 13,
-    color: 'rgba(250, 248, 245, 0.55)',
-    textAlign: 'center',
-    marginTop: 14,
-    lineHeight: 18,
+  signInLink: {
+    ...TYPOGRAPHY.bodyStrong,
+    fontSize: 14,
+    color: LOGO_RED_HOT,
   },
 });

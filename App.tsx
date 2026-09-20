@@ -2,11 +2,9 @@ import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Linking, View, StyleSheet } from 'react-native';
 import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
-import type { ComponentProps } from 'react';
-import { Ionicons } from '@expo/vector-icons';
 import { COLORS, FONTS_TO_LOAD } from './src/theme';
-import { GenoOnboardingFlow, GenoSplashScreen } from './src/components/onboarding';
-import type { GenoOnboardingSlide } from './src/components/onboarding';
+import { GenoOnboardingFlow } from './src/components/onboarding';
+import SplashVideoScreen from './screens/SplashVideoScreen';
 import GenoErrorBoundary from './src/components/shell/GenoErrorBoundary';
 import { resolveInitialScreen } from './src/lib/profiles';
 import { getAuthenticatedUserId, logAuthState } from './src/lib/auth';
@@ -24,32 +22,6 @@ const SignIn = lazy(() => import('./screens/SignIn'));
 const ResetPassword = lazy(() => import('./screens/ResetPassword'));
 const ProfileSetup = lazy(() => import('./screens/ProfileSetup'));
 const MainTabs = lazy(() => import('./screens/MainTabs'));
-
-type IonName = ComponentProps<typeof Ionicons>['name'];
-
-const ONBOARDING_SLIDES: GenoOnboardingSlide[] = [
-  {
-    icon: 'git-network-outline' as IonName,
-    title: 'Science-led compatibility',
-    subtitle: 'GENOTYPE-AWARE MATCHING',
-    body:
-      'Meet people with confidence through thoughtful genotype compatibility — built for intentional singles across Nigeria and West Africa.',
-  },
-  {
-    icon: 'heart-outline' as IonName,
-    title: 'Profiles that feel human',
-    subtitle: 'DEEPER SIGNALS, BETTER DATES',
-    body:
-      'Every profile blends emotional style, communication rhythm, and long-term intent so connections feel meaningful from day one.',
-  },
-  {
-    icon: 'sparkles-outline' as IonName,
-    title: 'Premium journey to forever',
-    subtitle: 'TRUSTED BY INTENTIONAL SINGLES',
-    body:
-      'From first match to first message, guided prompts and shared milestones help you build chemistry with clarity.',
-  },
-];
 
 function ScreenFallback() {
   return (
@@ -188,7 +160,7 @@ function AppInner() {
     return (
       <View style={styles.boot}>
         <StatusBar style="light" />
-        <GenoSplashScreen
+        <SplashVideoScreen
           bootstrapping={!appReady}
           readyToExit={appReady}
           onFinish={() => setSplashDone(true)}
@@ -265,9 +237,9 @@ function AppInner() {
 
   return (
     <GenoOnboardingFlow
-      slides={ONBOARDING_SLIDES}
       lastCtaLabel="Create your profile"
       onFinish={() => setScreen('register')}
+      onSignIn={() => setScreen('signIn')}
     />
   );
 }
