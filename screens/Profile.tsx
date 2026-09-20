@@ -30,6 +30,7 @@ import {
   ProfileSectionCard,
   ProfileStudioCTA,
   ProfileViewSections,
+  ProfileIdentityFields,
 } from '../src/components/profile';
 import {
   GenoMeshBackdrop,
@@ -66,7 +67,7 @@ import {
 import { getVerificationEligibility, type VerificationProfileInput } from '../src/lib/verification';
 import { formatSecurityError } from '../src/lib/security';
 import { supabase } from '../src/lib/supabase';
-import type { DiscoveryProfile, Genotype, ProfileRow } from '../src/types/database';
+import { parseProfilePronoun, type ProfilePronoun } from '../src/lib/profilePronouns';
 
 const HERO_HEIGHT = 288;
 const HERO_HEIGHT_STUDIO = 200;
@@ -91,6 +92,7 @@ type EditableProfile = {
   drinkingStatus: string;
   smokingStatus: string;
   educationStatus: string;
+  gender: ProfilePronoun | '';
 };
 
 function calculateProfileCompletion(data: EditableProfile): number {
@@ -129,6 +131,7 @@ function profilesEqual(a: EditableProfile, b: EditableProfile): boolean {
     a.drinkingStatus === b.drinkingStatus &&
     a.smokingStatus === b.smokingStatus &&
     a.educationStatus === b.educationStatus &&
+    a.gender === b.gender &&
     JSON.stringify(a.interests) === JSON.stringify(b.interests) &&
     JSON.stringify(a.photos) === JSON.stringify(b.photos)
   );
@@ -224,6 +227,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
         drinkingStatus: row.drinking_status ?? '',
         smokingStatus: row.smoking_status ?? '',
         educationStatus: row.education_status ?? '',
+        gender: parseProfilePronoun(row.gender) ?? '',
       };
       setProfile(loaded);
       setDraft(loaded);
@@ -323,6 +327,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
       drinking_status: target.drinkingStatus || null,
       smoking_status: target.smokingStatus || null,
       education_status: target.educationStatus || null,
+      gender: target.gender || null,
     };
 
     if (!target.genotypeVerified) {
@@ -626,8 +631,8 @@ export default function Profile({ onSignOut }: ProfileProps) {
     return (
       <View style={[styles.root, styles.centered]}>
         <GenoMeshBackdrop />
-        <GenoPremiumChrome variant="linen" />
-        <GenoLogoCeremony variant="auth" tone="dark" />
+        <GenoPremiumChrome variant="ink" />
+        <GenoLogoCeremony variant="auth" tone="light" />
         <Text style={styles.loadingText}>Loading your profile…</Text>
       </View>
     );
@@ -637,7 +642,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
     return (
       <View style={[styles.root, styles.centered]}>
         <GenoMeshBackdrop />
-        <GenoPremiumChrome variant="linen" />
+        <GenoPremiumChrome variant="ink" />
         {authUserId ? (
           <GenoInboxRetryPanel
             message="Complete profile setup to continue."
@@ -673,8 +678,8 @@ export default function Profile({ onSignOut }: ProfileProps) {
     <View style={styles.root}>
       <GenoMeshBackdrop studio={editing} />
       <ProfileBondAura active={editing} verified={data.genotypeVerified && editing} />
-      <GenoPremiumChrome variant="linen" />
-      <StatusBar style="dark" />
+      <GenoPremiumChrome variant="ink" />
+      <StatusBar style="light" />
 
       <KeyboardAvoidingView
         style={styles.flex}
@@ -783,6 +788,18 @@ export default function Profile({ onSignOut }: ProfileProps) {
                   onToggleInterest={toggleInterest}
                   onSelectGoal={(g) => setDraft((p) => (p ? { ...p, relationshipGoal: g } : p))}
                   hideHint
+                />
+              </ProfileSectionCard>
+
+              <ProfileSectionCard
+                kicker="IDENTITY"
+                label="Pronouns"
+                hint="How you appear on your profile and to matches"
+                editing
+              >
+                <ProfileIdentityFields
+                  pronouns={draft.gender}
+                  onSelectPronouns={(value) => setDraft((p) => (p ? { ...p, gender: value } : p))}
                 />
               </ProfileSectionCard>
 
@@ -940,7 +957,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: COLORS.linen },
+  root: { flex: 1, backgroundColor: COLORS.background },
   flex: { flex: 1 },
   centered: { alignItems: 'center', justifyContent: 'center', padding: 24 },
   scroll: { paddingBottom: GENO_TAB_BAR_HEIGHT + 20, paddingTop: 2 },

@@ -1,6 +1,7 @@
 export { default as DiscoverBondEdge } from './DiscoverBondEdge';
 export { default as DiscoverActionDock } from './DiscoverActionDock';
 export { default as DiscoverMatchCelebration } from './DiscoverMatchCelebration';
+export { default as DiscoverMatchModal } from './DiscoverMatchModal';
 export { default as DiscoverMatchPill } from './DiscoverMatchPill';
 export { default as DiscoverSeenAllState } from './DiscoverSeenAllState';
 export { default as DiscoverSwipeCard, DISCOVER_CARD_HEIGHT } from './DiscoverSwipeCard';

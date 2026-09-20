@@ -151,7 +151,7 @@ export default function Matches({ isActive, onStartChat, onImmersiveChange }: Ma
   return (
     <View style={styles.container}>
       <GenoPremiumChrome variant="discover" />
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
 
       <GenoInboxHeader
         title="Your matches"
@@ -163,7 +163,7 @@ export default function Matches({ isActive, onStartChat, onImmersiveChange }: Ma
 
       {loading ? (
         <View style={styles.centered}>
-          <GenoLogoCeremony variant="compact" tone="dark" />
+          <GenoLogoCeremony variant="compact" tone="light" />
           <Text style={styles.loadingText}>Loading matches…</Text>
         </View>
       ) : error ? (
@@ -215,7 +215,7 @@ export default function Matches({ isActive, onStartChat, onImmersiveChange }: Ma
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.linen },
+  container: { flex: 1, backgroundColor: COLORS.background },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, gap: 12 },
   loadingText: {
     fontFamily: FONT_FAMILY.gothamMedium,
