@@ -409,7 +409,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.ink,
+    color: COLORS.text,
     fontSize: 34,
     lineHeight: 39,
     letterSpacing: -0.7,
@@ -417,7 +417,7 @@ const styles = StyleSheet.create({
     maxWidth: '95%',
   },
   subtitle: {
-    color: 'rgba(200, 16, 46, 0.72)',
+    color: COLORS.textMuted,
     fontSize: 15,
     lineHeight: 24,
     fontWeight: '500',
