@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Reset password — GenoMatch</title>
+  <meta name="description" content="Open GenoMatch to finish resetting your password." />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <nav>
+        <a href="/">GenoMatch</a>
+        <a href="/support">Support</a>
+        <a href="/privacy">Privacy</a>
+        <a href="/terms">Terms</a>
+      </nav>
+    </header>
+    <p class="kicker">Account</p>
+    <h1>Open the app to reset your password</h1>
+    <p class="lede" id="status">If GenoMatch is installed, it should open automatically. If nothing happens, tap the button below or request a new reset email from Sign In.</p>
+    <p><a class="cta solid" id="open-app" href="genomatch://reset-password">Open GenoMatch</a></p>
+    <p class="note">Need help? <a href="mailto:hello@genomatch.app">hello@genomatch.app</a></p>
+    <footer>Genomatch Ltd Nigeria</footer>
+  </div>
+  <script>
+    (function () {
+      var extra = window.location.search + window.location.hash;
+      var appUrl = 'genomatch://reset-password' + extra;
+      var link = document.getElementById('open-app');
+      if (link) link.href = appUrl;
+      window.location.replace(appUrl);
+    })();
+  </script>
+</body>
+</html>

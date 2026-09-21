@@ -17,8 +17,8 @@ type Props = {
 export default function GenoLegalScreen({ title, subtitle, sections, onBack }: Props) {
   return (
     <View style={styles.container}>
-      <GenoPremiumChrome variant="linen" />
-      <StatusBar style="dark" />
+      <GenoPremiumChrome variant="ink" />
+      <StatusBar style="light" />
 
       <View style={styles.topBar}>
         <GenoGlassIconButton onPress={onBack} accessibilityLabel="Go back">
@@ -43,7 +43,7 @@ export default function GenoLegalScreen({ title, subtitle, sections, onBack }: P
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.linen },
+  container: { flex: 1, backgroundColor: COLORS.background },
   topBar: {
     paddingTop: 52,
     paddingHorizontal: 12,

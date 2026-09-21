@@ -29,6 +29,7 @@ export const MINT = CREAM_TINT;
 
 /** Backup mirror-chrome names → canonical palette (same pattern as forest/sage). */
 export const LOGO_RED_BRIGHT = LOGO_RED_HOT;
+export const BRAND_RED_SOFT = LOGO_RED_HOT;
 export const METALLIC_GRAPHITE = BRAND_BLACK_SOFT;
 export const METALLIC_SLATE = BRAND_BLACK_SOFT;
 export const METALLIC_STEEL = METALLIC_SILVER;
@@ -86,17 +87,21 @@ export const COLORS = {
   /** @deprecated Use cream — kept for gradual migration */
   ivory: CREAM,
 
-  background: CREAM,
+  forest: BRAND_BLACK,
+  forestDeep: BRAND_BLACK,
+  sage: METALLIC_SILVER,
+
+  background: BRAND_BLACK,
   surface: WHITE,
   tabBar: BRAND_BLACK,
   splash: BRAND_BLACK,
   hero: BRAND_BLACK_SOFT,
 
-  text: BRAND_BLACK,
+  text: CREAM,
   textOnDark: CREAM,
   textOnInk: CREAM,
-  textMuted: 'rgba(11, 12, 14, 0.55)',
-  textSubtle: 'rgba(11, 12, 14, 0.45)',
+  textMuted: 'rgba(250, 248, 245, 0.72)',
+  textSubtle: 'rgba(250, 248, 245, 0.45)',
 
   border: 'rgba(11, 12, 14, 0.08)',
   borderLight: 'rgba(184, 188, 196, 0.4)',

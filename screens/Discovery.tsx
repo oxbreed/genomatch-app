@@ -25,7 +25,7 @@ import FilterSheet, {
 } from '../src/components/FilterSheet';
 import {
   DiscoverActionDock,
-  DiscoverMatchCelebration,
+  DiscoverMatchModal,
   DiscoverProfileSheet,
   DiscoverSwipeCard,
   DiscoverSwipeStamp,
@@ -48,8 +48,13 @@ import ReportBlockSheet from '../src/components/ReportBlockSheet';
 import { COLORS, RADIUS, SHADOWS, TYPOGRAPHY, getMockDiscoveryProfiles } from '../src/data/mockData';
 import {
   fetchDiscoveryProfiles,
+  getCurrentProfile,
+  getViewerProfileSnapshot,
+  saveInterestedIn,
   type DiscoveryDeckStats,
+  type ViewerProfileSnapshot,
 } from '../src/lib/profiles';
+import { parseDiscoveryInterests } from '../src/lib/discoveryInterest';
 import { clearMyPasses, recordLike, recordPass } from '../src/lib/likes';
 import { formatSecurityError } from '../src/lib/security';
 import { getMatchIdForProfile } from '../src/lib/matches';
@@ -115,6 +120,7 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
   const [matchedName, setMatchedName] = useState('');
   const [matchedProfile, setMatchedProfile] = useState<DiscoveryProfile | null>(null);
   const [matchedMatchId, setMatchedMatchId] = useState<string | null>(null);
+  const [viewerSnapshot, setViewerSnapshot] = useState<ViewerProfileSnapshot | null>(null);
   const [actionError, setActionError] = useState('');
   const [deckColumnHeight, setDeckColumnHeight] = useState(0);
   const [usingMockFallback, setUsingMockFallback] = useState(false);
@@ -137,9 +143,18 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
     setLoadError('');
     setLoading(true);
     try {
-      const { profiles: rows, viewerGenotype: loadedViewerGenotype, deckStats: stats } =
-        await fetchDiscoveryProfiles();
+      const [{ profiles: rows, viewerGenotype: loadedViewerGenotype, deckStats: stats }, viewer, profile] =
+        await Promise.all([
+          fetchDiscoveryProfiles(),
+          getViewerProfileSnapshot(),
+          getCurrentProfile(),
+        ]);
+      const interestedIn = parseDiscoveryInterests(profile?.interested_in);
+      if (interestedIn.length > 0) {
+        setFilters((current) => ({ ...current, interestedIn }));
+      }
       setViewerGenotype(loadedViewerGenotype);
+      setViewerSnapshot(viewer);
       setDeckStats(stats);
       if (rows.length > 0) {
         setAllProfiles(rows);
@@ -154,6 +169,8 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
       }
       setIndex(0);
     } catch (err) {
+      const viewer = await getViewerProfileSnapshot().catch(() => null);
+      setViewerSnapshot(viewer);
       setAllProfiles([]);
       setUsingMockFallback(false);
       setDeckStats(null);
@@ -163,6 +180,23 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
       setLoading(false);
     }
   }, []);
+
+  const handleApplyFilters = useCallback(
+    async (next: DiscoveryFilters) => {
+      setFilters(next);
+      if (next.interestedIn.length > 0) {
+        try {
+          await saveInterestedIn(next.interestedIn);
+          await loadProfiles();
+        } catch (err) {
+          setActionError(
+            err instanceof Error ? err.message : 'Could not save your discovery preferences.'
+          );
+        }
+      }
+    },
+    [loadProfiles]
+  );
 
   useEffect(() => {
     if (isActive) {
@@ -777,7 +811,9 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
           filters={filters}
           previewProfiles={allProfiles}
           onClose={() => setShowFilterSheet(false)}
-          onApply={setFilters}
+          onApply={(next) => {
+            void handleApplyFilters(next);
+          }}
         />
 
         <View style={styles.deckArea}>
@@ -1037,10 +1073,11 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
         />
       ) : null}
 
-      <DiscoverMatchCelebration
+      <DiscoverMatchModal
         visible={showMatch}
         matchName={matchedName}
         profile={matchedProfile}
+        viewer={viewerSnapshot}
         onContinue={dismissMatchOverlay}
         onSendMessage={() => { void handleSendMessageFromMatch(); }}
       />

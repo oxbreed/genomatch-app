@@ -30,7 +30,7 @@ import TermsOfService from './TermsOfService';
 type SignInProps = {
   onBack: () => void;
   onCreateAccount: () => void;
-  onSignedIn: (destination: 'main' | 'profileSetup') => void;
+  onSignedIn: (destination: 'main' | 'profileSetup' | 'interestedInGate') => void;
   onNavigateResetPassword: (email: string) => void;
 };
 
@@ -168,8 +168,8 @@ export default function SignIn({
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <GenoPremiumChrome variant="linen" />
-      <StatusBar style="dark" />
+      <GenoPremiumChrome variant="ink" />
+      <StatusBar style="light" />
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
@@ -200,7 +200,7 @@ export default function SignIn({
           </View>
 
           <View style={styles.logoWrap}>
-            <GenoLogoCeremony variant="auth" tone="dark" />
+            <GenoLogoCeremony variant="auth" tone="light" />
           </View>
 
           <Text style={styles.title}>Sign In to GenoMatch</Text>
@@ -325,7 +325,7 @@ export default function SignIn({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.linen,
+    backgroundColor: COLORS.background,
   },
   scroll: {
     paddingHorizontal: 20,
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.ink,
+    color: COLORS.text,
     fontSize: 32,
     lineHeight: 38,
     letterSpacing: -0.8,
@@ -397,7 +397,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontFamily: FONT_FAMILY.gothamMedium,
-    color: 'rgba(13, 40, 24, 0.62)',
+    color: COLORS.textMuted,
     fontSize: 15,
     lineHeight: 24,
     maxWidth: '96%',

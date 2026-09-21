@@ -101,7 +101,8 @@
         }
       ],
       "expo-status-bar",
-      "expo-video"
+      "expo-video",
+      "expo-image"
     ]
   }
 }

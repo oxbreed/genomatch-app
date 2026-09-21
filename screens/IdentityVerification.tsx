@@ -71,8 +71,8 @@ export default function IdentityVerification() {
   if (!permission) {
     return (
       <View style={styles.container}>
-        <GenoPremiumChrome variant="linen" />
-        <StatusBar style="dark" />
+        <GenoPremiumChrome variant="ink" />
+        <StatusBar style="light" />
         <View style={styles.centered}>
           <ActivityIndicator size="large" color={COLORS.hero} />
         </View>
@@ -83,8 +83,8 @@ export default function IdentityVerification() {
   if (!permission.granted) {
     return (
       <View style={styles.container}>
-        <GenoPremiumChrome variant="linen" />
-        <StatusBar style="dark" />
+        <GenoPremiumChrome variant="ink" />
+        <StatusBar style="light" />
         <View style={styles.centered}>
           <View style={styles.permissionCard}>
             <View style={styles.permissionIconWrap}>
@@ -112,8 +112,8 @@ export default function IdentityVerification() {
   if (phase === 'success') {
     return (
       <View style={styles.container}>
-        <GenoPremiumChrome variant="linen" />
-        <StatusBar style="dark" />
+        <GenoPremiumChrome variant="ink" />
+        <StatusBar style="light" />
         <View style={styles.centered}>
           <View style={styles.permissionCard}>
             <View style={[styles.permissionIconWrap, styles.successIconWrap]}>
@@ -133,8 +133,8 @@ export default function IdentityVerification() {
   if (phase === 'preview' && capturedUri) {
     return (
       <View style={styles.container}>
-        <GenoPremiumChrome variant="linen" />
-        <StatusBar style="dark" />
+        <GenoPremiumChrome variant="ink" />
+        <StatusBar style="light" />
         <View style={styles.content}>
           <Text style={styles.title}>Review your selfie</Text>
           <Text style={styles.subtitle}>
@@ -185,8 +185,8 @@ export default function IdentityVerification() {
 
   return (
     <View style={styles.container}>
-      <GenoPremiumChrome variant="linen" />
-      <StatusBar style="dark" />
+      <GenoPremiumChrome variant="ink" />
+      <StatusBar style="light" />
       <View style={styles.content}>
         <Text style={styles.title}>Take a live selfie</Text>
         <Text style={styles.subtitle}>
@@ -230,7 +230,7 @@ export default function IdentityVerification() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.linen,
+    backgroundColor: COLORS.background,
   },
   centered: {
     flex: 1,

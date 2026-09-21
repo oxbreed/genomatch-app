@@ -1,14 +1,39 @@
 import type { ComponentProps } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import type { GenotypeOption } from '../components/auth/GenotypePicker';
-import { COLORS } from '../theme';
+import { BRAND_RED_SOFT, COLORS, LOGO_RED } from '../theme';
 
 type IonName = ComponentProps<typeof Ionicons>['name'];
 
 export const AUTH_GENOTYPE_OPTIONS: GenotypeOption[] = [
-  { id: 'AA', icon: 'ellipse-outline' as IonName, name: 'Hemoglobin AA', accent: COLORS.metallicSilver },
-  { id: 'AS', icon: 'ellipse-outline' as IonName, name: 'Sickle cell trait', accent: COLORS.metallicSilver },
-  { id: 'SS', icon: 'ellipse-outline' as IonName, name: 'Sickle cell disease', accent: COLORS.metallicSilver },
-  { id: 'AC', icon: 'ellipse-outline' as IonName, name: 'Hemoglobin AC', accent: COLORS.metallicSilver },
-  { id: 'SC', icon: 'ellipse-outline' as IonName, name: 'Hemoglobin SC', accent: COLORS.metallicSilver },
+  {
+    id: 'AA',
+    icon: 'heart' as IonName,
+    name: 'AA — no sickle cell trait',
+    accent: LOGO_RED,
+  },
+  {
+    id: 'AS',
+    icon: 'star-half' as IonName,
+    name: 'AS — sickle cell carrier',
+    accent: COLORS.gold,
+  },
+  {
+    id: 'SS',
+    icon: 'medical' as IonName,
+    name: 'SS — sickle cell disease',
+    accent: COLORS.error,
+  },
+  {
+    id: 'AC',
+    icon: 'water' as IonName,
+    name: 'AC — hemoglobin C carrier',
+    accent: BRAND_RED_SOFT,
+  },
+  {
+    id: 'SC',
+    icon: 'medical' as IonName,
+    name: 'SC — sickle cell disease (HbSC)',
+    accent: COLORS.error,
+  },
 ];

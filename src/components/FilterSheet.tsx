@@ -15,6 +15,8 @@ import { GenoBondMark } from '../brand';
 import { GenoGlassBackdrop, GenoGlassSurface } from '../brand/graphics';
 import { FONT_FAMILY, COLORS, GLASS } from '../theme';
 import { DISTANCE_BAND_FILTER_OPTIONS } from '../lib/distanceBands';
+import DiscoveryInterestPicker from './setup/DiscoveryInterestPicker';
+import { toggleDiscoveryInterest } from '../lib/discoveryInterest';
 import {
   DEFAULT_DISCOVERY_FILTERS,
   applyDiscoveryFilters,
@@ -61,9 +63,13 @@ export default function FilterSheet({
   onApply,
 }: FilterSheetProps) {
   const [draft, setDraft] = useState<DiscoveryFilters>(filters);
+  const [interestError, setInterestError] = useState('');
 
   useEffect(() => {
-    if (visible) setDraft(filters);
+    if (visible) {
+      setDraft(filters);
+      setInterestError('');
+    }
   }, [visible, filters]);
 
   const previewCount = useMemo(
@@ -174,6 +180,23 @@ export default function FilterSheet({
                   />
                 </View>
 
+                <Text style={styles.sectionLabel}>Show me</Text>
+                <Text style={styles.distanceHint}>
+                  Who you want to see in Discover. Women and Men can be combined; Everyone is open to all.
+                </Text>
+                <DiscoveryInterestPicker
+                  compact
+                  selected={draft.interestedIn}
+                  onToggle={(option) => {
+                    setInterestError('');
+                    setDraft((d) => ({
+                      ...d,
+                      interestedIn: toggleDiscoveryInterest(d.interestedIn, option),
+                    }));
+                  }}
+                />
+                {interestError ? <Text style={styles.interestError}>{interestError}</Text> : null}
+
                 <Text style={styles.sectionLabel}>City</Text>
                 <TextInput
                   style={styles.textInput}
@@ -280,6 +303,11 @@ export default function FilterSheet({
               <Pressable
                 style={({ pressed }) => [styles.applyWrap, pressed && styles.pressed]}
                 onPress={() => {
+                  if (draft.interestedIn.length === 0) {
+                    setInterestError('Select at least one option.');
+                    return;
+                  }
+                  setInterestError('');
                   onApply(normalizeDiscoveryFilters(draft));
                   onClose();
                 }}
@@ -288,7 +316,15 @@ export default function FilterSheet({
                   <Text style={styles.applyBtnText}>Apply filters</Text>
                 </LinearGradient>
               </Pressable>
-              <Pressable style={styles.resetBtn} onPress={() => onApply(DEFAULT_DISCOVERY_FILTERS)}>
+              <Pressable
+                style={styles.resetBtn}
+                onPress={() =>
+                  onApply({
+                    ...DEFAULT_DISCOVERY_FILTERS,
+                    interestedIn: draft.interestedIn,
+                  })
+                }
+              >
                 <Text style={styles.resetBtnText}>Reset all</Text>
               </Pressable>
             </GenoGlassSurface>
@@ -391,6 +427,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: COLORS.textSubtle,
     marginBottom: 8,
+  },
+  interestError: {
+    fontFamily: FONT_FAMILY.gothamBold,
+    fontSize: 13,
+    color: COLORS.error,
+    marginTop: 4,
   },
   sectionLabel: {
     fontFamily: FONT_FAMILY.gothamBold,

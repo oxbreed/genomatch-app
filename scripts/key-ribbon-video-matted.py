@@ -44,25 +44,88 @@ def chroma_strength(rgb: np.ndarray) -> np.ndarray:
     )
 
 
+def plate_mask(rgb: np.ndarray) -> np.ndarray:
+    """Near-neutral white plate only — must not eat bright gold highlights."""
+    sat = rgb.std(axis=2)
+    lum = rgb.mean(axis=2)
+    mn = rgb.min(axis=2)
+    chroma = chroma_strength(rgb)
+    return (lum > 160) & (sat < 28) & (chroma < 36) & (mn > 140)
+
+
 def vivid_ribbon_mask(rgb: np.ndarray) -> np.ndarray:
+    """Red + gold ribbon body, including darker metallic folds."""
+    r = rgb[:, :, 0].astype(np.int16)
+    g = rgb[:, :, 1].astype(np.int16)
+    b = rgb[:, :, 2].astype(np.int16)
     sat = rgb.std(axis=2)
     mx = rgb.max(axis=2)
     lum = rgb.mean(axis=2)
     chroma = chroma_strength(rgb)
-    plate = (lum > 145) & (sat < 62)
-    vivid = (sat > 28) & (mx > 80) & (chroma > 16) & (lum < 252)
-    return vivid & ~plate
+
+    plate = plate_mask(rgb)
+    reddish = (r > g + 8) & (r > b + 8) & (r > 45) & (sat > 10)
+    goldish = (
+        (r > 45)
+        & (g > 28)
+        & (r >= g - 12)
+        & (g > b + 3)
+        & (r > b + 6)
+        & (sat > 8)
+        & (lum > 20)
+    )
+    # Legacy vivid catch-all for saturated midtones
+    vivid = (sat > 22) & (mx > 70) & (chroma > 14) & (lum < 250)
+    fringe = (lum > 200) & (sat < 35) & (chroma < 55)
+    return (reddish | goldish | vivid) & ~plate & ~fringe & (mx > 40)
+
+
+def morph_erode(mask: np.ndarray, radius: int) -> np.ndarray:
+    out = mask.copy()
+    for _ in range(radius):
+        p = np.pad(out, 1, constant_values=True)
+        out = (
+            out
+            & p[:-2, :-2]
+            & p[:-2, 1:-1]
+            & p[:-2, 2:]
+            & p[1:-1, :-2]
+            & p[1:-1, 1:-1]
+            & p[1:-1, 2:]
+            & p[2:, :-2]
+            & p[2:, 1:-1]
+            & p[2:, 2:]
+        )
+    return out
+
+
+def morph_close(mask: np.ndarray, radius: int) -> np.ndarray:
+    return morph_erode(morph_dilate(mask, radius), radius)
 
 
 def clean_mask(rgb: np.ndarray) -> np.ndarray:
-    return morph_dilate(vivid_ribbon_mask(rgb), MASK_DILATE)
+    body = morph_close(vivid_ribbon_mask(rgb), 2)
+    body = morph_dilate(body, MASK_DILATE) & ~plate_mask(rgb)
+    return morph_close(body, 1) & ~plate_mask(rgb)
 
 
 def gray_cast(rgb: np.ndarray, paint: np.ndarray) -> np.ndarray:
+    """True gray haze only — never recolor gold / red metal."""
+    r = rgb[:, :, 0].astype(np.int16)
+    g = rgb[:, :, 1].astype(np.int16)
+    b = rgb[:, :, 2].astype(np.int16)
     sat = rgb.std(axis=2)
     lum = rgb.mean(axis=2)
     chroma = chroma_strength(rgb)
-    return paint & (chroma < 55) & (sat < 58) & (lum > 44) & (lum < 180)
+    warm = (r > b + 6) & ((r > g - 4) | (g > b + 4))
+    return (
+        paint
+        & ~warm
+        & (chroma < 40)
+        & (sat < 35)
+        & (lum > 44)
+        & (lum < 180)
+    )
 
 
 def solidify_grays(rgb: np.ndarray, paint: np.ndarray) -> np.ndarray:
@@ -117,14 +180,8 @@ def morph_dilate(mask: np.ndarray, radius: int) -> np.ndarray:
     return out
 
 
-def plate_mask(rgb: np.ndarray) -> np.ndarray:
-    sat = rgb.std(axis=2)
-    lum = rgb.mean(axis=2)
-    return (lum > 145) & (sat < 62)
-
-
 def frame_paint(rgb: np.ndarray) -> np.ndarray:
-    return morph_dilate(vivid_ribbon_mask(rgb), MASK_DILATE) & ~plate_mask(rgb)
+    return clean_mask(rgb)
 
 
 def build_frame(rgb: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
@@ -217,8 +274,14 @@ def sync_grok_source() -> str:
     if not os.path.isfile(grok):
         print(f'Grok source not found: {grok}', file=sys.stderr)
         return ASSET_SRC if os.path.isfile(ASSET_SRC) else grok
-    shutil.copy2(grok, ASSET_SRC)
-    print(f'Synced Grok source → {ASSET_SRC}')
+    try:
+        if os.path.abspath(grok) != os.path.abspath(ASSET_SRC):
+            shutil.copy2(grok, ASSET_SRC)
+            print(f'Synced Grok source → {ASSET_SRC}')
+    except OSError as err:
+        print(f'Could not sync Grok source ({err}); using {ASSET_SRC}', file=sys.stderr)
+        if not os.path.isfile(ASSET_SRC):
+            return grok
     return ASSET_SRC
 
 
@@ -321,8 +384,16 @@ def main() -> int:
     encode_frames(color_frames, fps, COLOR_OUT)
     encode_frames(mask_frames, fps, MASK_VIDEO_OUT)
 
-    rgba = np.dstack([color_frames[0], (mask_frames[0][:, :, 0]).astype(np.uint8)])
-    Image.fromarray(rgba, 'RGBA').save(PNG_OUT, compress_level=0, optimize=False)
+    rgba_hard = np.dstack([color_frames[0], (mask_frames[0][:, :, 0]).astype(np.uint8)])
+    # Soft AA on poster so retina UI edges aren't stair-stepped
+    from PIL import ImageFilter
+
+    hard = Image.fromarray(rgba_hard[:, :, 3], 'L')
+    soft = hard.filter(ImageFilter.GaussianBlur(radius=0.75))
+    alpha = np.maximum(np.array(soft), rgba_hard[:, :, 3])
+    rgb = color_frames[0].copy()
+    rgb[alpha == 0] = 0
+    Image.fromarray(np.dstack([rgb, alpha]), 'RGBA').save(PNG_OUT, compress_level=0, optimize=False)
 
     logical_w = out_w // EXPORT_SCALE
     logical_h = out_h // EXPORT_SCALE
