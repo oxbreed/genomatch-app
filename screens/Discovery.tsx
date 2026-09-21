@@ -58,7 +58,7 @@ import { parseDiscoveryInterests } from '../src/lib/discoveryInterest';
 import { clearMyPasses, recordLike, recordPass } from '../src/lib/likes';
 import { formatSecurityError } from '../src/lib/security';
 import { getMatchIdForProfile } from '../src/lib/matches';
-import { BRAND_BLACK, FONT_FAMILY, MOTION } from '../src/theme';
+import { CREAM, FONT_FAMILY, MOTION } from '../src/theme';
 import type { DiscoveryProfile, Genotype } from '../src/types/database';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -768,8 +768,8 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
 
   return (
     <View style={styles.container}>
-      <GenoPremiumChrome variant="discover" />
-      <StatusBar style="light" />
+      <GenoPremiumChrome variant="linen" />
+      <StatusBar style="dark" />
 
       <View style={styles.screenRoot}>
         {superLikeToast ? (
@@ -998,7 +998,12 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
                             },
                           ]}
                         >
-                          <DiscoverSwipeCard profile={stackProfile} hideGenotype={true} height={cardHeight} />
+                          <DiscoverSwipeCard
+                            profile={stackProfile}
+                            viewerGenotype={viewerGenotype}
+                            hideGenotype={true}
+                            height={cardHeight}
+                          />
                         </Animated.View>
                       );
                     }
@@ -1015,7 +1020,12 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
                           { zIndex: depthFromTop, opacity: 0 },
                         ]}
                       >
-                        <DiscoverSwipeCard profile={stackProfile} hideGenotype={true} height={cardHeight} />
+                        <DiscoverSwipeCard
+                          profile={stackProfile}
+                          viewerGenotype={viewerGenotype}
+                          hideGenotype={true}
+                          height={cardHeight}
+                        />
                       </Animated.View>
                     );
                   })}
@@ -1088,7 +1098,7 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: BRAND_BLACK,
+    backgroundColor: CREAM,
   },
   screenRoot: {
     flex: 1,

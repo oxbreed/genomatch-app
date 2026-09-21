@@ -260,7 +260,7 @@ function tabsFromCounts(matchCount: number, unreadCount: number) {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.cream,
   },
   content: {
     flex: 1,

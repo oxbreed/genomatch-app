@@ -243,8 +243,8 @@ export default function Messages({
 
   return (
     <View style={styles.container}>
-      <GenoPremiumChrome variant="discover" />
-      <StatusBar style="light" />
+      <GenoPremiumChrome variant="linen" />
+      <StatusBar style="dark" />
 
       <GenoInboxHeader
         title="Messages"
@@ -262,7 +262,7 @@ export default function Messages({
 
       {loading ? (
         <View style={styles.centered}>
-          <GenoLogoCeremony variant="compact" tone="light" />
+          <GenoLogoCeremony variant="compact" tone="dark" />
           <Text style={styles.loadingText}>Loading conversations…</Text>
         </View>
       ) : error ? (
@@ -321,7 +321,7 @@ export default function Messages({
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.background },
+  container: { flex: 1, backgroundColor: COLORS.cream },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, gap: 12 },
   loadingText: {
     fontFamily: FONT_FAMILY.gothamMedium,

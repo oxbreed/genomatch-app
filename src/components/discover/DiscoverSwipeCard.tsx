@@ -20,6 +20,7 @@ import GenotypeBadge from '../GenotypeBadge';
 import LocationLine from '../LocationLine';
 import PresenceBadge from '../PresenceBadge';
 import { COLORS, getInitials } from '../../data/mockData';
+import { getGenotypeRiskShort } from '../../lib/compatibility';
 import { FONT_FAMILY, SHADOWS } from '../../theme';
 import type { DiscoveryProfile, Genotype } from '../../types/database';
 import DiscoverMatchPill from './DiscoverMatchPill';
@@ -50,6 +51,7 @@ export default function DiscoverSwipeCard({
   profile,
   swipeIndex,
   totalProfiles,
+  viewerGenotype = null,
   hideGenotype = false,
   progressFillWidth,
   height = DISCOVER_CARD_HEIGHT,
@@ -61,6 +63,7 @@ export default function DiscoverSwipeCard({
     return [];
   }, [profile.photos, profile.avatarUrl]);
 
+  const riskShort = getGenotypeRiskShort(viewerGenotype, profile.genotype);
   const [photoIndex, setPhotoIndex] = useState(0);
   const hasMultiple = gallery.length > 1;
   const currentUri = gallery[photoIndex] ?? gallery[0];
@@ -172,7 +175,7 @@ export default function DiscoverSwipeCard({
             ]}
           />
           <Text style={styles.compatText} numberOfLines={1}>
-            {profile.lifestyleMatch}% match
+            {profile.lifestyleMatch}%{riskShort ? ` · ${riskShort}` : ' match'}
           </Text>
         </View>
       </Pressable>

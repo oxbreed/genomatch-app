@@ -31,6 +31,7 @@ import {
   RELIGION_LABELS,
   formatHeightCm,
 } from '../../lib/profileDetails';
+import { getGenotypeRiskShort } from '../../lib/compatibility';
 import { GENO_TAB_BAR_HEIGHT } from '../navigation/tabBarLayout';
 import { COLORS, getInitials, RELATIONSHIP_GOAL_LABELS } from '../../data/mockData';
 import { FONT_FAMILY, MOTION, RADIUS, SHADOWS } from '../../theme';
@@ -126,6 +127,10 @@ export default function DiscoverProfileSheet({
     if (profile.avatarUrl) return [profile.avatarUrl];
     return [];
   }, [profile]);
+
+  const riskShort = profile
+    ? getGenotypeRiskShort(viewerGenotype ?? null, profile.genotype)
+    : null;
 
   useEffect(() => {
     setPhotoIndex(0);
@@ -295,9 +300,10 @@ export default function DiscoverProfileSheet({
               <View style={styles.bondPanel}>
                 <View style={styles.bondHeader}>
                   <GenoBondMark size={18} opacity={0.75} />
-                  <Text style={styles.bondKicker}>Lifestyle match</Text>
+                  <Text style={styles.bondKicker}>Genotype bond</Text>
                 </View>
-                <GenoCompatRing percent={profile.lifestyleMatch} size={88} />
+                <GenoCompatRing percent={profile.lifestyleMatch} size={96} />
+                {riskShort ? <Text style={styles.riskLabel}>{riskShort}</Text> : null}
               </View>
 
               {!hideGenotype ? (
@@ -516,7 +522,14 @@ const styles = StyleSheet.create({
     fontSize: 12,
     letterSpacing: 1.4,
     textTransform: 'uppercase',
-    color: COLORS.hero,
+    color: COLORS.glossyRed,
+  },
+  riskLabel: {
+    fontFamily: FONT_FAMILY.gothamBold,
+    fontSize: 18,
+    letterSpacing: -0.2,
+    color: COLORS.ink,
+    textAlign: 'center',
   },
   genotypeInfoWrap: {
     width: '100%',
@@ -526,7 +539,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamBook,
     fontSize: 11,
     lineHeight: 15,
-    color: COLORS.textSubtle,
+    color: 'rgba(11, 12, 14, 0.45)',
     textAlign: 'center',
   },
   infoSection: {

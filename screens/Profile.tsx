@@ -632,8 +632,8 @@ export default function Profile({ onSignOut }: ProfileProps) {
     return (
       <View style={[styles.root, styles.centered]}>
         <GenoMeshBackdrop />
-        <GenoPremiumChrome variant="ink" />
-        <GenoLogoCeremony variant="auth" tone="light" />
+        <GenoPremiumChrome variant="linen" />
+        <GenoLogoCeremony variant="auth" tone="dark" />
         <Text style={styles.loadingText}>Loading your profile…</Text>
       </View>
     );
@@ -643,7 +643,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
     return (
       <View style={[styles.root, styles.centered]}>
         <GenoMeshBackdrop />
-        <GenoPremiumChrome variant="ink" />
+        <GenoPremiumChrome variant="linen" />
         {authUserId ? (
           <GenoInboxRetryPanel
             message="Complete profile setup to continue."
@@ -679,8 +679,8 @@ export default function Profile({ onSignOut }: ProfileProps) {
     <View style={styles.root}>
       <GenoMeshBackdrop studio={editing} />
       <ProfileBondAura active={editing} verified={data.genotypeVerified && editing} />
-      <GenoPremiumChrome variant="ink" />
-      <StatusBar style="light" />
+      <GenoPremiumChrome variant="linen" />
+      <StatusBar style="dark" />
 
       <KeyboardAvoidingView
         style={styles.flex}
@@ -958,7 +958,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: COLORS.background },
+  root: { flex: 1, backgroundColor: COLORS.cream },
   flex: { flex: 1 },
   centered: { alignItems: 'center', justifyContent: 'center', padding: 24 },
   scroll: { paddingBottom: GENO_TAB_BAR_HEIGHT + 20, paddingTop: 2 },

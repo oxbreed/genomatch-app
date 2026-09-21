@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.marketingExtrabold,
     fontSize: INBOX.headerKickerSize,
     letterSpacing: 2.4,
-    color: COLORS.gold,
+    color: COLORS.glossyRed,
   },
   titleRow: {
     flexDirection: 'row',
