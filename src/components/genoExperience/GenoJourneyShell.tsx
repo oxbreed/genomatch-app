@@ -34,7 +34,7 @@ export default function GenoJourneyShell({
 }: Props) {
   return (
     <View style={styles.root}>
-      <GenoPremiumChrome variant="linen" />
+      <GenoPremiumChrome variant="ink" />
       <StatusBar style={statusBarStyle} />
 
       <View style={styles.topBar}>
@@ -177,7 +177,7 @@ export function GenoJourneyFooter({
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: COLORS.linen,
+    backgroundColor: COLORS.background,
   },
   topBar: {
     flexDirection: 'row',

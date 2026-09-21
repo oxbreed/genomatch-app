@@ -204,8 +204,8 @@ export default function Register({
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <GenoPremiumChrome variant="linen" />
-      <StatusBar style="dark" />
+      <GenoPremiumChrome variant="ink" />
+      <StatusBar style="light" />
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
@@ -236,7 +236,7 @@ export default function Register({
           </View>
 
           <View style={styles.logoWrap}>
-            <GenoLogoCeremony variant="auth" tone="dark" />
+            <GenoLogoCeremony variant="auth" tone="light" />
           </View>
 
           <Text style={styles.title}>Create Your GenoMatch Account</Text>
@@ -444,7 +444,7 @@ export default function Register({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.linen,
+    backgroundColor: COLORS.background,
   },
   scroll: {
     paddingHorizontal: 20,
@@ -507,7 +507,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.ink,
+    color: COLORS.text,
     fontSize: 32,
     lineHeight: 38,
     letterSpacing: -0.8,
@@ -516,7 +516,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontFamily: FONT_FAMILY.gothamMedium,
-    color: 'rgba(13, 40, 24, 0.62)',
+    color: COLORS.textMuted,
     fontSize: 15,
     lineHeight: 24,
     maxWidth: '96%',

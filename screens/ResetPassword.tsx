@@ -222,8 +222,8 @@ export default function ResetPassword({
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <GenoPremiumChrome variant="linen" />
-      <StatusBar style="dark" />
+      <GenoPremiumChrome variant="ink" />
+      <StatusBar style="light" />
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
@@ -241,7 +241,7 @@ export default function ResetPassword({
           </Pressable>
 
           <View style={styles.logoWrap}>
-            <GenoLogoCeremony variant="auth" tone="dark" />
+            <GenoLogoCeremony variant="auth" tone="light" />
           </View>
           <Text style={styles.title}>Reset Password</Text>
           <Text style={styles.subtitle}>
@@ -365,7 +365,7 @@ export default function ResetPassword({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.linen,
+    backgroundColor: COLORS.background,
   },
   scroll: {
     paddingHorizontal: 20,
@@ -409,7 +409,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.ink,
+    color: COLORS.text,
     fontSize: 34,
     lineHeight: 39,
     letterSpacing: -0.7,
@@ -417,7 +417,7 @@ const styles = StyleSheet.create({
     maxWidth: '95%',
   },
   subtitle: {
-    color: 'rgba(200, 16, 46, 0.72)',
+    color: COLORS.textMuted,
     fontSize: 15,
     lineHeight: 24,
     fontWeight: '500',

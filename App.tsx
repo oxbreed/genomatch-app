@@ -21,6 +21,7 @@ const Register = lazy(() => import('./screens/Register'));
 const SignIn = lazy(() => import('./screens/SignIn'));
 const ResetPassword = lazy(() => import('./screens/ResetPassword'));
 const ProfileSetup = lazy(() => import('./screens/ProfileSetup'));
+const InterestedInGate = lazy(() => import('./screens/InterestedInGate'));
 const MainTabs = lazy(() => import('./screens/MainTabs'));
 
 function ScreenFallback() {
@@ -35,7 +36,7 @@ function AppInner() {
   const [fontsLoaded, fontError] = useFonts(FONTS_TO_LOAD);
   const [bootstrapping, setBootstrapping] = useState(true);
   const [screen, setScreen] = useState<
-    'onboarding' | 'register' | 'signIn' | 'resetPassword' | 'profileSetup' | 'main'
+    'onboarding' | 'register' | 'signIn' | 'resetPassword' | 'profileSetup' | 'interestedInGate' | 'main'
   >('onboarding');
   const [splashDone, setSplashDone] = useState(false);
   const [resetPasswordEmail, setResetPasswordEmail] = useState<string | null>(null);
@@ -136,7 +137,7 @@ function AppInner() {
       console.log('[App] auth state change', { event, hasSession: !!session });
       if (!session) {
         const current = screenRef.current;
-        if (current === 'main' || current === 'profileSetup') {
+        if (current === 'main' || current === 'profileSetup' || current === 'interestedInGate') {
           setScreen('onboarding');
         }
       } else if (event === 'TOKEN_REFRESHED') {
@@ -222,7 +223,15 @@ function AppInner() {
   if (screen === 'profileSetup') {
     return (
       <Suspense fallback={<ScreenFallback />}>
-        <ProfileSetup onComplete={() => setScreen('main')} />
+        <ProfileSetup onComplete={() => setScreen('interestedInGate')} />
+      </Suspense>
+    );
+  }
+
+  if (screen === 'interestedInGate') {
+    return (
+      <Suspense fallback={<ScreenFallback />}>
+        <InterestedInGate onComplete={() => setScreen('main')} />
       </Suspense>
     );
   }
@@ -258,6 +267,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.linen,
+    backgroundColor: COLORS.background,
   },
 });
