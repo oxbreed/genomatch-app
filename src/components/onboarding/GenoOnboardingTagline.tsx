@@ -1,54 +1,37 @@
-import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
-import GenoMetallicText from './GenoMetallicText';
-import { TYPOGRAPHY } from '../../theme';
+import { StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { LOGO_GOLD, LOGO_RED, TYPOGRAPHY } from '../../theme';
 
 type Props = {
   style?: StyleProp<ViewStyle>;
-  compact?: boolean;
 };
 
-/** Playfair serif taglines — metallic gold + red pairing */
-export default function GenoOnboardingTagline({ style, compact }: Props) {
+/** Brand promise — two-line serif, hero only */
+export default function GenoOnboardingTagline({ style }: Props) {
   return (
     <View style={[styles.block, style]}>
-      <GenoMetallicText
-        tone="gold"
-        textStyle={[styles.hearts, compact && styles.heartsCompact]}
-      >
-        Connecting hearts.
-      </GenoMetallicText>
-      <GenoMetallicText
-        tone="red"
-        style={styles.genesWrap}
-        textStyle={[styles.genes, compact && styles.genesCompact]}
-      >
-        Aligning genes
-      </GenoMetallicText>
+      <Text style={styles.line}>Hearts aligned.</Text>
+      <Text style={styles.accent}>Genes matched.</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   block: {
-    width: '100%',
     alignItems: 'center',
+    gap: 2,
   },
-  hearts: {
-    ...TYPOGRAPHY.marketingTitle,
-    fontSize: 28,
-  },
-  heartsCompact: {
+  line: {
+    ...TYPOGRAPHY.serifHeadline,
     fontSize: 24,
     lineHeight: 30,
+    color: LOGO_GOLD,
+    textAlign: 'center',
   },
-  genesWrap: {
-    marginTop: 4,
-  },
-  genes: {
-    ...TYPOGRAPHY.marketingTitle,
-  },
-  genesCompact: {
+  accent: {
+    ...TYPOGRAPHY.serifAccent,
     fontSize: 19,
     lineHeight: 24,
+    color: LOGO_RED,
+    textAlign: 'center',
   },
 });

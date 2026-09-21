@@ -1,12 +1,16 @@
 import { StyleSheet, Text, View } from 'react-native';
+import GenoMatchLogoVector from '../GenoMatchLogoVector';
 import { LOGO_GOLD, LOGO_RED, TYPOGRAPHY } from '../../theme';
 
-/** Geno + Match wordmark — flat color (Expo Go safe, no MaskedView) */
+/** Header lockup — vector mark + wordmark (no raster / ribbonLogo imports) */
 export default function GenoWordmark() {
   return (
     <View style={styles.row}>
-      <Text style={[styles.word, styles.red]}>Geno</Text>
-      <Text style={[styles.word, styles.gold]}>Match</Text>
+      <GenoMatchLogoVector size={22} />
+      <Text style={styles.word}>
+        <Text style={styles.red}>Geno</Text>
+        <Text style={styles.gold}>Match</Text>
+      </Text>
     </View>
   );
 }
@@ -14,11 +18,12 @@ export default function GenoWordmark() {
 const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
-    alignItems: 'baseline',
+    alignItems: 'center',
+    gap: 8,
   },
   word: {
     ...TYPOGRAPHY.bodyStrong,
-    fontSize: 22,
+    fontSize: 19,
     letterSpacing: -0.3,
   },
   red: {

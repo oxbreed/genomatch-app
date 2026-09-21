@@ -3,8 +3,7 @@ import { ActivityIndicator, Linking, View, StyleSheet } from 'react-native';
 import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
 import { COLORS, FONTS_TO_LOAD } from './src/theme';
-import { GenoOnboardingFlow } from './src/components/onboarding';
-import SplashVideoScreen from './screens/SplashVideoScreen';
+import { GenoOnboardingFlow, GenoSplashScreen } from './src/components/onboarding';
 import GenoErrorBoundary from './src/components/shell/GenoErrorBoundary';
 import { resolveInitialScreen } from './src/lib/profiles';
 import { getAuthenticatedUserId, logAuthState } from './src/lib/auth';
@@ -161,9 +160,9 @@ function AppInner() {
     return (
       <View style={styles.boot}>
         <StatusBar style="light" />
-        <SplashVideoScreen
+        <GenoSplashScreen
+          hold={!appReady}
           bootstrapping={!appReady}
-          readyToExit={appReady}
           onFinish={() => setSplashDone(true)}
         />
       </View>

@@ -46,27 +46,106 @@ def chroma_strength(rgb: np.ndarray) -> np.ndarray:
     )
 
 
+def plate_mask(rgb: np.ndarray) -> np.ndarray:
+    """Near-neutral white plate only — must not eat bright gold highlights."""
+    sat = rgb.std(axis=2)
+    lum = rgb.mean(axis=2)
+    mn = rgb.min(axis=2)
+    chroma = chroma_strength(rgb)
+    return (lum > 160) & (sat < 28) & (chroma < 36) & (mn > 140)
+
+
 def vivid_ribbon_mask(rgb: np.ndarray) -> np.ndarray:
+    """Red + gold ribbon body, including darker metallic folds."""
+    r = rgb[:, :, 0].astype(np.int16)
+    g = rgb[:, :, 1].astype(np.int16)
+    b = rgb[:, :, 2].astype(np.int16)
     sat = rgb.std(axis=2)
     mx = rgb.max(axis=2)
     lum = rgb.mean(axis=2)
     chroma = chroma_strength(rgb)
 
-    plate = (lum > 145) & (sat < 62)
-    vivid = (sat > 28) & (mx > 80) & (chroma > 16) & (lum < 252)
+    plate = plate_mask(rgb)
+    reddish = (r > g + 8) & (r > b + 8) & (r > 45) & (sat > 10)
+    goldish = (
+        (r > 45)
+        & (g > 28)
+        & (r >= g - 12)
+        & (g > b + 3)
+        & (r > b + 6)
+        & (sat > 8)
+        & (lum > 20)
+    )
+    vivid = (sat > 22) & (mx > 70) & (chroma > 14) & (lum < 250)
+    fringe = (lum > 200) & (sat < 35) & (chroma < 55)
+    return (reddish | goldish | vivid) & ~plate & ~fringe & (mx > 40)
 
-    return vivid & ~plate
+
+def morph_dilate(mask: np.ndarray, radius: int) -> np.ndarray:
+    out = mask.copy()
+    for _ in range(radius):
+        p = np.pad(out, 1, constant_values=False)
+        out = (
+            out
+            | p[:-2, :-2]
+            | p[:-2, 1:-1]
+            | p[:-2, 2:]
+            | p[1:-1, :-2]
+            | p[1:-1, 1:-1]
+            | p[1:-1, 2:]
+            | p[2:, :-2]
+            | p[2:, 1:-1]
+            | p[2:, 2:]
+        )
+    return out
+
+
+def morph_erode(mask: np.ndarray, radius: int) -> np.ndarray:
+    out = mask.copy()
+    for _ in range(radius):
+        p = np.pad(out, 1, constant_values=True)
+        out = (
+            out
+            & p[:-2, :-2]
+            & p[:-2, 1:-1]
+            & p[:-2, 2:]
+            & p[1:-1, :-2]
+            & p[1:-1, 1:-1]
+            & p[1:-1, 2:]
+            & p[2:, :-2]
+            & p[2:, 1:-1]
+            & p[2:, 2:]
+        )
+    return out
+
+
+def morph_close(mask: np.ndarray, radius: int) -> np.ndarray:
+    return morph_erode(morph_dilate(mask, radius), radius)
 
 
 def clean_mask(rgb: np.ndarray) -> np.ndarray:
-    return morph_dilate(vivid_ribbon_mask(rgb), MASK_DILATE)
+    body = morph_close(vivid_ribbon_mask(rgb), 2)
+    body = morph_dilate(body, MASK_DILATE) & ~plate_mask(rgb)
+    return morph_close(body, 1) & ~plate_mask(rgb)
 
 
 def gray_cast(rgb: np.ndarray, paint: np.ndarray) -> np.ndarray:
+    """True gray haze only — never recolor gold / red metal."""
+    r = rgb[:, :, 0].astype(np.int16)
+    g = rgb[:, :, 1].astype(np.int16)
+    b = rgb[:, :, 2].astype(np.int16)
     sat = rgb.std(axis=2)
     lum = rgb.mean(axis=2)
     chroma = chroma_strength(rgb)
-    return paint & (chroma < 55) & (sat < 58) & (lum > 44) & (lum < 180)
+    warm = (r > b + 6) & ((r > g - 4) | (g > b + 4))
+    return (
+        paint
+        & ~warm
+        & (chroma < 40)
+        & (sat < 35)
+        & (lum > 44)
+        & (lum < 180)
+    )
 
 
 def solidify_grays(rgb: np.ndarray, paint: np.ndarray) -> np.ndarray:
@@ -103,34 +182,9 @@ def solidify_grays(rgb: np.ndarray, paint: np.ndarray) -> np.ndarray:
     return out
 
 
-def morph_dilate(mask: np.ndarray, radius: int) -> np.ndarray:
-    out = mask.copy()
-    for _ in range(radius):
-        p = np.pad(out, 1, constant_values=False)
-        out = (
-            out
-            | p[:-2, :-2]
-            | p[:-2, 1:-1]
-            | p[:-2, 2:]
-            | p[1:-1, :-2]
-            | p[1:-1, 1:-1]
-            | p[1:-1, 2:]
-            | p[2:, :-2]
-            | p[2:, 1:-1]
-            | p[2:, 2:]
-        )
-    return out
-
-
-def plate_mask(rgb: np.ndarray) -> np.ndarray:
-    sat = rgb.std(axis=2)
-    lum = rgb.mean(axis=2)
-    return (lum > 145) & (sat < 62)
-
-
 def frame_paint(rgb: np.ndarray) -> np.ndarray:
     """Per-frame vivid body — dilated so rotation never punches cream holes."""
-    return morph_dilate(vivid_ribbon_mask(rgb), MASK_DILATE) & ~plate_mask(rgb)
+    return clean_mask(rgb)
 
 
 def paint_mask(mask: np.ndarray, rgb: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
@@ -232,17 +286,33 @@ def sync_grok_source() -> str:
     if not os.path.isfile(grok):
         print(f'Grok source not found: {grok}', file=sys.stderr)
         return ASSET_SRC if os.path.isfile(ASSET_SRC) else grok
-    shutil.copy2(grok, ASSET_SRC)
-    print(f'Synced Grok source → {ASSET_SRC}')
+    try:
+        if os.path.abspath(grok) != os.path.abspath(ASSET_SRC):
+            shutil.copy2(grok, ASSET_SRC)
+            print(f'Synced Grok source → {ASSET_SRC}')
+    except OSError as err:
+        print(f'Could not sync Grok source ({err}); using {ASSET_SRC}', file=sys.stderr)
+        if not os.path.isfile(ASSET_SRC):
+            return grok
     return ASSET_SRC
 
 
 def write_meta(logical_w: int, logical_h: int, fps: float, frames: int) -> None:
     import json
 
+    # Preserve transparent-pipeline fields when dark extract runs second
+    existing: dict = {}
+    if os.path.isfile(META_OUT):
+        try:
+            with open(META_OUT, encoding='utf-8') as fh:
+                existing = json.load(fh)
+        except (OSError, json.JSONDecodeError):
+            existing = {}
+
     payload = {
+        **existing,
         'version': 1,
-        'matteColor': MATTE_HEX,
+        'darkMatteColor': MATTE_HEX,
         'nativeWidth': logical_w,
         'nativeHeight': logical_h,
         'aspect': round(logical_w / logical_h, 6),
@@ -254,6 +324,8 @@ def write_meta(logical_w: int, logical_h: int, fps: float, frames: int) -> None:
         'minLogoWidth': MIN_LOGO_WIDTH,
         'maxLogoWidth': MAX_LOGO_WIDTH,
     }
+    # Keep transparent as the app-facing matte for the PNG poster pipeline
+    payload['matteColor'] = existing.get('matteColor', 'transparent')
     with open(META_OUT, 'w', encoding='utf-8') as fh:
         json.dump(payload, fh, indent=2)
     print(f'Wrote {META_OUT}')

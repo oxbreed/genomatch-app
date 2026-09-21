@@ -29,6 +29,7 @@ export const MINT = CREAM_TINT;
 
 /** Backup mirror-chrome names → canonical palette (same pattern as forest/sage). */
 export const LOGO_RED_BRIGHT = LOGO_RED_HOT;
+export const BRAND_RED_SOFT = LOGO_RED_HOT;
 export const METALLIC_GRAPHITE = BRAND_BLACK_SOFT;
 export const METALLIC_SLATE = BRAND_BLACK_SOFT;
 export const METALLIC_STEEL = METALLIC_SILVER;

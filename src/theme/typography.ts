@@ -225,4 +225,32 @@ export const TYPOGRAPHY = {
     letterSpacing: 0.2,
     color: COLORS.ink,
   } satisfies TextStyle,
+
+  helper: {
+    ...gothamBook(),
+    fontSize: 13,
+    lineHeight: 19.5,
+    color: COLORS.textSubtle,
+  } satisfies TextStyle,
+
+  cta: {
+    ...gothamBold(),
+    fontSize: 16,
+    letterSpacing: 0.15,
+    color: COLORS.ink,
+  } satisfies TextStyle,
+
+  serifHeadline: {
+    ...marketingExtrabold(),
+    fontSize: 22,
+    letterSpacing: -0.3,
+    color: COLORS.linen,
+  } satisfies TextStyle,
+
+  serifAccent: {
+    ...marketingBold(),
+    fontSize: 19,
+    letterSpacing: -0.2,
+    color: COLORS.linen,
+  } satisfies TextStyle,
 } as const;

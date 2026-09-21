@@ -1,8 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
-import { BRAND_BLACK, COLORS, LOGO_GOLD, TYPOGRAPHY } from '../../theme';
-import GenoOnboardingTrustShield from './GenoOnboardingTrustShield';
+import { COLORS, LOGO_GOLD, LOGO_RED, TYPOGRAPHY, creamAlpha } from '../../theme';
 
 type Props = {
   confirmed: boolean;
@@ -10,7 +9,6 @@ type Props = {
   showHelper?: boolean;
 };
 
-/** Age gate — flat panel (no mirror chrome; Expo Go safe) */
 export default function GenoOnboardingAgeGate({ confirmed, onToggle, showHelper }: Props) {
   const onPress = () => {
     void Haptics.selectionAsync();
@@ -19,23 +17,19 @@ export default function GenoOnboardingAgeGate({ confirmed, onToggle, showHelper 
 
   return (
     <View style={styles.wrap}>
-      <View style={styles.panel}>
-        <Pressable
-          onPress={onPress}
-          style={styles.row}
-          accessibilityRole="checkbox"
-          accessibilityState={{ checked: confirmed }}
-        >
-          <View style={[styles.box, confirmed && styles.boxOn]}>
-            {confirmed ? <Ionicons name="checkmark" size={12} color={LOGO_GOLD} /> : null}
-          </View>
-          <Text style={styles.label}>I confirm I am 18 or older</Text>
-          <GenoOnboardingTrustShield size={20} />
-        </Pressable>
-      </View>
-
+      <Pressable
+        onPress={onPress}
+        style={[styles.row, confirmed && styles.rowOn]}
+        accessibilityRole="checkbox"
+        accessibilityState={{ checked: confirmed }}
+      >
+        <View style={[styles.box, confirmed && styles.boxOn]}>
+          {confirmed ? <Ionicons name="checkmark" size={11} color={LOGO_GOLD} /> : null}
+        </View>
+        <Text style={styles.label}>I confirm I am 18 or older</Text>
+      </Pressable>
       {showHelper && !confirmed ? (
-        <Text style={styles.helper}>Confirm your age to continue.</Text>
+        <Text style={styles.helper}>Please confirm to continue.</Text>
       ) : null}
     </View>
   );
@@ -46,43 +40,43 @@ const styles = StyleSheet.create({
     width: '100%',
     gap: 6,
   },
-  panel: {
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    borderRadius: 12,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: 'rgba(250, 248, 245, 0.12)',
-    backgroundColor: 'rgba(255, 255, 255, 0.04)',
-  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 10,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: creamAlpha(0.12),
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+  },
+  rowOn: {
+    borderColor: 'rgba(212, 175, 55, 0.35)',
   },
   box: {
     width: 20,
     height: 20,
     borderRadius: 5,
     borderWidth: 1.5,
-    borderColor: 'rgba(250, 248, 245, 0.35)',
+    borderColor: creamAlpha(0.3),
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: BRAND_BLACK,
   },
   boxOn: {
     borderColor: LOGO_GOLD,
-    backgroundColor: 'rgba(200, 16, 46, 0.35)',
+    backgroundColor: 'rgba(200, 16, 46, 0.2)',
   },
   label: {
     ...TYPOGRAPHY.bodyStrong,
     flex: 1,
-    fontSize: 13,
-    color: COLORS.linen,
+    fontSize: 14,
+    color: COLORS.text,
   },
   helper: {
-    ...TYPOGRAPHY.caption,
+    ...TYPOGRAPHY.helper,
     textAlign: 'center',
-    color: LOGO_GOLD,
+    color: LOGO_RED,
     fontSize: 12,
   },
 });
