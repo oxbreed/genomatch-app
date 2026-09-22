@@ -99,11 +99,17 @@ export const COLORS = {
   splash: BRAND_BLACK,
   hero: BRAND_BLACK_SOFT,
 
-  text: CREAM,
+  // Default type is ink, because the signed-in app is cream paper. Anything
+  // drawn on brand black or on a photo must ask for the onDark variants; the
+  // default reading cream is how detail rows went invisible on cream cards.
+  text: BRAND_BLACK,
+  textMuted: 'rgba(11, 12, 14, 0.62)',
+  textSubtle: 'rgba(11, 12, 14, 0.42)',
+
   textOnDark: CREAM,
   textOnInk: CREAM,
-  textMuted: 'rgba(250, 248, 245, 0.72)',
-  textSubtle: 'rgba(250, 248, 245, 0.45)',
+  textMutedOnDark: 'rgba(250, 248, 245, 0.72)',
+  textSubtleOnDark: 'rgba(250, 248, 245, 0.45)',
 
   border: 'rgba(11, 12, 14, 0.08)',
   borderLight: 'rgba(184, 188, 196, 0.4)',

@@ -266,8 +266,8 @@ export default function ChatScreen({ matchId, profile, userId: userIdProp, onBac
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 4 : 0}
     >
-      <GenoPremiumChrome variant="discover" />
-      <StatusBar style="light" />
+      <GenoPremiumChrome variant="linen" />
+      <StatusBar style="dark" />
 
       <GenoGlassSurface
         variant="linen"
@@ -410,7 +410,7 @@ export default function ChatScreen({ matchId, profile, userId: userIdProp, onBac
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.cream,
   },
   headerGlass: {
     zIndex: 2,

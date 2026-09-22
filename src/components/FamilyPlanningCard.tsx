@@ -54,7 +54,9 @@ export default function FamilyPlanningCard({
   locked = false,
 }: Props) {
   const textPrimary = dark ? COLORS.linen : COLORS.ink;
-  const textSecondary = dark ? 'rgba(250, 248, 245, 0.82)' : COLORS.metallicSilver;
+  // Metallic silver disappears into a cream card, so light surfaces get ink.
+  const textSecondary = dark ? 'rgba(250, 248, 245, 0.82)' : COLORS.textMuted;
+  const kickerColor = dark ? COLORS.gold : COLORS.goldDeep;
   const lockedBg = dark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(240, 241, 243, 0.95)';
   const lockedBorder = dark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(184, 188, 196, 0.45)';
 
@@ -82,7 +84,7 @@ export default function FamilyPlanningCard({
             <Ionicons name="lock-closed-outline" size={18} color={dark ? COLORS.gold : COLORS.hero} />
           </View>
           <View style={styles.headerCopy}>
-            <Text style={[styles.kicker, { color: dark ? COLORS.gold : COLORS.metallicSilver }]}>
+            <Text style={[styles.kicker, { color: kickerColor }]}>
               FAMILY PLANNING
             </Text>
             <Text style={[styles.title, { color: textPrimary }]}>Unlocks after you match</Text>
@@ -132,7 +134,7 @@ export default function FamilyPlanningCard({
           <Ionicons name={insight.icon} size={18} color={tier.accent} />
         </View>
         <View style={styles.headerCopy}>
-          <Text style={[styles.kicker, { color: dark ? COLORS.gold : COLORS.metallicSilver }]}>
+          <Text style={[styles.kicker, { color: kickerColor }]}>
             FAMILY PLANNING
           </Text>
           <Text style={[styles.title, { color: textPrimary }]}>{insight.title}</Text>

@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.bodyStrong,
     flex: 1,
     fontSize: 14,
-    color: COLORS.text,
+    color: COLORS.textOnDark,
   },
   helper: {
     ...TYPOGRAPHY.helper,

@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.serifTitle,
     fontSize: 26,
     lineHeight: 32,
-    color: COLORS.text,
+    color: COLORS.textOnDark,
     textAlign: 'center',
   },
   body: {

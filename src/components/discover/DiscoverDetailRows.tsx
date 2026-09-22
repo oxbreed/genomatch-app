@@ -1,22 +1,9 @@
 import { StyleSheet, Text, View } from 'react-native';
 import type { ComponentProps } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import {
-  GenoMirrorMetallicIcon,
-  GenoMirrorRimFrame,
-  GenoMirrorSteelFill,
-} from '../../brand/graphics';
-import { COLORS, TYPOGRAPHY, type MirrorIconTone } from '../../theme';
+import { COLORS, TYPOGRAPHY } from '../../theme';
 
 type IonName = ComponentProps<typeof Ionicons>['name'];
-
-const ICON_TONE: Partial<Record<IonName, MirrorIconTone>> = {
-  'resize-outline': 'chrome',
-  'sparkles-outline': 'gold',
-  'wine-outline': 'chrome',
-  'cloud-outline': 'steel',
-  'school-outline': 'gold',
-};
 
 type Row = {
   icon: IonName;
@@ -32,14 +19,11 @@ export default function DiscoverDetailRows({ rows }: Props) {
     <View style={styles.list}>
       {rows.map((row, index) => {
         const isLast = index === rows.length - 1;
-        const tone = ICON_TONE[row.icon] ?? 'gold';
         return (
           <View key={`${row.icon}-${row.label}`} style={[styles.row, !isLast && styles.rowBorder]}>
-            <GenoMirrorRimFrame kind="steel" borderRadius={20} padding={1}>
-              <GenoMirrorSteelFill style={styles.iconRing}>
-                <GenoMirrorMetallicIcon name={row.icon} size={17} tone={tone} />
-              </GenoMirrorSteelFill>
-            </GenoMirrorRimFrame>
+            <View style={styles.iconRing}>
+              <Ionicons name={row.icon} size={17} color={COLORS.goldDeep} />
+            </View>
             <Text style={styles.label}>{row.label}</Text>
           </View>
         );
@@ -60,14 +44,17 @@ const styles = StyleSheet.create({
   },
   rowBorder: {
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: 'rgba(255, 255, 255, 0.08)',
+    borderBottomColor: 'rgba(11, 12, 14, 0.10)',
   },
   iconRing: {
-    width: 40,
-    height: 40,
+    width: 38,
+    height: 38,
     borderRadius: 19,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: 'rgba(201, 154, 75, 0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(201, 154, 75, 0.32)',
   },
   label: {
     flex: 1,

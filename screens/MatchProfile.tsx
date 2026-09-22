@@ -95,8 +95,8 @@ export default function MatchProfile({ match, onBack, onSendMessage }: MatchProf
 
   return (
     <View style={styles.container}>
-      <GenoPremiumChrome variant="discover" />
-      <StatusBar style="light" />
+      <GenoPremiumChrome variant="linen" />
+      <StatusBar style="dark" />
 
       <GenoBackHeader title="Match profile" onBack={onBack} right={menuBtn} />
 
@@ -237,7 +237,7 @@ export default function MatchProfile({ match, onBack, onSendMessage }: MatchProf
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.cream,
   },
   scroll: {
     paddingBottom: 120,

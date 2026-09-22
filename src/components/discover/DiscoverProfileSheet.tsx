@@ -539,7 +539,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamBook,
     fontSize: 11,
     lineHeight: 15,
-    color: 'rgba(11, 12, 14, 0.45)',
+    color: 'rgba(11, 12, 14, 0.58)',
     textAlign: 'center',
   },
   infoSection: {

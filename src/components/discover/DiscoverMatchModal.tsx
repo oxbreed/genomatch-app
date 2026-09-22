@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 32,
     letterSpacing: -0.6,
-    color: COLORS.text,
+    color: COLORS.textOnDark,
     textAlign: 'center',
     marginBottom: 8,
   },
@@ -354,7 +354,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 16,
     lineHeight: 22,
-    color: COLORS.textMuted,
+    color: COLORS.textMutedOnDark,
     textAlign: 'center',
     marginBottom: 24,
     paddingHorizontal: 4,
@@ -412,7 +412,7 @@ const styles = StyleSheet.create({
   avatarLabel: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: COLORS.textMuted,
+    color: COLORS.textMutedOnDark,
     textAlign: 'center',
     maxWidth: 88,
   },
@@ -441,7 +441,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 12,
     letterSpacing: 0.2,
-    color: COLORS.text,
+    color: COLORS.textOnDark,
   },
   verifiedText: {
     fontFamily: FONT_FAMILY.gothamBold,
@@ -453,7 +453,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 20,
     paddingHorizontal: 16,
-    color: COLORS.textSubtle,
+    color: COLORS.textSubtleOnDark,
   },
   ctaRim: {
     width: '100%',
@@ -492,6 +492,6 @@ const styles = StyleSheet.create({
   secondaryText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 14,
-    color: COLORS.text,
+    color: COLORS.textOnDark,
   },
 });

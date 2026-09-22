@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { GenoMirrorMetallicIcon, GenoMirrorRimFrame, GenoMirrorSteelFill } from '../../brand/graphics';
+import { Ionicons } from '@expo/vector-icons';
 import { PROFILE_PRONOUNS, type ProfilePronoun } from '../../lib/profilePronouns';
 import { COLORS } from '../../theme';
 import { PROFILE_TYPE } from './profileTokens';
@@ -14,11 +14,9 @@ export default function ProfileIdentityFields({ pronouns, onSelectPronouns }: Pr
   return (
     <View style={styles.wrap}>
       <View style={styles.fieldHeader}>
-        <GenoMirrorRimFrame kind="gold" borderRadius={18} padding={1.5}>
-          <GenoMirrorSteelFill style={styles.iconRing}>
-            <GenoMirrorMetallicIcon name="person" size={16} tone="gold" />
-          </GenoMirrorSteelFill>
-        </GenoMirrorRimFrame>
+        <View style={styles.iconRing}>
+          <Ionicons name="person" size={16} color={COLORS.goldDeep} />
+        </View>
         <View style={styles.fieldCopy}>
           <Text style={styles.label}>Pronouns</Text>
           <Text style={styles.hint}>How you appear on your profile and to matches.</Text>
@@ -51,9 +49,12 @@ const styles = StyleSheet.create({
   iconRing: {
     width: 36,
     height: 36,
-    borderRadius: 16.5,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: 'rgba(201, 154, 75, 0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(201, 154, 75, 0.32)',
   },
   fieldCopy: { flex: 1, gap: 2 },
   label: {
