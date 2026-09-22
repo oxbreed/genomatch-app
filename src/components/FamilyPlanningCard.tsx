@@ -18,10 +18,10 @@ const TIER_STYLE: Record<
 > = {
   favourable: {
     accent: COLORS.verified,
-    bg: 'rgba(200, 16, 46, 0.1)',
-    border: 'rgba(200, 16, 46, 0.28)',
-    darkBg: 'rgba(200, 16, 46, 0.22)',
-    darkBorder: 'rgba(200, 16, 46, 0.4)',
+    bg: 'rgba(198, 34, 34, 0.1)',
+    border: 'rgba(198, 34, 34, 0.28)',
+    darkBg: 'rgba(198, 34, 34, 0.22)',
+    darkBorder: 'rgba(198, 34, 34, 0.4)',
   },
   low_risk: {
     accent: COLORS.hero,
@@ -32,10 +32,10 @@ const TIER_STYLE: Record<
   },
   awareness: {
     accent: COLORS.gold,
-    bg: 'rgba(212, 175, 55, 0.12)',
-    border: 'rgba(212, 175, 55, 0.35)',
-    darkBg: 'rgba(212, 175, 55, 0.18)',
-    darkBorder: 'rgba(212, 175, 55, 0.45)',
+    bg: 'rgba(201, 154, 75, 0.12)',
+    border: 'rgba(201, 154, 75, 0.35)',
+    darkBg: 'rgba(201, 154, 75, 0.18)',
+    darkBorder: 'rgba(201, 154, 75, 0.45)',
   },
   counseling: {
     accent: '#B86B2E',

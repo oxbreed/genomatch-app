@@ -59,7 +59,7 @@ function HabitSection({
               onPress={() => onSelect(active ? '' : opt.id)}
             >
               {active ? (
-                <LinearGradient colors={[COLORS.gold, '#B8962E']} style={styles.religionChipActive}>
+                <LinearGradient colors={[COLORS.gold, '#96651F']} style={styles.religionChipActive}>
                   <Text style={styles.religionTextActive}>{opt.label}</Text>
                 </LinearGradient>
               ) : (
@@ -121,7 +121,7 @@ export default function ProfileDetailsFields({
           return (
             <Pressable key={cm} onPress={() => onSelectHeight(active ? null : cm)}>
               {active ? (
-                <LinearGradient colors={[COLORS.gold, '#B8962E']} style={styles.heightChipActive}>
+                <LinearGradient colors={[COLORS.gold, '#96651F']} style={styles.heightChipActive}>
                   <Text style={styles.heightChipTextActive}>{label}</Text>
                 </LinearGradient>
               ) : (
@@ -175,7 +175,7 @@ export default function ProfileDetailsFields({
               onPress={() => onSelectReligion(active ? '' : opt.id)}
             >
               {active ? (
-                <LinearGradient colors={[COLORS.gold, '#B8962E']} style={styles.religionChipActive}>
+                <LinearGradient colors={[COLORS.gold, '#96651F']} style={styles.religionChipActive}>
                   <Text style={styles.religionTextActive}>{opt.label}</Text>
                 </LinearGradient>
               ) : (
@@ -224,7 +224,7 @@ export default function ProfileDetailsFields({
               onPress={() => onSelectEducation(active ? '' : opt.id)}
             >
               {active ? (
-                <LinearGradient colors={[COLORS.gold, '#B8962E']} style={styles.religionChipActive}>
+                <LinearGradient colors={[COLORS.gold, '#96651F']} style={styles.religionChipActive}>
                   <Text style={styles.religionTextActive}>{opt.label}</Text>
                 </LinearGradient>
               ) : (
@@ -260,9 +260,9 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: 'rgba(212, 175, 55, 0.14)',
+    backgroundColor: 'rgba(201, 154, 75, 0.14)',
     borderWidth: 1,
-    borderColor: 'rgba(212, 175, 55, 0.35)',
+    borderColor: 'rgba(201, 154, 75, 0.35)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -281,7 +281,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     backgroundColor: COLORS.mint,
     borderWidth: 1,
-    borderColor: 'rgba(212, 175, 55, 0.28)',
+    borderColor: 'rgba(201, 154, 75, 0.28)',
   },
   valuePillText: {
     fontFamily: FONT_FAMILY.gothamBold,
@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: 12,
     borderWidth: 1.5,
-    borderColor: 'rgba(212, 175, 55, 0.35)',
+    borderColor: 'rgba(201, 154, 75, 0.35)',
     backgroundColor: COLORS.white,
     paddingHorizontal: 14,
     fontFamily: FONT_FAMILY.gothamMedium,

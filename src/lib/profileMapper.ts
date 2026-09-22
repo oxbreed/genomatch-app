@@ -3,11 +3,11 @@ import { computeLifestyleMatch } from './lifestyleMatch';
 import { isNewMember, resolvePresenceState } from './presence';
 
 const GRADIENTS: [string, string][] = [
-  ['#C8102E', '#0B0C0E'],
-  ['#D4AF37', '#15171A'],
+  ['#C62222', '#0B0C0E'],
+  ['#C99A4B', '#15171A'],
   ['#185FA5', '#0D47A1'],
   ['#6A4C93', '#4A2C6A'],
-  ['#D4AF37', '#8B6914'],
+  ['#C99A4B', '#8B6914'],
 ];
 
 export function ageFromDateOfBirth(dob: string | null): number | null {

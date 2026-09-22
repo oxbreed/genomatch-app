@@ -39,7 +39,7 @@ export default function StudioProgressHeader({
 
       <View style={styles.track}>
         <LinearGradient
-          colors={['rgba(13, 40, 24, 0.08)', 'rgba(212, 175, 55, 0.25)']}
+          colors={['rgba(13, 40, 24, 0.08)', 'rgba(201, 154, 75, 0.25)']}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}
           style={StyleSheet.absoluteFill}
@@ -94,9 +94,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: RADIUS.pill,
-    backgroundColor: 'rgba(212, 175, 55, 0.14)',
+    backgroundColor: 'rgba(201, 154, 75, 0.14)',
     borderWidth: 1,
-    borderColor: 'rgba(212, 175, 55, 0.35)',
+    borderColor: 'rgba(201, 154, 75, 0.35)',
     alignItems: 'center',
   },
   badgeText: {

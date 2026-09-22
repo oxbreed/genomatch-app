@@ -172,7 +172,7 @@ export default function ReportBlockSheet({
               </View>
               <Text style={styles.successText}>{successMessage}</Text>
               <Pressable style={styles.doneBtnWrap} onPress={handleDone}>
-                <LinearGradient colors={[COLORS.gold, '#B8962E']} style={styles.doneBtn}>
+                <LinearGradient colors={[COLORS.gold, '#96651F']} style={styles.doneBtn}>
                   <Text style={styles.doneBtnText}>Done</Text>
                 </LinearGradient>
               </Pressable>

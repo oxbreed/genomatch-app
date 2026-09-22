@@ -30,7 +30,7 @@ export default function GenoScreenHeader({
         colors={
           isInk
             ? ['rgba(13, 40, 24, 0.08)', 'transparent']
-            : ['rgba(212, 175, 55, 0.12)', 'transparent']
+            : ['rgba(201, 154, 75, 0.12)', 'transparent']
         }
         style={styles.shimmer}
         pointerEvents="none"
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
     color: COLORS.gold,
   },
   kickerInk: {
-    color: 'rgba(212, 175, 55, 0.85)',
+    color: 'rgba(201, 154, 75, 0.85)',
   },
   title: {
     fontFamily: FONT_FAMILY.gothamBold,

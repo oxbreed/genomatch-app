@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.xl,
     padding: 24,
     borderWidth: 1,
-    borderColor: 'rgba(212, 175, 55, 0.35)',
+    borderColor: 'rgba(201, 154, 75, 0.35)',
   },
   iconWrap: {
     alignSelf: 'center',

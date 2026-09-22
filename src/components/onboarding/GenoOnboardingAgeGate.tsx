@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.03)',
   },
   rowOn: {
-    borderColor: 'rgba(212, 175, 55, 0.35)',
+    borderColor: 'rgba(201, 154, 75, 0.35)',
   },
   box: {
     width: 20,
@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
   },
   boxOn: {
     borderColor: LOGO_GOLD,
-    backgroundColor: 'rgba(200, 16, 46, 0.2)',
+    backgroundColor: 'rgba(198, 34, 34, 0.2)',
   },
   label: {
     ...TYPOGRAPHY.bodyStrong,

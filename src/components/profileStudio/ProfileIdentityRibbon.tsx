@@ -49,7 +49,7 @@ export default function ProfileIdentityRibbon({ verified, genotype, onVerify }: 
             style={({ pressed }) => [styles.verifyBtn, pressed && styles.pressed]}
             onPress={onVerify}
           >
-            <LinearGradient colors={[COLORS.gold, '#B8962E']} style={styles.verifyGradient}>
+            <LinearGradient colors={[COLORS.gold, '#96651F']} style={styles.verifyGradient}>
               <Ionicons name="finger-print" size={16} color={COLORS.ink} />
               <Text style={styles.verifyText}>Verify now</Text>
             </LinearGradient>
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(200, 16, 46, 0.14)',
+    backgroundColor: 'rgba(198, 34, 34, 0.14)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: 'rgba(212, 175, 55, 0.2)',
+    backgroundColor: 'rgba(201, 154, 75, 0.2)',
     alignItems: 'center',
     justifyContent: 'center',
   },

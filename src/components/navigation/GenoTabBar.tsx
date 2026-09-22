@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
     borderRadius: TAB_BAR_RADIUS,
     backgroundColor: GLASS.tabBarIndicator,
     borderWidth: 1,
-    borderColor: 'rgba(212, 175, 55, 0.22)',
+    borderColor: 'rgba(201, 154, 75, 0.22)',
   },
   tabItem: {
     flex: 1,

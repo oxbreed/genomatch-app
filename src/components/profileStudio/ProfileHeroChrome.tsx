@@ -37,7 +37,7 @@ export default function ProfileHeroChrome({ studio, height, children }: Props) {
         <View style={[styles.hero, { height }]}>
           {children}
           <LinearGradient
-            colors={['rgba(212, 175, 55, 0.45)', 'transparent']}
+            colors={['rgba(201, 154, 75, 0.45)', 'transparent']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.topAccent}

@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(250, 248, 245, 0.12)',
   },
   studioPill: {
-    borderColor: 'rgba(212, 175, 55, 0.55)',
+    borderColor: 'rgba(201, 154, 75, 0.55)',
     backgroundColor: 'rgba(13, 40, 24, 0.78)',
   },
   brandText: {
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: COLORS.linen,
     borderBottomWidth: 2,
-    borderBottomColor: 'rgba(212, 175, 55, 0.6)',
+    borderBottomColor: 'rgba(201, 154, 75, 0.6)',
     minWidth: 120,
     flexShrink: 1,
     paddingVertical: 2,
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.linen,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(212, 175, 55, 0.5)',
+    borderBottomColor: 'rgba(201, 154, 75, 0.5)',
     paddingVertical: 2,
   },
   locationLocked: {

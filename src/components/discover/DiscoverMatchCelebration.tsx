@@ -250,7 +250,7 @@ export default function DiscoverMatchCelebration({
 
         <View style={styles.ambientTop} pointerEvents="none">
           <LinearGradient
-            colors={['rgba(212, 175, 55, 0.22)', 'transparent']}
+            colors={['rgba(201, 154, 75, 0.22)', 'transparent']}
             style={styles.ambientGlow}
           />
         </View>
@@ -273,14 +273,14 @@ export default function DiscoverMatchCelebration({
           ]}
         >
           <LinearGradient
-            colors={['rgba(212, 175, 55, 0.65)', 'rgba(200, 16, 46, 0.4)', 'rgba(212, 175, 55, 0.5)']}
+            colors={['rgba(201, 154, 75, 0.65)', 'rgba(198, 34, 34, 0.4)', 'rgba(201, 154, 75, 0.5)']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.cardBorder}
           >
             <View style={styles.cardInner}>
               <LinearGradient
-                colors={['#C8102E', '#8E0B20', COLORS.ink]}
+                colors={['#C62222', '#8A0B0C', COLORS.ink]}
                 start={{ x: 0.2, y: 0 }}
                 end={{ x: 0.8, y: 1 }}
                 style={styles.cardGradient}
@@ -306,7 +306,7 @@ export default function DiscoverMatchCelebration({
                     style={[styles.shimmerBar, { transform: [{ translateX: shimmerX }] }]}
                   >
                     <LinearGradient
-                      colors={['transparent', 'rgba(212, 175, 55, 0.55)', 'transparent']}
+                      colors={['transparent', 'rgba(201, 154, 75, 0.55)', 'transparent']}
                       start={{ x: 0, y: 0.5 }}
                       end={{ x: 1, y: 0.5 }}
                       style={StyleSheet.absoluteFill}
@@ -347,7 +347,7 @@ export default function DiscoverMatchCelebration({
 
                     <Animated.View style={[styles.bondCenter, { transform: [{ scale: bondPulse }] }]}>
                       <LinearGradient
-                        colors={['rgba(212, 175, 55, 0.35)', 'rgba(13, 40, 24, 0.2)']}
+                        colors={['rgba(201, 154, 75, 0.35)', 'rgba(13, 40, 24, 0.2)']}
                         style={styles.bondGlow}
                       >
                         <GenoBondMark size={56} opacity={1} />
@@ -400,7 +400,7 @@ export default function DiscoverMatchCelebration({
                   }}
                 >
                   <LinearGradient
-                    colors={[COLORS.gold, '#E5C766', '#B8962E']}
+                    colors={[COLORS.gold, '#F3DC95', '#96651F']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     style={styles.ctaGradient}
@@ -502,7 +502,7 @@ const styles = StyleSheet.create({
   crownLine: {
     flex: 1,
     height: 1,
-    backgroundColor: 'rgba(212, 175, 55, 0.35)',
+    backgroundColor: 'rgba(201, 154, 75, 0.35)',
   },
   crownKicker: {
     fontFamily: FONT_FAMILY.gothamBold,
@@ -524,7 +524,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     marginBottom: 14,
     borderRadius: 1,
-    backgroundColor: 'rgba(212, 175, 55, 0.12)',
+    backgroundColor: 'rgba(201, 154, 75, 0.12)',
   },
   shimmerBar: {
     width: 120,
@@ -573,7 +573,7 @@ const styles = StyleSheet.create({
     height: 200,
     borderRadius: 100,
     borderWidth: 1,
-    borderColor: 'rgba(212, 175, 55, 0.25)',
+    borderColor: 'rgba(201, 154, 75, 0.25)',
     borderStyle: 'dashed',
     alignItems: 'center',
     justifyContent: 'center',
@@ -607,7 +607,7 @@ const styles = StyleSheet.create({
     padding: 3,
     borderRadius: 40,
     borderWidth: 2,
-    borderColor: 'rgba(212, 175, 55, 0.5)',
+    borderColor: 'rgba(201, 154, 75, 0.5)',
     backgroundColor: 'rgba(13, 40, 24, 0.6)',
   },
   youRing: {
@@ -636,7 +636,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1.5,
-    borderColor: 'rgba(212, 175, 55, 0.4)',
+    borderColor: 'rgba(201, 154, 75, 0.4)',
   },
   avatarLabel: {
     fontFamily: FONT_FAMILY.gothamBold,
@@ -653,9 +653,9 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 14,
     borderRadius: 16,
-    backgroundColor: 'rgba(212, 175, 55, 0.1)',
+    backgroundColor: 'rgba(201, 154, 75, 0.1)',
     borderWidth: 1,
-    borderColor: 'rgba(212, 175, 55, 0.28)',
+    borderColor: 'rgba(201, 154, 75, 0.28)',
     marginBottom: 20,
   },
   compatRing: {

@@ -51,7 +51,7 @@ function HeaderContent({
         </View>
       </View>
       <LinearGradient
-        colors={['transparent', COLORS.gold, 'rgba(200, 16, 46, 0.4)', 'transparent']}
+        colors={['transparent', COLORS.gold, 'rgba(198, 34, 34, 0.4)', 'transparent']}
         start={{ x: 0, y: 0.5 }}
         end={{ x: 1, y: 0.5 }}
         style={styles.rule}

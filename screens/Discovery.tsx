@@ -867,7 +867,7 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
           ) : seenAll ? (
             <View style={styles.seenAllWrap}>
               <LinearGradient
-                colors={['rgba(212, 175, 55, 0.42)', 'rgba(200, 16, 46, 0.22)', 'rgba(212, 175, 55, 0.38)']}
+                colors={['rgba(201, 154, 75, 0.42)', 'rgba(198, 34, 34, 0.22)', 'rgba(201, 154, 75, 0.38)']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={styles.seenAllBorder}
@@ -1320,16 +1320,16 @@ const styles = StyleSheet.create({
     width: 108,
     height: 108,
     borderRadius: 54,
-    backgroundColor: 'rgba(212, 175, 55, 0.14)',
+    backgroundColor: 'rgba(201, 154, 75, 0.14)',
     borderWidth: 1.5,
-    borderColor: 'rgba(212, 175, 55, 0.45)',
+    borderColor: 'rgba(201, 154, 75, 0.45)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   noPhotoInitials: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 40,
-    color: 'rgba(212, 175, 55, 0.75)',
+    color: 'rgba(201, 154, 75, 0.75)',
     textAlign: 'center',
     letterSpacing: 1,
   },
@@ -1428,9 +1428,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 999,
-    backgroundColor: 'rgba(212, 175, 55, 0.22)',
+    backgroundColor: 'rgba(201, 154, 75, 0.22)',
     borderWidth: 1,
-    borderColor: 'rgba(212, 175, 55, 0.42)',
+    borderColor: 'rgba(201, 154, 75, 0.42)',
   },
   tagText: {
     fontFamily: FONT_FAMILY.gothamBold,
@@ -1653,7 +1653,7 @@ const styles = StyleSheet.create({
     paddingVertical: 32,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(212, 175, 55, 0.2)',
+    borderColor: 'rgba(201, 154, 75, 0.2)',
   },
   seenAllIconWrap: {
     width: 64,
@@ -1661,7 +1661,7 @@ const styles = StyleSheet.create({
     borderRadius: 32,
     backgroundColor: COLORS.mint,
     borderWidth: 1,
-    borderColor: 'rgba(212, 175, 55, 0.35)',
+    borderColor: 'rgba(201, 154, 75, 0.35)',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 18,

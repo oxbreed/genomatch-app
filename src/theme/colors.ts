@@ -1,12 +1,14 @@
 /** GenoMatch brand palette — mirror system: logo red/gold on brand black. */
 
-// Canonical mirror brand colors (FINAL). Source of truth for the app palette.
-export const LOGO_RED = '#C8102E';
-export const LOGO_RED_DEEP = '#8E0B20';
-export const LOGO_RED_HOT = '#E5344E';
-export const LOGO_GOLD = '#D4AF37';
-export const LOGO_GOLD_BRIGHT = '#E5C766';
-export const LOGO_GOLD_DEEP = '#B8962E';
+// Sampled from the master ribbon mark (assets/genomatch-logo-master.png) so the
+// UI and the logo are the same red and the same gold. Each family is the lit
+// ribbon face, its specular highlight, and its shadow side.
+export const LOGO_RED = '#C62222';
+export const LOGO_RED_DEEP = '#8A0B0C';
+export const LOGO_RED_HOT = '#E85050';
+export const LOGO_GOLD = '#C99A4B';
+export const LOGO_GOLD_BRIGHT = '#F3DC95';
+export const LOGO_GOLD_DEEP = '#96651F';
 export const BRAND_BLACK = '#0B0C0E';
 export const BRAND_BLACK_SOFT = '#15171A';
 export const METALLIC_SILVER = '#B8BCC4';
@@ -35,8 +37,8 @@ export const METALLIC_SLATE = BRAND_BLACK_SOFT;
 export const METALLIC_STEEL = METALLIC_SILVER;
 
 const CREAM_RGB = '250, 248, 245';
-const RED_RGB = '200, 16, 46';
-const GOLD_RGB = '212, 175, 55';
+const RED_RGB = '198, 34, 34';
+const GOLD_RGB = '201, 154, 75';
 const SILVER_RGB = '184, 188, 196';
 const CHROME_RGB = '212, 216, 224';
 
@@ -130,8 +132,8 @@ export const GLASS = {
   ],
 
   linenTint: 'rgba(250, 248, 245, 0.48)',
-  linenBorder: 'rgba(212, 175, 55, 0.42)',
-  linenSheen: ['rgba(255, 255, 255, 0.72)', 'rgba(212, 175, 55, 0.14)', 'transparent'] as [
+  linenBorder: 'rgba(201, 154, 75, 0.42)',
+  linenSheen: ['rgba(255, 255, 255, 0.72)', 'rgba(201, 154, 75, 0.14)', 'transparent'] as [
     string,
     string,
     string,
@@ -139,19 +141,19 @@ export const GLASS = {
 
   darkTint: 'rgba(11, 12, 14, 0.44)',
   darkBorder: 'rgba(250, 248, 245, 0.22)',
-  darkSheen: ['rgba(212, 175, 55, 0.38)', 'rgba(255, 255, 255, 0.12)', 'transparent'] as [
+  darkSheen: ['rgba(201, 154, 75, 0.38)', 'rgba(255, 255, 255, 0.12)', 'transparent'] as [
     string,
     string,
     string,
   ],
 
   sheetTint: 'rgba(250, 248, 245, 0.58)',
-  sheetBorder: 'rgba(212, 175, 55, 0.48)',
+  sheetBorder: 'rgba(201, 154, 75, 0.48)',
 
   backdropDark: 'rgba(11, 12, 14, 0.28)',
   backdropLight: 'rgba(250, 248, 245, 0.18)',
 
-  topRule: ['transparent', 'rgba(212, 175, 55, 0.85)', 'transparent'] as [string, string, string],
+  topRule: ['transparent', 'rgba(201, 154, 75, 0.85)', 'transparent'] as [string, string, string],
   edgeHighlight: 'rgba(255, 255, 255, 0.62)',
   rimHighlight: ['rgba(255, 255, 255, 0.55)', 'rgba(255, 255, 255, 0.08)', 'transparent'] as [
     string,
@@ -167,13 +169,13 @@ export const GLASS = {
     string,
     string,
   ],
-  tabBarIndicator: 'rgba(212, 175, 55, 0.18)',
+  tabBarIndicator: 'rgba(201, 154, 75, 0.18)',
 
   /** Flat controls that mimic glass without blur (chips, legacy inputs) */
   insetFill: 'rgba(255, 255, 255, 0.58)',
   insetBorder: 'rgba(255, 255, 255, 0.72)',
-  insetActiveFill: 'rgba(212, 175, 55, 0.2)',
-  insetActiveBorder: 'rgba(212, 175, 55, 0.55)',
+  insetActiveFill: 'rgba(201, 154, 75, 0.2)',
+  insetActiveBorder: 'rgba(201, 154, 75, 0.55)',
 } as const;
 
 export const MIRROR_GRADIENTS = {
