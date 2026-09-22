@@ -890,6 +890,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
                   educationStatus={data.educationStatus}
                   heightCm={data.heightCm}
                   religion={data.religion}
+                  pronouns={data.gender || null}
                 />
               </ProfileSectionCard>
 

@@ -18,6 +18,7 @@ type Props = {
   educationStatus?: string | null;
   heightCm?: number | null;
   religion?: string | null;
+  pronouns?: string | null;
 };
 
 function SectionBlock({
@@ -49,6 +50,7 @@ export default function ProfileViewSections({
   educationStatus,
   heightCm,
   religion,
+  pronouns,
 }: Props) {
   const goalLabel =
     RELATIONSHIP_GOAL_LABELS[relationshipGoal] ?? (relationshipGoal || 'Not set');
@@ -64,6 +66,14 @@ export default function ProfileViewSections({
             presenceState={presenceState ?? 'offline'}
             isNewMember={isNewMember}
           />
+        </SectionBlock>
+      ) : null}
+
+      {pronouns ? (
+        <SectionBlock label="Identity" showDivider>
+          <View style={styles.goalPill}>
+            <Text style={styles.goalText}>{pronouns}</Text>
+          </View>
         </SectionBlock>
       ) : null}
 
