@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
   loadingText: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
   },
   listWrap: { flex: 1 },
   list: { paddingTop: 4, paddingBottom: TAB_SCENE_BOTTOM_PADDING },

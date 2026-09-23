@@ -1617,7 +1617,7 @@ const styles = StyleSheet.create({
   loadingText: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 15,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
     fontWeight: '600',
   },
   retryBtn: {
@@ -1679,7 +1679,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 15,
     lineHeight: 22,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
     textAlign: 'center',
     marginBottom: 24,
     maxWidth: 280,

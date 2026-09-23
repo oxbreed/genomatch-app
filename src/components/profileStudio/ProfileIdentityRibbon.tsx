@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
   },
   sub: {
     ...PROFILE_TYPE.ribbonSub,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
     marginTop: 2,
   },
   verifyBtn: {

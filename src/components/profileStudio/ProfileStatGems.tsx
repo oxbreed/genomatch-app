@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
   },
   label: {
     ...PROFILE_TYPE.statLabel,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
     textAlign: 'center',
   },
 });

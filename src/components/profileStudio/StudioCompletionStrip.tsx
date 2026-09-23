@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
   value: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 15,
-    color: COLORS.gold,
+    color: COLORS.goldDeep,
   },
   track: {
     height: 5,
@@ -76,6 +76,6 @@ const styles = StyleSheet.create({
   hint: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
   },
 });

@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
   },
   kicker: {
     ...PROFILE_TYPE.sectionKicker,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
   },
   title: {
     ...PROFILE_TYPE.sectionTitle,

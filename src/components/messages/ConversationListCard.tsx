@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
   pct: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: INBOX.pctSize,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
   },
   pctHigh: {
     color: COLORS.ink,

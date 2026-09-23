@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
   hint: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
     marginBottom: 12,
   },
   grid: {
@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
   addLabel: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 11,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
   },
   emptyView: {
     paddingVertical: 22,
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
     lineHeight: 21,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
     textAlign: 'center',
   },
   emptyStudio: {
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
   emptyStudioSub: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
     textAlign: 'center',
     lineHeight: 17,
     marginBottom: 4,

@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
   hint: {
     fontFamily: FONT_FAMILY.gothamBook,
     fontSize: 12,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
     marginTop: 6,
     marginBottom: 12,
     lineHeight: 17,
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
   genoName: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 11,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
     textAlign: 'center',
   },
   badge: {

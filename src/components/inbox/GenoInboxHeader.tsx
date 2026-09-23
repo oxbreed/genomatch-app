@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: INBOX.headerSubtitleSize,
     lineHeight: 18,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
     marginTop: 1,
   },
   rule: {

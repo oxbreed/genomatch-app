@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
   },
   blockLabel: {
     ...PROFILE_TYPE.blockLabel,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
   },
   bioText: {
     ...PROFILE_TYPE.body,

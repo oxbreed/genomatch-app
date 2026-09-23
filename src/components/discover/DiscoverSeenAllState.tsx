@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamBook,
     fontSize: 15,
     lineHeight: 22,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
     textAlign: 'center',
     marginBottom: 18,
     maxWidth: 300,
@@ -329,7 +329,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     letterSpacing: 1,
     textTransform: 'uppercase',
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
   },
   tomorrowValue: {
     fontFamily: FONT_FAMILY.gothamMedium,

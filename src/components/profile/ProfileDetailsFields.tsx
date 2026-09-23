@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
   },
   hint: {
     ...PROFILE_TYPE.sectionHint,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
   },
   valuePill: {
     paddingHorizontal: 10,
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
   customHint: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
   },
   religionGrid: {
     flexDirection: 'row',

@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
   stepBadgeText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 10,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
   },
   stepBadgeTextActive: {
     color: COLORS.ink,
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
   pillLabel: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
   },
   pillLabelActive: {
     fontFamily: FONT_FAMILY.gothamBold,

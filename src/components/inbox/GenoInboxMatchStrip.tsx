@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     letterSpacing: 1.4,
     textTransform: 'uppercase',
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
   },
   scroll: {
     paddingHorizontal: 10,

@@ -106,6 +106,12 @@ export const COLORS = {
   textMuted: 'rgba(11, 12, 14, 0.62)',
   textSubtle: 'rgba(11, 12, 14, 0.42)',
 
+  /**
+   * Secondary copy and section labels on paper. Metallic silver is a chrome
+   * colour, not a text colour: at 1.8:1 on cream it reads as blank space.
+   */
+  label: 'rgba(11, 12, 14, 0.68)',
+
   textOnDark: CREAM,
   textOnInk: CREAM,
   textMutedOnDark: 'rgba(250, 248, 245, 0.72)',

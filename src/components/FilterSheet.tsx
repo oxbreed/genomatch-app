@@ -439,7 +439,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     letterSpacing: 1.2,
     textTransform: 'uppercase',
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
     marginTop: 12,
     marginBottom: 8,
   },

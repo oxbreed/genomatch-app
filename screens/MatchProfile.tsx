@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     letterSpacing: 1.2,
     textTransform: 'uppercase',
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
   },
   displayName: {
     fontFamily: FONT_FAMILY.gothamBold,

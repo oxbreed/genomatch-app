@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 9,
     letterSpacing: 2,
-    color: COLORS.gold,
+    color: COLORS.goldDeep,
   },
   title: {
     fontFamily: FONT_FAMILY.gothamBold,
@@ -81,6 +81,6 @@ const styles = StyleSheet.create({
   sub: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
   },
 });

@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
     lineHeight: 21,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
     textAlign: 'center',
     marginTop: 10,
     marginBottom: 16,
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
   cancel: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 15,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
     marginTop: 14,
     textAlign: 'center',
   },

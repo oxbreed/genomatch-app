@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
   },
   doneWrap: {
     borderRadius: RADIUS.md,

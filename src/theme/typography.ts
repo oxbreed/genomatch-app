@@ -123,7 +123,7 @@ export const TYPOGRAPHY = {
     ...gothamMedium(),
     fontSize: 14,
     letterSpacing: 0.1,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
   } satisfies TextStyle,
 
   body: {
@@ -145,7 +145,7 @@ export const TYPOGRAPHY = {
     fontSize: 12,
     letterSpacing: 1.1,
     textTransform: 'uppercase',
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
   } satisfies TextStyle,
 
   caption: {
@@ -209,7 +209,7 @@ export const TYPOGRAPHY = {
     fontSize: 12,
     letterSpacing: 1.1,
     textTransform: 'uppercase',
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
   } satisfies TextStyle,
 
   serifTitle: {

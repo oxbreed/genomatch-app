@@ -550,8 +550,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     letterSpacing: 1.2,
     textTransform: 'uppercase',
-    color: COLORS.hero,
-    opacity: 0.8,
+    color: COLORS.logoRed,
   },
   infoPanel: {
     padding: 16,

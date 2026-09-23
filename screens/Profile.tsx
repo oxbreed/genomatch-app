@@ -236,11 +236,12 @@ export default function Profile({ onSignOut }: ProfileProps) {
       if (loaded.genotypeVerified) {
         try {
           setCityUpdateEligibility(await fetchCityUpdateEligibility());
-        } catch {
+        } catch (err) {
+          console.warn('[Profile] city update eligibility unavailable', err);
           setCityUpdateEligibility({ canUpdate: false });
         }
       } else {
-        setCityUpdateEligibility({ canUpdate: false });
+        setCityUpdateEligibility({ canUpdate: false, reason: 'not_verified' });
       }
 
       const userId = session?.user?.id;
@@ -502,6 +503,27 @@ export default function Profile({ onSignOut }: ProfileProps) {
   };
 
   const handleVerifiedCityUpdate = () => {
+    if (!cityUpdateEligibility.canUpdate) {
+      const { reason, nextEligibleAt } = cityUpdateEligibility;
+      const when = nextEligibleAt ? new Date(nextEligibleAt) : null;
+      const whenLabel =
+        when && !Number.isNaN(when.getTime())
+          ? when.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })
+          : null;
+
+      Alert.alert(
+        'City update locked',
+        reason === 'cooldown'
+          ? whenLabel
+            ? `Your city was confirmed by GPS in the last 12 months. You can change it again on ${whenLabel}. Contact support if you moved.`
+            : 'Your city was confirmed by GPS in the last 12 months. Contact support if you moved.'
+          : reason === 'not_verified'
+            ? 'Verify your genotype first — GPS city updates are only for verified members.'
+            : 'City updates are not available on your account right now. Contact support and we will sort it out.'
+      );
+      return;
+    }
+
     Alert.alert(
       'Update my city',
       'We will use your phone GPS to confirm your new city. You can do this once every 12 months.',
@@ -847,6 +869,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
                 <ProfileVerifiedCityCard
                   city={data.city}
                   canUpdate={cityUpdateEligibility.canUpdate}
+                  reason={cityUpdateEligibility.reason}
                   nextEligibleAt={cityUpdateEligibility.nextEligibleAt}
                   updating={updatingCity}
                   onUpdate={handleVerifiedCityUpdate}
@@ -999,6 +1022,6 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
   },
 });

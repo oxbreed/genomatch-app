@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
   hint: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
     marginBottom: 8,
   },
   label: {
@@ -162,10 +162,10 @@ const styles = StyleSheet.create({
   counter: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
   },
   counterWarn: {
-    color: COLORS.gold,
+    color: COLORS.goldDeep,
     fontFamily: FONT_FAMILY.gothamBold,
   },
   labelSpaced: { marginTop: 14, marginBottom: 8 },

@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 10,
     letterSpacing: 2.2,
-    color: COLORS.gold,
+    color: COLORS.goldDeep,
   },
   title: {
     fontFamily: FONT_FAMILY.gothamBold,

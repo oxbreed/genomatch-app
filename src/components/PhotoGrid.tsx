@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     letterSpacing: 1.1,
     textTransform: 'uppercase',
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
     marginBottom: 10,
     paddingHorizontal: H_PADDING,
   },

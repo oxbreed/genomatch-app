@@ -469,7 +469,7 @@ const styles = StyleSheet.create({
   typingMeta: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
     fontStyle: 'italic',
     marginTop: 2,
   },

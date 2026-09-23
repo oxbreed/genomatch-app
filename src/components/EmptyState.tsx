@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: INBOX.headerSubtitleSize + 1,
     lineHeight: 22,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
     textAlign: 'center',
     maxWidth: 280,
   },

@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
     lineHeight: 20,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
     marginTop: 2,
   },
   subtitleInk: {
