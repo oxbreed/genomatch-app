@@ -366,7 +366,7 @@ export default function ChatScreen({ matchId, profile, userId: userIdProp, onBac
               candidateGenotype={profile.genotype}
             />
             <Text style={styles.emptyHintText}>
-              You matched! Say hello and start your compatibility journey.
+              You matched. Say hello.
             </Text>
           </View>
         }

@@ -12,7 +12,7 @@ export const LEGAL_UPDATED = 'September 2026';
 export const PRIVACY_POLICY_SECTIONS: LegalSection[] = [
   {
     title: 'Introduction',
-    body: `${GENOMATCH_OPERATOR_INTRO}, collects and processes your personal data to provide genotype-aware matchmaking services. This policy explains what we collect, how we use it, and your rights.`,
+    body: `${GENOMATCH_OPERATOR_INTRO}, collects and processes your personal data to run the GenoMatch dating service. This policy explains what we collect, how we use it, and your rights.`,
   },
   {
     title: 'Data We Collect',
@@ -22,12 +22,12 @@ export const PRIVACY_POLICY_SECTIONS: LegalSection[] = [
   {
     title: 'How We Use Your Data',
     body:
-      'Your data powers our matching algorithm, displays your profile to compatible members, and enables communication between mutual matches. We use your information only to deliver and improve the GenoMatch experience.',
+      'We use your data to show your profile to other adults, to let mutual matches message each other, and to keep the service working. We do not use genotype to calculate a health result.',
   },
   {
     title: 'Genotype Data',
     body:
-      'Genotype information is self-reported, treated as sensitive health-related data, and used solely for compatibility guidance within GenoMatch — not as medical advice or a laboratory test. It is never sold to third parties.',
+      'Genotype is something you type in. We treat it as sensitive information, show it on your profile, and never sell it. GenoMatch does not diagnose, predict disease, or give medical advice.',
   },
   {
     title: 'Data Sharing',
@@ -66,7 +66,7 @@ export const TERMS_OF_SERVICE_SECTIONS: LegalSection[] = [
   {
     title: 'Not medical advice',
     body:
-      'GenoMatch shows educational compatibility information based on self-reported sickle cell genotypes. It is not a laboratory, clinic, or medical device, and it does not diagnose, treat, or replace advice from a qualified clinician or genetic counsellor.',
+      'GenoMatch is a dating app. A genotype on a profile is self-reported. The app does not diagnose, predict disease risk, or replace a clinician.',
   },
   {
     title: 'Your account',
@@ -132,7 +132,7 @@ export const COMMUNITY_GUIDELINES_SECTIONS: LegalSection[] = [
   {
     title: 'Genotype Integrity',
     body:
-      'Do not misrepresent your genotype. This information affects real families and health decisions. Self-declared verification is a trust signal, not a medical test.',
+      'Do not misrepresent your genotype. Other members may read what you enter. A verified badge means you completed the in-app check, not a medical test.',
   },
   {
     title: 'Reporting',

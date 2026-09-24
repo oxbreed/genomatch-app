@@ -1,9 +1,7 @@
-import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { FONT_FAMILY, COLORS } from '../../theme';
 import type { Genotype } from '../../types/database';
-
-const GENOTYPE_EDUCATION_URL = 'https://www.cdc.gov/sickle-cell/about/';
 
 type Props = {
   viewerGenotype: Genotype | null;
@@ -12,11 +10,7 @@ type Props = {
 };
 
 /**
- * Plain, informational genotype pairing display.
- *
- * Deliberately NOT promotional: no percentage, no score, no tier language, no
- * gradient/card container. It never shares a container with MatchProfileCard.
- * It shows the raw pairing plus a static link to genotype education.
+ * Shows the two self-reported genotype letters. No health interpretation.
  */
 export default function GenotypeInfoRow({
   viewerGenotype,
@@ -25,32 +19,25 @@ export default function GenotypeInfoRow({
 }: Props) {
   const pairing = `${viewerGenotype ?? '—'} × ${candidateGenotype}`;
 
-  const handleLearnMore = () => {
-    if (onLearnMore) {
-      onLearnMore();
-      return;
-    }
-    void Linking.openURL(GENOTYPE_EDUCATION_URL).catch(() => {
-      /* no-op: education link is best-effort */
-    });
-  };
-
   return (
     <View style={styles.row}>
       <View style={styles.textCol}>
         <Text style={styles.label}>Genotype</Text>
         <Text style={styles.pairing}>{pairing}</Text>
+        <Text style={styles.note}>Self-reported. Not a health result.</Text>
       </View>
-      <Pressable
-        onPress={handleLearnMore}
-        hitSlop={8}
-        accessibilityRole="link"
-        accessibilityLabel="Learn about genotypes"
-        style={styles.linkWrap}
-      >
-        <Ionicons name="information-circle-outline" size={15} color={COLORS.textMuted} />
-        <Text style={styles.link}>Learn about genotypes</Text>
-      </Pressable>
+      {onLearnMore ? (
+        <Pressable
+          onPress={onLearnMore}
+          hitSlop={8}
+          accessibilityRole="button"
+          accessibilityLabel="More about this genotype"
+          style={styles.linkWrap}
+        >
+          <Ionicons name="information-circle-outline" size={15} color={COLORS.textMuted} />
+          <Text style={styles.link}>Details</Text>
+        </Pressable>
+      ) : null}
     </View>
   );
 }
@@ -81,6 +68,13 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: COLORS.text,
     marginTop: 1,
+  },
+  note: {
+    fontFamily: FONT_FAMILY.gothamMedium,
+    fontSize: 12,
+    lineHeight: 16,
+    color: COLORS.text,
+    marginTop: 4,
   },
   linkWrap: {
     flexDirection: 'row',

@@ -28,7 +28,7 @@ const SECTIONS = [
   {
     title: 'Profiles and genotype',
     body:
-      'Genotype on GenoMatch is self-reported for compatibility guidance only. It is not a clinical test, medical advice, or a government-verified identity document. Profile badges marked verified mean the member completed in-app attestations and/or a photo review — not a passport or ID check.',
+      'A genotype on a profile is something that member typed in. It is not a clinical test, a health result, or a government ID. A verified badge means they completed the in-app check, not a lab test or passport check.',
   },
   {
     title: 'Content licence',

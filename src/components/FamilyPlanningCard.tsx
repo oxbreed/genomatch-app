@@ -16,33 +16,12 @@ const TIER_STYLE: Record<
   FamilyPlanningTier,
   { accent: string; bg: string; border: string; darkBg: string; darkBorder: string }
 > = {
-  favourable: {
-    accent: COLORS.verified,
-    bg: 'rgba(198, 34, 34, 0.1)',
-    border: 'rgba(198, 34, 34, 0.28)',
-    darkBg: 'rgba(198, 34, 34, 0.22)',
-    darkBorder: 'rgba(198, 34, 34, 0.4)',
-  },
-  low_risk: {
-    accent: COLORS.hero,
-    bg: 'rgba(240, 241, 243, 0.95)',
-    border: 'rgba(184, 188, 196, 0.45)',
+  awareness: {
+    accent: COLORS.ink,
+    bg: COLORS.white,
+    border: 'rgba(11, 12, 14, 0.12)',
     darkBg: 'rgba(255, 255, 255, 0.1)',
     darkBorder: 'rgba(255, 255, 255, 0.2)',
-  },
-  awareness: {
-    accent: COLORS.gold,
-    bg: 'rgba(201, 154, 75, 0.12)',
-    border: 'rgba(201, 154, 75, 0.35)',
-    darkBg: 'rgba(201, 154, 75, 0.18)',
-    darkBorder: 'rgba(201, 154, 75, 0.45)',
-  },
-  counseling: {
-    accent: '#B86B2E',
-    bg: 'rgba(184, 107, 46, 0.1)',
-    border: 'rgba(184, 107, 46, 0.3)',
-    darkBg: 'rgba(184, 107, 46, 0.2)',
-    darkBorder: 'rgba(184, 107, 46, 0.4)',
   },
 };
 
@@ -66,7 +45,7 @@ export default function FamilyPlanningCard({
         <View style={[styles.compact, { backgroundColor: lockedBg, borderColor: lockedBorder }]}>
           <Ionicons name="lock-closed-outline" size={14} color={dark ? COLORS.gold : COLORS.hero} />
           <Text style={[styles.compactTitle, { color: textPrimary }]} numberOfLines={1}>
-            Unlocks after you match
+            Visible after you match
           </Text>
         </View>
       );
@@ -85,11 +64,11 @@ export default function FamilyPlanningCard({
           </View>
           <View style={styles.headerCopy}>
             <Text style={[styles.kicker, { color: kickerColor }]}>
-              FAMILY PLANNING
+              GENOTYPE
             </Text>
-            <Text style={[styles.title, { color: textPrimary }]}>Unlocks after you match</Text>
+            <Text style={[styles.title, { color: textPrimary }]}>Visible after you match</Text>
             <Text style={[styles.pair, { color: textSecondary }]}>
-              Pairing-specific guidance stays private until you both like each other.
+              After you both like each other, you can see the genotypes you each entered. GenoMatch does not interpret them.
             </Text>
           </View>
         </View>
@@ -135,7 +114,7 @@ export default function FamilyPlanningCard({
         </View>
         <View style={styles.headerCopy}>
           <Text style={[styles.kicker, { color: kickerColor }]}>
-            FAMILY PLANNING
+            GENOTYPE
           </Text>
           <Text style={[styles.title, { color: textPrimary }]}>{insight.title}</Text>
           <Text style={[styles.pair, { color: textSecondary }]}>{insight.pairLabel}</Text>
@@ -146,7 +125,7 @@ export default function FamilyPlanningCard({
       <Text style={[styles.detail, { color: textSecondary }]}>{insight.detail}</Text>
 
       <Text style={[styles.disclaimer, { color: dark ? 'rgba(250, 248, 245,0.55)' : COLORS.textSubtle }]}>
-        Educational guidance only — consult a healthcare provider for personal advice.
+        Self-reported profile detail. Not a lab test or medical advice.
       </Text>
     </View>
   );

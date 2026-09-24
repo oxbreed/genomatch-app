@@ -29,7 +29,7 @@ const SECTIONS = [
   {
     title: 'Genotype Integrity',
     body:
-      'Do not misrepresent your genotype. This information affects real families and health decisions. Self-declared verification is a trust signal, not a medical test.',
+      'Do not misrepresent your genotype. Other members may read what you enter. A verified badge means you completed the in-app check, not a medical test.',
   },
   {
     title: 'Reporting',

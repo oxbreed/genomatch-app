@@ -129,7 +129,7 @@ export default function MatchProfile({ match, onBack, onSendMessage }: MatchProf
                 percent={profile.lifestyleMatch}
                 theirTraits={profile.interests}
                 onViewReport={onSendMessage}
-                ctaLabel="View Full Report"
+                ctaLabel="Send a message"
               />
             </View>
 

@@ -30,26 +30,12 @@ describe('SC genotype pairings', () => {
     expect(genotypePairKey('AC', 'SS')).toBe('ACSS');
   });
 
-  it.each(SC_PAIRS)('returns non-fallback family-planning copy for %s × %s', (a, b) => {
+  it.each(SC_PAIRS)('returns the same non-clinical note for %s × %s', (a, b) => {
     const insight = getFamilyPlanningInsight(a, b);
     expect(insight.pairLabel).toBe(`${a} × ${b}`);
-    expect(insight.title).not.toBe('Discuss with a counselor');
-    expect(insight.summary.length).toBeGreaterThan(15);
-  });
-
-  it('treats AA × SC as low risk (AA cannot pass an affected gene)', () => {
-    expect(getFamilyPlanningInsight('AA', 'SC').tier).toBe('low_risk');
-  });
-
-  it('flags SC pairings that can produce disease as counseling', () => {
-    for (const other of ['AS', 'AC', 'SS', 'SC'] as Genotype[]) {
-      expect(getFamilyPlanningInsight('SC', other).tier).toBe('counseling');
-    }
-  });
-
-  it.each(SC_PAIRS)('resolves a short risk label for %s × %s', (a, b) => {
-    expect(getGenotypeRiskShort(a, b)).not.toBeNull();
-    expect(getGenotypeRiskShort(a, b)).not.toBe('Compatible');
+    expect(insight.title).toBe('Self-reported only');
+    expect(insight.summary).toMatch(/does not assess health/i);
+    expect(getGenotypeRiskShort(a, b)).toBeNull();
   });
 
   it('covers every unordered pair of the five genotypes and never emits ACCC', () => {

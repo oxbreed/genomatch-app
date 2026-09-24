@@ -31,7 +31,6 @@ import {
   RELIGION_LABELS,
   formatHeightCm,
 } from '../../lib/profileDetails';
-import { getGenotypeRiskShort } from '../../lib/compatibility';
 import { GENO_TAB_BAR_HEIGHT } from '../navigation/tabBarLayout';
 import { COLORS, getInitials, RELATIONSHIP_GOAL_LABELS } from '../../data/mockData';
 import { FONT_FAMILY, MOTION, RADIUS, SHADOWS } from '../../theme';
@@ -129,11 +128,6 @@ export default function DiscoverProfileSheet({
     if (profile.avatarUrl) return [profile.avatarUrl];
     return [];
   }, [profile]);
-
-  const riskShort =
-    profile && !hideGenotype
-      ? getGenotypeRiskShort(viewerGenotype ?? null, profile.genotype)
-      : null;
 
   useEffect(() => {
     setPhotoIndex(0);
@@ -321,7 +315,6 @@ export default function DiscoverProfileSheet({
                   </Text>
                 </View>
                 <GenoCompatRing percent={profile.lifestyleMatch} size={96} />
-                {riskShort ? <Text style={styles.riskLabel}>{riskShort}</Text> : null}
               </View>
 
               {!hideGenotype ? (
@@ -557,13 +550,6 @@ const styles = StyleSheet.create({
     letterSpacing: 1.4,
     textTransform: 'uppercase',
     color: COLORS.glossyRed,
-  },
-  riskLabel: {
-    fontFamily: FONT_FAMILY.gothamBold,
-    fontSize: 18,
-    letterSpacing: -0.2,
-    color: COLORS.ink,
-    textAlign: 'center',
   },
   genotypeInfoWrap: {
     width: '100%',

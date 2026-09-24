@@ -14,10 +14,10 @@ export type GenoOnboardingSlide = {
 export const GENO_ONBOARDING_SLIDES: GenoOnboardingSlide[] = [
   {
     icon: 'git-network-outline',
-    kicker: 'Science-led matching',
-    title: 'Compatibility you can trust',
-    body: 'Genotype-aware pairing helps you meet with clarity — before chemistry takes over.',
-    highlights: ['Risk insights you can understand', 'Built for Nigeria & West Africa'],
+    kicker: 'Dating, 18+',
+    title: 'Meet people on purpose',
+    body: 'Add a self-reported genotype to your profile if you want to. GenoMatch does not turn those letters into a health result.',
+    highlights: ['You type it in yourself', 'Built for Nigeria & West Africa'],
   },
   {
     icon: 'heart-half-outline',
