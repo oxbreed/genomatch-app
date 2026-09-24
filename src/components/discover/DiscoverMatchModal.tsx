@@ -9,12 +9,12 @@ import {
   View,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { GenoBondMark } from '../../brand';
 import {
   GenoGlassBackdrop,
   GenoGlassSurface,
-  GenoMirrorBrandCtaFill,
   GenoMirrorMetallicIcon,
   GenoMirrorRimFrame,
   GenoMirrorSteelFill,
@@ -253,37 +253,58 @@ export default function DiscoverMatchModal({
                 </>
               ) : null}
 
-              <Pressable
-                style={({ pressed }) => [pressed && styles.ctaPressed]}
-                onPress={() => {
-                  void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  onContinue();
-                }}
-              >
-                <GenoMirrorRimFrame kind="red" borderRadius={RADIUS.pill} style={styles.ctaRim}>
-                  <GenoMirrorBrandCtaFill horizontal style={styles.cta}>
-                    <Text style={styles.ctaText}>Continue</Text>
-                    <GenoMirrorMetallicIcon name="arrow-forward" size={18} tone="chrome" />
-                  </GenoMirrorBrandCtaFill>
-                </GenoMirrorRimFrame>
-              </Pressable>
-
-              {onSendMessage ? (
+              <View style={styles.actions}>
                 <Pressable
-                  style={({ pressed }) => [pressed && styles.ctaPressed]}
+                  accessibilityRole="button"
+                  accessibilityLabel="Continue"
+                  style={({ pressed }) => [styles.actionHit, pressed && styles.actionPressed]}
                   onPress={() => {
-                    void Haptics.selectionAsync();
-                    onSendMessage();
+                    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    onContinue();
                   }}
                 >
-                  <GenoMirrorRimFrame kind="steel" borderRadius={RADIUS.pill} style={styles.secondaryRim}>
-                    <GenoMirrorSteelFill style={styles.secondaryBtn}>
-                      <GenoMirrorMetallicIcon name="chatbubble-outline" size={16} tone="gold" />
-                      <Text style={styles.secondaryText}>Send a message</Text>
-                    </GenoMirrorSteelFill>
-                  </GenoMirrorRimFrame>
+                  <LinearGradient
+                    colors={[COLORS.goldBright, COLORS.gold, COLORS.goldDeep]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.primaryRim}
+                  >
+                    <LinearGradient
+                      colors={[COLORS.glossyRedDeep, COLORS.glossyRed, COLORS.glossyRed]}
+                      start={{ x: 0, y: 0.5 }}
+                      end={{ x: 1, y: 0.5 }}
+                      style={styles.primaryBtn}
+                    >
+                      <Text style={styles.primaryLabel}>Continue</Text>
+                      <Ionicons name="arrow-forward" size={18} color={COLORS.goldBright} />
+                    </LinearGradient>
+                  </LinearGradient>
                 </Pressable>
-              ) : null}
+
+                {onSendMessage ? (
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Send a message"
+                    style={({ pressed }) => [styles.actionHit, pressed && styles.actionPressed]}
+                    onPress={() => {
+                      void Haptics.selectionAsync();
+                      onSendMessage();
+                    }}
+                  >
+                    <LinearGradient
+                      colors={[COLORS.goldBright, COLORS.goldDeep, COLORS.gold]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={styles.secondaryRim}
+                    >
+                      <View style={styles.secondaryBtn}>
+                        <Ionicons name="chatbubble-ellipses" size={18} color={COLORS.gold} />
+                        <Text style={styles.secondaryLabel}>Send a message</Text>
+                      </View>
+                    </LinearGradient>
+                  </Pressable>
+                ) : null}
+              </View>
             </GenoGlassSurface>
           </GenoMirrorRimFrame>
         </Animated.View>
@@ -451,47 +472,65 @@ const styles = StyleSheet.create({
   compatDisclaimer: {
     ...TYPOGRAPHY.caption,
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 22,
     paddingHorizontal: 16,
     color: COLORS.textSubtleOnDark,
   },
-  ctaRim: {
+  actions: {
     width: '100%',
     alignSelf: 'stretch',
+    gap: 12,
   },
-  ctaPressed: {
-    opacity: 0.92,
-    transform: [{ scale: 0.98 }],
-  },
-  cta: {
-    paddingVertical: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    borderRadius: RADIUS.pill - 1.5,
-  },
-  ctaText: {
-    fontFamily: FONT_FAMILY.gothamBold,
-    fontSize: 16,
-    color: COLORS.white,
-    letterSpacing: 0.1,
-  },
-  secondaryRim: {
-    marginTop: 12,
-    alignSelf: 'stretch',
+  actionHit: {
     width: '100%',
+    borderRadius: RADIUS.pill,
   },
-  secondaryBtn: {
+  actionPressed: {
+    opacity: 0.9,
+    transform: [{ scale: 0.985 }],
+  },
+  primaryRim: {
+    borderRadius: RADIUS.pill,
+    padding: 1.5,
+    shadowColor: COLORS.glossyRed,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.38,
+    shadowRadius: 14,
+    elevation: 8,
+  },
+  primaryBtn: {
+    minHeight: 52,
+    borderRadius: RADIUS.pill,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    paddingVertical: 12,
-    borderRadius: RADIUS.pill - 1.5,
+    gap: 10,
+    paddingHorizontal: 22,
   },
-  secondaryText: {
+  primaryLabel: {
     fontFamily: FONT_FAMILY.gothamBold,
-    fontSize: 14,
-    color: COLORS.textOnDark,
+    fontSize: 17,
+    letterSpacing: 0.2,
+    color: COLORS.cream,
+  },
+  secondaryRim: {
+    borderRadius: RADIUS.pill,
+    padding: 1.5,
+  },
+  secondaryBtn: {
+    minHeight: 48,
+    borderRadius: RADIUS.pill,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    paddingHorizontal: 22,
+    backgroundColor: '#121418',
+  },
+  secondaryLabel: {
+    fontFamily: FONT_FAMILY.gothamBold,
+    fontSize: 15,
+    letterSpacing: 0.15,
+    color: COLORS.cream,
   },
 });

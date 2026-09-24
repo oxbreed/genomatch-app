@@ -392,37 +392,60 @@ export default function DiscoverMatchCelebration({
                   </View>
                 ) : null}
 
-                <Pressable
-                  style={({ pressed }) => [styles.cta, pressed && styles.ctaPressed]}
-                  onPress={() => {
-                    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    onContinue();
-                  }}
-                >
-                  <LinearGradient
-                    colors={[COLORS.gold, '#F3DC95', '#96651F']}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                    style={styles.ctaGradient}
+                <View style={styles.actions}>
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Continue"
+                    style={({ pressed }) => [styles.actionHit, pressed && styles.ctaPressed]}
+                    onPress={() => {
+                      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      onContinue();
+                    }}
                   >
-                    <Text style={styles.ctaText}>Continue</Text>
-                    <Ionicons name="arrow-forward" size={20} color={COLORS.ink} />
-                  </LinearGradient>
-                </Pressable>
+                    <LinearGradient
+                      colors={[COLORS.goldBright, COLORS.gold, COLORS.goldDeep]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={styles.primaryRim}
+                    >
+                      <LinearGradient
+                        colors={[COLORS.glossyRedDeep, COLORS.glossyRed, COLORS.glossyRed]}
+                        start={{ x: 0, y: 0.5 }}
+                        end={{ x: 1, y: 0.5 }}
+                        style={styles.primaryBtn}
+                      >
+                        <Text style={styles.ctaText}>Continue</Text>
+                        <Ionicons name="arrow-forward" size={18} color={COLORS.goldBright} />
+                      </LinearGradient>
+                    </LinearGradient>
+                  </Pressable>
 
-                <Pressable
-                  style={({ pressed }) => [styles.skipBtn, pressed && styles.skipBtnPressed]}
-                  onPress={() => {
-                    if (onSendMessage) {
-                      onSendMessage();
-                      return;
-                    }
-                    onContinue();
-                  }}
-                >
-                  <Ionicons name="chatbubble-outline" size={16} color={COLORS.gold} />
-                  <Text style={styles.skipText}>Send a message</Text>
-                </Pressable>
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Send a message"
+                    style={({ pressed }) => [styles.actionHit, pressed && styles.ctaPressed]}
+                    onPress={() => {
+                      if (onSendMessage) {
+                        void Haptics.selectionAsync();
+                        onSendMessage();
+                        return;
+                      }
+                      onContinue();
+                    }}
+                  >
+                    <LinearGradient
+                      colors={[COLORS.goldBright, COLORS.goldDeep, COLORS.gold]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={styles.secondaryRim}
+                    >
+                      <View style={styles.messageBtn}>
+                        <Ionicons name="chatbubble-ellipses" size={18} color={COLORS.gold} />
+                        <Text style={styles.messageLabel}>Send a message</Text>
+                      </View>
+                    </LinearGradient>
+                  </Pressable>
+                </View>
               </LinearGradient>
             </View>
           </LinearGradient>
@@ -687,40 +710,61 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: 'rgba(250, 248, 245, 0.6)',
   },
-  cta: {
+  actions: {
     width: '100%',
-    borderRadius: 18,
-    overflow: 'hidden',
-    marginBottom: 12,
+    alignSelf: 'stretch',
+    gap: 12,
+  },
+  actionHit: {
+    width: '100%',
+    borderRadius: 999,
   },
   ctaPressed: {
-    opacity: 0.92,
-    transform: [{ scale: 0.98 }],
+    opacity: 0.9,
+    transform: [{ scale: 0.985 }],
   },
-  ctaGradient: {
+  primaryRim: {
+    borderRadius: 999,
+    padding: 1.5,
+    shadowColor: COLORS.glossyRed,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.38,
+    shadowRadius: 14,
+    elevation: 8,
+  },
+  primaryBtn: {
+    minHeight: 52,
+    borderRadius: 999,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 10,
-    paddingVertical: 17,
+    paddingHorizontal: 22,
   },
   ctaText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 17,
-    color: COLORS.ink,
+    letterSpacing: 0.2,
+    color: COLORS.cream,
   },
-  skipBtn: {
+  secondaryRim: {
+    borderRadius: 999,
+    padding: 1.5,
+  },
+  messageBtn: {
+    minHeight: 48,
+    borderRadius: 999,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    paddingVertical: 8,
+    justifyContent: 'center',
+    gap: 10,
+    paddingHorizontal: 22,
+    backgroundColor: '#121418',
   },
-  skipBtnPressed: {
-    opacity: 0.75,
-  },
-  skipText: {
-    fontFamily: FONT_FAMILY.gothamMedium,
-    fontSize: 14,
-    color: 'rgba(250, 248, 245, 0.55)',
+  messageLabel: {
+    fontFamily: FONT_FAMILY.gothamBold,
+    fontSize: 15,
+    letterSpacing: 0.15,
+    color: COLORS.cream,
   },
 });
