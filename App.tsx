@@ -3,8 +3,7 @@ import { ActivityIndicator, Linking, View, StyleSheet } from 'react-native';
 import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
 import { COLORS, FONTS_TO_LOAD } from './src/theme';
-import { GenoOnboardingFlow } from './src/components/onboarding';
-import SplashVideoScreen from './screens/SplashVideoScreen';
+import { GenoOnboardingFlow, GenoSplashScreen } from './src/components/onboarding';
 import GenoErrorBoundary from './src/components/shell/GenoErrorBoundary';
 import { resolveInitialScreen } from './src/lib/profiles';
 import { getAuthenticatedUserId, logAuthState } from './src/lib/auth';
@@ -21,6 +20,7 @@ const Register = lazy(() => import('./screens/Register'));
 const SignIn = lazy(() => import('./screens/SignIn'));
 const ResetPassword = lazy(() => import('./screens/ResetPassword'));
 const ProfileSetup = lazy(() => import('./screens/ProfileSetup'));
+const InterestedInGate = lazy(() => import('./screens/InterestedInGate'));
 const MainTabs = lazy(() => import('./screens/MainTabs'));
 
 function ScreenFallback() {
@@ -35,7 +35,7 @@ function AppInner() {
   const [fontsLoaded, fontError] = useFonts(FONTS_TO_LOAD);
   const [bootstrapping, setBootstrapping] = useState(true);
   const [screen, setScreen] = useState<
-    'onboarding' | 'register' | 'signIn' | 'resetPassword' | 'profileSetup' | 'main'
+    'onboarding' | 'register' | 'signIn' | 'resetPassword' | 'profileSetup' | 'interestedInGate' | 'main'
   >('onboarding');
   const [splashDone, setSplashDone] = useState(false);
   const [resetPasswordEmail, setResetPasswordEmail] = useState<string | null>(null);
@@ -136,7 +136,7 @@ function AppInner() {
       console.log('[App] auth state change', { event, hasSession: !!session });
       if (!session) {
         const current = screenRef.current;
-        if (current === 'main' || current === 'profileSetup') {
+        if (current === 'main' || current === 'profileSetup' || current === 'interestedInGate') {
           setScreen('onboarding');
         }
       } else if (event === 'TOKEN_REFRESHED') {
@@ -160,9 +160,9 @@ function AppInner() {
     return (
       <View style={styles.boot}>
         <StatusBar style="light" />
-        <SplashVideoScreen
+        <GenoSplashScreen
+          hold={!appReady}
           bootstrapping={!appReady}
-          readyToExit={appReady}
           onFinish={() => setSplashDone(true)}
         />
       </View>
@@ -222,7 +222,15 @@ function AppInner() {
   if (screen === 'profileSetup') {
     return (
       <Suspense fallback={<ScreenFallback />}>
-        <ProfileSetup onComplete={() => setScreen('main')} />
+        <ProfileSetup onComplete={() => setScreen('interestedInGate')} />
+      </Suspense>
+    );
+  }
+
+  if (screen === 'interestedInGate') {
+    return (
+      <Suspense fallback={<ScreenFallback />}>
+        <InterestedInGate onComplete={() => setScreen('main')} />
       </Suspense>
     );
   }
@@ -258,6 +266,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.linen,
+    backgroundColor: COLORS.background,
   },
 });

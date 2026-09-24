@@ -7,6 +7,7 @@ import { FONT_FAMILY, COLORS, RADIUS } from '../../theme';
 type Props = {
   city: string;
   canUpdate: boolean;
+  reason?: 'not_signed_in' | 'not_found' | 'not_verified' | 'cooldown';
   nextEligibleAt?: string | null;
   updating?: boolean;
   onUpdate: () => void;
@@ -22,11 +23,23 @@ function formatNextEligible(iso: string | null | undefined): string | null {
 export default function ProfileVerifiedCityCard({
   city,
   canUpdate,
+  reason,
   nextEligibleAt,
   updating = false,
   onUpdate,
 }: Props) {
   const nextDate = formatNextEligible(nextEligibleAt);
+
+  // The button stays on screen when an update is not allowed, because a card
+  // that silently drops its only control reads as broken. Tapping explains why.
+  const blockedHint =
+    reason === 'cooldown'
+      ? nextDate
+        ? `You changed your city in the last 12 months. Next update available ${nextDate}.`
+        : 'You changed your city in the last 12 months.'
+      : reason === 'not_verified'
+        ? 'GPS city updates open up once your genotype is verified.'
+        : 'City updates use GPS and are limited to once every 12 months.';
 
   return (
     <GenoGlassSurface
@@ -45,28 +58,28 @@ export default function ProfileVerifiedCityCard({
         Your city is locked to protect matches from misleading location changes. You are shown as{' '}
         <Text style={styles.bold}>{city || 'your city'}</Text>.
       </Text>
-      {canUpdate ? (
-        <Pressable
-          style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
-          onPress={onUpdate}
-          disabled={updating}
-        >
-          {updating ? (
-            <ActivityIndicator color={COLORS.ink} />
-          ) : (
-            <>
-              <Ionicons name="locate" size={16} color={COLORS.ink} />
-              <Text style={styles.buttonText}>Update my city (GPS)</Text>
-            </>
-          )}
-        </Pressable>
-      ) : (
-        <Text style={styles.hint}>
-          {nextDate
-            ? `You can update your city again on ${nextDate}.`
-            : 'City updates use GPS and are limited to once every 12 months.'}
-        </Text>
-      )}
+      <Pressable
+        style={({ pressed }) => [
+          styles.button,
+          !canUpdate && styles.buttonLocked,
+          pressed && styles.buttonPressed,
+        ]}
+        onPress={onUpdate}
+        disabled={updating}
+        accessibilityRole="button"
+        accessibilityLabel="Update my city using GPS"
+        accessibilityState={{ disabled: !canUpdate, busy: updating }}
+      >
+        {updating ? (
+          <ActivityIndicator color={COLORS.ink} />
+        ) : (
+          <>
+            <Ionicons name={canUpdate ? 'locate' : 'lock-closed'} size={16} color={COLORS.ink} />
+            <Text style={styles.buttonText}>Update my city (GPS)</Text>
+          </>
+        )}
+      </Pressable>
+      {!canUpdate ? <Text style={styles.hint}>{blockedHint}</Text> : null}
       <Text style={styles.support}>
         Moved recently and location is off? Contact {GENOMATCH_COMPANY.contactEmail} for help.
       </Text>
@@ -98,7 +111,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 13,
     lineHeight: 19,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
   },
   bold: {
     fontFamily: FONT_FAMILY.gothamBold,
@@ -111,9 +124,12 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 12,
     borderRadius: RADIUS.md,
-    backgroundColor: COLORS.mint,
+    backgroundColor: COLORS.gold,
     borderWidth: 1,
-    borderColor: 'rgba(184, 188, 196, 0.35)',
+    borderColor: 'rgba(150, 101, 31, 0.45)',
+  },
+  buttonLocked: {
+    backgroundColor: 'rgba(201, 154, 75, 0.28)',
   },
   buttonPressed: { opacity: 0.9 },
   buttonText: {

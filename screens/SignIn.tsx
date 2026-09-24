@@ -30,7 +30,7 @@ import TermsOfService from './TermsOfService';
 type SignInProps = {
   onBack: () => void;
   onCreateAccount: () => void;
-  onSignedIn: (destination: 'main' | 'profileSetup') => void;
+  onSignedIn: (destination: 'main' | 'profileSetup' | 'interestedInGate') => void;
   onNavigateResetPassword: (email: string) => void;
 };
 
@@ -168,8 +168,8 @@ export default function SignIn({
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <GenoPremiumChrome variant="linen" />
-      <StatusBar style="dark" />
+      <GenoPremiumChrome variant="ink" />
+      <StatusBar style="light" />
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
@@ -200,7 +200,7 @@ export default function SignIn({
           </View>
 
           <View style={styles.logoWrap}>
-            <GenoLogoCeremony variant="auth" tone="dark" />
+            <GenoLogoCeremony variant="auth" tone="light" />
           </View>
 
           <Text style={styles.title}>Sign In to GenoMatch</Text>
@@ -221,7 +221,7 @@ export default function SignIn({
                 value={email}
                 onChangeText={setEmail}
                 placeholder="you@example.com"
-                placeholderTextColor="rgba(200, 16, 46, 0.35)"
+                placeholderTextColor="rgba(198, 34, 34, 0.35)"
                 keyboardType="email-address"
                 autoCapitalize="none"
                 autoComplete="email"
@@ -241,7 +241,7 @@ export default function SignIn({
                 value={password}
                 onChangeText={setPassword}
                 placeholder="Your password"
-                placeholderTextColor="rgba(200, 16, 46, 0.35)"
+                placeholderTextColor="rgba(198, 34, 34, 0.35)"
                 secureTextEntry={!showPass}
                 autoComplete="password"
                 textContentType="password"
@@ -277,7 +277,7 @@ export default function SignIn({
                   disabled={loading}
                 >
                   <LinearGradient
-                    colors={[COLORS.gold, '#E5C766', '#B8962E']}
+                    colors={[COLORS.gold, '#F3DC95', '#96651F']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     style={styles.submitGradient}
@@ -325,7 +325,7 @@ export default function SignIn({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.linen,
+    backgroundColor: COLORS.background,
   },
   scroll: {
     paddingHorizontal: 20,
@@ -371,9 +371,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: RADIUS.pill,
-    backgroundColor: 'rgba(212, 175, 55, 0.14)',
+    backgroundColor: 'rgba(201, 154, 75, 0.14)',
     borderWidth: 1,
-    borderColor: 'rgba(212, 175, 55, 0.35)',
+    borderColor: 'rgba(201, 154, 75, 0.35)',
     marginBottom: 14,
   },
   brandChipText: {
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.ink,
+    color: COLORS.textOnDark,
     fontSize: 32,
     lineHeight: 38,
     letterSpacing: -0.8,
@@ -397,7 +397,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontFamily: FONT_FAMILY.gothamMedium,
-    color: 'rgba(13, 40, 24, 0.62)',
+    color: COLORS.textMutedOnDark,
     fontSize: 15,
     lineHeight: 24,
     maxWidth: '96%',
@@ -417,7 +417,7 @@ const styles = StyleSheet.create({
     height: 54,
     borderRadius: RADIUS.md,
     borderWidth: 1.5,
-    borderColor: 'rgba(200, 16, 46, 0.16)',
+    borderColor: 'rgba(198, 34, 34, 0.16)',
     backgroundColor: GLASS.insetFill,
     paddingHorizontal: 14,
     color: COLORS.ink,
@@ -425,7 +425,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   inputFocused: {
-    borderColor: 'rgba(212, 175, 55, 0.65)',
+    borderColor: 'rgba(201, 154, 75, 0.65)',
     ...SHADOWS.card,
     shadowOpacity: 0.05,
     shadowRadius: 6,
@@ -457,9 +457,9 @@ const styles = StyleSheet.create({
   trustBox: {
     marginTop: 16,
     borderRadius: RADIUS.md,
-    backgroundColor: 'rgba(200, 16, 46, 0.08)',
+    backgroundColor: 'rgba(198, 34, 34, 0.08)',
     borderWidth: 1,
-    borderColor: 'rgba(200, 16, 46, 0.14)',
+    borderColor: 'rgba(198, 34, 34, 0.14)',
     paddingVertical: 12,
     paddingHorizontal: 12,
     flexDirection: 'row',
@@ -470,7 +470,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: 'rgba(200, 16, 46, 0.12)',
+    backgroundColor: 'rgba(198, 34, 34, 0.12)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -521,7 +521,7 @@ const styles = StyleSheet.create({
   },
   createText: {
     fontFamily: FONT_FAMILY.gothamMedium,
-    color: 'rgba(200, 16, 46, 0.65)',
+    color: 'rgba(198, 34, 34, 0.65)',
     fontSize: 14,
   },
   createBold: {
@@ -531,7 +531,7 @@ const styles = StyleSheet.create({
   legalText: {
     textAlign: 'center',
     fontFamily: FONT_FAMILY.gothamMedium,
-    color: 'rgba(200, 16, 46, 0.55)',
+    color: 'rgba(198, 34, 34, 0.55)',
     fontSize: 12,
     lineHeight: 18,
     paddingBottom: 4,

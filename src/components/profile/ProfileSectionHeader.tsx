@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
   },
   kicker: {
     ...PROFILE_TYPE.sectionKicker,
-    color: COLORS.gold,
+    color: COLORS.goldDeep,
   },
   title: {
     ...PROFILE_TYPE.sectionTitle,
@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
   },
   hint: {
     ...PROFILE_TYPE.sectionHint,
-    color: COLORS.textSubtle,
+    color: COLORS.textMuted,
     marginTop: 2,
   },
   rule: {

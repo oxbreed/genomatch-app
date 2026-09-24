@@ -25,7 +25,7 @@ import FilterSheet, {
 } from '../src/components/FilterSheet';
 import {
   DiscoverActionDock,
-  DiscoverMatchCelebration,
+  DiscoverMatchModal,
   DiscoverProfileSheet,
   DiscoverSwipeCard,
   DiscoverSwipeStamp,
@@ -48,12 +48,17 @@ import ReportBlockSheet from '../src/components/ReportBlockSheet';
 import { COLORS, RADIUS, SHADOWS, TYPOGRAPHY, getMockDiscoveryProfiles } from '../src/data/mockData';
 import {
   fetchDiscoveryProfiles,
+  getCurrentProfile,
+  getViewerProfileSnapshot,
+  saveInterestedIn,
   type DiscoveryDeckStats,
+  type ViewerProfileSnapshot,
 } from '../src/lib/profiles';
+import { parseDiscoveryInterests } from '../src/lib/discoveryInterest';
 import { clearMyPasses, recordLike, recordPass } from '../src/lib/likes';
 import { formatSecurityError } from '../src/lib/security';
 import { getMatchIdForProfile } from '../src/lib/matches';
-import { BRAND_BLACK, FONT_FAMILY, MOTION } from '../src/theme';
+import { CREAM, FONT_FAMILY, MOTION } from '../src/theme';
 import type { DiscoveryProfile, Genotype } from '../src/types/database';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -115,6 +120,7 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
   const [matchedName, setMatchedName] = useState('');
   const [matchedProfile, setMatchedProfile] = useState<DiscoveryProfile | null>(null);
   const [matchedMatchId, setMatchedMatchId] = useState<string | null>(null);
+  const [viewerSnapshot, setViewerSnapshot] = useState<ViewerProfileSnapshot | null>(null);
   const [actionError, setActionError] = useState('');
   const [deckColumnHeight, setDeckColumnHeight] = useState(0);
   const [usingMockFallback, setUsingMockFallback] = useState(false);
@@ -137,9 +143,18 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
     setLoadError('');
     setLoading(true);
     try {
-      const { profiles: rows, viewerGenotype: loadedViewerGenotype, deckStats: stats } =
-        await fetchDiscoveryProfiles();
+      const [{ profiles: rows, viewerGenotype: loadedViewerGenotype, deckStats: stats }, viewer, profile] =
+        await Promise.all([
+          fetchDiscoveryProfiles(),
+          getViewerProfileSnapshot(),
+          getCurrentProfile(),
+        ]);
+      const interestedIn = parseDiscoveryInterests(profile?.interested_in);
+      if (interestedIn.length > 0) {
+        setFilters((current) => ({ ...current, interestedIn }));
+      }
       setViewerGenotype(loadedViewerGenotype);
+      setViewerSnapshot(viewer);
       setDeckStats(stats);
       if (rows.length > 0) {
         setAllProfiles(rows);
@@ -154,6 +169,8 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
       }
       setIndex(0);
     } catch (err) {
+      const viewer = await getViewerProfileSnapshot().catch(() => null);
+      setViewerSnapshot(viewer);
       setAllProfiles([]);
       setUsingMockFallback(false);
       setDeckStats(null);
@@ -163,6 +180,23 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
       setLoading(false);
     }
   }, []);
+
+  const handleApplyFilters = useCallback(
+    async (next: DiscoveryFilters) => {
+      setFilters(next);
+      if (next.interestedIn.length > 0) {
+        try {
+          await saveInterestedIn(next.interestedIn);
+          await loadProfiles();
+        } catch (err) {
+          setActionError(
+            err instanceof Error ? err.message : 'Could not save your discovery preferences.'
+          );
+        }
+      }
+    },
+    [loadProfiles]
+  );
 
   useEffect(() => {
     if (isActive) {
@@ -734,8 +768,8 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
 
   return (
     <View style={styles.container}>
-      <GenoPremiumChrome variant="discover" />
-      <StatusBar style="light" />
+      <GenoPremiumChrome variant="linen" />
+      <StatusBar style="dark" />
 
       <View style={styles.screenRoot}>
         {superLikeToast ? (
@@ -777,7 +811,9 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
           filters={filters}
           previewProfiles={allProfiles}
           onClose={() => setShowFilterSheet(false)}
-          onApply={setFilters}
+          onApply={(next) => {
+            void handleApplyFilters(next);
+          }}
         />
 
         <View style={styles.deckArea}>
@@ -831,7 +867,7 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
           ) : seenAll ? (
             <View style={styles.seenAllWrap}>
               <LinearGradient
-                colors={['rgba(212, 175, 55, 0.42)', 'rgba(200, 16, 46, 0.22)', 'rgba(212, 175, 55, 0.38)']}
+                colors={['rgba(201, 154, 75, 0.42)', 'rgba(198, 34, 34, 0.22)', 'rgba(201, 154, 75, 0.38)']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={styles.seenAllBorder}
@@ -937,6 +973,7 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
                             progressFillWidth={progressFillWidth}
                             height={cardHeight}
                             onExpand={openProfileSheet}
+                            onReport={() => setShowModerationSheet(true)}
                           />
                         </Animated.View>
                       );
@@ -962,7 +999,12 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
                             },
                           ]}
                         >
-                          <DiscoverSwipeCard profile={stackProfile} hideGenotype={true} height={cardHeight} />
+                          <DiscoverSwipeCard
+                            profile={stackProfile}
+                            viewerGenotype={viewerGenotype}
+                            hideGenotype={true}
+                            height={cardHeight}
+                          />
                         </Animated.View>
                       );
                     }
@@ -979,7 +1021,12 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
                           { zIndex: depthFromTop, opacity: 0 },
                         ]}
                       >
-                        <DiscoverSwipeCard profile={stackProfile} hideGenotype={true} height={cardHeight} />
+                        <DiscoverSwipeCard
+                          profile={stackProfile}
+                          viewerGenotype={viewerGenotype}
+                          hideGenotype={true}
+                          height={cardHeight}
+                        />
                       </Animated.View>
                     );
                   })}
@@ -990,7 +1037,7 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
                 ) : null}
                 <View style={[styles.cardActionsOverlay, cardLayoutStyles.cardActionsOverlay]} pointerEvents="box-none">
                   <LinearGradient
-                    colors={['transparent', 'rgba(13, 40, 24, 0.22)', 'rgba(13, 40, 24, 0.48)']}
+                    colors={['transparent', 'rgba(11, 12, 14, 0.22)', 'rgba(11, 12, 14, 0.48)']}
                     locations={[0, 0.55, 1]}
                     style={styles.cardActionsFade}
                     pointerEvents="none"
@@ -1025,6 +1072,7 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
         onPass={handleSheetPass}
         onLike={handleSheetLike}
         onSuperLike={handleSheetSuperLike}
+        onReport={() => setShowModerationSheet(true)}
       />
 
       {profile ? (
@@ -1037,10 +1085,11 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
         />
       ) : null}
 
-      <DiscoverMatchCelebration
+      <DiscoverMatchModal
         visible={showMatch}
         matchName={matchedName}
         profile={matchedProfile}
+        viewer={viewerSnapshot}
         onContinue={dismissMatchOverlay}
         onSendMessage={() => { void handleSendMessageFromMatch(); }}
       />
@@ -1051,7 +1100,7 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: BRAND_BLACK,
+    backgroundColor: CREAM,
   },
   screenRoot: {
     flex: 1,
@@ -1273,16 +1322,16 @@ const styles = StyleSheet.create({
     width: 108,
     height: 108,
     borderRadius: 54,
-    backgroundColor: 'rgba(212, 175, 55, 0.14)',
+    backgroundColor: 'rgba(201, 154, 75, 0.14)',
     borderWidth: 1.5,
-    borderColor: 'rgba(212, 175, 55, 0.45)',
+    borderColor: 'rgba(201, 154, 75, 0.45)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   noPhotoInitials: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 40,
-    color: 'rgba(212, 175, 55, 0.75)',
+    color: 'rgba(201, 154, 75, 0.75)',
     textAlign: 'center',
     letterSpacing: 1,
   },
@@ -1349,7 +1398,7 @@ const styles = StyleSheet.create({
     letterSpacing: -0.4,
     flexShrink: 1,
     minWidth: 0,
-    textShadowColor: 'rgba(13, 40, 24, 0.45)',
+    textShadowColor: 'rgba(11, 12, 14, 0.45)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 4,
   },
@@ -1381,9 +1430,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 999,
-    backgroundColor: 'rgba(212, 175, 55, 0.22)',
+    backgroundColor: 'rgba(201, 154, 75, 0.22)',
     borderWidth: 1,
-    borderColor: 'rgba(212, 175, 55, 0.42)',
+    borderColor: 'rgba(201, 154, 75, 0.42)',
   },
   tagText: {
     fontFamily: FONT_FAMILY.gothamBold,
@@ -1469,7 +1518,7 @@ const styles = StyleSheet.create({
     zIndex: 8,
   },
   cardDragTintLike: {
-    backgroundColor: 'rgba(13, 40, 24, 0.3)',
+    backgroundColor: 'rgba(11, 12, 14, 0.3)',
   },
   cardDragTintNope: {
     backgroundColor: 'rgba(184, 188, 196, 0.3)',
@@ -1570,7 +1619,7 @@ const styles = StyleSheet.create({
   loadingText: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 15,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
     fontWeight: '600',
   },
   retryBtn: {
@@ -1606,7 +1655,7 @@ const styles = StyleSheet.create({
     paddingVertical: 32,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(212, 175, 55, 0.2)',
+    borderColor: 'rgba(201, 154, 75, 0.2)',
   },
   seenAllIconWrap: {
     width: 64,
@@ -1614,7 +1663,7 @@ const styles = StyleSheet.create({
     borderRadius: 32,
     backgroundColor: COLORS.mint,
     borderWidth: 1,
-    borderColor: 'rgba(212, 175, 55, 0.35)',
+    borderColor: 'rgba(201, 154, 75, 0.35)',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 18,
@@ -1632,7 +1681,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 15,
     lineHeight: 22,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
     textAlign: 'center',
     marginBottom: 24,
     maxWidth: 280,

@@ -19,7 +19,7 @@ export default function ProfileStudioCTA({ percent, onPress }: Props) {
       accessibilityRole="button"
       accessibilityLabel="Open profile studio"
     >
-      <GenoCardFrame showWatermark={false} style={styles.frame}>
+      <GenoCardFrame glass={false} showWatermark={false} style={styles.frame}>
         <View style={styles.inner}>
           <View style={styles.icon}>
             <Ionicons name="color-wand-outline" size={18} color={COLORS.ink} />

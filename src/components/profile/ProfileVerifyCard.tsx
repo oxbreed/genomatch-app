@@ -14,7 +14,7 @@ type Props = {
 
 export default function ProfileVerifyCard({ genotype, onVerify }: Props) {
   return (
-    <GenoCardFrame>
+    <GenoCardFrame glass={false}>
       <View style={styles.inner}>
         <GenoBondMark size={32} opacity={0.88} />
         <View style={styles.copy}>
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: PROFILE.metaSize,
     lineHeight: 16,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
   },
   btn: { borderRadius: 12, overflow: 'hidden', alignSelf: 'flex-start' },
   btnGradient: {

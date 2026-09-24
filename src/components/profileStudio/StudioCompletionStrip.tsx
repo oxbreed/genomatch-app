@@ -21,7 +21,7 @@ export default function StudioCompletionStrip({
       </View>
       <View style={styles.track}>
         <LinearGradient
-          colors={['rgba(200, 16, 46, 0.35)', COLORS.gold]}
+          colors={['rgba(198, 34, 34, 0.35)', COLORS.gold]}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}
           style={[styles.fill, { width: `${Math.min(100, Math.max(0, percent))}%` }]}
@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.lg,
     backgroundColor: COLORS.white,
     borderWidth: 1,
-    borderColor: 'rgba(13, 40, 24, 0.07)',
+    borderColor: 'rgba(11, 12, 14, 0.07)',
     gap: 10,
   },
   row: {
@@ -61,13 +61,13 @@ const styles = StyleSheet.create({
   value: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 15,
-    color: COLORS.gold,
+    color: COLORS.goldDeep,
   },
   track: {
     height: 5,
     borderRadius: 3,
     overflow: 'hidden',
-    backgroundColor: 'rgba(13, 40, 24, 0.06)',
+    backgroundColor: 'rgba(11, 12, 14, 0.06)',
   },
   fill: {
     height: 5,
@@ -76,6 +76,6 @@ const styles = StyleSheet.create({
   hint: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
   },
 });

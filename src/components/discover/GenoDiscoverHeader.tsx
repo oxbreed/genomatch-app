@@ -14,7 +14,7 @@ export default function GenoDiscoverHeader({ subtitle, right }: Props) {
   return (
     <View style={styles.wrap}>
       <GenoGlassSurface
-        variant="dark"
+        variant="light"
         borderRadius={RADIUS.xl}
         shadow="glassFloat"
         showTopRule
@@ -24,7 +24,7 @@ export default function GenoDiscoverHeader({ subtitle, right }: Props) {
         contentStyle={styles.glassInner}
       >
         <View style={styles.row}>
-          <GenoLogoCeremony variant="mark" tone="light" style={styles.mark} />
+          <GenoLogoCeremony variant="mark" tone="dark" style={styles.mark} />
           <View style={styles.copy}>
             <View style={styles.titleRow}>
               <View style={styles.titleBlock}>
@@ -39,7 +39,7 @@ export default function GenoDiscoverHeader({ subtitle, right }: Props) {
           </View>
         </View>
         <LinearGradient
-          colors={['transparent', COLORS.gold, 'rgba(200, 16, 46, 0.35)', 'transparent']}
+          colors={['transparent', COLORS.gold, 'rgba(198, 34, 34, 0.35)', 'transparent']}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}
           style={styles.rule}
@@ -96,20 +96,20 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.marketingExtrabold,
     fontSize: 8,
     letterSpacing: 2.2,
-    color: COLORS.gold,
+    color: COLORS.glossyRed,
   },
   title: {
     fontFamily: FONT_FAMILY.gothamSemiBold,
     fontSize: 19,
     letterSpacing: -0.35,
-    color: COLORS.linen,
+    color: COLORS.ink,
   },
   subtitle: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 10,
     lineHeight: 12,
     letterSpacing: 0.05,
-    color: COLORS.metallicSilver,
+    color: 'rgba(11, 12, 14, 0.55)',
     minWidth: 0,
     flexShrink: 1,
   },

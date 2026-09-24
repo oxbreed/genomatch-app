@@ -23,6 +23,7 @@ export type ProfileRow = {
   city: string | null;
   country: string | null;
   gender: string | null;
+  interested_in: string[] | null;
   interests: string[] | null;
   relationship_goal: string | null;
   onboarding_completed: boolean;

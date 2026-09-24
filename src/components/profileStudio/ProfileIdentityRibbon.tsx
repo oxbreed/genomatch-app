@@ -15,7 +15,7 @@ type Props = {
 export default function ProfileIdentityRibbon({ verified, genotype, onVerify }: Props) {
   if (verified) {
     return (
-      <GenoCardFrame showWatermark={false} style={styles.frame}>
+      <GenoCardFrame glass={false} showWatermark={false} style={styles.frame}>
         <View style={styles.verifiedInner}>
           <View style={styles.iconVerified}>
             <Ionicons name="shield-checkmark" size={20} color={COLORS.verified} />
@@ -32,7 +32,7 @@ export default function ProfileIdentityRibbon({ verified, genotype, onVerify }: 
   }
 
   return (
-    <GenoCardFrame showWatermark={false} style={styles.frame}>
+    <GenoCardFrame glass={false} showWatermark={false} style={styles.frame}>
       <View style={[styles.accentBar, styles.accentPending]} />
       <View style={styles.unverifiedInner}>
         <View style={styles.iconPending}>
@@ -49,7 +49,7 @@ export default function ProfileIdentityRibbon({ verified, genotype, onVerify }: 
             style={({ pressed }) => [styles.verifyBtn, pressed && styles.pressed]}
             onPress={onVerify}
           >
-            <LinearGradient colors={[COLORS.gold, '#B8962E']} style={styles.verifyGradient}>
+            <LinearGradient colors={[COLORS.gold, '#96651F']} style={styles.verifyGradient}>
               <Ionicons name="finger-print" size={16} color={COLORS.ink} />
               <Text style={styles.verifyText}>Verify now</Text>
             </LinearGradient>
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(200, 16, 46, 0.14)',
+    backgroundColor: 'rgba(198, 34, 34, 0.14)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: 'rgba(212, 175, 55, 0.2)',
+    backgroundColor: 'rgba(201, 154, 75, 0.2)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
   },
   sub: {
     ...PROFILE_TYPE.ribbonSub,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
     marginTop: 2,
   },
   verifyBtn: {

@@ -14,39 +14,29 @@ describe('genotypePairKey', () => {
 });
 
 describe('getGenotypeRiskShort', () => {
-  it('returns a plain risk label for a mapped pairing', () => {
-    expect(getGenotypeRiskShort('AA', 'SS')).toBe('Elevated risk');
-    expect(getGenotypeRiskShort('AS', 'AS')).toBe('Moderate risk');
-  });
-
-  it('resolves AS × AC (key ACAS) and AC × SS (key ACSS)', () => {
-    expect(getGenotypeRiskShort('AS', 'AC')).toBe('Moderate risk');
-    expect(getGenotypeRiskShort('AC', 'AS')).toBe('Moderate risk');
-    expect(getGenotypeRiskShort('AC', 'SS')).toBe('Higher risk');
-    expect(getGenotypeRiskShort('SS', 'AC')).toBe('Higher risk');
-  });
-
-  it('returns null when the viewer genotype is missing — never a default label', () => {
+  it('never returns a health-risk label', () => {
+    expect(getGenotypeRiskShort('AA', 'SS')).toBeNull();
+    expect(getGenotypeRiskShort('AS', 'AS')).toBeNull();
+    expect(getGenotypeRiskShort('AS', 'AC')).toBeNull();
     expect(getGenotypeRiskShort(null, 'AA')).toBeNull();
   });
 });
 
 describe('getFamilyPlanningInsight', () => {
-  it('still returns a tiered educational insight per pairing', () => {
-    expect(getFamilyPlanningInsight('AA', 'AA').tier).toBe('favourable');
-    expect(getFamilyPlanningInsight('AS', 'AS').tier).toBe('counseling');
-  });
-
-  it('uses the AS × AC copy for both orderings', () => {
-    const insight = getFamilyPlanningInsight('AS', 'AC');
+  it('states that the letters are self-reported and not a health result', () => {
+    const insight = getFamilyPlanningInsight('AS', 'AS');
     expect(insight.tier).toBe('awareness');
-    expect(insight.detail).toMatch(/AS × AC/);
-    expect(getFamilyPlanningInsight('AC', 'AS').title).toBe(insight.title);
+    expect(insight.title).toBe('Self-reported only');
+    expect(insight.summary).toMatch(/does not assess health/i);
+    expect(`${insight.summary} ${insight.detail}`).not.toMatch(/sickle|disease|counsel|%|risk/i);
   });
 
-  it('treats AC × SS as counseling (all children HbSC)', () => {
-    const insight = getFamilyPlanningInsight('AC', 'SS');
-    expect(insight.tier).toBe('counseling');
-    expect(`${insight.summary} ${insight.detail}`).toMatch(/HbSC/);
+  it('labels the pair without changing the message by order', () => {
+    const forward = getFamilyPlanningInsight('AS', 'AC');
+    const reverse = getFamilyPlanningInsight('AC', 'AS');
+    expect(forward.pairLabel).toBe('AS × AC');
+    expect(reverse.pairLabel).toBe('AC × AS');
+    expect(reverse.title).toBe(forward.title);
+    expect(reverse.summary).toBe(forward.summary);
   });
 });

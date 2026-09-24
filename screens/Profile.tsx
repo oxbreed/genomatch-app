@@ -11,10 +11,12 @@ import {
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { Ionicons } from '@expo/vector-icons';
 import About from './About';
 import CommunityGuidelines from './CommunityGuidelines';
 import PrivacyPolicy from './PrivacyPolicy';
 import TermsOfService from './TermsOfService';
+import IdentityVerification from './IdentityVerification';
 import { GenoPremiumChrome, GenoLogoCeremony } from '../src/brand/graphics';
 import EmptyState from '../src/components/EmptyState';
 import { GenoInboxHeader, GenoInboxIconButton, GenoInboxRetryPanel } from '../src/components/inbox';
@@ -30,10 +32,9 @@ import {
   ProfileSectionCard,
   ProfileStudioCTA,
   ProfileViewSections,
+  ProfileIdentityFields,
 } from '../src/components/profile';
 import {
-  GenoMeshBackdrop,
-  ProfileBondAura,
   ProfileHeroChrome,
   ProfileIdentityRibbon,
   ProfileStatGems,
@@ -66,6 +67,7 @@ import {
 import { getVerificationEligibility, type VerificationProfileInput } from '../src/lib/verification';
 import { formatSecurityError } from '../src/lib/security';
 import { supabase } from '../src/lib/supabase';
+import { parseProfilePronoun, type ProfilePronoun } from '../src/lib/profilePronouns';
 import type { DiscoveryProfile, Genotype, ProfileRow } from '../src/types/database';
 
 const HERO_HEIGHT = 288;
@@ -78,7 +80,10 @@ type EditableProfile = {
   displayName: string;
   city: string;
   bio: string;
+  /** Derived from dateOfBirth for display; never typed here. */
   age: string;
+  /** The date of birth registered at signup. Read-only once set. */
+  dateOfBirth: string | null;
   genotype: Genotype;
   interests: string[];
   relationshipGoal: string;
@@ -91,6 +96,7 @@ type EditableProfile = {
   drinkingStatus: string;
   smokingStatus: string;
   educationStatus: string;
+  gender: ProfilePronoun | '';
 };
 
 function calculateProfileCompletion(data: EditableProfile): number {
@@ -129,6 +135,7 @@ function profilesEqual(a: EditableProfile, b: EditableProfile): boolean {
     a.drinkingStatus === b.drinkingStatus &&
     a.smokingStatus === b.smokingStatus &&
     a.educationStatus === b.educationStatus &&
+    a.gender === b.gender &&
     JSON.stringify(a.interests) === JSON.stringify(b.interests) &&
     JSON.stringify(a.photos) === JSON.stringify(b.photos)
   );
@@ -170,6 +177,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
   const [showCommunityGuidelines, setShowCommunityGuidelines] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
+  const [showPhotoReview, setShowPhotoReview] = useState(false);
   const [showVerifyModal, setShowVerifyModal] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [locatingCity, setLocatingCity] = useState(false);
@@ -212,6 +220,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
         city: mapped.city,
         bio: mapped.bio,
         age: mapped.age != null ? String(mapped.age) : '',
+        dateOfBirth: row.date_of_birth ?? null,
         genotype: mapped.genotype,
         interests: mapped.interests,
         relationshipGoal: row.relationship_goal ?? 'serious',
@@ -224,6 +233,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
         drinkingStatus: row.drinking_status ?? '',
         smokingStatus: row.smoking_status ?? '',
         educationStatus: row.education_status ?? '',
+        gender: parseProfilePronoun(row.gender) ?? '',
       };
       setProfile(loaded);
       setDraft(loaded);
@@ -231,11 +241,12 @@ export default function Profile({ onSignOut }: ProfileProps) {
       if (loaded.genotypeVerified) {
         try {
           setCityUpdateEligibility(await fetchCityUpdateEligibility());
-        } catch {
+        } catch (err) {
+          console.warn('[Profile] city update eligibility unavailable', err);
           setCityUpdateEligibility({ canUpdate: false });
         }
       } else {
-        setCityUpdateEligibility({ canUpdate: false });
+        setCityUpdateEligibility({ canUpdate: false, reason: 'not_verified' });
       }
 
       const userId = session?.user?.id;
@@ -315,7 +326,11 @@ export default function Profile({ onSignOut }: ProfileProps) {
     const fields: Parameters<typeof updateProfileFields>[0] = {
       display_name: target.displayName.trim(),
       bio: target.bio.trim(),
-      date_of_birth: !Number.isNaN(ageNum) ? dateOfBirthFromAge(ageNum) : undefined,
+      // The registered date of birth is authoritative. Re-deriving it from the
+      // displayed age on every autosave moved the birthday to the save date and
+      // shifted it again each year, so it is only written when none exists.
+      date_of_birth:
+        target.dateOfBirth ?? (!Number.isNaN(ageNum) ? dateOfBirthFromAge(ageNum) : undefined),
       interests: target.interests,
       relationship_goal: target.relationshipGoal,
       height_cm: target.heightCm,
@@ -323,6 +338,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
       drinking_status: target.drinkingStatus || null,
       smoking_status: target.smokingStatus || null,
       education_status: target.educationStatus || null,
+      gender: target.gender || null,
     };
 
     if (!target.genotypeVerified) {
@@ -496,6 +512,27 @@ export default function Profile({ onSignOut }: ProfileProps) {
   };
 
   const handleVerifiedCityUpdate = () => {
+    if (!cityUpdateEligibility.canUpdate) {
+      const { reason, nextEligibleAt } = cityUpdateEligibility;
+      const when = nextEligibleAt ? new Date(nextEligibleAt) : null;
+      const whenLabel =
+        when && !Number.isNaN(when.getTime())
+          ? when.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })
+          : null;
+
+      Alert.alert(
+        'City update locked',
+        reason === 'cooldown'
+          ? whenLabel
+            ? `Your city was confirmed by GPS in the last 12 months. You can change it again on ${whenLabel}. Contact support if you moved.`
+            : 'Your city was confirmed by GPS in the last 12 months. Contact support if you moved.'
+          : reason === 'not_verified'
+            ? 'Verify your genotype first — GPS city updates are only for verified members.'
+            : 'City updates are not available on your account right now. Contact support and we will sort it out.'
+      );
+      return;
+    }
+
     Alert.alert(
       'Update my city',
       'We will use your phone GPS to confirm your new city. You can do this once every 12 months.',
@@ -625,7 +662,6 @@ export default function Profile({ onSignOut }: ProfileProps) {
   if (loading) {
     return (
       <View style={[styles.root, styles.centered]}>
-        <GenoMeshBackdrop />
         <GenoPremiumChrome variant="linen" />
         <GenoLogoCeremony variant="auth" tone="dark" />
         <Text style={styles.loadingText}>Loading your profile…</Text>
@@ -636,7 +672,6 @@ export default function Profile({ onSignOut }: ProfileProps) {
   if (!data) {
     return (
       <View style={[styles.root, styles.centered]}>
-        <GenoMeshBackdrop />
         <GenoPremiumChrome variant="linen" />
         {authUserId ? (
           <GenoInboxRetryPanel
@@ -666,13 +701,16 @@ export default function Profile({ onSignOut }: ProfileProps) {
   if (showTerms) {
     return <TermsOfService onBack={() => setShowTerms(false)} />;
   }
+  if (showPhotoReview) {
+    return (
+      <IdentityVerification onClose={() => setShowPhotoReview(false)} />
+    );
+  }
 
   const heroPhotoUri = data.photos[0] ?? data.avatarUrl ?? null;
 
   return (
     <View style={styles.root}>
-      <GenoMeshBackdrop studio={editing} />
-      <ProfileBondAura active={editing} verified={data.genotypeVerified && editing} />
       <GenoPremiumChrome variant="linen" />
       <StatusBar style="dark" />
 
@@ -787,6 +825,18 @@ export default function Profile({ onSignOut }: ProfileProps) {
               </ProfileSectionCard>
 
               <ProfileSectionCard
+                kicker="IDENTITY"
+                label="Pronouns"
+                hint="How you appear on your profile and to matches"
+                editing
+              >
+                <ProfileIdentityFields
+                  pronouns={draft.gender}
+                  onSelectPronouns={(value) => setDraft((p) => (p ? { ...p, gender: value } : p))}
+                />
+              </ProfileSectionCard>
+
+              <ProfileSectionCard
                 kicker="DETAILS"
                 label="Lifestyle"
                 hint="Optional details shown on your profile"
@@ -825,10 +875,29 @@ export default function Profile({ onSignOut }: ProfileProps) {
                 genotype={data.genotype}
                 onVerify={requestVerification}
               />
+              <ProfileSectionCard
+                kicker="PHOTO REVIEW"
+                label="Live selfie"
+                hint="A photo check. Not a passport or government ID."
+              >
+                <Text style={styles.photoReviewHint}>
+                  Take a new photo with the camera. Gallery pictures are not accepted.
+                </Text>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Start live selfie"
+                  style={({ pressed }) => [styles.photoReviewBtn, pressed && styles.photoReviewPressed]}
+                  onPress={() => setShowPhotoReview(true)}
+                >
+                  <Ionicons name="camera-outline" size={18} color={COLORS.cream} />
+                  <Text style={styles.photoReviewText}>Start live selfie</Text>
+                </Pressable>
+              </ProfileSectionCard>
               {data.genotypeVerified ? (
                 <ProfileVerifiedCityCard
                   city={data.city}
                   canUpdate={cityUpdateEligibility.canUpdate}
+                  reason={cityUpdateEligibility.reason}
                   nextEligibleAt={cityUpdateEligibility.nextEligibleAt}
                   updating={updatingCity}
                   onUpdate={handleVerifiedCityUpdate}
@@ -872,6 +941,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
                   educationStatus={data.educationStatus}
                   heightCm={data.heightCm}
                   religion={data.religion}
+                  pronouns={data.gender || null}
                 />
               </ProfileSectionCard>
 
@@ -940,7 +1010,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: COLORS.linen },
+  root: { flex: 1, backgroundColor: COLORS.cream },
   flex: { flex: 1 },
   centered: { alignItems: 'center', justifyContent: 'center', padding: 24 },
   scroll: { paddingBottom: GENO_TAB_BAR_HEIGHT + 20, paddingTop: 2 },
@@ -951,6 +1021,31 @@ const styles = StyleSheet.create({
   },
   viewStack: {
     gap: 2,
+  },
+  photoReviewHint: {
+    fontFamily: FONT_FAMILY.gothamMedium,
+    fontSize: 16,
+    lineHeight: 24,
+    color: COLORS.ink,
+    marginBottom: 14,
+  },
+  photoReviewBtn: {
+    minHeight: 52,
+    borderRadius: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: COLORS.glossyRed,
+    paddingHorizontal: 16,
+  },
+  photoReviewPressed: {
+    opacity: 0.9,
+  },
+  photoReviewText: {
+    fontFamily: FONT_FAMILY.gothamBold,
+    fontSize: 16,
+    color: COLORS.cream,
   },
   errorBanner: {
     marginHorizontal: 16,
@@ -980,6 +1075,6 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
   },
 });

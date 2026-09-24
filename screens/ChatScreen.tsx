@@ -266,7 +266,7 @@ export default function ChatScreen({ matchId, profile, userId: userIdProp, onBac
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 4 : 0}
     >
-      <GenoPremiumChrome variant="discover" />
+      <GenoPremiumChrome variant="linen" />
       <StatusBar style="dark" />
 
       <GenoGlassSurface
@@ -366,7 +366,7 @@ export default function ChatScreen({ matchId, profile, userId: userIdProp, onBac
               candidateGenotype={profile.genotype}
             />
             <Text style={styles.emptyHintText}>
-              You matched! Say hello and start your compatibility journey.
+              You matched. Say hello.
             </Text>
           </View>
         }
@@ -410,7 +410,7 @@ export default function ChatScreen({ matchId, profile, userId: userIdProp, onBac
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.linen,
+    backgroundColor: COLORS.cream,
   },
   headerGlass: {
     zIndex: 2,
@@ -441,9 +441,9 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(212, 175, 55, 0.15)',
+    backgroundColor: 'rgba(201, 154, 75, 0.15)',
     borderWidth: 1.5,
-    borderColor: 'rgba(212, 175, 55, 0.4)',
+    borderColor: 'rgba(201, 154, 75, 0.4)',
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
@@ -469,7 +469,7 @@ const styles = StyleSheet.create({
   typingMeta: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
     fontStyle: 'italic',
     marginTop: 2,
   },
@@ -535,7 +535,7 @@ const styles = StyleSheet.create({
     maxHeight: 120,
     borderRadius: 25,
     borderWidth: 1,
-    borderColor: 'rgba(212, 175, 55, 0.35)',
+    borderColor: 'rgba(201, 154, 75, 0.35)',
     backgroundColor: 'rgba(255, 255, 255, 0.55)',
     paddingHorizontal: 14,
     paddingVertical: 10,

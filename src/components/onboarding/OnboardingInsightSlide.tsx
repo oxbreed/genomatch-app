@@ -27,7 +27,7 @@ export default function OnboardingInsightSlide({ slide, width }: Props) {
 
       <View style={styles.iconOuter}>
         <LinearGradient
-          colors={['rgba(212, 175, 55, 0.35)', 'rgba(184, 188, 196, 0.2)']}
+          colors={['rgba(201, 154, 75, 0.35)', 'rgba(184, 188, 196, 0.2)']}
           style={styles.iconRing}
         >
           <View style={[styles.iconCard, { borderColor: `${accent}55` }]}>
@@ -46,7 +46,7 @@ export default function OnboardingInsightSlide({ slide, width }: Props) {
       <Text style={styles.body}>{slide.body}</Text>
 
       <LinearGradient
-        colors={['transparent', 'rgba(212, 175, 55, 0.5)', 'transparent']}
+        colors={['transparent', 'rgba(201, 154, 75, 0.5)', 'transparent']}
         start={{ x: 0, y: 0.5 }}
         end={{ x: 1, y: 0.5 }}
         style={styles.rule}

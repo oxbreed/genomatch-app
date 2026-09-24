@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
   hint: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
     marginBottom: 12,
   },
   grid: {
@@ -141,12 +141,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 6,
     left: 6,
-    backgroundColor: 'rgba(13, 40, 24, 0.72)',
+    backgroundColor: 'rgba(11, 12, 14, 0.72)',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: 'rgba(212, 175, 55, 0.35)',
+    borderColor: 'rgba(201, 154, 75, 0.35)',
   },
   mainText: {
     fontFamily: FONT_FAMILY.gothamBold,
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: 'rgba(13, 40, 24, 0.65)',
+    backgroundColor: 'rgba(11, 12, 14, 0.65)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
   addLabel: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 11,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
   },
   emptyView: {
     paddingVertical: 22,
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
     lineHeight: 21,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
     textAlign: 'center',
   },
   emptyStudio: {
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
   emptyStudioSub: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
     textAlign: 'center',
     lineHeight: 17,
     marginBottom: 4,

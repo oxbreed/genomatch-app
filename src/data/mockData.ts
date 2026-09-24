@@ -47,7 +47,7 @@ export const MOCK_MATCHES: MockProfile[] = [
     lifestyleMatch: 94,
     bio: 'Architect who loves live music and long walks. Looking for someone intentional, kind, and ready for something real.',
     interests: ['Music', 'Travel', 'Art', 'Food'],
-    gradient: ['#C8102E', '#15171A'],
+    gradient: ['#C62222', '#15171A'],
     photoUrl: 'https://genomatch.app/demo/demo-amara.png',
     lastMessageAt: '2h ago',
   },
@@ -60,7 +60,7 @@ export const MOCK_MATCHES: MockProfile[] = [
     lifestyleMatch: 87,
     bio: 'Fitness coach and foodie. I value honesty, good conversation, and building a future with the right person.',
     interests: ['Fitness', 'Food', 'Sports', 'Movies'],
-    gradient: ['#C8102E', '#8E0B20'],
+    gradient: ['#C62222', '#8A0B0C'],
     photoUrl: 'https://genomatch.app/demo/demo-kwame.png',
     lastMessageAt: 'Yesterday',
   },
@@ -86,7 +86,7 @@ export const MOCK_MATCHES: MockProfile[] = [
     lifestyleMatch: 82,
     bio: 'Software engineer who enjoys hiking and photography. Looking for an honest connection built on shared values and laughter.',
     interests: ['Hiking', 'Photography', 'Tech', 'Music'],
-    gradient: ['#C8102E', COLORS.ink],
+    gradient: ['#C62222', COLORS.ink],
     photoUrl: 'https://genomatch.app/demo/demo-amani.png',
     lastMessageAt: '3d ago',
   },
@@ -117,7 +117,7 @@ export const MOCK_CURRENT_USER: CurrentUserProfile = {
   bio: 'Passionate about meaningful connections, good food, and building a future with the right person. Genotype-aware and intentional about love.',
   interests: ['Music', 'Travel', 'Tech', 'Food'],
   relationshipGoal: 'serious',
-  gradient: ['#15171A', '#C8102E'],
+  gradient: ['#15171A', '#C62222'],
 };
 
 export function getInitials(name: string) {

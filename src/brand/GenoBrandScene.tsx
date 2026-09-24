@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFill,
     borderRadius: 999,
     borderWidth: 1.5,
-    borderColor: 'rgba(212, 175, 55, 0.35)',
+    borderColor: 'rgba(201, 154, 75, 0.35)',
     backgroundColor: 'rgba(240, 241, 243, 0.65)',
   },
   pattern: {

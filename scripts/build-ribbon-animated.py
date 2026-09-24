@@ -23,9 +23,15 @@ ANIMATED_SCALE = int(os.environ.get('RIBBON_ANIMATED_SCALE', '2'))
 
 
 def rgba_frame(color_rgb: np.ndarray, mask_rgb: np.ndarray) -> Image.Image:
-    alpha = mask_rgb[:, :, 0].astype(np.uint8)
-    rgba = np.dstack([color_rgb[:, :, :3], alpha])
-    return Image.fromarray(rgba, 'RGBA')
+    hard = (mask_rgb[:, :, 0] > 127).astype(np.uint8) * 255
+    # Soft edge for anti-aliased cutout on dark UI
+    from PIL import ImageFilter
+
+    soft = Image.fromarray(hard, 'L').filter(ImageFilter.GaussianBlur(radius=0.75))
+    alpha = np.maximum(np.array(soft), hard)
+    rgb = color_rgb[:, :, :3].copy()
+    rgb[alpha == 0] = 0
+    return Image.fromarray(np.dstack([rgb, alpha]), 'RGBA')
 
 
 def resize_rgba(frame: Image.Image, size: tuple[int, int]) -> Image.Image:
@@ -73,22 +79,28 @@ def main() -> int:
     mask_frames = iio.imread(MASK_PATH)
     count = min(len(color_frames), len(mask_frames))
 
+    # Full-resolution poster (export scale) — crisp on @3x screens
+    poster = rgba_frame(color_frames[0], mask_frames[0])
+    write_poster(poster, PNG_OUT)
+
     rgba_frames: list[Image.Image] = []
     for index in range(count):
         rgba = rgba_frame(color_frames[index], mask_frames[index])
         rgba_frames.append(resize_rgba(rgba, (out_w, out_h)))
 
     write_webp(rgba_frames, fps, WEBP_OUT)
-    write_poster(rgba_frames[0], PNG_OUT)
 
     meta['animatedScale'] = ANIMATED_SCALE
     meta['animatedPixelWidth'] = out_w
     meta['animatedPixelHeight'] = out_h
+    meta['posterPixelWidth'] = poster.size[0]
+    meta['posterPixelHeight'] = poster.size[1]
     with open(META_PATH, 'w', encoding='utf-8') as fh:
         json.dump(meta, fh, indent=2)
 
     print(
-        f'Wrote {WEBP_OUT} + {PNG_OUT} ({out_w}x{out_h}, {count} frames @ {fps}fps, webp q100)'
+        f'Wrote {WEBP_OUT} ({out_w}x{out_h}) + poster {PNG_OUT} '
+        f'({poster.size[0]}x{poster.size[1]}, {count} frames @ {fps}fps)'
     )
     return 0
 

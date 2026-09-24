@@ -11,21 +11,21 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import {
   BRAND_BLACK,
   COLORS,
   LOGO_RED,
-  LOGO_RED_HOT,
+  LOGO_RED_BRIGHT,
+  MOTION,
   TYPOGRAPHY,
+  creamAlpha,
 } from '../../theme';
 import GenoOnboardingAgeGate from './GenoOnboardingAgeGate';
 import GenoOnboardingProgress from './GenoOnboardingProgress';
 import GenoOnboardingSlidePage from './GenoOnboardingSlidePage';
 import GenoPremiumOnboardingBackdrop from './GenoPremiumOnboardingBackdrop';
-import GenoRibbonLogoAnimated from './GenoRibbonLogoAnimated';
 import GenoWordmark from './GenoWordmark';
 import { GENO_ONBOARDING_SLIDES } from './onboardingSlides';
 import {
@@ -63,6 +63,7 @@ export default function GenoOnboardingFlow({
   const scrollRef = useRef<ScrollView>(null);
   const slideRef = useRef(0);
   const ctaScale = useRef(new Animated.Value(1)).current;
+  const enterOpacity = useRef(new Animated.Value(0)).current;
 
   const isLast = slide === SLIDE_COUNT - 1;
 
@@ -74,6 +75,15 @@ export default function GenoOnboardingFlow({
   useEffect(() => {
     slideRef.current = slide;
   }, [slide]);
+
+  useEffect(() => {
+    Animated.timing(enterOpacity, {
+      toValue: 1,
+      duration: 280,
+      easing: MOTION.easing.out,
+      useNativeDriver: true,
+    }).start();
+  }, [enterOpacity]);
 
   const goToSlide = useCallback(
     (index: number) => {
@@ -97,6 +107,7 @@ export default function GenoOnboardingFlow({
       if (next !== slideRef.current) {
         setAgeNudge(false);
         setSlide(next);
+        void Haptics.selectionAsync();
       }
     },
     [resolveSlideFromOffset]
@@ -125,120 +136,109 @@ export default function GenoOnboardingFlow({
   const ctaReady = !isLast || ageConfirmed;
 
   return (
-    <View style={styles.root}>
+    <Animated.View style={[styles.root, { opacity: enterOpacity }]}>
       <StatusBar style="light" />
       <GenoPremiumOnboardingBackdrop />
 
-      <View style={styles.shell}>
-        <View style={[styles.header, { paddingTop: ONBOARDING_TOP_PAD }]}>
-          <View style={styles.brandRow}>
-            <GenoRibbonLogoAnimated width={40} height={40} variant="static" />
-            <GenoWordmark />
-          </View>
-          {!isLast ? (
-            <Pressable
-              onPress={skipToEnd}
-              hitSlop={14}
-              accessibilityRole="button"
-              accessibilityLabel="Skip to last step"
-            >
-              <Text style={styles.skip}>Skip</Text>
-            </Pressable>
-          ) : (
-            <View style={styles.headerSpacer} />
-          )}
-        </View>
+      {/* ── Header ── */}
+      <View style={[styles.header, { paddingTop: ONBOARDING_TOP_PAD }]}>
+        <GenoWordmark />
+        {!isLast ? (
+          <Pressable
+            onPress={skipToEnd}
+            hitSlop={14}
+            accessibilityRole="button"
+            accessibilityLabel="Skip to last step"
+          >
+            <Text style={styles.skip}>Skip</Text>
+          </Pressable>
+        ) : (
+          <View style={styles.headerSpacer} />
+        )}
+      </View>
 
-        <ScrollView
-          ref={scrollRef}
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          bounces={false}
-          decelerationRate="fast"
-          scrollEventThrottle={16}
-          onMomentumScrollEnd={onScrollSettled}
-          onScrollEndDrag={onScrollSettled}
-          style={styles.pager}
-          contentContainerStyle={styles.pagerContent}
-        >
-          {GENO_ONBOARDING_SLIDES.map((item, index) => (
-            <GenoOnboardingSlidePage
-              key={item.kicker}
-              slide={item}
-              width={screenWidth}
-              showSwipeHint={index === 0 && slide === 0}
-            />
-          ))}
-        </ScrollView>
+      {/* ── Slides ── */}
+      <ScrollView
+        ref={scrollRef}
+        horizontal
+        pagingEnabled
+        removeClippedSubviews
+        showsHorizontalScrollIndicator={false}
+        bounces={false}
+        decelerationRate="fast"
+        scrollEventThrottle={16}
+        onMomentumScrollEnd={onScrollSettled}
+        onScrollEndDrag={onScrollSettled}
+        style={styles.pager}
+        contentContainerStyle={styles.pagerContent}
+      >
+        {GENO_ONBOARDING_SLIDES.map((item, index) => (
+          <GenoOnboardingSlidePage
+            key={item.kicker}
+            slide={item}
+            index={index}
+            width={screenWidth}
+          />
+        ))}
+      </ScrollView>
 
-        <View style={[styles.footer, { minHeight: ONBOARDING_FOOTER_MIN_HEIGHT }]}>
-          <LinearGradient
-            colors={['transparent', BRAND_BLACK]}
-            style={styles.footerFade}
-            pointerEvents="none"
+      {/* ── Footer dock ── */}
+      <View style={[styles.footer, { minHeight: ONBOARDING_FOOTER_MIN_HEIGHT }]}>
+        <View style={styles.footerInner}>
+          <GenoOnboardingProgress
+            total={SLIDE_COUNT}
+            current={slide}
+            onSelect={goToSlide}
           />
 
-          <View style={[styles.footerInner, { paddingBottom: ONBOARDING_BOTTOM_PAD }]}>
-            <GenoOnboardingProgress
-              total={SLIDE_COUNT}
-              current={slide}
-              onSelect={goToSlide}
-            />
-
-            <View
-              style={[
-                styles.ageSlot,
-                { height: isLast ? ONBOARDING_AGE_SLOT_HEIGHT : 0 },
-              ]}
-            >
-              {isLast ? (
-                <GenoOnboardingAgeGate
-                  confirmed={ageConfirmed}
-                  onToggle={() => {
-                    setAgeConfirmed((v) => !v);
-                    setAgeNudge(false);
-                  }}
-                  showHelper={ageNudge}
-                />
-              ) : null}
-            </View>
-
-            <Animated.View style={[styles.ctaWrap, { transform: [{ scale: ctaScale }] }]}>
-              <Pressable
-                onPressIn={() =>
-                  Animated.spring(ctaScale, { toValue: 0.98, useNativeDriver: true }).start()
-                }
-                onPressOut={() =>
-                  Animated.spring(ctaScale, { toValue: 1, useNativeDriver: true }).start()
-                }
-                onPress={onContinue}
-                disabled={isLast && !ageConfirmed}
-                accessibilityRole="button"
-                accessibilityState={{ disabled: isLast && !ageConfirmed }}
-                style={[styles.ctaOuter, !ctaReady && styles.ctaOuterMuted]}
-              >
-                <View style={styles.cta}>
-                  <View style={styles.ctaInner}>
-                    <Text style={styles.ctaText}>{ctaLabel}</Text>
-                    {!isLast ? (
-                      <Ionicons name="arrow-forward" size={18} color={COLORS.white} />
-                    ) : null}
-                  </View>
-                </View>
-              </Pressable>
-            </Animated.View>
-
-            {onSignIn ? (
-              <Pressable onPress={onSignIn} hitSlop={12} style={styles.signInRow}>
-                <Text style={styles.signInText}>Already have an account? </Text>
-                <Text style={styles.signInLink}>Sign in</Text>
-              </Pressable>
+          <View
+            style={[
+              styles.ageSlot,
+              { height: isLast ? ONBOARDING_AGE_SLOT_HEIGHT : 0 },
+            ]}
+          >
+            {isLast ? (
+              <GenoOnboardingAgeGate
+                confirmed={ageConfirmed}
+                onToggle={() => {
+                  setAgeConfirmed((v) => !v);
+                  setAgeNudge(false);
+                }}
+                showHelper={ageNudge}
+              />
             ) : null}
           </View>
+
+          <Animated.View style={[styles.ctaWrap, { transform: [{ scale: ctaScale }] }]}>
+            <Pressable
+              onPressIn={() =>
+                Animated.spring(ctaScale, { ...MOTION.springSnappy, toValue: 0.98 }).start()
+              }
+              onPressOut={() =>
+                Animated.spring(ctaScale, { ...MOTION.springSnappy, toValue: 1 }).start()
+              }
+              onPress={onContinue}
+              accessibilityRole="button"
+              style={[styles.cta, !ctaReady && styles.ctaMuted]}
+            >
+              <View style={styles.ctaInner}>
+                <Text style={styles.ctaText}>{ctaLabel}</Text>
+                {!isLast ? (
+                  <Ionicons name="arrow-forward" size={17} color={COLORS.white} />
+                ) : null}
+              </View>
+            </Pressable>
+          </Animated.View>
+
+          {onSignIn ? (
+            <Pressable onPress={onSignIn} hitSlop={12} style={styles.signInRow}>
+              <Text style={styles.signInText}>Already have an account? </Text>
+              <Text style={styles.signInLink}>Sign in</Text>
+            </Pressable>
+          ) : null}
         </View>
       </View>
-    </View>
+    </Animated.View>
   );
 }
 
@@ -247,29 +247,21 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: BRAND_BLACK,
   },
-  shell: {
-    flex: 1,
-  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: ONBOARDING_H_PAD,
-    minHeight: 40,
+    paddingBottom: 8,
     zIndex: 2,
   },
   headerSpacer: {
-    width: 44,
-  },
-  brandRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+    width: 40,
   },
   skip: {
     ...TYPOGRAPHY.bodyStrong,
     fontSize: 14,
-    color: 'rgba(250, 248, 245, 0.7)',
+    color: creamAlpha(0.55),
   },
   pager: {
     flex: 1,
@@ -278,23 +270,16 @@ const styles = StyleSheet.create({
     alignItems: 'stretch',
   },
   footer: {
-    position: 'relative',
-  },
-  footerFade: {
-    position: 'absolute',
-    top: -48,
-    left: 0,
-    right: 0,
-    height: 48,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: creamAlpha(0.08),
+    backgroundColor: BRAND_BLACK,
   },
   footerInner: {
     paddingHorizontal: ONBOARDING_H_PAD,
-    paddingTop: 10,
+    paddingTop: 16,
+    paddingBottom: ONBOARDING_BOTTOM_PAD,
     gap: 14,
     alignItems: 'center',
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: 'rgba(255, 255, 255, 0.06)',
-    backgroundColor: BRAND_BLACK,
   },
   ageSlot: {
     width: '100%',
@@ -304,26 +289,17 @@ const styles = StyleSheet.create({
     width: ONBOARDING_CTA_WIDTH,
     maxWidth: '100%',
   },
-  ctaOuter: {
-    width: '100%',
-    borderRadius: 999,
-    overflow: 'hidden',
-    shadowColor: LOGO_RED,
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 6,
-  },
-  ctaOuterMuted: {
-    opacity: 0.5,
-  },
   cta: {
+    width: '100%',
     height: ONBOARDING_CTA_HEIGHT,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 28,
-    borderRadius: 999,
+    paddingHorizontal: 24,
+    borderRadius: 12,
     backgroundColor: LOGO_RED,
+  },
+  ctaMuted: {
+    opacity: 0.45,
   },
   ctaInner: {
     flexDirection: 'row',
@@ -331,25 +307,23 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   ctaText: {
-    ...TYPOGRAPHY.button,
-    fontSize: 17,
-    color: COLORS.linen,
+    ...TYPOGRAPHY.cta,
+    fontSize: 16,
   },
   signInRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     flexWrap: 'wrap',
-    marginTop: -2,
   },
   signInText: {
     ...TYPOGRAPHY.body,
     fontSize: 14,
-    color: 'rgba(250, 248, 245, 0.7)',
+    color: creamAlpha(0.55),
   },
   signInLink: {
     ...TYPOGRAPHY.bodyStrong,
     fontSize: 14,
-    color: LOGO_RED_HOT,
+    color: LOGO_RED_BRIGHT,
   },
 });

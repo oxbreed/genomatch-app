@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
   percent: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 18,
-    color: COLORS.gold,
+    color: COLORS.goldDeep,
   },
   track: {
     height: 10,
@@ -78,6 +78,6 @@ const styles = StyleSheet.create({
   hint: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 13,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
   },
 });

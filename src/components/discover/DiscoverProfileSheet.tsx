@@ -55,6 +55,7 @@ type Props = {
   onLike: () => void;
   onPass: () => void;
   onSuperLike: () => void;
+  onReport?: () => void;
 };
 
 function formatGoal(goal?: string | null): string {
@@ -115,6 +116,7 @@ export default function DiscoverProfileSheet({
   onLike,
   onPass,
   onSuperLike,
+  onReport,
 }: Props) {
   const [photoIndex, setPhotoIndex] = useState(0);
   const scrollAtTop = useRef(true);
@@ -233,7 +235,7 @@ export default function DiscoverProfileSheet({
                         pointerEvents="none"
                       />
                       <LinearGradient
-                        colors={['transparent', 'rgba(13, 40, 24, 0.15)', 'rgba(13, 40, 24, 0.72)']}
+                        colors={['transparent', 'rgba(11, 12, 14, 0.15)', 'rgba(11, 12, 14, 0.72)']}
                         locations={[0.35, 0.65, 1]}
                         style={styles.heroGlossBottom}
                         pointerEvents="none"
@@ -263,9 +265,22 @@ export default function DiscoverProfileSheet({
                 </View>
               ) : null}
 
+              {onReport ? (
+                <Pressable
+                  style={({ pressed }) => [styles.reportBtn, pressed && styles.closeBtnPressed]}
+                  onPress={onReport}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Report or block ${profile.name}`}
+                  hitSlop={8}
+                >
+                  <Ionicons name="flag-outline" size={18} color={COLORS.linen} />
+                </Pressable>
+              ) : null}
+
               <Pressable
                 style={({ pressed }) => [styles.closeBtn, pressed && styles.closeBtnPressed]}
                 onPress={onClose}
+                accessibilityRole="button"
                 accessibilityLabel="Close profile"
                 hitSlop={8}
               >
@@ -295,9 +310,11 @@ export default function DiscoverProfileSheet({
               <View style={styles.bondPanel}>
                 <View style={styles.bondHeader}>
                   <GenoBondMark size={18} opacity={0.75} />
-                  <Text style={styles.bondKicker}>Lifestyle match</Text>
+                  <Text style={styles.bondKicker}>
+                    {hideGenotype ? 'Lifestyle match' : 'Genotype bond'}
+                  </Text>
                 </View>
-                <GenoCompatRing percent={profile.lifestyleMatch} size={88} />
+                <GenoCompatRing percent={profile.lifestyleMatch} size={96} />
               </View>
 
               {!hideGenotype ? (
@@ -308,7 +325,9 @@ export default function DiscoverProfileSheet({
                   />
                 </View>
               ) : null}
-              <Text style={styles.bondDisclaimer}>Informational only — not medical advice.</Text>
+              {!hideGenotype ? (
+                <Text style={styles.bondDisclaimer}>Informational only — not medical advice.</Text>
+              ) : null}
 
               {profile.bio?.trim() ? (
                 <InfoSection title="About">
@@ -417,8 +436,8 @@ const styles = StyleSheet.create({
   photoBars: {
     position: 'absolute',
     top: 14,
-    left: 14,
-    right: 56,
+    left: 68,
+    right: 68,
     flexDirection: 'row',
     gap: 4,
     zIndex: 12,
@@ -432,14 +451,28 @@ const styles = StyleSheet.create({
   photoBarActive: {
     backgroundColor: COLORS.linen,
   },
+  reportBtn: {
+    position: 'absolute',
+    top: 12,
+    left: 14,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(11, 12, 14, 0.42)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.22)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 14,
+  },
   closeBtn: {
     position: 'absolute',
     top: 12,
     right: 14,
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: 'rgba(13, 40, 24, 0.42)',
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(11, 12, 14, 0.42)',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.22)',
     alignItems: 'center',
@@ -463,7 +496,7 @@ const styles = StyleSheet.create({
     fontSize: 32,
     color: COLORS.linen,
     letterSpacing: -0.6,
-    textShadowColor: 'rgba(13, 40, 24, 0.55)',
+    textShadowColor: 'rgba(11, 12, 14, 0.55)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 6,
   },
@@ -482,7 +515,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: 'rgba(212, 175, 55, 0.35)',
+    borderColor: 'rgba(201, 154, 75, 0.35)',
   },
   noPhotoInitials: {
     fontFamily: FONT_FAMILY.gothamBold,
@@ -502,7 +535,7 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.xl,
     backgroundColor: COLORS.white,
     borderWidth: 1,
-    borderColor: 'rgba(13, 40, 24, 0.08)',
+    borderColor: 'rgba(11, 12, 14, 0.08)',
     ...SHADOWS.card,
     shadowOpacity: 0.06,
   },
@@ -516,7 +549,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     letterSpacing: 1.4,
     textTransform: 'uppercase',
-    color: COLORS.hero,
+    color: COLORS.glossyRed,
   },
   genotypeInfoWrap: {
     width: '100%',
@@ -526,7 +559,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamBook,
     fontSize: 11,
     lineHeight: 15,
-    color: COLORS.textSubtle,
+    color: 'rgba(11, 12, 14, 0.58)',
     textAlign: 'center',
   },
   infoSection: {
@@ -537,15 +570,14 @@ const styles = StyleSheet.create({
     fontSize: 12,
     letterSpacing: 1.2,
     textTransform: 'uppercase',
-    color: COLORS.hero,
-    opacity: 0.8,
+    color: COLORS.logoRed,
   },
   infoPanel: {
     padding: 16,
     borderRadius: RADIUS.lg,
     backgroundColor: COLORS.white,
     borderWidth: 1,
-    borderColor: 'rgba(13, 40, 24, 0.08)',
+    borderColor: 'rgba(11, 12, 14, 0.08)',
     ...SHADOWS.card,
     shadowOpacity: 0.05,
   },

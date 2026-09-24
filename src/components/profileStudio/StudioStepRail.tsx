@@ -57,7 +57,7 @@ function StepPill({
       <Animated.View style={[styles.pillOuter, { transform: [{ scale }] }]}>
         {active ? (
           <LinearGradient
-            colors={['rgba(212, 175, 55, 0.55)', 'rgba(200, 16, 46, 0.35)']}
+            colors={['rgba(201, 154, 75, 0.55)', 'rgba(198, 34, 34, 0.35)']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.pillGlow}
@@ -114,7 +114,7 @@ export default function StudioStepRail({ steps, activeIndex, onSelect, completed
         onLayout={(e: LayoutChangeEvent) => setTrackWidth(e.nativeEvent.layout.width)}
       >
         <LinearGradient
-          colors={['rgba(13, 40, 24, 0.06)', 'rgba(212, 175, 55, 0.2)', 'rgba(13, 40, 24, 0.06)']}
+          colors={['rgba(11, 12, 14, 0.06)', 'rgba(201, 154, 75, 0.2)', 'rgba(11, 12, 14, 0.06)']}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}
           style={styles.track}
@@ -200,21 +200,21 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: COLORS.white,
     borderWidth: 1,
-    borderColor: 'rgba(13, 40, 24, 0.1)',
+    borderColor: 'rgba(11, 12, 14, 0.1)',
   },
   pillActive: {
     backgroundColor: COLORS.mint,
-    borderColor: 'rgba(212, 175, 55, 0.55)',
+    borderColor: 'rgba(201, 154, 75, 0.55)',
   },
   pillComplete: {
-    borderColor: 'rgba(200, 16, 46, 0.35)',
+    borderColor: 'rgba(198, 34, 34, 0.35)',
     backgroundColor: 'rgba(240, 241, 243, 0.85)',
   },
   stepBadge: {
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: 'rgba(13, 40, 24, 0.06)',
+    backgroundColor: 'rgba(11, 12, 14, 0.06)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -222,12 +222,12 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.gold,
   },
   stepBadgeComplete: {
-    backgroundColor: 'rgba(200, 16, 46, 0.25)',
+    backgroundColor: 'rgba(198, 34, 34, 0.25)',
   },
   stepBadgeText: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 10,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
   },
   stepBadgeTextActive: {
     color: COLORS.ink,
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
   pillLabel: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
   },
   pillLabelActive: {
     fontFamily: FONT_FAMILY.gothamBold,

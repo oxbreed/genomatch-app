@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
   value: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 26,
-    color: COLORS.gold,
+    color: COLORS.goldDeep,
   },
   label: {
     fontFamily: FONT_FAMILY.gothamBold,

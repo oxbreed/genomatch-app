@@ -25,7 +25,11 @@ export default function GenoGlassIconButton({
       style={({ pressed }) => [pressed && !disabled && styles.pressed, style]}
       onPress={onPress}
       disabled={disabled}
+      accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
+      // The glass circle is drawn at 40pt for the layout; the touch area is
+      // padded out to clear the 44pt minimum without changing how it looks.
+      hitSlop={Math.max(0, Math.ceil((44 - size) / 2))}
     >
       <GenoGlassSurface
         variant="tabBar"

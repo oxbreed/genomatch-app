@@ -81,7 +81,7 @@ export default function ProfileHero({
       ) : null}
 
       <LinearGradient
-        colors={['transparent', 'rgba(13,40,24,0.42)', 'rgba(13,40,24,0.94)']}
+        colors={['transparent', 'rgba(11, 12, 14,0.42)', 'rgba(11, 12, 14,0.94)']}
         style={styles.heroGradient}
         pointerEvents="none"
       />
@@ -227,13 +227,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 11,
     paddingVertical: 6,
     borderRadius: 999,
-    backgroundColor: 'rgba(13, 40, 24, 0.52)',
+    backgroundColor: 'rgba(11, 12, 14, 0.52)',
     borderWidth: 1,
     borderColor: 'rgba(250, 248, 245, 0.12)',
   },
   studioPill: {
-    borderColor: 'rgba(212, 175, 55, 0.55)',
-    backgroundColor: 'rgba(13, 40, 24, 0.78)',
+    borderColor: 'rgba(201, 154, 75, 0.55)',
+    backgroundColor: 'rgba(11, 12, 14, 0.78)',
   },
   brandText: {
     fontFamily: FONT_FAMILY.gothamBold,
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: COLORS.linen,
     borderBottomWidth: 2,
-    borderBottomColor: 'rgba(212, 175, 55, 0.6)',
+    borderBottomColor: 'rgba(201, 154, 75, 0.6)',
     minWidth: 120,
     flexShrink: 1,
     paddingVertical: 2,
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.linen,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(212, 175, 55, 0.5)',
+    borderBottomColor: 'rgba(201, 154, 75, 0.5)',
     paddingVertical: 2,
   },
   locationLocked: {

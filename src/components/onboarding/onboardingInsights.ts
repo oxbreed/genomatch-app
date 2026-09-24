@@ -20,12 +20,12 @@ export const ONBOARDING_INSIGHTS: OnboardingInsight[] = [
     id: 'compatibility',
     icon: 'shield-checkmark-outline',
     accent: 'gold',
-    kicker: 'GENOTYPE-AWARE MATCHING',
-    title: 'Love with science on your side',
+    kicker: 'DATING, 18+',
+    title: 'Meet people on purpose',
     body:
-      'Discover people aligned with your genotype — built for intentional singles across West Africa and the diaspora.',
-    stat: '75%+',
-    statLabel: 'High-compat filter',
+      'Profiles can include a genotype you typed in yourself. GenoMatch does not turn that into a health result.',
+    stat: '18+',
+    statLabel: 'Adults only',
   },
   {
     id: 'profiles',

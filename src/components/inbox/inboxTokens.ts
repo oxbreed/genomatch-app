@@ -21,11 +21,11 @@ export const INBOX = {
   countBadgeH: 26,
   colors: {
     borderGradient: [
-      'rgba(212, 175, 55, 0.45)',
-      'rgba(200, 16, 46, 0.28)',
-      'rgba(212, 175, 55, 0.35)',
+      'rgba(201, 154, 75, 0.45)',
+      'rgba(198, 34, 34, 0.28)',
+      'rgba(201, 154, 75, 0.35)',
     ] as [string, string, string],
-    goldBtn: [COLORS.gold, '#B8962E'] as [string, string],
+    goldBtn: [COLORS.gold, '#96651F'] as [string, string],
     inkBtn: [COLORS.ink, COLORS.hero] as [string, string],
   },
 } as const;

@@ -96,7 +96,7 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
   const [interests, setInterests] = useState<string[]>([]);
   const [relationshipGoal, setRelationshipGoal] = useState('');
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const [avatarGradient, setAvatarGradient] = useState<[string, string]>(['#0B0C0E', '#D4AF37']);
+  const [avatarGradient, setAvatarGradient] = useState<[string, string]>(['#0B0C0E', '#C99A4B']);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
@@ -524,12 +524,12 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
 
   return (
     <View style={styles.container}>
-      <GenoPremiumChrome variant="linen" />
+      <GenoPremiumChrome variant="ink" />
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
 
       <View style={styles.header}>
         <View style={styles.progressTrack}>
@@ -653,7 +653,7 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.linen,
+    backgroundColor: COLORS.background,
   },
   flex: { flex: 1 },
   footerGlass: { overflow: 'hidden' },

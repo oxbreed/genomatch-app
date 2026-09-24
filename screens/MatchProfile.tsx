@@ -95,7 +95,7 @@ export default function MatchProfile({ match, onBack, onSendMessage }: MatchProf
 
   return (
     <View style={styles.container}>
-      <GenoPremiumChrome variant="discover" />
+      <GenoPremiumChrome variant="linen" />
       <StatusBar style="dark" />
 
       <GenoBackHeader title="Match profile" onBack={onBack} right={menuBtn} />
@@ -129,7 +129,7 @@ export default function MatchProfile({ match, onBack, onSendMessage }: MatchProf
                 percent={profile.lifestyleMatch}
                 theirTraits={profile.interests}
                 onViewReport={onSendMessage}
-                ctaLabel="View Full Report"
+                ctaLabel="Send a message"
               />
             </View>
 
@@ -237,7 +237,7 @@ export default function MatchProfile({ match, onBack, onSendMessage }: MatchProf
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.linen,
+    backgroundColor: COLORS.cream,
   },
   scroll: {
     paddingBottom: 120,
@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     letterSpacing: 1.2,
     textTransform: 'uppercase',
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
   },
   displayName: {
     fontFamily: FONT_FAMILY.gothamBold,
@@ -316,9 +316,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 7,
     borderRadius: RADIUS.pill,
-    backgroundColor: 'rgba(212, 175, 55, 0.22)',
+    backgroundColor: 'rgba(201, 154, 75, 0.22)',
     borderWidth: 1,
-    borderColor: 'rgba(212, 175, 55, 0.35)',
+    borderColor: 'rgba(201, 154, 75, 0.35)',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,

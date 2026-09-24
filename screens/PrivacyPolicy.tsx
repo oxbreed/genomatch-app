@@ -13,7 +13,7 @@ type PrivacyPolicyProps = {
 const SECTIONS = [
   {
     title: 'Introduction',
-    body: `${GENOMATCH_OPERATOR_INTRO}, collects and processes your personal data to provide genotype-aware matchmaking services. This policy explains what we collect, how we use it, and your rights.`,
+    body: `${GENOMATCH_OPERATOR_INTRO}, collects and processes your personal data to run the GenoMatch dating service. This policy explains what we collect, how we use it, and your rights.`,
   },
   {
     title: 'Data We Collect',
@@ -23,12 +23,12 @@ const SECTIONS = [
   {
     title: 'How We Use Your Data',
     body:
-      'Your data powers our matching algorithm, displays your profile to compatible members, and enables communication between mutual matches. We use your information only to deliver and improve the GenoMatch experience.',
+      'We use your data to show your profile to other adults, to let mutual matches message each other, and to keep the service working. We do not use genotype to calculate a health result.',
   },
   {
     title: 'Genotype Data',
     body:
-      'Genotype information is self-reported, treated as sensitive health-related data, and used solely for compatibility guidance within GenoMatch — not as medical advice or a laboratory test. It is never sold to third parties.',
+      'Genotype is something you type in. We treat it as sensitive information, show it on your profile, and never sell it. GenoMatch does not diagnose, predict disease, or give medical advice.',
   },
   {
     title: 'Data Sharing',

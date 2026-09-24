@@ -12,7 +12,7 @@ type Props = {
 
 export default function ProfileStrengthPanel({ percent, hint }: Props) {
   return (
-    <GenoCardFrame showWatermark={false} style={styles.frame}>
+    <GenoCardFrame glass={false} showWatermark={false} style={styles.frame}>
       <View style={styles.inner}>
         <ProfileVitalityRing percent={percent} size={68} />
         <View style={styles.copy}>
@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
   },
   kicker: {
     ...PROFILE_TYPE.sectionKicker,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
   },
   title: {
     ...PROFILE_TYPE.sectionTitle,
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
   barTrack: {
     height: 3,
     borderRadius: 2,
-    backgroundColor: 'rgba(13, 40, 24, 0.06)',
+    backgroundColor: 'rgba(11, 12, 14, 0.06)',
     overflow: 'hidden',
     marginTop: 4,
   },

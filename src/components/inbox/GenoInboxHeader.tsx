@@ -51,7 +51,7 @@ function HeaderContent({
         </View>
       </View>
       <LinearGradient
-        colors={['transparent', COLORS.gold, 'rgba(200, 16, 46, 0.4)', 'transparent']}
+        colors={['transparent', COLORS.gold, 'rgba(198, 34, 34, 0.4)', 'transparent']}
         start={{ x: 0, y: 0.5 }}
         end={{ x: 1, y: 0.5 }}
         style={styles.rule}
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.marketingExtrabold,
     fontSize: INBOX.headerKickerSize,
     letterSpacing: 2.4,
-    color: COLORS.gold,
+    color: COLORS.glossyRed,
   },
   titleRow: {
     flexDirection: 'row',
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: INBOX.headerSubtitleSize,
     lineHeight: 18,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
     marginTop: 1,
   },
   rule: {

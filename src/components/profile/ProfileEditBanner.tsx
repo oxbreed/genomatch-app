@@ -37,7 +37,7 @@ export default function ProfileEditBanner() {
   return (
     <Animated.View style={{ opacity }}>
       <LinearGradient
-        colors={['rgba(212, 175, 55, 0.35)', 'rgba(200, 16, 46, 0.2)']}
+        colors={['rgba(201, 154, 75, 0.35)', 'rgba(198, 34, 34, 0.2)']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={styles.banner}
@@ -64,14 +64,14 @@ const styles = StyleSheet.create({
     padding: 14,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(212, 175, 55, 0.45)',
+    borderColor: 'rgba(201, 154, 75, 0.45)',
   },
   copy: { flex: 1, gap: 2 },
   kicker: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 9,
     letterSpacing: 2,
-    color: COLORS.gold,
+    color: COLORS.goldDeep,
   },
   title: {
     fontFamily: FONT_FAMILY.gothamBold,
@@ -81,6 +81,6 @@ const styles = StyleSheet.create({
   sub: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
   },
 });

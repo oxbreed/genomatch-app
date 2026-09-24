@@ -27,7 +27,7 @@ export default function ProfileStatGems({ matches, likesReceived, profileViews }
   ];
 
   return (
-    <GenoCardFrame showWatermark={false}>
+    <GenoCardFrame glass={false} showWatermark={false}>
       <View style={styles.row}>
         {stats.map((stat, index) => (
           <View key={stat.label} style={styles.gemWrap}>
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
   },
   label: {
     ...PROFILE_TYPE.statLabel,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
     textAlign: 'center',
   },
 });
