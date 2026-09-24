@@ -880,13 +880,16 @@ export default function Profile({ onSignOut }: ProfileProps) {
                 label="Live selfie"
                 hint="A photo check for the trust team. Not a passport or government ID."
               >
+                <Text style={styles.photoReviewHint}>
+                  Take a live selfie so the trust team can review your photo. This is not a passport or government ID.
+                </Text>
                 <Pressable
                   accessibilityRole="button"
                   accessibilityLabel="Start photo review"
                   style={({ pressed }) => [styles.photoReviewBtn, pressed && styles.photoReviewPressed]}
                   onPress={() => setShowPhotoReview(true)}
                 >
-                  <Ionicons name="camera-outline" size={18} color={COLORS.ink} />
+                  <Ionicons name="camera-outline" size={18} color={COLORS.cream} />
                   <Text style={styles.photoReviewText}>Start photo review</Text>
                 </Pressable>
               </ProfileSectionCard>
@@ -1019,14 +1022,21 @@ const styles = StyleSheet.create({
   viewStack: {
     gap: 2,
   },
+  photoReviewHint: {
+    fontFamily: FONT_FAMILY.gothamMedium,
+    fontSize: 15,
+    lineHeight: 22,
+    color: 'rgba(11, 12, 14, 0.82)',
+    marginBottom: 14,
+  },
   photoReviewBtn: {
-    minHeight: 48,
+    minHeight: 52,
     borderRadius: 14,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: COLORS.gold,
+    backgroundColor: COLORS.glossyRed,
     paddingHorizontal: 16,
   },
   photoReviewPressed: {
@@ -1034,8 +1044,8 @@ const styles = StyleSheet.create({
   },
   photoReviewText: {
     fontFamily: FONT_FAMILY.gothamBold,
-    fontSize: 15,
-    color: COLORS.ink,
+    fontSize: 16,
+    color: COLORS.cream,
   },
   errorBanner: {
     marginHorizontal: 16,

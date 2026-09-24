@@ -14,7 +14,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { GenoPremiumChrome } from '../src/brand/graphics';
 import { submitIdentitySelfie } from '../src/lib/identityVerification';
-import { COLORS, GLASS, RADIUS, SHADOWS } from '../src/theme';
+import { COLORS, FONT_FAMILY, GLASS, RADIUS, SHADOWS } from '../src/theme';
 
 type ScreenPhase = 'camera' | 'preview' | 'success';
 
@@ -79,11 +79,11 @@ export default function IdentityVerification({ onClose, onSubmitted }: Props) {
   if (!permission) {
     return (
       <View style={styles.container}>
-        <GenoPremiumChrome variant="ink" />
-        <StatusBar style="light" />
+        <GenoPremiumChrome variant="linen" />
+        <StatusBar style="dark" />
         <CloseControl onPress={onClose} label="Close photo review" />
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color={COLORS.hero} />
+          <ActivityIndicator size="large" color={COLORS.ink} />
         </View>
       </View>
     );
@@ -92,13 +92,13 @@ export default function IdentityVerification({ onClose, onSubmitted }: Props) {
   if (!permission.granted) {
     return (
       <View style={styles.container}>
-        <GenoPremiumChrome variant="ink" />
-        <StatusBar style="light" />
+        <GenoPremiumChrome variant="linen" />
+        <StatusBar style="dark" />
         <CloseControl onPress={onClose} label="Close photo review" />
         <View style={styles.centered}>
           <View style={styles.permissionCard}>
             <View style={styles.permissionIconWrap}>
-              <Ionicons name="camera-outline" size={28} color={COLORS.hero} />
+              <Ionicons name="camera-outline" size={28} color={COLORS.ink} />
             </View>
             <Text style={styles.title}>Camera access needed</Text>
             <Text style={styles.subtitle}>
@@ -122,12 +122,12 @@ export default function IdentityVerification({ onClose, onSubmitted }: Props) {
   if (phase === 'success') {
     return (
       <View style={styles.container}>
-        <GenoPremiumChrome variant="ink" />
-        <StatusBar style="light" />
+        <GenoPremiumChrome variant="linen" />
+        <StatusBar style="dark" />
         <View style={styles.centered}>
           <View style={styles.permissionCard}>
             <View style={[styles.permissionIconWrap, styles.successIconWrap]}>
-              <Ionicons name="checkmark-circle" size={32} color={COLORS.hero} />
+              <Ionicons name="checkmark-circle" size={32} color={COLORS.ink} />
             </View>
             <Text style={styles.title}>Submitted — we'll review it shortly</Text>
             <Text style={styles.subtitle}>
@@ -153,8 +153,8 @@ export default function IdentityVerification({ onClose, onSubmitted }: Props) {
   if (phase === 'preview' && capturedUri) {
     return (
       <View style={styles.container}>
-        <GenoPremiumChrome variant="ink" />
-        <StatusBar style="light" />
+        <GenoPremiumChrome variant="linen" />
+        <StatusBar style="dark" />
         <CloseControl onPress={onClose} label="Close photo review" />
         <View style={styles.content}>
           <Text style={styles.title}>Review your selfie</Text>
@@ -190,7 +190,7 @@ export default function IdentityVerification({ onClose, onSubmitted }: Props) {
               <LinearGradient colors={[COLORS.gold, COLORS.goldDeep]} style={styles.primaryBtn}>
                 {submitting ? (
                   <View style={styles.submittingRow}>
-                    <ActivityIndicator color={COLORS.hero} size="small" />
+                    <ActivityIndicator color={COLORS.ink} size="small" />
                     <Text style={styles.primaryBtnText}>Submitting…</Text>
                   </View>
                 ) : (
@@ -206,8 +206,8 @@ export default function IdentityVerification({ onClose, onSubmitted }: Props) {
 
   return (
     <View style={styles.container}>
-      <GenoPremiumChrome variant="ink" />
-      <StatusBar style="light" />
+      <GenoPremiumChrome variant="linen" />
+      <StatusBar style="dark" />
       <CloseControl onPress={onClose} label="Close photo review" />
       <View style={styles.content}>
         <Text style={styles.title}>Take a live selfie</Text>
@@ -258,7 +258,7 @@ function CloseControl({ onPress, label }: { onPress: () => void; label: string }
       hitSlop={8}
       style={styles.closeBtn}
     >
-      <Ionicons name="chevron-back" size={22} color={COLORS.cream} />
+      <Ionicons name="chevron-back" size={22} color={COLORS.ink} />
     </Pressable>
   );
 }
@@ -274,11 +274,13 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(11, 12, 14, 0.45)',
+    backgroundColor: COLORS.cream,
+    borderWidth: 1,
+    borderColor: 'rgba(11, 12, 14, 0.16)',
   },
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.cream,
   },
   centered: {
     flex: 1,
@@ -298,7 +300,7 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.lg,
     borderWidth: 1.5,
     borderColor: GLASS.insetBorder,
-    backgroundColor: GLASS.insetFill,
+    backgroundColor: COLORS.white,
     padding: 24,
     alignItems: 'center',
     gap: 12,
@@ -316,17 +318,17 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(184, 188, 196, 0.45)',
   },
   title: {
+    fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 26,
-    fontWeight: '800',
-    color: COLORS.hero,
+    color: COLORS.ink,
     letterSpacing: -0.5,
     textAlign: 'center',
   },
   subtitle: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: 'rgba(11, 12, 14, 0.65)',
-    fontWeight: '500',
+    fontFamily: FONT_FAMILY.gothamMedium,
+    fontSize: 16,
+    lineHeight: 24,
+    color: 'rgba(11, 12, 14, 0.82)',
     textAlign: 'center',
     marginBottom: 20,
   },
@@ -372,7 +374,7 @@ const styles = StyleSheet.create({
     height: 76,
     borderRadius: 38,
     borderWidth: 4,
-    borderColor: COLORS.hero,
+    borderColor: COLORS.ink,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: COLORS.white,
@@ -382,7 +384,7 @@ const styles = StyleSheet.create({
     width: 58,
     height: 58,
     borderRadius: 29,
-    backgroundColor: COLORS.hero,
+    backgroundColor: COLORS.glossyRed,
   },
   actionsRow: {
     flexDirection: 'row',
@@ -401,8 +403,8 @@ const styles = StyleSheet.create({
   },
   secondaryBtnText: {
     fontSize: 16,
-    fontWeight: '700',
-    color: COLORS.hero,
+    fontFamily: FONT_FAMILY.gothamBold,
+    color: COLORS.ink,
   },
   primaryBtnWrap: {
     borderRadius: RADIUS.md,
@@ -420,8 +422,8 @@ const styles = StyleSheet.create({
   },
   primaryBtnText: {
     fontSize: 16,
-    fontWeight: '800',
-    color: COLORS.hero,
+    fontFamily: FONT_FAMILY.gothamBold,
+    color: COLORS.ink,
   },
   submittingRow: {
     flexDirection: 'row',
