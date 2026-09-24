@@ -9,8 +9,8 @@ import {
   View,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import MatchCardActions from './MatchCardActions';
 import { GenoBondMark } from '../../brand';
 import {
   GenoGlassBackdrop,
@@ -253,58 +253,7 @@ export default function DiscoverMatchModal({
                 </>
               ) : null}
 
-              <View style={styles.actions}>
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel="Continue"
-                  style={({ pressed }) => [styles.actionHit, pressed && styles.actionPressed]}
-                  onPress={() => {
-                    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    onContinue();
-                  }}
-                >
-                  <LinearGradient
-                    colors={[COLORS.goldBright, COLORS.gold, COLORS.goldDeep]}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                    style={styles.primaryRim}
-                  >
-                    <LinearGradient
-                      colors={[COLORS.glossyRedDeep, COLORS.glossyRed, COLORS.glossyRed]}
-                      start={{ x: 0, y: 0.5 }}
-                      end={{ x: 1, y: 0.5 }}
-                      style={styles.primaryBtn}
-                    >
-                      <Text style={styles.primaryLabel}>Continue</Text>
-                      <Ionicons name="arrow-forward" size={18} color={COLORS.goldBright} />
-                    </LinearGradient>
-                  </LinearGradient>
-                </Pressable>
-
-                {onSendMessage ? (
-                  <Pressable
-                    accessibilityRole="button"
-                    accessibilityLabel="Send a message"
-                    style={({ pressed }) => [styles.actionHit, pressed && styles.actionPressed]}
-                    onPress={() => {
-                      void Haptics.selectionAsync();
-                      onSendMessage();
-                    }}
-                  >
-                    <LinearGradient
-                      colors={[COLORS.goldBright, COLORS.goldDeep, COLORS.gold]}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 1 }}
-                      style={styles.secondaryRim}
-                    >
-                      <View style={styles.secondaryBtn}>
-                        <Ionicons name="chatbubble-ellipses" size={18} color={COLORS.gold} />
-                        <Text style={styles.secondaryLabel}>Send a message</Text>
-                      </View>
-                    </LinearGradient>
-                  </Pressable>
-                ) : null}
-              </View>
+              <MatchCardActions onContinue={onContinue} onSendMessage={onSendMessage} />
             </GenoGlassSurface>
           </GenoMirrorRimFrame>
         </Animated.View>
@@ -472,65 +421,8 @@ const styles = StyleSheet.create({
   compatDisclaimer: {
     ...TYPOGRAPHY.caption,
     textAlign: 'center',
-    marginBottom: 22,
-    paddingHorizontal: 16,
+    marginBottom: 20,
+    paddingHorizontal: 8,
     color: COLORS.textSubtleOnDark,
-  },
-  actions: {
-    width: '100%',
-    alignSelf: 'stretch',
-    gap: 12,
-  },
-  actionHit: {
-    width: '100%',
-    borderRadius: RADIUS.pill,
-  },
-  actionPressed: {
-    opacity: 0.9,
-    transform: [{ scale: 0.985 }],
-  },
-  primaryRim: {
-    borderRadius: RADIUS.pill,
-    padding: 1.5,
-    shadowColor: COLORS.glossyRed,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.38,
-    shadowRadius: 14,
-    elevation: 8,
-  },
-  primaryBtn: {
-    minHeight: 52,
-    borderRadius: RADIUS.pill,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-    paddingHorizontal: 22,
-  },
-  primaryLabel: {
-    fontFamily: FONT_FAMILY.gothamBold,
-    fontSize: 17,
-    letterSpacing: 0.2,
-    color: COLORS.cream,
-  },
-  secondaryRim: {
-    borderRadius: RADIUS.pill,
-    padding: 1.5,
-  },
-  secondaryBtn: {
-    minHeight: 48,
-    borderRadius: RADIUS.pill,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-    paddingHorizontal: 22,
-    backgroundColor: '#121418',
-  },
-  secondaryLabel: {
-    fontFamily: FONT_FAMILY.gothamBold,
-    fontSize: 15,
-    letterSpacing: 0.15,
-    color: COLORS.cream,
   },
 });
