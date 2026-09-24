@@ -282,10 +282,11 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   cardFill: {
-    paddingHorizontal: 24,
+    width: '100%',
+    paddingHorizontal: 22,
     paddingTop: 28,
-    paddingBottom: 24,
-    alignItems: 'center',
+    paddingBottom: 22,
+    alignItems: 'stretch',
   },
   kickerRow: {
     flexDirection: 'row',
