@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
   barTrack: {
     height: 3,
     borderRadius: 2,
-    backgroundColor: 'rgba(13, 40, 24, 0.06)',
+    backgroundColor: 'rgba(11, 12, 14, 0.06)',
     overflow: 'hidden',
     marginTop: 4,
   },

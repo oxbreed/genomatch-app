@@ -29,7 +29,7 @@ export default function GenoScreenHeader({
       <LinearGradient
         colors={
           isInk
-            ? ['rgba(13, 40, 24, 0.08)', 'transparent']
+            ? ['rgba(11, 12, 14, 0.08)', 'transparent']
             : ['rgba(201, 154, 75, 0.12)', 'transparent']
         }
         style={styles.shimmer}

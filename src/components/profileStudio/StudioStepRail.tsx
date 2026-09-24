@@ -114,7 +114,7 @@ export default function StudioStepRail({ steps, activeIndex, onSelect, completed
         onLayout={(e: LayoutChangeEvent) => setTrackWidth(e.nativeEvent.layout.width)}
       >
         <LinearGradient
-          colors={['rgba(13, 40, 24, 0.06)', 'rgba(201, 154, 75, 0.2)', 'rgba(13, 40, 24, 0.06)']}
+          colors={['rgba(11, 12, 14, 0.06)', 'rgba(201, 154, 75, 0.2)', 'rgba(11, 12, 14, 0.06)']}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}
           style={styles.track}
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: COLORS.white,
     borderWidth: 1,
-    borderColor: 'rgba(13, 40, 24, 0.1)',
+    borderColor: 'rgba(11, 12, 14, 0.1)',
   },
   pillActive: {
     backgroundColor: COLORS.mint,
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: 'rgba(13, 40, 24, 0.06)',
+    backgroundColor: 'rgba(11, 12, 14, 0.06)',
     alignItems: 'center',
     justifyContent: 'center',
   },

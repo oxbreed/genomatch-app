@@ -238,7 +238,7 @@ export default function DiscoverProfileSheet({
                         pointerEvents="none"
                       />
                       <LinearGradient
-                        colors={['transparent', 'rgba(13, 40, 24, 0.15)', 'rgba(13, 40, 24, 0.72)']}
+                        colors={['transparent', 'rgba(11, 12, 14, 0.15)', 'rgba(11, 12, 14, 0.72)']}
                         locations={[0.35, 0.65, 1]}
                         style={styles.heroGlossBottom}
                         pointerEvents="none"
@@ -445,7 +445,7 @@ const styles = StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: 19,
-    backgroundColor: 'rgba(13, 40, 24, 0.42)',
+    backgroundColor: 'rgba(11, 12, 14, 0.42)',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.22)',
     alignItems: 'center',
@@ -469,7 +469,7 @@ const styles = StyleSheet.create({
     fontSize: 32,
     color: COLORS.linen,
     letterSpacing: -0.6,
-    textShadowColor: 'rgba(13, 40, 24, 0.55)',
+    textShadowColor: 'rgba(11, 12, 14, 0.55)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 6,
   },
@@ -508,7 +508,7 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.xl,
     backgroundColor: COLORS.white,
     borderWidth: 1,
-    borderColor: 'rgba(13, 40, 24, 0.08)',
+    borderColor: 'rgba(11, 12, 14, 0.08)',
     ...SHADOWS.card,
     shadowOpacity: 0.06,
   },
@@ -557,7 +557,7 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.lg,
     backgroundColor: COLORS.white,
     borderWidth: 1,
-    borderColor: 'rgba(13, 40, 24, 0.08)',
+    borderColor: 'rgba(11, 12, 14, 0.08)',
     ...SHADOWS.card,
     shadowOpacity: 0.05,
   },

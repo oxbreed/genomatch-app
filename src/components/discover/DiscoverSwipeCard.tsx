@@ -324,7 +324,7 @@ const styles = StyleSheet.create({
     letterSpacing: -0.4,
     flexShrink: 1,
     minWidth: 0,
-    textShadowColor: 'rgba(13, 40, 24, 0.45)',
+    textShadowColor: 'rgba(11, 12, 14, 0.45)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 4,
   },

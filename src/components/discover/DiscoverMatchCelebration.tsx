@@ -347,7 +347,7 @@ export default function DiscoverMatchCelebration({
 
                     <Animated.View style={[styles.bondCenter, { transform: [{ scale: bondPulse }] }]}>
                       <LinearGradient
-                        colors={['rgba(201, 154, 75, 0.35)', 'rgba(13, 40, 24, 0.2)']}
+                        colors={['rgba(201, 154, 75, 0.35)', 'rgba(11, 12, 14, 0.2)']}
                         style={styles.bondGlow}
                       >
                         <GenoBondMark size={56} opacity={1} />
@@ -608,7 +608,7 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     borderWidth: 2,
     borderColor: 'rgba(201, 154, 75, 0.5)',
-    backgroundColor: 'rgba(13, 40, 24, 0.6)',
+    backgroundColor: 'rgba(11, 12, 14, 0.6)',
   },
   youRing: {
     width: 68,
@@ -666,7 +666,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.gold,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(13, 40, 24, 0.5)',
+    backgroundColor: 'rgba(11, 12, 14, 0.5)',
   },
   compatPercent: {
     fontFamily: FONT_FAMILY.gothamBold,

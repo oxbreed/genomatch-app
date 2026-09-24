@@ -17,7 +17,7 @@ export default function ProfileHeroChrome({ studio, height, children }: Props) {
         <View style={[styles.viewHero, { height }, SHADOWS.cardElevated]}>
           {children}
           <LinearGradient
-            colors={['transparent', 'rgba(13, 40, 24, 0.28)']}
+            colors={['transparent', 'rgba(11, 12, 14, 0.28)']}
             style={styles.viewVignette}
             pointerEvents="none"
           />
@@ -44,7 +44,7 @@ export default function ProfileHeroChrome({ studio, height, children }: Props) {
             pointerEvents="none"
           />
           <LinearGradient
-            colors={['transparent', 'rgba(13, 40, 24, 0.35)']}
+            colors={['transparent', 'rgba(11, 12, 14, 0.35)']}
             style={styles.bottomVignette}
             pointerEvents="none"
           />

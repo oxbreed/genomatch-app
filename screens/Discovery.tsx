@@ -1036,7 +1036,7 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
                 ) : null}
                 <View style={[styles.cardActionsOverlay, cardLayoutStyles.cardActionsOverlay]} pointerEvents="box-none">
                   <LinearGradient
-                    colors={['transparent', 'rgba(13, 40, 24, 0.22)', 'rgba(13, 40, 24, 0.48)']}
+                    colors={['transparent', 'rgba(11, 12, 14, 0.22)', 'rgba(11, 12, 14, 0.48)']}
                     locations={[0, 0.55, 1]}
                     style={styles.cardActionsFade}
                     pointerEvents="none"
@@ -1396,7 +1396,7 @@ const styles = StyleSheet.create({
     letterSpacing: -0.4,
     flexShrink: 1,
     minWidth: 0,
-    textShadowColor: 'rgba(13, 40, 24, 0.45)',
+    textShadowColor: 'rgba(11, 12, 14, 0.45)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 4,
   },
@@ -1516,7 +1516,7 @@ const styles = StyleSheet.create({
     zIndex: 8,
   },
   cardDragTintLike: {
-    backgroundColor: 'rgba(13, 40, 24, 0.3)',
+    backgroundColor: 'rgba(11, 12, 14, 0.3)',
   },
   cardDragTintNope: {
     backgroundColor: 'rgba(184, 188, 196, 0.3)',

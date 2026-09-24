@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.lg,
     backgroundColor: COLORS.white,
     borderWidth: 1,
-    borderColor: 'rgba(13, 40, 24, 0.07)',
+    borderColor: 'rgba(11, 12, 14, 0.07)',
     gap: 10,
   },
   row: {
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     height: 5,
     borderRadius: 3,
     overflow: 'hidden',
-    backgroundColor: 'rgba(13, 40, 24, 0.06)',
+    backgroundColor: 'rgba(11, 12, 14, 0.06)',
   },
   fill: {
     height: 5,

@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: 'rgba(184, 188, 196, 0.25)',
     borderStyle: 'dashed',
-    borderColor: 'rgba(13, 40, 24, 0.25)',
+    borderColor: 'rgba(11, 12, 14, 0.25)',
   },
   addPressed: {
     opacity: 0.88,

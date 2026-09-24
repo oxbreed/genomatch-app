@@ -39,7 +39,7 @@ export default function StudioProgressHeader({
 
       <View style={styles.track}>
         <LinearGradient
-          colors={['rgba(13, 40, 24, 0.08)', 'rgba(201, 154, 75, 0.25)']}
+          colors={['rgba(11, 12, 14, 0.08)', 'rgba(201, 154, 75, 0.25)']}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}
           style={StyleSheet.absoluteFill}
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.lg,
     backgroundColor: COLORS.white,
     borderWidth: 1,
-    borderColor: 'rgba(13, 40, 24, 0.08)',
+    borderColor: 'rgba(11, 12, 14, 0.08)',
     gap: 10,
   },
   topRow: {
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     height: 6,
     borderRadius: 3,
     overflow: 'hidden',
-    backgroundColor: 'rgba(13, 40, 24, 0.06)',
+    backgroundColor: 'rgba(11, 12, 14, 0.06)',
   },
   trackFill: {
     height: 6,

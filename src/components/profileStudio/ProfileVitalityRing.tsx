@@ -90,7 +90,7 @@ export default function ProfileVitalityRing({ percent, size = 76 }: Props) {
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke="rgba(13, 40, 24, 0.08)"
+          stroke="rgba(11, 12, 14, 0.08)"
           strokeWidth={stroke}
           fill="none"
         />

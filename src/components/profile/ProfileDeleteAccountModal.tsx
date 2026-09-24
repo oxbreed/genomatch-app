@@ -124,7 +124,7 @@ export default function ProfileDeleteAccountModal({
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(13, 40, 24, 0.55)',
+    backgroundColor: 'rgba(11, 12, 14, 0.55)',
     justifyContent: 'center',
     paddingHorizontal: 24,
   },
@@ -153,14 +153,14 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
     lineHeight: 22,
-    color: 'rgba(13, 40, 24, 0.72)',
+    color: 'rgba(11, 12, 14, 0.72)',
     marginBottom: 8,
   },
   bodySecondary: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 13,
     lineHeight: 20,
-    color: 'rgba(13, 40, 24, 0.58)',
+    color: 'rgba(11, 12, 14, 0.58)',
     marginBottom: 16,
   },
   checkRow: {

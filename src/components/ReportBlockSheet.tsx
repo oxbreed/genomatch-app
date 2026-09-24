@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 4,
     borderRadius: 2,
-    backgroundColor: 'rgba(13, 40, 24, 0.2)',
+    backgroundColor: 'rgba(11, 12, 14, 0.2)',
     marginBottom: 16,
   },
   sheetTitle: {

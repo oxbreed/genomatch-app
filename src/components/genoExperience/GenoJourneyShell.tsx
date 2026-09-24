@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: 'rgba(13, 40, 24, 0.14)',
+    backgroundColor: 'rgba(11, 12, 14, 0.14)',
   },
   dotActive: {
     width: 28,
