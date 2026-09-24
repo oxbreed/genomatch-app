@@ -18,7 +18,14 @@ import { COLORS, GLASS, RADIUS, SHADOWS } from '../src/theme';
 
 type ScreenPhase = 'camera' | 'preview' | 'success';
 
-export default function IdentityVerification() {
+type Props = {
+  /** Return to the screen that opened the check. */
+  onClose: () => void;
+  /** Fired after a selfie is accepted, so the caller can refresh status. */
+  onSubmitted?: () => void;
+};
+
+export default function IdentityVerification({ onClose, onSubmitted }: Props) {
   const cameraRef = useRef<CameraViewInstance>(null);
   const [permission, requestPermission] = useCameraPermissions();
   const [cameraReady, setCameraReady] = useState(false);
@@ -61,6 +68,7 @@ export default function IdentityVerification() {
     try {
       await submitIdentitySelfie(capturedUri);
       setPhase('success');
+      onSubmitted?.();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not submit your selfie. Please try again.');
     } finally {
@@ -73,6 +81,7 @@ export default function IdentityVerification() {
       <View style={styles.container}>
         <GenoPremiumChrome variant="ink" />
         <StatusBar style="light" />
+        <CloseControl onPress={onClose} label="Close photo review" />
         <View style={styles.centered}>
           <ActivityIndicator size="large" color={COLORS.hero} />
         </View>
@@ -85,6 +94,7 @@ export default function IdentityVerification() {
       <View style={styles.container}>
         <GenoPremiumChrome variant="ink" />
         <StatusBar style="light" />
+        <CloseControl onPress={onClose} label="Close photo review" />
         <View style={styles.centered}>
           <View style={styles.permissionCard}>
             <View style={styles.permissionIconWrap}>
@@ -99,7 +109,7 @@ export default function IdentityVerification() {
               style={({ pressed }) => [styles.primaryBtnWrap, pressed && styles.pressed]}
               onPress={() => void requestPermission()}
             >
-              <LinearGradient colors={[COLORS.gold, '#C49A38']} style={styles.primaryBtn}>
+              <LinearGradient colors={[COLORS.gold, COLORS.goldDeep]} style={styles.primaryBtn}>
                 <Text style={styles.primaryBtnText}>Allow camera access</Text>
               </LinearGradient>
             </Pressable>
@@ -124,6 +134,16 @@ export default function IdentityVerification() {
               Our team will review your selfie. You'll be notified when that review is complete.
               This is a photo check, not a government identity document.
             </Text>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Done"
+              style={({ pressed }) => [styles.primaryBtnWrap, pressed && styles.pressed]}
+              onPress={onClose}
+            >
+              <LinearGradient colors={[COLORS.gold, COLORS.goldDeep]} style={styles.primaryBtn}>
+                <Text style={styles.primaryBtnText}>Done</Text>
+              </LinearGradient>
+            </Pressable>
           </View>
         </View>
       </View>
@@ -135,6 +155,7 @@ export default function IdentityVerification() {
       <View style={styles.container}>
         <GenoPremiumChrome variant="ink" />
         <StatusBar style="light" />
+        <CloseControl onPress={onClose} label="Close photo review" />
         <View style={styles.content}>
           <Text style={styles.title}>Review your selfie</Text>
           <Text style={styles.subtitle}>
@@ -166,7 +187,7 @@ export default function IdentityVerification() {
               onPress={() => void handleSubmit()}
               disabled={submitting}
             >
-              <LinearGradient colors={[COLORS.gold, '#C49A38']} style={styles.primaryBtn}>
+              <LinearGradient colors={[COLORS.gold, COLORS.goldDeep]} style={styles.primaryBtn}>
                 {submitting ? (
                   <View style={styles.submittingRow}>
                     <ActivityIndicator color={COLORS.hero} size="small" />
@@ -187,6 +208,7 @@ export default function IdentityVerification() {
     <View style={styles.container}>
       <GenoPremiumChrome variant="ink" />
       <StatusBar style="light" />
+      <CloseControl onPress={onClose} label="Close photo review" />
       <View style={styles.content}>
         <Text style={styles.title}>Take a live selfie</Text>
         <Text style={styles.subtitle}>
@@ -227,7 +249,33 @@ export default function IdentityVerification() {
   );
 }
 
+function CloseControl({ onPress, label }: { onPress: () => void; label: string }) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      onPress={onPress}
+      hitSlop={8}
+      style={styles.closeBtn}
+    >
+      <Ionicons name="chevron-back" size={22} color={COLORS.cream} />
+    </Pressable>
+  );
+}
+
 const styles = StyleSheet.create({
+  closeBtn: {
+    position: 'absolute',
+    top: 54,
+    left: 16,
+    zIndex: 4,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(11, 12, 14, 0.45)',
+  },
   container: {
     flex: 1,
     backgroundColor: COLORS.background,

@@ -11,10 +11,12 @@ import {
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { Ionicons } from '@expo/vector-icons';
 import About from './About';
 import CommunityGuidelines from './CommunityGuidelines';
 import PrivacyPolicy from './PrivacyPolicy';
 import TermsOfService from './TermsOfService';
+import IdentityVerification from './IdentityVerification';
 import { GenoPremiumChrome, GenoLogoCeremony } from '../src/brand/graphics';
 import EmptyState from '../src/components/EmptyState';
 import { GenoInboxHeader, GenoInboxIconButton, GenoInboxRetryPanel } from '../src/components/inbox';
@@ -175,6 +177,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
   const [showCommunityGuidelines, setShowCommunityGuidelines] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
+  const [showPhotoReview, setShowPhotoReview] = useState(false);
   const [showVerifyModal, setShowVerifyModal] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [locatingCity, setLocatingCity] = useState(false);
@@ -698,6 +701,11 @@ export default function Profile({ onSignOut }: ProfileProps) {
   if (showTerms) {
     return <TermsOfService onBack={() => setShowTerms(false)} />;
   }
+  if (showPhotoReview) {
+    return (
+      <IdentityVerification onClose={() => setShowPhotoReview(false)} />
+    );
+  }
 
   const heroPhotoUri = data.photos[0] ?? data.avatarUrl ?? null;
 
@@ -867,6 +875,21 @@ export default function Profile({ onSignOut }: ProfileProps) {
                 genotype={data.genotype}
                 onVerify={requestVerification}
               />
+              <ProfileSectionCard
+                kicker="PHOTO REVIEW"
+                label="Live selfie"
+                hint="A photo check for the trust team. Not a passport or government ID."
+              >
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Start photo review"
+                  style={({ pressed }) => [styles.photoReviewBtn, pressed && styles.photoReviewPressed]}
+                  onPress={() => setShowPhotoReview(true)}
+                >
+                  <Ionicons name="camera-outline" size={18} color={COLORS.ink} />
+                  <Text style={styles.photoReviewText}>Start photo review</Text>
+                </Pressable>
+              </ProfileSectionCard>
               {data.genotypeVerified ? (
                 <ProfileVerifiedCityCard
                   city={data.city}
@@ -995,6 +1018,24 @@ const styles = StyleSheet.create({
   },
   viewStack: {
     gap: 2,
+  },
+  photoReviewBtn: {
+    minHeight: 48,
+    borderRadius: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: COLORS.gold,
+    paddingHorizontal: 16,
+  },
+  photoReviewPressed: {
+    opacity: 0.9,
+  },
+  photoReviewText: {
+    fontFamily: FONT_FAMILY.gothamBold,
+    fontSize: 15,
+    color: COLORS.ink,
   },
   errorBanner: {
     marginHorizontal: 16,

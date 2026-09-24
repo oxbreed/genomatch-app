@@ -973,6 +973,7 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
                             progressFillWidth={progressFillWidth}
                             height={cardHeight}
                             onExpand={openProfileSheet}
+                            onReport={() => setShowModerationSheet(true)}
                           />
                         </Animated.View>
                       );
@@ -1071,6 +1072,7 @@ export default function Discovery({ isActive = true, onMatchCreated, onStartChat
         onPass={handleSheetPass}
         onLike={handleSheetLike}
         onSuperLike={handleSheetSuperLike}
+        onReport={() => setShowModerationSheet(true)}
       />
 
       {profile ? (

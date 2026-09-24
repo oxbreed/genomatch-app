@@ -20,7 +20,6 @@ import GenotypeBadge from '../GenotypeBadge';
 import LocationLine from '../LocationLine';
 import PresenceBadge from '../PresenceBadge';
 import { COLORS, getInitials } from '../../data/mockData';
-import { getGenotypeRiskShort } from '../../lib/compatibility';
 import { FONT_FAMILY, SHADOWS } from '../../theme';
 import type { DiscoveryProfile, Genotype } from '../../types/database';
 import DiscoverMatchPill from './DiscoverMatchPill';
@@ -44,6 +43,7 @@ type Props = {
   progressFillWidth?: Animated.AnimatedInterpolation<string | number>;
   height?: number;
   onExpand?: () => void;
+  onReport?: () => void;
 };
 
 /** Full-bleed bond card — seamless photo, no frame seam */
@@ -51,11 +51,11 @@ export default function DiscoverSwipeCard({
   profile,
   swipeIndex,
   totalProfiles,
-  viewerGenotype = null,
   hideGenotype = false,
   progressFillWidth,
   height = DISCOVER_CARD_HEIGHT,
   onExpand,
+  onReport,
 }: Props) {
   const gallery = useMemo(() => {
     if (profile.photos.length > 0) return profile.photos;
@@ -63,7 +63,6 @@ export default function DiscoverSwipeCard({
     return [];
   }, [profile.photos, profile.avatarUrl]);
 
-  const riskShort = getGenotypeRiskShort(viewerGenotype, profile.genotype);
   const [photoIndex, setPhotoIndex] = useState(0);
   const hasMultiple = gallery.length > 1;
   const currentUri = gallery[photoIndex] ?? gallery[0];
@@ -175,7 +174,7 @@ export default function DiscoverSwipeCard({
             ]}
           />
           <Text style={styles.compatText} numberOfLines={1}>
-            {profile.lifestyleMatch}%{riskShort ? ` · ${riskShort}` : ' match'}
+            {profile.lifestyleMatch}% match
           </Text>
         </View>
       </Pressable>
@@ -192,9 +191,21 @@ export default function DiscoverSwipeCard({
         </Pressable>
       ) : null}
 
+      {onReport ? (
+        <Pressable
+          style={({ pressed }) => [styles.reportBtn, pressed && styles.reportBtnPressed]}
+          onPress={onReport}
+          accessibilityRole="button"
+          accessibilityLabel={`Report or block ${profile.name}`}
+          hitSlop={8}
+        >
+          <Ionicons name="flag-outline" size={18} color={COLORS.linen} />
+        </Pressable>
+      ) : null}
+
       {hasMultiple ? (
         <>
-          <View style={styles.photoBars} pointerEvents="none">
+          <View style={[styles.photoBars, onReport && styles.photoBarsWithReport]} pointerEvents="none">
             {gallery.map((_, i) => (
               <View
                 key={i}
@@ -360,6 +371,24 @@ const styles = StyleSheet.create({
     gap: 4,
     zIndex: 14,
   },
+  reportBtn: {
+    position: 'absolute',
+    top: 18,
+    right: 14,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(11, 12, 14, 0.5)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.28)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 20,
+  },
+  reportBtnPressed: {
+    opacity: 0.86,
+    transform: [{ scale: 0.96 }],
+  },
   photoBars: {
     position: 'absolute',
     top: 10,
@@ -368,6 +397,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 4,
     zIndex: 8,
+  },
+  photoBarsWithReport: {
+    right: 68,
   },
   photoBar: {
     flex: 1,

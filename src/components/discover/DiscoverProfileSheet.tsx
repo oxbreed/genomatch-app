@@ -56,6 +56,7 @@ type Props = {
   onLike: () => void;
   onPass: () => void;
   onSuperLike: () => void;
+  onReport?: () => void;
 };
 
 function formatGoal(goal?: string | null): string {
@@ -116,6 +117,7 @@ export default function DiscoverProfileSheet({
   onLike,
   onPass,
   onSuperLike,
+  onReport,
 }: Props) {
   const [photoIndex, setPhotoIndex] = useState(0);
   const scrollAtTop = useRef(true);
@@ -128,9 +130,10 @@ export default function DiscoverProfileSheet({
     return [];
   }, [profile]);
 
-  const riskShort = profile
-    ? getGenotypeRiskShort(viewerGenotype ?? null, profile.genotype)
-    : null;
+  const riskShort =
+    profile && !hideGenotype
+      ? getGenotypeRiskShort(viewerGenotype ?? null, profile.genotype)
+      : null;
 
   useEffect(() => {
     setPhotoIndex(0);
@@ -268,9 +271,22 @@ export default function DiscoverProfileSheet({
                 </View>
               ) : null}
 
+              {onReport ? (
+                <Pressable
+                  style={({ pressed }) => [styles.reportBtn, pressed && styles.closeBtnPressed]}
+                  onPress={onReport}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Report or block ${profile.name}`}
+                  hitSlop={8}
+                >
+                  <Ionicons name="flag-outline" size={18} color={COLORS.linen} />
+                </Pressable>
+              ) : null}
+
               <Pressable
                 style={({ pressed }) => [styles.closeBtn, pressed && styles.closeBtnPressed]}
                 onPress={onClose}
+                accessibilityRole="button"
                 accessibilityLabel="Close profile"
                 hitSlop={8}
               >
@@ -300,7 +316,9 @@ export default function DiscoverProfileSheet({
               <View style={styles.bondPanel}>
                 <View style={styles.bondHeader}>
                   <GenoBondMark size={18} opacity={0.75} />
-                  <Text style={styles.bondKicker}>Genotype bond</Text>
+                  <Text style={styles.bondKicker}>
+                    {hideGenotype ? 'Lifestyle match' : 'Genotype bond'}
+                  </Text>
                 </View>
                 <GenoCompatRing percent={profile.lifestyleMatch} size={96} />
                 {riskShort ? <Text style={styles.riskLabel}>{riskShort}</Text> : null}
@@ -314,7 +332,9 @@ export default function DiscoverProfileSheet({
                   />
                 </View>
               ) : null}
-              <Text style={styles.bondDisclaimer}>Informational only — not medical advice.</Text>
+              {!hideGenotype ? (
+                <Text style={styles.bondDisclaimer}>Informational only — not medical advice.</Text>
+              ) : null}
 
               {profile.bio?.trim() ? (
                 <InfoSection title="About">
@@ -423,8 +443,8 @@ const styles = StyleSheet.create({
   photoBars: {
     position: 'absolute',
     top: 14,
-    left: 14,
-    right: 56,
+    left: 68,
+    right: 68,
     flexDirection: 'row',
     gap: 4,
     zIndex: 12,
@@ -438,13 +458,27 @@ const styles = StyleSheet.create({
   photoBarActive: {
     backgroundColor: COLORS.linen,
   },
+  reportBtn: {
+    position: 'absolute',
+    top: 12,
+    left: 14,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(11, 12, 14, 0.42)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.22)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 14,
+  },
   closeBtn: {
     position: 'absolute',
     top: 12,
     right: 14,
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: 'rgba(11, 12, 14, 0.42)',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.22)',
