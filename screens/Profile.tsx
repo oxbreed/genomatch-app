@@ -878,19 +878,19 @@ export default function Profile({ onSignOut }: ProfileProps) {
               <ProfileSectionCard
                 kicker="PHOTO REVIEW"
                 label="Live selfie"
-                hint="A photo check for the trust team. Not a passport or government ID."
+                hint="A photo check. Not a passport or government ID."
               >
                 <Text style={styles.photoReviewHint}>
-                  Take a live selfie so the trust team can review your photo. This is not a passport or government ID.
+                  Take a new photo with the camera. Gallery pictures are not accepted.
                 </Text>
                 <Pressable
                   accessibilityRole="button"
-                  accessibilityLabel="Start photo review"
+                  accessibilityLabel="Start live selfie"
                   style={({ pressed }) => [styles.photoReviewBtn, pressed && styles.photoReviewPressed]}
                   onPress={() => setShowPhotoReview(true)}
                 >
                   <Ionicons name="camera-outline" size={18} color={COLORS.cream} />
-                  <Text style={styles.photoReviewText}>Start photo review</Text>
+                  <Text style={styles.photoReviewText}>Start live selfie</Text>
                 </Pressable>
               </ProfileSectionCard>
               {data.genotypeVerified ? (
@@ -1024,9 +1024,9 @@ const styles = StyleSheet.create({
   },
   photoReviewHint: {
     fontFamily: FONT_FAMILY.gothamMedium,
-    fontSize: 15,
-    lineHeight: 22,
-    color: 'rgba(11, 12, 14, 0.82)',
+    fontSize: 16,
+    lineHeight: 24,
+    color: COLORS.ink,
     marginBottom: 14,
   },
   photoReviewBtn: {
