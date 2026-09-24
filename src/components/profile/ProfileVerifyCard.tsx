@@ -14,7 +14,7 @@ type Props = {
 
 export default function ProfileVerifyCard({ genotype, onVerify }: Props) {
   return (
-    <GenoCardFrame>
+    <GenoCardFrame glass={false}>
       <View style={styles.inner}>
         <GenoBondMark size={32} opacity={0.88} />
         <View style={styles.copy}>

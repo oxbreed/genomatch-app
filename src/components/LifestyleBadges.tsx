@@ -6,7 +6,7 @@ import {
   RELIGION_LABELS,
   formatHeightCm,
 } from '../lib/profileDetails';
-import { FONT_FAMILY, COLORS, GLASS } from '../theme';
+import { FONT_FAMILY, COLORS } from '../theme';
 
 type LifestyleItem = {
   icon: keyof typeof Ionicons.glyphMap;
@@ -103,9 +103,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 999,
-    backgroundColor: GLASS.insetFill,
+    backgroundColor: 'rgba(11, 12, 14, 0.04)',
     borderWidth: 1,
-    borderColor: GLASS.insetBorder,
+    borderColor: 'rgba(11, 12, 14, 0.12)',
   },
   chipCompact: {
     paddingHorizontal: 8,

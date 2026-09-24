@@ -33,8 +33,6 @@ import {
   ProfileIdentityFields,
 } from '../src/components/profile';
 import {
-  GenoMeshBackdrop,
-  ProfileBondAura,
   ProfileHeroChrome,
   ProfileIdentityRibbon,
   ProfileStatGems,
@@ -80,7 +78,10 @@ type EditableProfile = {
   displayName: string;
   city: string;
   bio: string;
+  /** Derived from dateOfBirth for display; never typed here. */
   age: string;
+  /** The date of birth registered at signup. Read-only once set. */
+  dateOfBirth: string | null;
   genotype: Genotype;
   interests: string[];
   relationshipGoal: string;
@@ -216,6 +217,7 @@ export default function Profile({ onSignOut }: ProfileProps) {
         city: mapped.city,
         bio: mapped.bio,
         age: mapped.age != null ? String(mapped.age) : '',
+        dateOfBirth: row.date_of_birth ?? null,
         genotype: mapped.genotype,
         interests: mapped.interests,
         relationshipGoal: row.relationship_goal ?? 'serious',
@@ -321,7 +323,11 @@ export default function Profile({ onSignOut }: ProfileProps) {
     const fields: Parameters<typeof updateProfileFields>[0] = {
       display_name: target.displayName.trim(),
       bio: target.bio.trim(),
-      date_of_birth: !Number.isNaN(ageNum) ? dateOfBirthFromAge(ageNum) : undefined,
+      // The registered date of birth is authoritative. Re-deriving it from the
+      // displayed age on every autosave moved the birthday to the save date and
+      // shifted it again each year, so it is only written when none exists.
+      date_of_birth:
+        target.dateOfBirth ?? (!Number.isNaN(ageNum) ? dateOfBirthFromAge(ageNum) : undefined),
       interests: target.interests,
       relationship_goal: target.relationshipGoal,
       height_cm: target.heightCm,
@@ -653,7 +659,6 @@ export default function Profile({ onSignOut }: ProfileProps) {
   if (loading) {
     return (
       <View style={[styles.root, styles.centered]}>
-        <GenoMeshBackdrop />
         <GenoPremiumChrome variant="linen" />
         <GenoLogoCeremony variant="auth" tone="dark" />
         <Text style={styles.loadingText}>Loading your profile…</Text>
@@ -664,7 +669,6 @@ export default function Profile({ onSignOut }: ProfileProps) {
   if (!data) {
     return (
       <View style={[styles.root, styles.centered]}>
-        <GenoMeshBackdrop />
         <GenoPremiumChrome variant="linen" />
         {authUserId ? (
           <GenoInboxRetryPanel
@@ -699,8 +703,6 @@ export default function Profile({ onSignOut }: ProfileProps) {
 
   return (
     <View style={styles.root}>
-      <GenoMeshBackdrop studio={editing} />
-      <ProfileBondAura active={editing} verified={data.genotypeVerified && editing} />
       <GenoPremiumChrome variant="linen" />
       <StatusBar style="dark" />
 

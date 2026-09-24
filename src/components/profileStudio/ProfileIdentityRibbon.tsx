@@ -15,7 +15,7 @@ type Props = {
 export default function ProfileIdentityRibbon({ verified, genotype, onVerify }: Props) {
   if (verified) {
     return (
-      <GenoCardFrame showWatermark={false} style={styles.frame}>
+      <GenoCardFrame glass={false} showWatermark={false} style={styles.frame}>
         <View style={styles.verifiedInner}>
           <View style={styles.iconVerified}>
             <Ionicons name="shield-checkmark" size={20} color={COLORS.verified} />
@@ -32,7 +32,7 @@ export default function ProfileIdentityRibbon({ verified, genotype, onVerify }: 
   }
 
   return (
-    <GenoCardFrame showWatermark={false} style={styles.frame}>
+    <GenoCardFrame glass={false} showWatermark={false} style={styles.frame}>
       <View style={[styles.accentBar, styles.accentPending]} />
       <View style={styles.unverifiedInner}>
         <View style={styles.iconPending}>

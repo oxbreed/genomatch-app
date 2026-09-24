@@ -27,7 +27,7 @@ export default function ProfileStatGems({ matches, likesReceived, profileViews }
   ];
 
   return (
-    <GenoCardFrame showWatermark={false}>
+    <GenoCardFrame glass={false} showWatermark={false}>
       <View style={styles.row}>
         {stats.map((stat, index) => (
           <View key={stat.label} style={styles.gemWrap}>

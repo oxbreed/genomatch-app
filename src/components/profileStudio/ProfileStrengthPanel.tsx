@@ -12,7 +12,7 @@ type Props = {
 
 export default function ProfileStrengthPanel({ percent, hint }: Props) {
   return (
-    <GenoCardFrame showWatermark={false} style={styles.frame}>
+    <GenoCardFrame glass={false} showWatermark={false} style={styles.frame}>
       <View style={styles.inner}>
         <ProfileVitalityRing percent={percent} size={68} />
         <View style={styles.copy}>
