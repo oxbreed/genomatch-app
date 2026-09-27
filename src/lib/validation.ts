@@ -49,14 +49,62 @@ export function isMinimumAge(age: number): boolean {
   return Number.isInteger(age) && age >= MINIMUM_AGE && age <= MAXIMUM_AGE;
 }
 
-/** Derive a date_of_birth that satisfies the 18+ gate for the given age today. */
-export function dateOfBirthFromAge(age: number): string {
-  const dob = new Date();
-  dob.setFullYear(dob.getFullYear() - age);
-  const year = dob.getFullYear();
-  const month = String(dob.getMonth() + 1).padStart(2, '0');
-  const day = String(dob.getDate()).padStart(2, '0');
+/** Calendar date as YYYY-MM-DD in the local timezone. */
+export function formatDateOnly(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
+}
+
+/** Parse YYYY-MM-DD as a local calendar date. Rejects impossible days such as 31 Feb. */
+export function parseDateOnly(value: string): Date | null {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value.trim());
+  if (!match) return null;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const date = new Date(year, month - 1, day);
+  if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) {
+    return null;
+  }
+  return date;
+}
+
+/** Build YYYY-MM-DD from the day, month, and year boxes on signup. */
+export function dateOfBirthFromParts(day: string, month: string, year: string): string | null {
+  if (!/^\d{1,2}$/.test(day.trim()) || !/^\d{1,2}$/.test(month.trim()) || !/^\d{4}$/.test(year.trim())) {
+    return null;
+  }
+  const iso = `${year.trim()}-${month.trim().padStart(2, '0')}-${day.trim().padStart(2, '0')}`;
+  return parseDateOnly(iso) ? iso : null;
+}
+
+/**
+ * Whole years since a calendar birthday.
+ * Age increases on the birthday itself, including when that date is 29 Feb.
+ */
+export function ageFromDateOfBirth(dob: string | null, today = new Date()): number | null {
+  const birth = dob ? parseDateOnly(dob) : null;
+  if (!birth) return null;
+  let age = today.getFullYear() - birth.getFullYear();
+  const monthDiff = today.getMonth() - birth.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    age -= 1;
+  }
+  return age;
+}
+
+/** True when the birthday is a real date and the person is 18–100 today. */
+export function isAdultDateOfBirth(dob: string | null, today = new Date()): boolean {
+  const age = ageFromDateOfBirth(dob, today);
+  return age != null && isMinimumAge(age);
+}
+
+/** Derive a date_of_birth that satisfies the 18+ gate for the given age today. */
+export function dateOfBirthFromAge(age: number, today = new Date()): string {
+  const dob = new Date(today.getFullYear() - age, today.getMonth(), today.getDate());
+  return formatDateOnly(dob);
 }
 
 /** 2–50 chars; letters, spaces, and hyphens only. */
