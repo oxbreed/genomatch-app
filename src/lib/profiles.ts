@@ -365,6 +365,7 @@ export async function fetchDiscoveryProfiles(): Promise<{
   const rpcResult = await supabase.rpc('discovery_profiles_for_viewer', { max_rows: 50 });
 
   let rows: { row: ProfileRow; distanceBand: DistanceBand | null }[] = [];
+  let rpcFailure: PostgrestError | null = null;
 
   if (!rpcResult.error && rpcResult.data) {
     rows = (rpcResult.data as Record<string, unknown>[]).map((raw) => {
@@ -387,21 +388,52 @@ export async function fetchDiscoveryProfiles(): Promise<{
     if (error) throw error;
     rows = data.map((row) => ({ row, distanceBand: null }));
   } else if (rpcResult.error) {
-    throw rpcResult.error;
+    rpcFailure = rpcResult.error;
   }
 
-  const profiles = rows
-    .filter(({ row }) => !seenSet.has(row.id) && !blockedSet.has(row.id))
-    .map(({ row, distanceBand }) =>
-      mapProfileRow(row, viewerGenotype, {
-        distanceBand,
-        viewerInterests,
-        viewerRelationshipGoal,
-      })
+  const toCards = (source: { row: ProfileRow; distanceBand: DistanceBand | null }[]) =>
+    source
+      .filter(({ row }) => !seenSet.has(row.id) && !blockedSet.has(row.id))
+      .map(({ row, distanceBand }) =>
+        mapProfileRow(row, viewerGenotype, {
+          distanceBand,
+          viewerInterests,
+          viewerRelationshipGoal,
+        })
+      );
+
+  let profiles = toCards(rows);
+  let deckStats: DiscoveryDeckStats | null = null;
+
+  // The ranked query can return nobody while other named profiles still exist
+  // (null account status, or the query itself erroring). The public directory
+  // still lists them. Likes, passes, and blocks stay hidden.
+  if (profiles.length === 0) {
+    deckStats = await fetchDiscoveryDeckStats().catch(() => null);
+    const { data, error } = await fetchPublicProfilesWithFallback((fields) =>
+      supabase
+        .from('public_profiles')
+        .select(fields)
+        .neq('id', userId)
+        .order('created_at', { ascending: false })
+        .limit(50)
     );
 
-  const deckStats =
-    profiles.length === 0 ? await fetchDiscoveryDeckStats().catch(() => null) : null;
+    if (!error) {
+      const recovered = data
+        .filter((row) => Boolean(row.display_name?.trim()))
+        .map((row) => ({ row, distanceBand: null as DistanceBand | null }));
+      const recoveredCards = toCards(recovered);
+      if (recoveredCards.length > 0) {
+        profiles = recoveredCards;
+        deckStats = null;
+      }
+    }
+
+    if (profiles.length === 0 && rpcFailure) {
+      throw rpcFailure;
+    }
+  }
 
   return { profiles, viewerGenotype, deckStats };
 }
