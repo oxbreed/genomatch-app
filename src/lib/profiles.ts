@@ -10,6 +10,7 @@ import { supabase } from './supabase';
 import { sanitizeText } from './validation';
 import type { DiscoveryInterest } from './discoveryInterest';
 import { orderDiscoveryInterests } from './discoveryInterest';
+import { discoveryDeckIsMissingPeople } from './discoveryDeckRecovery';
 
 const CORE_PROFILE_FIELDS =
   'id, email, genotype, display_name, avatar_url, photos, bio, date_of_birth, city, country, gender, interests, relationship_goal, onboarding_completed, verification_status, genotype_verified, created_at, updated_at';
@@ -390,20 +391,51 @@ export async function fetchDiscoveryProfiles(): Promise<{
     throw rpcResult.error;
   }
 
-  const profiles = rows
-    .filter(({ row }) => !seenSet.has(row.id) && !blockedSet.has(row.id))
-    .map(({ row, distanceBand }) =>
-      mapProfileRow(row, viewerGenotype, {
-        distanceBand,
-        viewerInterests,
-        viewerRelationshipGoal,
-      })
-    );
+  const toCards = (source: { row: ProfileRow; distanceBand: DistanceBand | null }[]) =>
+    source
+      .filter(({ row }) => !seenSet.has(row.id) && !blockedSet.has(row.id))
+      .map(({ row, distanceBand }) =>
+        mapProfileRow(row, viewerGenotype, {
+          distanceBand,
+          viewerInterests,
+          viewerRelationshipGoal,
+        })
+      );
+
+  let profiles = toCards(rows);
 
   const deckStats =
     profiles.length === 0 ? await fetchDiscoveryDeckStats().catch(() => null) : null;
 
-  return { profiles, viewerGenotype, deckStats };
+  // The deck query can return nobody even when other finished profiles exist
+  // (for example a new account that has not liked anyone). Fall back to the
+  // public directory so Discover, report, and block stay usable.
+  if (profiles.length === 0 && discoveryDeckIsMissingPeople(deckStats)) {
+    const { data, error } = await fetchPublicProfilesWithFallback((fields) =>
+      supabase
+        .from('public_profiles')
+        .select(fields)
+        .neq('id', userId)
+        .order('created_at', { ascending: false })
+        .limit(50)
+    );
+
+    if (!error) {
+      const recovered = data
+        .filter((row) => Boolean(row.display_name?.trim()))
+        .map((row) => ({ row, distanceBand: null }));
+      const recoveredCards = toCards(recovered);
+      if (recoveredCards.length > 0) {
+        profiles = recoveredCards;
+      }
+    }
+  }
+
+  return {
+    profiles,
+    viewerGenotype,
+    deckStats: profiles.length === 0 ? deckStats : null,
+  };
 }
 
 export async function updateProfileAvatar(avatarUrl: string): Promise<void> {
