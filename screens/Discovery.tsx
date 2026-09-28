@@ -55,6 +55,7 @@ import {
   type ViewerProfileSnapshot,
 } from '../src/lib/profiles';
 import { parseDiscoveryInterests } from '../src/lib/discoveryInterest';
+import { discoveryDeckIsMissingPeople } from '../src/lib/discoveryDeckRecovery';
 import { clearMyPasses, recordLike, recordPass } from '../src/lib/likes';
 import { formatSecurityError } from '../src/lib/security';
 import { getMatchIdForProfile } from '../src/lib/matches';
@@ -75,6 +76,9 @@ function discoveryDeckHint(stats: DiscoveryDeckStats | null): string {
   if (!stats) return 'Check back soon for new people nearby.';
   if (stats.eligible === 0) {
     return 'No completed profiles yet. Check back as more members join.';
+  }
+  if (discoveryDeckIsMissingPeople(stats)) {
+    return 'New profiles are available. Pull to refresh.';
   }
   if (stats.passed > 0 && stats.liked > 0) {
     return `You passed on ${stats.passed} and liked ${stats.liked}. Passed profiles stay hidden until you reset them.`;
