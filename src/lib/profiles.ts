@@ -10,7 +10,6 @@ import { supabase } from './supabase';
 import { sanitizeText } from './validation';
 import type { DiscoveryInterest } from './discoveryInterest';
 import { orderDiscoveryInterests } from './discoveryInterest';
-import { discoveryDeckIsMissingPeople } from './discoveryDeckRecovery';
 
 const CORE_PROFILE_FIELDS =
   'id, email, genotype, display_name, avatar_url, photos, bio, date_of_birth, city, country, gender, interests, relationship_goal, onboarding_completed, verification_status, genotype_verified, created_at, updated_at';
@@ -366,6 +365,7 @@ export async function fetchDiscoveryProfiles(): Promise<{
   const rpcResult = await supabase.rpc('discovery_profiles_for_viewer', { max_rows: 50 });
 
   let rows: { row: ProfileRow; distanceBand: DistanceBand | null }[] = [];
+  let rpcFailure: PostgrestError | null = null;
 
   if (!rpcResult.error && rpcResult.data) {
     rows = (rpcResult.data as Record<string, unknown>[]).map((raw) => {
@@ -388,7 +388,7 @@ export async function fetchDiscoveryProfiles(): Promise<{
     if (error) throw error;
     rows = data.map((row) => ({ row, distanceBand: null }));
   } else if (rpcResult.error) {
-    throw rpcResult.error;
+    rpcFailure = rpcResult.error;
   }
 
   const toCards = (source: { row: ProfileRow; distanceBand: DistanceBand | null }[]) =>
@@ -403,14 +403,13 @@ export async function fetchDiscoveryProfiles(): Promise<{
       );
 
   let profiles = toCards(rows);
+  let deckStats: DiscoveryDeckStats | null = null;
 
-  const deckStats =
-    profiles.length === 0 ? await fetchDiscoveryDeckStats().catch(() => null) : null;
-
-  // The deck query can return nobody even when other finished profiles exist
-  // (for example a new account that has not liked anyone). Fall back to the
-  // public directory so Discover, report, and block stay usable.
-  if (profiles.length === 0 && discoveryDeckIsMissingPeople(deckStats)) {
+  // The ranked query can return nobody while other named profiles still exist
+  // (null account status, or the query itself erroring). The public directory
+  // still lists them. Likes, passes, and blocks stay hidden.
+  if (profiles.length === 0) {
+    deckStats = await fetchDiscoveryDeckStats().catch(() => null);
     const { data, error } = await fetchPublicProfilesWithFallback((fields) =>
       supabase
         .from('public_profiles')
@@ -423,19 +422,20 @@ export async function fetchDiscoveryProfiles(): Promise<{
     if (!error) {
       const recovered = data
         .filter((row) => Boolean(row.display_name?.trim()))
-        .map((row) => ({ row, distanceBand: null }));
+        .map((row) => ({ row, distanceBand: null as DistanceBand | null }));
       const recoveredCards = toCards(recovered);
       if (recoveredCards.length > 0) {
         profiles = recoveredCards;
+        deckStats = null;
       }
+    }
+
+    if (profiles.length === 0 && rpcFailure) {
+      throw rpcFailure;
     }
   }
 
-  return {
-    profiles,
-    viewerGenotype,
-    deckStats: profiles.length === 0 ? deckStats : null,
-  };
+  return { profiles, viewerGenotype, deckStats };
 }
 
 export async function updateProfileAvatar(avatarUrl: string): Promise<void> {
