@@ -124,11 +124,17 @@ Deno.serve(async (req) => {
 
     const { data: profile } = await admin
       .from('profiles')
-      .select('avatar_url, photos')
+      .select('avatar_url, photos, identity_selfie_url, verification_doc_url')
       .eq('id', user.id)
       .maybeSingle();
 
-    await deleteProfilePhotos(profile?.avatar_url ?? null, profile?.photos ?? null);
+    const extraUrls = [profile?.identity_selfie_url, profile?.verification_doc_url].filter(
+      (url): url is string => Boolean(url)
+    );
+    await deleteProfilePhotos(profile?.avatar_url ?? null, [
+      ...(profile?.photos ?? []),
+      ...extraUrls,
+    ]);
 
     const { error: deleteError } = await admin.auth.admin.deleteUser(user.id);
 

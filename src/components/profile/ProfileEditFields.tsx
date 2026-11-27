@@ -90,7 +90,7 @@ export default function ProfileEditFields({
                 <Pressable key={item} onPress={() => onToggleInterest(item)}>
                   {active ? (
                     <LinearGradient
-                      colors={[COLORS.gold, '#B8962E']}
+                      colors={[COLORS.gold, '#96651F']}
                       style={styles.chipActive}
                     >
                       <Text style={styles.chipTextActive}>{item}</Text>
@@ -116,7 +116,7 @@ export default function ProfileEditFields({
               return (
                 <Pressable key={g.id} onPress={() => onSelectGoal(g.id)}>
                   {selected ? (
-                    <LinearGradient colors={[COLORS.gold, '#B8962E']} style={styles.goalChipActive}>
+                    <LinearGradient colors={[COLORS.gold, '#96651F']} style={styles.goalChipActive}>
                       <Text style={styles.goalTextActive}>{g.label}</Text>
                     </LinearGradient>
                   ) : (
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
   hint: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
     marginBottom: 8,
   },
   label: {
@@ -162,10 +162,10 @@ const styles = StyleSheet.create({
   counter: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
   },
   counterWarn: {
-    color: COLORS.gold,
+    color: COLORS.goldDeep,
     fontFamily: FONT_FAMILY.gothamBold,
   },
   labelSpaced: { marginTop: 14, marginBottom: 8 },
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
     minHeight: 100,
     borderRadius: 14,
     borderWidth: 1.5,
-    borderColor: 'rgba(212, 175, 55, 0.35)',
+    borderColor: 'rgba(201, 154, 75, 0.35)',
     backgroundColor: COLORS.white,
     padding: 14,
     fontFamily: FONT_FAMILY.gothamMedium,

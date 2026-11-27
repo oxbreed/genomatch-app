@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.xl,
     padding: 24,
     borderWidth: 1,
-    borderColor: 'rgba(212, 175, 55, 0.35)',
+    borderColor: 'rgba(201, 154, 75, 0.35)',
   },
   iconWrap: {
     alignSelf: 'center',
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
     lineHeight: 21,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
     textAlign: 'center',
     marginTop: 10,
     marginBottom: 16,
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
   cancel: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 15,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
     marginTop: 14,
     textAlign: 'center',
   },

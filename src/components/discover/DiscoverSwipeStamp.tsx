@@ -24,7 +24,7 @@ export default function DiscoverSwipeStamp({ side, opacity }: Props) {
       <LinearGradient
         colors={
           isBond
-            ? ['rgba(212, 175, 55, 0.42)', 'rgba(212, 175, 55, 0.1)']
+            ? ['rgba(201, 154, 75, 0.42)', 'rgba(201, 154, 75, 0.1)']
             : ['rgba(184, 188, 196, 0.38)', 'rgba(184, 188, 196, 0.08)']
         }
         style={styles.stampFill}

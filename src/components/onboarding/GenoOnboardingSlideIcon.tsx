@@ -1,47 +1,41 @@
 import type { ComponentProps } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, View } from 'react-native';
-import { LOGO_GOLD } from '../../theme';
+import { LOGO_GOLD, creamAlpha } from '../../theme';
+import { ONBOARDING_VISUAL_HEIGHT } from './onboardingLayout';
 
 type IonName = ComponentProps<typeof Ionicons>['name'];
 
 type Props = {
   name: IonName;
-  size?: 'md' | 'lg';
 };
 
-const SIZES = {
-  md: { disc: 44, icon: 20 },
-  lg: { disc: 56, icon: 26 },
-} as const;
-
-/** Slide motif — flat icon disc (no MaskedView; Expo Go safe) */
-export default function GenoOnboardingSlideIcon({ name, size = 'lg' }: Props) {
-  const spec = SIZES[size];
-
+/** Icon in the fixed visual slot */
+export default function GenoOnboardingSlideIcon({ name }: Props) {
   return (
-    <View
-      style={[
-        styles.disc,
-        {
-          width: spec.disc,
-          height: spec.disc,
-          borderRadius: spec.disc / 2,
-        },
-      ]}
-    >
-      <Ionicons name={name} size={spec.icon} color={LOGO_GOLD} />
+    <View style={styles.slot}>
+      <View style={styles.disc}>
+        <Ionicons name={name} size={32} color={LOGO_GOLD} />
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  disc: {
+  slot: {
+    height: ONBOARDING_VISUAL_HEIGHT,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 4,
-    borderWidth: 1,
-    borderColor: 'rgba(250, 248, 245, 0.12)',
+    width: '100%',
+  },
+  disc: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: creamAlpha(0.14),
     backgroundColor: 'rgba(255, 255, 255, 0.04)',
   },
 });

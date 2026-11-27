@@ -3,7 +3,6 @@ import { StyleSheet, Text, View } from 'react-native';
 import LifestyleBadges from '../LifestyleBadges';
 import PresenceBadge from '../PresenceBadge';
 import { COLORS, RELATIONSHIP_GOAL_LABELS } from '../../data/mockData';
-import { GLASS } from '../../theme';
 import type { PresenceState } from '../../types/database';
 import { PROFILE, PROFILE_TYPE } from './profileTokens';
 
@@ -18,6 +17,7 @@ type Props = {
   educationStatus?: string | null;
   heightCm?: number | null;
   religion?: string | null;
+  pronouns?: string | null;
 };
 
 function SectionBlock({
@@ -49,6 +49,7 @@ export default function ProfileViewSections({
   educationStatus,
   heightCm,
   religion,
+  pronouns,
 }: Props) {
   const goalLabel =
     RELATIONSHIP_GOAL_LABELS[relationshipGoal] ?? (relationshipGoal || 'Not set');
@@ -64,6 +65,14 @@ export default function ProfileViewSections({
             presenceState={presenceState ?? 'offline'}
             isNewMember={isNewMember}
           />
+        </SectionBlock>
+      ) : null}
+
+      {pronouns ? (
+        <SectionBlock label="Identity" showDivider>
+          <View style={styles.goalPill}>
+            <Text style={styles.goalText}>{pronouns}</Text>
+          </View>
         </SectionBlock>
       ) : null}
 
@@ -118,7 +127,7 @@ const styles = StyleSheet.create({
   },
   blockLabel: {
     ...PROFILE_TYPE.blockLabel,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
   },
   bioText: {
     ...PROFILE_TYPE.body,
@@ -138,9 +147,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 999,
-    backgroundColor: GLASS.insetFill,
+    // The card is opaque paper now, so a white-on-white pill has no edge.
+    backgroundColor: 'rgba(11, 12, 14, 0.04)',
     borderWidth: 1,
-    borderColor: GLASS.insetBorder,
+    borderColor: 'rgba(11, 12, 14, 0.12)',
   },
   chipText: {
     ...PROFILE_TYPE.chip,
@@ -155,9 +165,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 11,
     borderRadius: 12,
-    backgroundColor: GLASS.insetFill,
+    backgroundColor: 'rgba(11, 12, 14, 0.04)',
     borderWidth: 1,
-    borderColor: GLASS.insetBorder,
+    borderColor: 'rgba(11, 12, 14, 0.12)',
   },
   goalText: {
     ...PROFILE_TYPE.goal,

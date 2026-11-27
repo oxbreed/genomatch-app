@@ -78,15 +78,15 @@ export default function ProfileBondAura({ active, verified }: Props) {
         <LinearGradient
           colors={
             verified
-              ? ['rgba(200, 16, 46, 0.32)', 'rgba(212, 175, 55, 0.12)']
-              : ['rgba(212, 175, 55, 0.26)', 'rgba(200, 16, 46, 0.1)']
+              ? ['rgba(198, 34, 34, 0.32)', 'rgba(201, 154, 75, 0.12)']
+              : ['rgba(201, 154, 75, 0.26)', 'rgba(198, 34, 34, 0.1)']
           }
           style={styles.orbFill}
         />
       </Animated.View>
       <Animated.View style={[styles.orbB, { transform: [{ translateX: orbBX }] }]}>
         <LinearGradient
-          colors={['rgba(13, 40, 24, 0.06)', 'rgba(212, 175, 55, 0.18)']}
+          colors={['rgba(11, 12, 14, 0.06)', 'rgba(201, 154, 75, 0.18)']}
           style={styles.orbFill}
         />
       </Animated.View>

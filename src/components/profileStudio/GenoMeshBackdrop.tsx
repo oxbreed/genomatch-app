@@ -9,8 +9,8 @@ type Props = {
   studio?: boolean;
 };
 
-const ORB_A = ['rgba(212, 175, 55, 0.22)', 'rgba(212, 175, 55, 0)'] as const;
-const ORB_B = ['rgba(200, 16, 46, 0.2)', 'rgba(200, 16, 46, 0)'] as const;
+const ORB_A = ['rgba(201, 154, 75, 0.22)', 'rgba(201, 154, 75, 0)'] as const;
+const ORB_B = ['rgba(198, 34, 34, 0.2)', 'rgba(198, 34, 34, 0)'] as const;
 const ORB_C = ['rgba(21, 23, 26, 0.14)', 'rgba(21, 23, 26, 0)'] as const;
 
 function HelixDecor({ opacity }: { opacity: number }) {

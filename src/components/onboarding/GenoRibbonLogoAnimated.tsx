@@ -1,31 +1,25 @@
 import { Image, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
-import {
-  GENOMATCH_RIBBON_ANIMATED,
-  GENOMATCH_RIBBON_POSTER,
-} from '../../brand/ribbonLogo';
+import { RIBBON_POSTER } from '../../brand/ribbonPoster';
 
 type Props = {
   width: number;
   height: number;
-  /** static = PNG only (splash / Expo Go). animated = GIF loop */
-  variant?: 'static' | 'animated';
   style?: StyleProp<ViewStyle>;
 };
 
 /**
- * Onboarding ribbon mark.
- * Splash uses `static` poster — animated GIF + onboarding MaskedViews OOM Expo Go.
+ * Ribbon mark — crisp transparent PNG.
+ *
+ * The animated WebP variant was removed from the bundle. Metro resolves
+ * `require()` statically wherever it appears, so even a lazy require inside
+ * this component shipped all 4.5MB of assets/onboarding-ribbon-logo.webp in
+ * the app download. Nothing rendered it. If the animation is wanted later,
+ * require the file here and re-check `expo export` output for the size cost.
  */
-export default function GenoRibbonLogoAnimated({
-  width,
-  height,
-  variant = 'animated',
-  style,
-}: Props) {
+export default function GenoRibbonLogoAnimated({ width, height, style }: Props) {
   const w = Math.round(width);
   const h = Math.round(height);
   const media = { width: w, height: h };
-  const source = variant === 'static' ? GENOMATCH_RIBBON_POSTER : GENOMATCH_RIBBON_ANIMATED;
 
   return (
     <View
@@ -35,7 +29,7 @@ export default function GenoRibbonLogoAnimated({
       accessibilityRole="image"
     >
       <Image
-        source={source}
+        source={RIBBON_POSTER}
         style={media}
         resizeMode="contain"
         accessibilityIgnoresInvertColors

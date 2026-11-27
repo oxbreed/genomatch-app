@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
   bubbleReceived: {
     backgroundColor: 'rgba(255, 255, 255, 0.92)',
     borderWidth: 1,
-    borderColor: 'rgba(200, 16, 46, 0.18)',
+    borderColor: 'rgba(198, 34, 34, 0.18)',
     borderBottomLeftRadius: 6,
   },
   bubbleText: {

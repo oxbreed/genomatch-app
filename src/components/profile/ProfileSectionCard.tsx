@@ -22,7 +22,7 @@ export default function ProfileSectionCard({
   style,
 }: Props) {
   return (
-    <GenoCardFrame style={[styles.wrap, style]} showWatermark={false}>
+    <GenoCardFrame glass={false} style={[styles.wrap, style]} showWatermark={false}>
       <View style={[styles.inner, editing && styles.innerEditing]}>
         {label ? (
           <ProfileSectionHeader kicker={kicker} title={label} hint={hint} />

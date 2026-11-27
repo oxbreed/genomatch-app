@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 12,
     letterSpacing: 1.2,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
     textTransform: 'uppercase',
   },
 });

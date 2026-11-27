@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   Image,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -10,15 +11,20 @@ import {
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import type { CameraView as CameraViewInstance } from 'expo-camera';
 import { StatusBar } from 'expo-status-bar';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { GenoPremiumChrome } from '../src/brand/graphics';
 import { submitIdentitySelfie } from '../src/lib/identityVerification';
-import { COLORS, GLASS, RADIUS, SHADOWS } from '../src/theme';
+import { COLORS, FONT_FAMILY, RADIUS, SHADOWS } from '../src/theme';
 
 type ScreenPhase = 'camera' | 'preview' | 'success';
 
-export default function IdentityVerification() {
+type Props = {
+  /** Return to the screen that opened the check. */
+  onClose: () => void;
+  /** Fired after a selfie is accepted, so the caller can refresh status. */
+  onSubmitted?: () => void;
+};
+
+export default function IdentityVerification({ onClose, onSubmitted }: Props) {
   const cameraRef = useRef<CameraViewInstance>(null);
   const [permission, requestPermission] = useCameraPermissions();
   const [cameraReady, setCameraReady] = useState(false);
@@ -61,6 +67,7 @@ export default function IdentityVerification() {
     try {
       await submitIdentitySelfie(capturedUri);
       setPhase('success');
+      onSubmitted?.();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not submit your selfie. Please try again.');
     } finally {
@@ -71,10 +78,10 @@ export default function IdentityVerification() {
   if (!permission) {
     return (
       <View style={styles.container}>
-        <GenoPremiumChrome variant="linen" />
         <StatusBar style="dark" />
+        <ScreenHeader onClose={onClose} title="Live selfie" />
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color={COLORS.hero} />
+          <ActivityIndicator size="large" color={COLORS.ink} />
         </View>
       </View>
     );
@@ -83,28 +90,22 @@ export default function IdentityVerification() {
   if (!permission.granted) {
     return (
       <View style={styles.container}>
-        <GenoPremiumChrome variant="linen" />
         <StatusBar style="dark" />
-        <View style={styles.centered}>
-          <View style={styles.permissionCard}>
-            <View style={styles.permissionIconWrap}>
-              <Ionicons name="camera-outline" size={28} color={COLORS.hero} />
-            </View>
-            <Text style={styles.title}>Camera access needed</Text>
-            <Text style={styles.subtitle}>
-              We need your front camera to take a live selfie for photo review. Gallery
-              photos are not accepted. This is not a government ID check.
-            </Text>
-            <Pressable
-              style={({ pressed }) => [styles.primaryBtnWrap, pressed && styles.pressed]}
-              onPress={() => void requestPermission()}
-            >
-              <LinearGradient colors={[COLORS.gold, '#C49A38']} style={styles.primaryBtn}>
-                <Text style={styles.primaryBtnText}>Allow camera access</Text>
-              </LinearGradient>
-            </Pressable>
-          </View>
-        </View>
+        <ScreenHeader onClose={onClose} title="Live selfie" />
+        <ScrollView contentContainerStyle={styles.scroll}>
+          <CopyCard
+            title="Camera access needed"
+            body="GenoMatch needs the front camera to take a live selfie. Photos already in your gallery are not accepted. This is a photo check, not a passport or government ID."
+          />
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Allow camera access"
+            style={({ pressed }) => [styles.primaryBtn, pressed && styles.pressed]}
+            onPress={() => void requestPermission()}
+          >
+            <Text style={styles.primaryBtnText}>Allow camera access</Text>
+          </Pressable>
+        </ScrollView>
       </View>
     );
   }
@@ -112,20 +113,22 @@ export default function IdentityVerification() {
   if (phase === 'success') {
     return (
       <View style={styles.container}>
-        <GenoPremiumChrome variant="linen" />
         <StatusBar style="dark" />
-        <View style={styles.centered}>
-          <View style={styles.permissionCard}>
-            <View style={[styles.permissionIconWrap, styles.successIconWrap]}>
-              <Ionicons name="checkmark-circle" size={32} color={COLORS.hero} />
-            </View>
-            <Text style={styles.title}>Submitted — we'll review it shortly</Text>
-            <Text style={styles.subtitle}>
-              Our team will review your selfie. You'll be notified when that review is complete.
-              This is a photo check, not a government identity document.
-            </Text>
-          </View>
-        </View>
+        <ScreenHeader onClose={onClose} title="Live selfie" />
+        <ScrollView contentContainerStyle={styles.scroll}>
+          <CopyCard
+            title="Submitted"
+            body="Your selfie is with the trust team. You will be notified when the review is complete. This is a photo check, not a government ID."
+          />
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Done"
+            style={({ pressed }) => [styles.primaryBtn, pressed && styles.pressed]}
+            onPress={onClose}
+          >
+            <Text style={styles.primaryBtnText}>Done</Text>
+          </Pressable>
+        </ScrollView>
       </View>
     );
   }
@@ -133,66 +136,60 @@ export default function IdentityVerification() {
   if (phase === 'preview' && capturedUri) {
     return (
       <View style={styles.container}>
-        <GenoPremiumChrome variant="linen" />
         <StatusBar style="dark" />
-        <View style={styles.content}>
-          <Text style={styles.title}>Review your selfie</Text>
-          <Text style={styles.subtitle}>
-            Make sure your face is clearly visible and well lit before submitting.
-          </Text>
-
+        <ScreenHeader onClose={onClose} title="Live selfie" />
+        <ScrollView contentContainerStyle={styles.scroll}>
+          <CopyCard
+            title="Review your selfie"
+            body="Check that your face is clear and well lit. If it is not, retake the photo before you submit."
+          />
           <View style={styles.previewFrame}>
             <Image source={{ uri: capturedUri }} style={styles.previewImage} resizeMode="cover" />
           </View>
-
           {error ? <Text style={styles.error}>{error}</Text> : null}
-
           <View style={styles.actionsRow}>
             <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Retake"
               style={({ pressed }) => [styles.secondaryBtn, pressed && styles.pressed]}
               onPress={handleRetake}
               disabled={submitting}
             >
               <Text style={styles.secondaryBtnText}>Retake</Text>
             </Pressable>
-
             <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Submit selfie"
               style={({ pressed }) => [
-                styles.primaryBtnWrap,
-                styles.submitBtnWrap,
+                styles.primaryBtn,
+                styles.submitBtn,
                 pressed && styles.pressed,
                 submitting && styles.disabled,
               ]}
               onPress={() => void handleSubmit()}
               disabled={submitting}
             >
-              <LinearGradient colors={[COLORS.gold, '#C49A38']} style={styles.primaryBtn}>
-                {submitting ? (
-                  <View style={styles.submittingRow}>
-                    <ActivityIndicator color={COLORS.hero} size="small" />
-                    <Text style={styles.primaryBtnText}>Submitting…</Text>
-                  </View>
-                ) : (
-                  <Text style={styles.primaryBtnText}>Submit</Text>
-                )}
-              </LinearGradient>
+              {submitting ? (
+                <ActivityIndicator color={COLORS.cream} />
+              ) : (
+                <Text style={styles.primaryBtnText}>Submit</Text>
+              )}
             </Pressable>
           </View>
-        </View>
+        </ScrollView>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <GenoPremiumChrome variant="linen" />
       <StatusBar style="dark" />
-      <View style={styles.content}>
-        <Text style={styles.title}>Take a live selfie</Text>
-        <Text style={styles.subtitle}>
-          Position your face in the frame. This must be a live camera photo — not from your gallery.
-        </Text>
-
+      <ScreenHeader onClose={onClose} title="Live selfie" />
+      <ScrollView contentContainerStyle={styles.scroll}>
+        <CopyCard
+          title="Take a live selfie"
+          body="Hold the phone in front of your face so it fills the frame. Take the photo with the camera on this screen. Do not choose a picture from your gallery. This is a photo check, not a passport or government ID."
+        />
         <View style={styles.cameraFrame}>
           <CameraView
             ref={cameraRef}
@@ -204,10 +201,10 @@ export default function IdentityVerification() {
             <View style={styles.faceGuide} />
           </View>
         </View>
-
         {error ? <Text style={styles.error}>{error}</Text> : null}
-
         <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Take selfie"
           style={({ pressed }) => [
             styles.captureBtn,
             pressed && styles.pressed,
@@ -217,12 +214,38 @@ export default function IdentityVerification() {
           disabled={!cameraReady || capturing}
         >
           {capturing ? (
-            <ActivityIndicator color={COLORS.hero} />
+            <ActivityIndicator color={COLORS.glossyRed} />
           ) : (
             <View style={styles.captureBtnInner} />
           )}
         </Pressable>
-      </View>
+      </ScrollView>
+    </View>
+  );
+}
+
+function ScreenHeader({ onClose, title }: { onClose: () => void; title: string }) {
+  return (
+    <View style={styles.header}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Close live selfie"
+        onPress={onClose}
+        hitSlop={8}
+        style={styles.closeBtn}
+      >
+        <Ionicons name="chevron-back" size={22} color={COLORS.ink} />
+      </Pressable>
+      <Text style={styles.headerTitle}>{title}</Text>
+    </View>
+  );
+}
+
+function CopyCard({ title, body }: { title: string; body: string }) {
+  return (
+    <View style={styles.copyCard}>
+      <Text style={styles.title}>{title}</Text>
+      <Text style={styles.body}>{body}</Text>
     </View>
   );
 }
@@ -230,65 +253,69 @@ export default function IdentityVerification() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.linen,
+    backgroundColor: COLORS.cream,
+  },
+  header: {
+    paddingTop: 54,
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: COLORS.cream,
+  },
+  closeBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.white,
+    borderWidth: 1,
+    borderColor: 'rgba(11, 12, 14, 0.18)',
+  },
+  headerTitle: {
+    fontFamily: FONT_FAMILY.gothamBold,
+    fontSize: 20,
+    color: COLORS.ink,
+  },
+  scroll: {
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 40,
+    gap: 16,
   },
   centered: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 72,
   },
-  content: {
-    flex: 1,
-    paddingTop: 72,
-    paddingHorizontal: 24,
-    paddingBottom: 40,
-  },
-  permissionCard: {
-    width: '100%',
-    borderRadius: RADIUS.lg,
-    borderWidth: 1.5,
-    borderColor: GLASS.insetBorder,
-    backgroundColor: GLASS.insetFill,
-    padding: 24,
-    alignItems: 'center',
-    gap: 12,
-  },
-  permissionIconWrap: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: 'rgba(184, 188, 196, 0.3)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 4,
-  },
-  successIconWrap: {
-    backgroundColor: 'rgba(184, 188, 196, 0.45)',
+  copyCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(11, 12, 14, 0.12)',
+    paddingHorizontal: 18,
+    paddingVertical: 18,
+    gap: 10,
   },
   title: {
-    fontSize: 26,
-    fontWeight: '800',
-    color: COLORS.hero,
-    letterSpacing: -0.5,
-    textAlign: 'center',
+    fontFamily: FONT_FAMILY.gothamBold,
+    fontSize: 24,
+    lineHeight: 30,
+    color: COLORS.ink,
   },
-  subtitle: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: 'rgba(11, 12, 14, 0.65)',
-    fontWeight: '500',
-    textAlign: 'center',
-    marginBottom: 20,
+  body: {
+    fontFamily: FONT_FAMILY.gothamMedium,
+    fontSize: 17,
+    lineHeight: 26,
+    color: COLORS.ink,
   },
   cameraFrame: {
-    flex: 1,
-    minHeight: 360,
+    height: 420,
     borderRadius: RADIUS.lg,
     overflow: 'hidden',
     backgroundColor: COLORS.ink,
-    marginBottom: 24,
   },
   camera: {
     flex: 1,
@@ -307,12 +334,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   previewFrame: {
-    flex: 1,
-    minHeight: 360,
+    height: 420,
     borderRadius: RADIUS.lg,
     overflow: 'hidden',
     backgroundColor: COLORS.ink,
-    marginBottom: 20,
   },
   previewImage: {
     width: '100%',
@@ -324,7 +349,7 @@ const styles = StyleSheet.create({
     height: 76,
     borderRadius: 38,
     borderWidth: 4,
-    borderColor: COLORS.hero,
+    borderColor: COLORS.ink,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: COLORS.white,
@@ -334,7 +359,7 @@ const styles = StyleSheet.create({
     width: 58,
     height: 58,
     borderRadius: 29,
-    backgroundColor: COLORS.hero,
+    backgroundColor: COLORS.glossyRed,
   },
   actionsRow: {
     flexDirection: 'row',
@@ -343,49 +368,42 @@ const styles = StyleSheet.create({
   },
   secondaryBtn: {
     flex: 1,
-    height: 56,
+    minHeight: 56,
     borderRadius: RADIUS.md,
     borderWidth: 1.5,
     borderColor: 'rgba(11, 12, 14, 0.2)',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: COLORS.white,
+    paddingHorizontal: 16,
   },
   secondaryBtnText: {
     fontSize: 16,
-    fontWeight: '700',
-    color: COLORS.hero,
+    fontFamily: FONT_FAMILY.gothamBold,
+    color: COLORS.ink,
   },
-  primaryBtnWrap: {
-    borderRadius: RADIUS.md,
-    overflow: 'hidden',
-    ...SHADOWS.button,
-  },
-  submitBtnWrap: {
+  submitBtn: {
     flex: 1.4,
   },
   primaryBtn: {
-    height: 56,
+    minHeight: 56,
+    borderRadius: RADIUS.md,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 20,
+    backgroundColor: COLORS.glossyRed,
   },
   primaryBtnText: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: COLORS.hero,
-  },
-  submittingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
+    fontSize: 17,
+    fontFamily: FONT_FAMILY.gothamBold,
+    color: COLORS.cream,
   },
   error: {
     color: COLORS.error,
-    fontSize: 13,
-    fontWeight: '600',
+    fontFamily: FONT_FAMILY.gothamBold,
+    fontSize: 16,
+    lineHeight: 22,
     textAlign: 'center',
-    marginBottom: 12,
   },
   pressed: {
     opacity: 0.9,

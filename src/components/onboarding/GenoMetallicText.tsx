@@ -16,8 +16,9 @@ import {
   LOGO_GOLD_BRIGHT,
   LOGO_GOLD_DEEP,
   LOGO_RED,
-  LOGO_RED_HOT,
+  LOGO_RED_BRIGHT,
   LOGO_RED_DEEP,
+  creamAlpha,
 } from '../../theme';
 import { useMetallicShimmer } from './useMetallicShimmer';
 
@@ -34,9 +35,9 @@ type Props = {
 
 const GRADIENTS: Record<GenoMetallicTone, readonly [string, string, string]> = {
   gold: [LOGO_GOLD_BRIGHT, LOGO_GOLD, LOGO_GOLD_DEEP],
-  red: [LOGO_RED_HOT, LOGO_RED, LOGO_RED_DEEP],
+  red: [LOGO_RED_BRIGHT, LOGO_RED, LOGO_RED_DEEP],
   charcoal: ['#C8C2BA', CREAM, '#A8A29C'],
-  trust: ['#B8B0A6', 'rgba(250, 248, 245, 0.85)', '#7A746E'],
+  trust: ['#B8B0A6', creamAlpha(0.85), '#7A746E'],
   white: ['#FFFFFF', '#FFF9F2', '#F2EBE2'],
 };
 

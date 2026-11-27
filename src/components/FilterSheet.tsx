@@ -15,6 +15,8 @@ import { GenoBondMark } from '../brand';
 import { GenoGlassBackdrop, GenoGlassSurface } from '../brand/graphics';
 import { FONT_FAMILY, COLORS, GLASS } from '../theme';
 import { DISTANCE_BAND_FILTER_OPTIONS } from '../lib/distanceBands';
+import DiscoveryInterestPicker from './setup/DiscoveryInterestPicker';
+import { toggleDiscoveryInterest } from '../lib/discoveryInterest';
 import {
   DEFAULT_DISCOVERY_FILTERS,
   applyDiscoveryFilters,
@@ -23,7 +25,7 @@ import {
   normalizeDiscoveryFilters,
   type DiscoveryFilters,
 } from './FilterSheet.logic';
-import type { DiscoveryProfile } from '../types/database';
+import type { DiscoveryProfile, Genotype } from '../types/database';
 
 export type { DiscoveryFilters };
 export {
@@ -33,6 +35,14 @@ export {
   hasActiveDiscoveryFilters,
   normalizeDiscoveryFilters,
 };
+
+const GENOTYPE_FILTER_OPTIONS: Genotype[] = ['AA', 'AS', 'SS', 'AC', 'SC'];
+
+function toggleSelectedGenotype(current: Genotype[], value: Genotype): Genotype[] {
+  return current.includes(value)
+    ? current.filter((item) => item !== value)
+    : [...current, value];
+}
 
 const RELATIONSHIP_OPTIONS: {
   id: DiscoveryFilters['relationshipGoal'];
@@ -61,9 +71,13 @@ export default function FilterSheet({
   onApply,
 }: FilterSheetProps) {
   const [draft, setDraft] = useState<DiscoveryFilters>(filters);
+  const [interestError, setInterestError] = useState('');
 
   useEffect(() => {
-    if (visible) setDraft(filters);
+    if (visible) {
+      setDraft(filters);
+      setInterestError('');
+    }
   }, [visible, filters]);
 
   const previewCount = useMemo(
@@ -80,7 +94,7 @@ export default function FilterSheet({
         <Pressable style={styles.backdropPress} onPress={onClose} />
         <View style={styles.sheet} onStartShouldSetResponder={() => true}>
           <LinearGradient
-            colors={['rgba(212, 175, 55, 0.52)', 'rgba(200, 16, 46, 0.34)', 'rgba(255, 255, 255, 0.18)']}
+            colors={['rgba(201, 154, 75, 0.52)', 'rgba(198, 34, 34, 0.34)', 'rgba(255, 255, 255, 0.18)']}
             style={styles.sheetBorder}
           >
             <GenoGlassSurface
@@ -136,6 +150,51 @@ export default function FilterSheet({
                 keyboardShouldPersistTaps="handled"
                 showsVerticalScrollIndicator={false}
               >
+                <Text style={styles.sectionLabel}>Genotype compatibility</Text>
+                <Text style={styles.distanceHint}>
+                  Every Discover card shows the genotype that member entered. Limit the deck to
+                  specific letters if you want to.
+                </Text>
+                <View style={styles.toggleRow}>
+                  {GENOTYPE_FILTER_OPTIONS.map((genotype) => {
+                    const active = draft.selectedGenotypes.includes(genotype);
+                    return (
+                      <Pressable
+                        key={genotype}
+                        style={[styles.toggleChip, active && styles.toggleChipActive]}
+                        onPress={() =>
+                          setDraft((d) => ({
+                            ...d,
+                            selectedGenotypes: toggleSelectedGenotype(d.selectedGenotypes, genotype),
+                          }))
+                        }
+                        accessibilityRole="button"
+                        accessibilityState={{ selected: active }}
+                        accessibilityLabel={`Genotype ${genotype}`}
+                      >
+                        <Text style={[styles.toggleChipText, active && styles.toggleChipTextActive]}>
+                          {genotype}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+
+                <View style={styles.verifyRow}>
+                  <View style={styles.verifyCopy}>
+                    <Text style={styles.sectionLabel}>Self-verified members only</Text>
+                    <Text style={styles.verifyHint}>
+                      Show profiles that confirmed their genotype
+                    </Text>
+                  </View>
+                  <Switch
+                    value={draft.verifiedOnly}
+                    onValueChange={(verifiedOnly) => setDraft((d) => ({ ...d, verifiedOnly }))}
+                    trackColor={{ false: COLORS.border, true: COLORS.metallicSilver }}
+                    thumbColor={draft.verifiedOnly ? COLORS.gold : COLORS.white}
+                  />
+                </View>
+
                 <Text style={styles.sectionLabel}>Lifestyle match</Text>
                 <View style={styles.toggleRow}>
                   {(['all', 'high'] as const).map((mode) => (
@@ -159,20 +218,22 @@ export default function FilterSheet({
                   ))}
                 </View>
 
-                <View style={styles.verifyRow}>
-                  <View style={styles.verifyCopy}>
-                    <Text style={styles.sectionLabel}>Self-verified members only</Text>
-                    <Text style={styles.verifyHint}>
-                      Show profiles that confirmed their genotype
-                    </Text>
-                  </View>
-                  <Switch
-                    value={draft.verifiedOnly}
-                    onValueChange={(verifiedOnly) => setDraft((d) => ({ ...d, verifiedOnly }))}
-                    trackColor={{ false: COLORS.border, true: COLORS.metallicSilver }}
-                    thumbColor={draft.verifiedOnly ? COLORS.gold : COLORS.white}
-                  />
-                </View>
+                <Text style={styles.sectionLabel}>Show me</Text>
+                <Text style={styles.distanceHint}>
+                  Who you want to see in Discover. Women and Men can be combined; Everyone is open to all.
+                </Text>
+                <DiscoveryInterestPicker
+                  compact
+                  selected={draft.interestedIn}
+                  onToggle={(option) => {
+                    setInterestError('');
+                    setDraft((d) => ({
+                      ...d,
+                      interestedIn: toggleDiscoveryInterest(d.interestedIn, option),
+                    }));
+                  }}
+                />
+                {interestError ? <Text style={styles.interestError}>{interestError}</Text> : null}
 
                 <Text style={styles.sectionLabel}>City</Text>
                 <TextInput
@@ -280,15 +341,28 @@ export default function FilterSheet({
               <Pressable
                 style={({ pressed }) => [styles.applyWrap, pressed && styles.pressed]}
                 onPress={() => {
+                  if (draft.interestedIn.length === 0) {
+                    setInterestError('Select at least one option.');
+                    return;
+                  }
+                  setInterestError('');
                   onApply(normalizeDiscoveryFilters(draft));
                   onClose();
                 }}
               >
-                <LinearGradient colors={[COLORS.gold, '#B8962E']} style={styles.applyBtn}>
+                <LinearGradient colors={[COLORS.gold, '#96651F']} style={styles.applyBtn}>
                   <Text style={styles.applyBtnText}>Apply filters</Text>
                 </LinearGradient>
               </Pressable>
-              <Pressable style={styles.resetBtn} onPress={() => onApply(DEFAULT_DISCOVERY_FILTERS)}>
+              <Pressable
+                style={styles.resetBtn}
+                onPress={() =>
+                  onApply({
+                    ...DEFAULT_DISCOVERY_FILTERS,
+                    interestedIn: draft.interestedIn,
+                  })
+                }
+              >
                 <Text style={styles.resetBtnText}>Reset all</Text>
               </Pressable>
             </GenoGlassSurface>
@@ -392,16 +466,22 @@ const styles = StyleSheet.create({
     color: COLORS.textSubtle,
     marginBottom: 8,
   },
+  interestError: {
+    fontFamily: FONT_FAMILY.gothamBold,
+    fontSize: 13,
+    color: COLORS.error,
+    marginTop: 4,
+  },
   sectionLabel: {
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 11,
     letterSpacing: 1.2,
     textTransform: 'uppercase',
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
     marginTop: 12,
     marginBottom: 8,
   },
-  toggleRow: { gap: 8 },
+  toggleRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   toggleChip: {
     paddingVertical: 12,
     paddingHorizontal: 14,

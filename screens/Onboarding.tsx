@@ -11,8 +11,8 @@ type IonName = ComponentProps<typeof Ionicons>['name'];
 const SLIDES: { icon: IonName; title: string; body: string }[] = [
   {
     icon: 'git-network-outline',
-    title: 'Science-Led Compatibility',
-    body: 'Genotype-aware matching designed for modern West African love stories.',
+    title: 'Find compatible matches',
+    body: 'Share your genotype so you can find compatible matches. GenoMatch does not provide medical advice; talk to a qualified health professional.',
   },
   {
     icon: 'heart-outline',

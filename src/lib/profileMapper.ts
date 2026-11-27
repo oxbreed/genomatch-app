@@ -1,27 +1,17 @@
 import type { DiscoveryProfile, DistanceBand, Genotype, ProfileRow } from '../types/database';
 import { computeLifestyleMatch } from './lifestyleMatch';
 import { isNewMember, resolvePresenceState } from './presence';
+import { ageFromDateOfBirth } from './validation';
+
+export { ageFromDateOfBirth };
 
 const GRADIENTS: [string, string][] = [
-  ['#C8102E', '#0B0C0E'],
-  ['#D4AF37', '#15171A'],
+  ['#C62222', '#0B0C0E'],
+  ['#C99A4B', '#15171A'],
   ['#185FA5', '#0D47A1'],
   ['#6A4C93', '#4A2C6A'],
-  ['#D4AF37', '#8B6914'],
+  ['#C99A4B', '#8B6914'],
 ];
-
-export function ageFromDateOfBirth(dob: string | null): number | null {
-  if (!dob) return null;
-  const birth = new Date(dob);
-  if (Number.isNaN(birth.getTime())) return null;
-  const today = new Date();
-  let age = today.getFullYear() - birth.getFullYear();
-  const monthDiff = today.getMonth() - birth.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-    age -= 1;
-  }
-  return age;
-}
 
 export function gradientFromId(id: string): [string, string] {
   let hash = 0;
@@ -70,6 +60,7 @@ export function mapProfileRow(
     name: row.display_name?.trim() || 'GenoMatch Member',
     age: ageFromDateOfBirth(row.date_of_birth),
     city: row.city?.trim() || 'Nearby',
+    gender: row.gender ?? null,
     distanceBand: options?.distanceBand ?? null,
     genotype,
     lifestyleMatch: computeLifestyleMatch(

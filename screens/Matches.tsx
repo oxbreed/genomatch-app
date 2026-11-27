@@ -150,7 +150,7 @@ export default function Matches({ isActive, onStartChat, onImmersiveChange }: Ma
 
   return (
     <View style={styles.container}>
-      <GenoPremiumChrome variant="discover" />
+      <GenoPremiumChrome variant="linen" />
       <StatusBar style="dark" />
 
       <GenoInboxHeader
@@ -215,12 +215,12 @@ export default function Matches({ isActive, onStartChat, onImmersiveChange }: Ma
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.linen },
+  container: { flex: 1, backgroundColor: COLORS.cream },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, gap: 12 },
   loadingText: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 14,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
   },
   listWrap: { flex: 1 },
   list: { paddingTop: 4, paddingBottom: TAB_SCENE_BOTTOM_PADDING },

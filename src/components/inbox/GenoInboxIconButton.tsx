@@ -22,12 +22,17 @@ export default function GenoInboxIconButton({
 }: Props) {
   const size = INBOX.iconBtnSize;
 
+  // 38pt keeps the header compact; the padded touch area clears 44pt.
+  const touchPadding = Math.ceil((44 - size) / 2);
+
   if (variant === 'gold') {
     return (
       <Pressable
         style={({ pressed }) => [styles.btn, pressed && styles.pressed]}
         onPress={onPress}
+        accessibilityRole="button"
         accessibilityLabel={accessibilityLabel}
+        hitSlop={touchPadding}
       >
         <GenoGlassSurface
           variant="tabBar"
@@ -50,7 +55,9 @@ export default function GenoInboxIconButton({
     <Pressable
       style={({ pressed }) => [styles.btn, pressed && styles.pressed]}
       onPress={onPress}
+      accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
+      hitSlop={touchPadding}
     >
       <GenoGlassSurface
         variant="light"
@@ -67,7 +74,7 @@ export default function GenoInboxIconButton({
         <Ionicons
           name={icon}
           size={17}
-          color={variant === 'danger' ? COLORS.error : COLORS.metallicSilver}
+          color={variant === 'danger' ? COLORS.error : COLORS.label}
         />
       </GenoGlassSurface>
     </Pressable>

@@ -18,7 +18,7 @@ const SECTIONS = [
   {
     title: 'Eligibility',
     body:
-      'You must be at least 18 years old. GenoMatch is a social discovery and dating service, not a medical, laboratory, or government identity service.',
+      'You must be at least 18 years old. GenoMatch is a genotype-aware dating service for adults, not a laboratory or government identity service.',
   },
   {
     title: 'Your account',
@@ -28,7 +28,7 @@ const SECTIONS = [
   {
     title: 'Profiles and genotype',
     body:
-      'Genotype on GenoMatch is self-reported for compatibility guidance only. It is not a clinical test, medical advice, or a government-verified identity document. Profile badges marked verified mean the member completed in-app attestations and/or a photo review — not a passport or ID check.',
+      'A genotype on a profile is something that member typed in. It is not a laboratory test or a government ID. A verified badge means they completed the in-app check, not a passport check. GenoMatch does not provide medical advice; talk to a qualified health professional.',
   },
   {
     title: 'Content licence',

@@ -3,10 +3,18 @@
     "apps": [],
     "details": [
       {
-        "appIDs": ["REPLACE_WITH_APPLE_TEAM_ID.ng.genomatch.app"],
-        "components": [
-          { "/": "/reset-password" },
-          { "/": "/reset-password/*" }
+        "appID": "REPLACE_APPLE_TEAM_ID.ng.genomatch.app",
+        "paths": [
+          "/reset-password",
+          "/reset-password/*",
+          "/privacy",
+          "/privacy/*",
+          "/terms",
+          "/terms/*",
+          "/support",
+          "/support/*",
+          "/guidelines",
+          "/guidelines/*"
         ]
       }
     ]

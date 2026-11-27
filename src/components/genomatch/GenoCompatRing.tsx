@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     fontSize: 9,
     letterSpacing: 1.2,
     textTransform: 'uppercase',
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
     marginTop: 1,
   },
 });

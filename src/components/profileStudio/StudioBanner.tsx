@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     gap: 14,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: 'rgba(212, 175, 55, 0.35)',
+    borderColor: 'rgba(201, 154, 75, 0.35)',
     shadowColor: COLORS.ink,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.2,
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: 'rgba(212, 175, 55, 0.2)',
+    backgroundColor: 'rgba(201, 154, 75, 0.2)',
   },
   logoSlot: {
     width: 64,
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.gothamBold,
     fontSize: 10,
     letterSpacing: 2.2,
-    color: COLORS.gold,
+    color: COLORS.goldDeep,
   },
   title: {
     fontFamily: FONT_FAMILY.gothamBold,

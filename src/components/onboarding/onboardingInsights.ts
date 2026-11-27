@@ -1,5 +1,6 @@
 import type { ComponentProps } from 'react';
 import { Ionicons } from '@expo/vector-icons';
+import { GENOTYPE_VALUE_PROP } from '../../constants/healthDisclaimers';
 
 type IonName = ComponentProps<typeof Ionicons>['name'];
 
@@ -14,39 +15,38 @@ export type OnboardingInsight = {
   statLabel: string;
 };
 
-/** Three world-class onboarding insights — import in App.tsx carousel */
+/** Three onboarding insights — kept in sync with GENO_ONBOARDING_SLIDES. */
 export const ONBOARDING_INSIGHTS: OnboardingInsight[] = [
   {
     id: 'compatibility',
     icon: 'shield-checkmark-outline',
     accent: 'gold',
-    kicker: 'GENOTYPE-AWARE MATCHING',
-    title: 'Love with science on your side',
-    body:
-      'Discover people aligned with your genotype — built for intentional singles across West Africa and the diaspora.',
-    stat: '75%+',
-    statLabel: 'High-compat filter',
+    kicker: 'GENOTYPE-AWARE DATING',
+    title: 'Find compatible matches',
+    body: GENOTYPE_VALUE_PROP,
+    stat: '18+',
+    statLabel: 'Adults only',
   },
   {
     id: 'profiles',
     icon: 'heart-outline',
     accent: 'metallicSilver',
-    kicker: 'DEEPER SIGNALS',
-    title: 'Profiles that feel human',
+    kicker: 'ON EVERY PROFILE',
+    title: 'Compatibility at a glance',
     body:
-      'See compatibility, intent, and city context up front — so every swipe moves you closer to someone real.',
-    stat: '3×',
-    statLabel: 'Richer match context',
+      'Every Discover profile shows the genotype that member entered, alongside interests and relationship goals.',
+    stat: 'AA–SC',
+    statLabel: 'Genotypes you can share',
   },
   {
     id: 'journey',
     icon: 'sparkles-outline',
     accent: 'mint',
-    kicker: 'PREMIUM JOURNEY',
-    title: 'Designed to keep you coming back',
+    kicker: 'GET STARTED',
+    title: 'Share your genotype',
     body:
-      'From first spark to first message, GenoMatch guides you with clarity — not chaos — so momentum never fades.',
-    stat: '24h',
-    statLabel: 'Fresh picks daily',
+      'Create your profile, add your genotype, and start meeting people. Confirm you are 18 or over to continue.',
+    stat: '1st',
+    statLabel: 'Step after you join',
   },
 ];

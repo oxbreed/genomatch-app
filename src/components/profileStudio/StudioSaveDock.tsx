@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.xl,
     backgroundColor: COLORS.white,
     borderWidth: 1,
-    borderColor: 'rgba(13, 40, 24, 0.08)',
+    borderColor: 'rgba(11, 12, 14, 0.08)',
     gap: 10,
     shadowColor: COLORS.ink,
     shadowOffset: { width: 0, height: -3 },
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 12,
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
   },
   doneWrap: {
     borderRadius: RADIUS.md,

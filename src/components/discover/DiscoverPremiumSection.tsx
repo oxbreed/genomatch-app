@@ -43,6 +43,6 @@ const styles = StyleSheet.create({
   },
   panelAccent: {
     borderTopWidth: 1,
-    borderTopColor: 'rgba(212, 175, 55, 0.28)',
+    borderTopColor: 'rgba(201, 154, 75, 0.28)',
   },
 });

@@ -51,12 +51,12 @@ const styles = StyleSheet.create({
   },
   text: {
     ...TYPOGRAPHY.chip,
-    color: COLORS.text,
+    color: COLORS.ink,
     textAlign: 'center',
   },
   textActive: {
     ...TYPOGRAPHY.chip,
-    color: COLORS.text,
+    color: COLORS.ink,
     textAlign: 'center',
   },
 });

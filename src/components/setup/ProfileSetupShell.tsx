@@ -22,7 +22,7 @@ export default function ProfileSetupShell({ stepLabel, title, subtitle, children
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.subtitle}>{subtitle}</Text>
       <LinearGradient
-        colors={['transparent', COLORS.gold, 'rgba(200, 16, 46, 0.35)', 'transparent']}
+        colors={['transparent', COLORS.gold, 'rgba(198, 34, 34, 0.35)', 'transparent']}
         start={{ x: 0, y: 0.5 }}
         end={{ x: 1, y: 0.5 }}
         style={styles.rule}

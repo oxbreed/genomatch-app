@@ -22,7 +22,7 @@ export default function GenoScreenCanvas({ children, studio = false, style }: Pr
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: COLORS.linen,
+    backgroundColor: COLORS.background,
     position: 'relative',
   },
   content: {

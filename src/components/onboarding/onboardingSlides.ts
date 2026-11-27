@@ -1,5 +1,6 @@
 import type { ComponentProps } from 'react';
 import { Ionicons } from '@expo/vector-icons';
+import { GENOTYPE_VALUE_PROP } from '../../constants/healthDisclaimers';
 
 type IonName = ComponentProps<typeof Ionicons>['name'];
 
@@ -14,23 +15,23 @@ export type GenoOnboardingSlide = {
 export const GENO_ONBOARDING_SLIDES: GenoOnboardingSlide[] = [
   {
     icon: 'git-network-outline',
-    kicker: 'Genotype-aware matching',
-    title: 'Compatibility you can trust',
-    body: 'Thoughtful genotype pairing for intentional singles — so every match starts with clarity, not guesswork.',
-    highlights: ['Genotype as profile context', 'Built for Nigeria & West Africa'],
+    kicker: 'Genotype-aware dating',
+    title: 'Find compatible matches',
+    body: GENOTYPE_VALUE_PROP,
+    highlights: ['Genotype from the first step', 'AA, AS, SS, AC, or SC'],
   },
   {
     icon: 'heart-half-outline',
-    kicker: 'Profiles that feel human',
-    title: 'More than a photo',
-    body: 'Bios, interests, goals, and emotional signals — profiles designed to feel real before the first message.',
-    highlights: ['Rich profile storytelling', 'Compatibility at a glance'],
+    kicker: 'See it on every profile',
+    title: 'Compatibility at a glance',
+    body: 'Every Discover profile shows the genotype that member entered, alongside interests and relationship goals. You choose how you use that information.',
+    highlights: ['Genotype badge on Discover', 'You enter it yourself'],
   },
   {
     icon: 'sparkles-outline',
-    kicker: 'Premium journey to forever',
-    title: 'Ready when you are',
-    body: 'Create your profile, confirm your age, and step into a dating experience crafted for lasting connection.',
-    highlights: ['Guided from match to message', 'Private & verification-ready'],
+    kicker: 'Get started',
+    title: 'Share your genotype',
+    body: 'Create your profile, add your genotype, and start meeting people. Confirm you are 18 or over to continue.',
+    highlights: ['Genotype is required to join', 'Private & verification-ready'],
   },
 ];

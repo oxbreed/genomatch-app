@@ -25,17 +25,18 @@ import { formatSecurityError } from '../src/lib/security';
 import { supabase } from '../src/lib/supabase';
 import { validateEmail } from '../src/lib/validation';
 import { GENOTYPE_SELF_REPORT_DISCLAIMER } from '../src/constants/healthDisclaimers';
+import CommunityGuidelines from './CommunityGuidelines';
 import PrivacyPolicy from './PrivacyPolicy';
 import TermsOfService from './TermsOfService';
 
 type IonName = ComponentProps<typeof Ionicons>['name'];
 
 const GENOTYPES: { id: string; icon: IonName; name: string; accent: string }[] = [
-  { id: 'AA', icon: 'ellipse-outline', name: 'Hemoglobin AA', accent: COLORS.metallicSilver },
-  { id: 'AS', icon: 'ellipse-outline', name: 'Sickle cell trait', accent: COLORS.metallicSilver },
-  { id: 'SS', icon: 'ellipse-outline', name: 'Sickle cell disease', accent: COLORS.metallicSilver },
-  { id: 'AC', icon: 'ellipse-outline', name: 'Hemoglobin AC', accent: COLORS.metallicSilver },
-  { id: 'SC', icon: 'ellipse-outline', name: 'Hemoglobin SC', accent: COLORS.metallicSilver },
+  { id: 'AA', icon: 'ellipse-outline', name: 'AA', accent: COLORS.metallicSilver },
+  { id: 'AS', icon: 'ellipse-outline', name: 'AS', accent: COLORS.metallicSilver },
+  { id: 'SS', icon: 'ellipse-outline', name: 'SS', accent: COLORS.metallicSilver },
+  { id: 'AC', icon: 'ellipse-outline', name: 'AC', accent: COLORS.metallicSilver },
+  { id: 'SC', icon: 'ellipse-outline', name: 'SC', accent: COLORS.metallicSilver },
 ];
 
 export default function Register({
@@ -52,11 +53,12 @@ export default function Register({
   const [genotype, setGenotype] = useState('');
   const [showPass, setShowPass] = useState(false);
   const [ageConfirmed, setAgeConfirmed] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [focusedField, setFocusedField] = useState<'email' | 'password' | null>(null);
-  const [legalDoc, setLegalDoc] = useState<null | 'privacy' | 'terms'>(null);
+  const [legalDoc, setLegalDoc] = useState<null | 'privacy' | 'terms' | 'guidelines'>(null);
 
   const introOpacity = useRef(new Animated.Value(0)).current;
   const introTranslateY = useRef(new Animated.Value(18)).current;
@@ -121,6 +123,10 @@ export default function Register({
       setError('You must confirm that you are at least 18 years old.');
       return;
     }
+    if (!termsAccepted) {
+      setError('You must agree to the Terms of Service, Privacy Policy, and Community Guidelines.');
+      return;
+    }
 
     setError('');
     setSuccessMessage('');
@@ -175,6 +181,9 @@ export default function Register({
   if (legalDoc === 'terms') {
     return <TermsOfService onBack={() => setLegalDoc(null)} />;
   }
+  if (legalDoc === 'guidelines') {
+    return <CommunityGuidelines onBack={() => setLegalDoc(null)} />;
+  }
 
   const onCtaPressIn = () => {
     Animated.spring(ctaScale, {
@@ -204,8 +213,8 @@ export default function Register({
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <GenoPremiumChrome variant="linen" />
-      <StatusBar style="dark" />
+      <GenoPremiumChrome variant="ink" />
+      <StatusBar style="light" />
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
@@ -236,7 +245,7 @@ export default function Register({
           </View>
 
           <View style={styles.logoWrap}>
-            <GenoLogoCeremony variant="auth" tone="dark" />
+            <GenoLogoCeremony variant="auth" tone="light" />
           </View>
 
           <Text style={styles.title}>Create Your GenoMatch Account</Text>
@@ -257,7 +266,7 @@ export default function Register({
                 value={email}
                 onChangeText={setEmail}
                 placeholder="you@example.com"
-                placeholderTextColor="rgba(200, 16, 46, 0.35)"
+                placeholderTextColor="rgba(198, 34, 34, 0.35)"
                 keyboardType="email-address"
                 autoCapitalize="none"
                 autoComplete="email"
@@ -277,7 +286,7 @@ export default function Register({
                 value={password}
                 onChangeText={setPassword}
                 placeholder="At least 8 characters"
-                placeholderTextColor="rgba(200, 16, 46, 0.35)"
+                placeholderTextColor="rgba(198, 34, 34, 0.35)"
                 secureTextEntry={!showPass}
                 autoComplete="new-password"
                 textContentType="newPassword"
@@ -342,8 +351,8 @@ export default function Register({
                   <Ionicons name="shield-checkmark" size={16} color={COLORS.verified} />
                 </View>
                 <Text style={styles.privacyText}>
-                  Your genotype is kept private and used for compatibility only.{' '}
-                  {GENOTYPE_SELF_REPORT_DISCLAIMER}
+                  Share your genotype so you can find compatible matches. It appears on your
+                  profile. {GENOTYPE_SELF_REPORT_DISCLAIMER}
                 </Text>
               </View>
 
@@ -394,7 +403,7 @@ export default function Register({
                   disabled={loading || !!successMessage}
                 >
                   <LinearGradient
-                    colors={[COLORS.gold, '#E5C766', '#B8962E']}
+                    colors={[COLORS.gold, '#F3DC95', '#96651F']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     style={styles.submitGradient}
@@ -419,22 +428,42 @@ export default function Register({
                 </Text>
               </Pressable>
 
-              <Text style={styles.legalText}>
-                By continuing you agree to our{' '}
-                <Text
-                  style={styles.legalLink}
-                  onPress={() => setLegalDoc('terms')}
-                >
-                  Terms of Service
+              <Pressable
+                style={styles.ageConfirmRow}
+                onPress={() => setTermsAccepted((prev) => !prev)}
+                accessibilityRole="checkbox"
+                accessibilityState={{ checked: termsAccepted }}
+              >
+                <View style={[styles.ageConfirmBox, termsAccepted && styles.ageConfirmBoxChecked]}>
+                  {termsAccepted ? (
+                    <Ionicons name="checkmark" size={14} color={COLORS.ivory} />
+                  ) : null}
+                </View>
+                <Text style={styles.ageConfirmText}>
+                  I agree to the{' '}
+                  <Text
+                    style={styles.legalLink}
+                    onPress={() => setLegalDoc('terms')}
+                  >
+                    Terms of Service
+                  </Text>
+                  {', '}
+                  <Text
+                    style={styles.legalLink}
+                    onPress={() => setLegalDoc('privacy')}
+                  >
+                    Privacy Policy
+                  </Text>
+                  {', and '}
+                  <Text
+                    style={styles.legalLink}
+                    onPress={() => setLegalDoc('guidelines')}
+                  >
+                    Community Guidelines
+                  </Text>
+                  , including a zero-tolerance policy for objectionable content.
                 </Text>
-                {' '}and{' '}
-                <Text
-                  style={styles.legalLink}
-                  onPress={() => setLegalDoc('privacy')}
-                >
-                  Privacy Policy
-                </Text>
-              </Text>
+              </Pressable>
         </AuthFormCard>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -444,7 +473,7 @@ export default function Register({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.linen,
+    backgroundColor: COLORS.background,
   },
   scroll: {
     paddingHorizontal: 20,
@@ -490,9 +519,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: RADIUS.pill,
-    backgroundColor: 'rgba(212, 175, 55, 0.14)',
+    backgroundColor: 'rgba(201, 154, 75, 0.14)',
     borderWidth: 1,
-    borderColor: 'rgba(212, 175, 55, 0.35)',
+    borderColor: 'rgba(201, 154, 75, 0.35)',
     marginBottom: 14,
   },
   brandChipText: {
@@ -507,7 +536,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.ink,
+    color: COLORS.textOnDark,
     fontSize: 32,
     lineHeight: 38,
     letterSpacing: -0.8,
@@ -516,7 +545,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontFamily: FONT_FAMILY.gothamMedium,
-    color: 'rgba(13, 40, 24, 0.62)',
+    color: COLORS.textMutedOnDark,
     fontSize: 15,
     lineHeight: 24,
     maxWidth: '96%',
@@ -536,7 +565,7 @@ const styles = StyleSheet.create({
     height: 54,
     borderRadius: RADIUS.md,
     borderWidth: 1.5,
-    borderColor: 'rgba(200, 16, 46, 0.16)',
+    borderColor: 'rgba(198, 34, 34, 0.16)',
     backgroundColor: GLASS.insetFill,
     paddingHorizontal: 14,
     color: COLORS.ink,
@@ -544,7 +573,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   inputFocused: {
-    borderColor: 'rgba(212, 175, 55, 0.65)',
+    borderColor: 'rgba(201, 154, 75, 0.65)',
     backgroundColor: GLASS.insetFill,
     ...SHADOWS.card,
     shadowOpacity: 0.05,
@@ -574,9 +603,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: RADIUS.pill,
-    backgroundColor: 'rgba(212, 175, 55, 0.16)',
+    backgroundColor: 'rgba(201, 154, 75, 0.16)',
     borderWidth: 1,
-    borderColor: 'rgba(212, 175, 55, 0.3)',
+    borderColor: 'rgba(201, 154, 75, 0.3)',
   },
   requiredPillText: {
     fontFamily: FONT_FAMILY.gothamBold,
@@ -599,7 +628,7 @@ const styles = StyleSheet.create({
     minHeight: 128,
     borderRadius: RADIUS.md,
     borderWidth: 1.5,
-    borderColor: 'rgba(200, 16, 46, 0.12)',
+    borderColor: 'rgba(198, 34, 34, 0.12)',
     backgroundColor: GLASS.insetFill,
     paddingVertical: 14,
     paddingHorizontal: 10,
@@ -622,7 +651,7 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: 'rgba(200, 16, 46, 0.07)',
+    backgroundColor: 'rgba(198, 34, 34, 0.07)',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 8,
@@ -637,7 +666,7 @@ const styles = StyleSheet.create({
   genoName: {
     fontFamily: FONT_FAMILY.gothamMedium,
     fontSize: 11,
-    color: 'rgba(200, 16, 46, 0.58)',
+    color: 'rgba(198, 34, 34, 0.58)',
     textAlign: 'center',
   },
   selectedBadge: {
@@ -658,9 +687,9 @@ const styles = StyleSheet.create({
   privacyBox: {
     marginTop: 8,
     borderRadius: RADIUS.md,
-    backgroundColor: 'rgba(200, 16, 46, 0.08)',
+    backgroundColor: 'rgba(198, 34, 34, 0.08)',
     borderWidth: 1,
-    borderColor: 'rgba(200, 16, 46, 0.14)',
+    borderColor: 'rgba(198, 34, 34, 0.14)',
     paddingVertical: 12,
     paddingHorizontal: 12,
     flexDirection: 'row',
@@ -671,7 +700,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: 'rgba(200, 16, 46, 0.12)',
+    backgroundColor: 'rgba(198, 34, 34, 0.12)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -685,7 +714,7 @@ const styles = StyleSheet.create({
   selectionHint: {
     marginTop: 10,
     fontFamily: FONT_FAMILY.gothamMedium,
-    color: 'rgba(200, 16, 46, 0.7)',
+    color: 'rgba(198, 34, 34, 0.7)',
     fontSize: 12,
   },
   ageConfirmRow: {
@@ -699,7 +728,7 @@ const styles = StyleSheet.create({
     height: 22,
     borderRadius: 6,
     borderWidth: 1.5,
-    borderColor: 'rgba(200, 16, 46, 0.35)',
+    borderColor: 'rgba(198, 34, 34, 0.35)',
     backgroundColor: GLASS.insetFill,
     alignItems: 'center',
     justifyContent: 'center',
@@ -724,9 +753,9 @@ const styles = StyleSheet.create({
   successBox: {
     marginTop: 12,
     borderRadius: RADIUS.md,
-    backgroundColor: 'rgba(200, 16, 46, 0.1)',
+    backgroundColor: 'rgba(198, 34, 34, 0.1)',
     borderWidth: 1,
-    borderColor: 'rgba(200, 16, 46, 0.22)',
+    borderColor: 'rgba(198, 34, 34, 0.22)',
     paddingVertical: 14,
     paddingHorizontal: 14,
     flexDirection: 'row',
@@ -774,7 +803,7 @@ const styles = StyleSheet.create({
   },
   signInText: {
     fontFamily: FONT_FAMILY.gothamMedium,
-    color: 'rgba(200, 16, 46, 0.65)',
+    color: 'rgba(198, 34, 34, 0.65)',
     fontSize: 14,
   },
   signInBold: {
@@ -784,7 +813,7 @@ const styles = StyleSheet.create({
   legalText: {
     textAlign: 'center',
     fontFamily: FONT_FAMILY.gothamMedium,
-    color: 'rgba(200, 16, 46, 0.55)',
+    color: 'rgba(198, 34, 34, 0.55)',
     fontSize: 12,
     lineHeight: 18,
     paddingBottom: 4,

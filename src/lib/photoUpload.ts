@@ -1,6 +1,7 @@
 import * as ImagePicker from 'expo-image-picker';
 import { Alert } from 'react-native';
 import { uploadImageToCloudinary } from './cloudinary';
+import { assertPhotoAllowed, confirmPhotoGuidelines } from './photoModeration';
 
 export async function pickProfilePhotoUri(): Promise<string | null> {
   const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -17,7 +18,18 @@ export async function pickProfilePhotoUri(): Promise<string | null> {
   });
 
   if (result.canceled || !result.assets[0]?.uri) return null;
-  return result.assets[0].uri;
+  const uri = result.assets[0].uri;
+  try {
+    await assertPhotoAllowed(uri);
+  } catch (err) {
+    Alert.alert(
+      'Photo not accepted',
+      err instanceof Error ? err.message : 'Try another image.'
+    );
+    return null;
+  }
+  const accepted = await confirmPhotoGuidelines();
+  return accepted ? uri : null;
 }
 
 export async function pickAndUploadProfilePhoto(): Promise<string | null> {

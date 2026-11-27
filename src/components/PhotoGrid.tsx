@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     letterSpacing: 1.1,
     textTransform: 'uppercase',
-    color: COLORS.metallicSilver,
+    color: COLORS.label,
     marginBottom: 10,
     paddingHorizontal: H_PADDING,
   },
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: 'rgba(184, 188, 196, 0.25)',
     borderStyle: 'dashed',
-    borderColor: 'rgba(13, 40, 24, 0.25)',
+    borderColor: 'rgba(11, 12, 14, 0.25)',
   },
   addPressed: {
     opacity: 0.88,

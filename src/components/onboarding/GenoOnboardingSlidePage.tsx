@@ -1,53 +1,63 @@
 import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, Text, View } from 'react-native';
-import { COLORS, LOGO_GOLD, TYPOGRAPHY } from '../../theme';
+import { COLORS, LOGO_GOLD, TYPOGRAPHY, creamAlpha } from '../../theme';
 import type { GenoOnboardingSlide } from './onboardingSlides';
+import GenoOnboardingHeroCluster from './GenoOnboardingHeroCluster';
 import GenoOnboardingSlideIcon from './GenoOnboardingSlideIcon';
-import { ONBOARDING_H_PAD, ONBOARDING_SCREEN_WIDTH } from './onboardingLayout';
+import {
+  ONBOARDING_CONTENT_WIDTH,
+  ONBOARDING_H_PAD,
+  ONBOARDING_SCREEN_WIDTH,
+  ONBOARDING_SECTION_GAP,
+  ONBOARDING_TEXT_GAP,
+} from './onboardingLayout';
 
 type Props = {
   slide: GenoOnboardingSlide;
+  index: number;
   width?: number;
-  showSwipeHint?: boolean;
 };
 
-/** One full-width onboarding page — icon, story, proof points */
+function FeatureList({ items }: { items: readonly [string, string] }) {
+  return (
+    <View style={styles.featureCard}>
+      {items.map((line) => (
+        <View key={line} style={styles.featureRow}>
+          <Ionicons name="checkmark" size={14} color={LOGO_GOLD} />
+          <Text style={styles.featureText}>{line}</Text>
+        </View>
+      ))}
+    </View>
+  );
+}
+
+/**
+ * Standard onboarding page structure (every slide):
+ * 1. Visual slot  2. Kicker  3. Title  4. Body  5. Feature card
+ */
 export default function GenoOnboardingSlidePage({
   slide,
+  index,
   width = ONBOARDING_SCREEN_WIDTH,
-  showSwipeHint,
 }: Props) {
+  const isFirst = index === 0;
+
   return (
-    <View style={[styles.page, { width, paddingHorizontal: ONBOARDING_H_PAD }]}>
-      <View style={styles.inner}>
-        <GenoOnboardingSlideIcon name={slide.icon} size="lg" />
+    <View style={[styles.page, { width }]}>
+      <View style={styles.content}>
+        {isFirst ? (
+          <GenoOnboardingHeroCluster />
+        ) : (
+          <GenoOnboardingSlideIcon name={slide.icon} />
+        )}
 
-        <View style={styles.kickerRow}>
-          <View style={styles.kickerDot} />
+        <View style={styles.textBlock}>
           <Text style={styles.kicker}>{slide.kicker}</Text>
+          <Text style={styles.title}>{slide.title}</Text>
+          <Text style={styles.body}>{slide.body}</Text>
         </View>
 
-        <Text style={styles.headline}>{slide.title}</Text>
-        <Text style={styles.body}>{slide.body}</Text>
-
-        <View style={styles.highlights}>
-          {slide.highlights.map((line) => (
-            <View key={line} style={styles.highlightRow}>
-              <View style={styles.checkRing}>
-                <Ionicons name="checkmark" size={12} color={LOGO_GOLD} />
-              </View>
-              <Text style={styles.highlightText}>{line}</Text>
-            </View>
-          ))}
-        </View>
-
-        {showSwipeHint ? (
-          <View style={styles.swipeHint}>
-            <Ionicons name="chevron-back" size={14} color="rgba(250, 248, 245, 0.35)" />
-            <Text style={styles.swipeHintText}>Swipe to explore</Text>
-            <Ionicons name="chevron-forward" size={14} color="rgba(250, 248, 245, 0.35)" />
-          </View>
-        ) : null}
+        <FeatureList items={slide.highlights} />
       </View>
     </View>
   );
@@ -56,84 +66,65 @@ export default function GenoOnboardingSlidePage({
 const styles = StyleSheet.create({
   page: {
     flex: 1,
+    paddingHorizontal: ONBOARDING_H_PAD,
+  },
+  content: {
+    flex: 1,
     justifyContent: 'center',
-  },
-  inner: {
     alignItems: 'center',
-    gap: 12,
-    paddingBottom: 8,
+    maxWidth: ONBOARDING_CONTENT_WIDTH,
+    width: '100%',
+    alignSelf: 'center',
+    gap: ONBOARDING_SECTION_GAP,
+    paddingBottom: 16,
   },
-  kickerRow: {
-    flexDirection: 'row',
+  textBlock: {
+    width: '100%',
     alignItems: 'center',
-    gap: 8,
-    marginTop: 4,
-  },
-  kickerDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: LOGO_GOLD,
+    gap: ONBOARDING_TEXT_GAP,
   },
   kicker: {
     ...TYPOGRAPHY.marketingKicker,
-    fontSize: 10,
-    letterSpacing: 2.4,
-  },
-  headline: {
-    ...TYPOGRAPHY.marketingTitle,
-    fontSize: 30,
-    lineHeight: 36,
+    fontSize: 11,
+    letterSpacing: 1.8,
+    color: LOGO_GOLD,
     textAlign: 'center',
-    color: COLORS.linen,
-    maxWidth: 320,
+  },
+  title: {
+    ...TYPOGRAPHY.serifTitle,
+    fontSize: 26,
+    lineHeight: 32,
+    color: COLORS.textOnDark,
+    textAlign: 'center',
   },
   body: {
     ...TYPOGRAPHY.body,
+    fontSize: 15,
+    lineHeight: 23,
+    color: creamAlpha(0.72),
     textAlign: 'center',
-    maxWidth: 310,
-    lineHeight: 24,
-    color: 'rgba(250, 248, 245, 0.78)',
+    maxWidth: 320,
   },
-  highlights: {
+  featureCard: {
     width: '100%',
-    maxWidth: 300,
-    gap: 10,
-    marginTop: 8,
+    gap: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: creamAlpha(0.1),
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
   },
-  highlightRow: {
+  featureRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     gap: 10,
   },
-  checkRing: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    borderWidth: 1,
-    borderColor: 'rgba(212, 175, 55, 0.35)',
-    backgroundColor: 'rgba(212, 175, 55, 0.08)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  highlightText: {
+  featureText: {
     ...TYPOGRAPHY.bodyStrong,
     flex: 1,
     fontSize: 14,
-    color: 'rgba(250, 248, 245, 0.88)',
-  },
-  swipeHint: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    marginTop: 16,
-  },
-  swipeHintText: {
-    ...TYPOGRAPHY.caption,
-    fontSize: 11,
-    letterSpacing: 1.2,
-    textTransform: 'uppercase',
-    color: 'rgba(250, 248, 245, 0.4)',
+    lineHeight: 20,
+    color: creamAlpha(0.88),
   },
 });

@@ -64,7 +64,7 @@ export default function StudioSectionShell({ active, children, onLayout, style }
     <View onLayout={onLayout} style={[styles.outer, style]}>
       <Animated.View style={[styles.glow, { opacity: glowOpacity }]} pointerEvents="none">
         <LinearGradient
-          colors={['rgba(212, 175, 55, 0.35)', 'transparent', 'rgba(200, 16, 46, 0.2)']}
+          colors={['rgba(201, 154, 75, 0.35)', 'transparent', 'rgba(198, 34, 34, 0.2)']}
           style={StyleSheet.absoluteFill}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
@@ -104,12 +104,12 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     backgroundColor: COLORS.white,
     borderWidth: 1.5,
-    borderColor: 'rgba(13, 40, 24, 0.08)',
+    borderColor: 'rgba(11, 12, 14, 0.08)',
     overflow: 'hidden',
     position: 'relative',
   },
   cardActive: {
-    borderColor: 'rgba(212, 175, 55, 0.55)',
+    borderColor: 'rgba(201, 154, 75, 0.55)',
     shadowColor: COLORS.gold,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.15,

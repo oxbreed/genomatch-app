@@ -34,7 +34,7 @@ export default function GenoJourneyShell({
 }: Props) {
   return (
     <View style={styles.root}>
-      <GenoPremiumChrome variant="linen" />
+      <GenoPremiumChrome variant="ink" />
       <StatusBar style={statusBarStyle} />
 
       <View style={styles.topBar}>
@@ -84,7 +84,7 @@ export function GenoJourneyCard({ children, style }: JourneyCardProps) {
   return (
     <View style={[styles.cardOuter, style]}>
       <LinearGradient
-        colors={['rgba(212, 175, 55, 0.48)', 'rgba(200, 16, 46, 0.3)', 'rgba(212, 175, 55, 0.42)']}
+        colors={['rgba(201, 154, 75, 0.48)', 'rgba(198, 34, 34, 0.3)', 'rgba(201, 154, 75, 0.42)']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.cardBorder}
@@ -177,7 +177,7 @@ export function GenoJourneyFooter({
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: COLORS.linen,
+    backgroundColor: COLORS.background,
   },
   topBar: {
     flexDirection: 'row',
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: 'rgba(13, 40, 24, 0.14)',
+    backgroundColor: 'rgba(11, 12, 14, 0.14)',
   },
   dotActive: {
     width: 28,
@@ -289,9 +289,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: RADIUS.pill,
-    backgroundColor: 'rgba(212, 175, 55, 0.16)',
+    backgroundColor: 'rgba(201, 154, 75, 0.16)',
     borderWidth: 1,
-    borderColor: 'rgba(212, 175, 55, 0.35)',
+    borderColor: 'rgba(201, 154, 75, 0.35)',
   },
   kickerText: {
     fontFamily: FONT_FAMILY.gothamBold,

@@ -222,8 +222,8 @@ export default function ResetPassword({
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <GenoPremiumChrome variant="linen" />
-      <StatusBar style="dark" />
+      <GenoPremiumChrome variant="ink" />
+      <StatusBar style="light" />
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
@@ -241,7 +241,7 @@ export default function ResetPassword({
           </Pressable>
 
           <View style={styles.logoWrap}>
-            <GenoLogoCeremony variant="auth" tone="dark" />
+            <GenoLogoCeremony variant="auth" tone="light" />
           </View>
           <Text style={styles.title}>Reset Password</Text>
           <Text style={styles.subtitle}>
@@ -260,7 +260,7 @@ export default function ResetPassword({
                 value={otpCode}
                 onChangeText={(text) => setOtpCode(text.replace(/\D/g, '').slice(0, 6))}
                 placeholder="000000"
-                placeholderTextColor="rgba(200, 16, 46, 0.35)"
+                placeholderTextColor="rgba(198, 34, 34, 0.35)"
                 keyboardType="number-pad"
                 autoComplete="one-time-code"
                 textContentType="oneTimeCode"
@@ -304,7 +304,7 @@ export default function ResetPassword({
             value={password}
             onChangeText={setPassword}
             placeholder="At least 8 characters"
-            placeholderTextColor="rgba(200, 16, 46, 0.35)"
+            placeholderTextColor="rgba(198, 34, 34, 0.35)"
             secureTextEntry={!showPass}
             autoComplete="new-password"
             textContentType="newPassword"
@@ -323,7 +323,7 @@ export default function ResetPassword({
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             placeholder="Re-enter your password"
-            placeholderTextColor="rgba(200, 16, 46, 0.35)"
+            placeholderTextColor="rgba(198, 34, 34, 0.35)"
             secureTextEntry={!showConfirmPass}
             autoComplete="new-password"
             textContentType="newPassword"
@@ -365,7 +365,7 @@ export default function ResetPassword({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.linen,
+    backgroundColor: COLORS.background,
   },
   scroll: {
     paddingHorizontal: 20,
@@ -409,7 +409,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily: FONT_FAMILY.gothamBold,
-    color: COLORS.ink,
+    color: COLORS.textOnDark,
     fontSize: 34,
     lineHeight: 39,
     letterSpacing: -0.7,
@@ -417,14 +417,14 @@ const styles = StyleSheet.create({
     maxWidth: '95%',
   },
   subtitle: {
-    color: 'rgba(200, 16, 46, 0.72)',
+    color: COLORS.textMutedOnDark,
     fontSize: 15,
     lineHeight: 24,
     fontWeight: '500',
     maxWidth: '96%',
   },
   hint: {
-    color: 'rgba(200, 16, 46, 0.65)',
+    color: 'rgba(198, 34, 34, 0.65)',
     fontSize: 13,
     lineHeight: 18,
     fontWeight: '500',
@@ -443,7 +443,7 @@ const styles = StyleSheet.create({
     height: 54,
     borderRadius: 14,
     borderWidth: 1.5,
-    borderColor: 'rgba(200, 16, 46, 0.18)',
+    borderColor: 'rgba(198, 34, 34, 0.18)',
     backgroundColor: GLASS.insetFill,
     paddingHorizontal: 14,
     color: '#1D2B23',
@@ -465,13 +465,13 @@ const styles = StyleSheet.create({
     letterSpacing: 0.1,
   },
   resendTextDisabled: {
-    color: 'rgba(200, 16, 46, 0.45)',
+    color: 'rgba(198, 34, 34, 0.45)',
   },
   input: {
     height: 54,
     borderRadius: 14,
     borderWidth: 1.5,
-    borderColor: 'rgba(200, 16, 46, 0.18)',
+    borderColor: 'rgba(198, 34, 34, 0.18)',
     backgroundColor: GLASS.insetFill,
     paddingHorizontal: 14,
     color: '#1D2B23',
@@ -528,7 +528,7 @@ const styles = StyleSheet.create({
   },
   createText: {
     fontFamily: FONT_FAMILY.gothamMedium,
-    color: 'rgba(200, 16, 46, 0.65)',
+    color: 'rgba(198, 34, 34, 0.65)',
     fontSize: 14,
   },
   createBold: {

@@ -1,5 +1,26 @@
 import { PixelRatio } from 'react-native';
-import ribbonMeta from '../../assets/genomatch-ribbon-meta.json';
+import rawRibbonMeta from '../../assets/genomatch-ribbon-meta.json';
+
+/**
+ * Shape of genomatch-ribbon-meta.json. The animated fields are written only by
+ * `npm run ribbon:animated`; a poster-only export omits them, so they are
+ * optional here rather than inferred from whichever build is on disk.
+ */
+type RibbonMeta = {
+  nativeWidth: number;
+  nativeHeight: number;
+  exportScale: number;
+  fps: number;
+  frames: number;
+  logoWidthFraction?: number;
+  minLogoWidth?: number;
+  maxLogoWidth?: number;
+  animatedPixelWidth?: number;
+  animatedPixelHeight?: number;
+  animatedScale?: number;
+};
+
+const ribbonMeta = rawRibbonMeta as RibbonMeta;
 
 /**
  * Onboarding ribbon — lightweight runtime assets only (no MP4 requires).
@@ -13,11 +34,24 @@ import ribbonMeta from '../../assets/genomatch-ribbon-meta.json';
 export const ONBOARDING_CREAM = '#FAF8F5';
 export const ONBOARDING_CHARCOAL = '#0B0C0E';
 
-/** Transparent animated loop (326px GIF — Expo Go safe) */
-export const GENOMATCH_RIBBON_ANIMATED = require('../../assets/onboarding-ribbon-logo.gif');
+/**
+ * The animated ribbon loop (assets/onboarding-ribbon-logo.webp) is deliberately
+ * NOT required from this module.
+ *
+ * Metro resolves `require()` with a literal path statically, wherever it
+ * appears — inside a function body included. Any require of that file in the
+ * graph therefore ships all 4.5MB in the app download, whether or not anything
+ * renders it. Nothing currently does.
+ *
+ * To bring the animation back: require it inside the component that renders it,
+ * and accept the 4.5MB. Check `expo export` output before and after.
+ */
 
-/** Frame-0 poster with alpha */
-export const GENOMATCH_RIBBON_POSTER = require('../../assets/genomatch-ribbon-logo.png');
+/** Full-resolution transparent poster with alpha */
+export const GENOMATCH_RIBBON_POSTER = require('../../assets/genomatch-ribbon-logo-v11.png');
+
+/** Alias of transparent poster (no baked square) */
+export const GENOMATCH_RIBBON_DISPLAY = GENOMATCH_RIBBON_POSTER;
 
 export const GENOMATCH_RIBBON_NATIVE_WIDTH = ribbonMeta.nativeWidth;
 export const GENOMATCH_RIBBON_NATIVE_HEIGHT = ribbonMeta.nativeHeight;
