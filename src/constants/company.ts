@@ -13,6 +13,8 @@ export const GENOMATCH_COMPANY = {
   privacyEmail: 'privacy@genomatch.app',
   website: 'genomatch.app',
   privacyUrl: 'https://www.genomatch.app/privacy',
+  supportUrl: 'https://www.genomatch.app/support',
+  deleteAccountUrl: 'https://www.genomatch.app/delete-account',
   parentLegalName: OXBREED_PARENT.legalName,
 } as const;
 
@@ -26,3 +28,6 @@ export const GENOMATCH_ABOUT_LINE = `${GENOMATCH_COMPANY.legalName} · ${GENOMAT
 export const GENOMATCH_PARENT_LINE = `A product of ${GENOMATCH_COMPANY.parentLegalName}`;
 
 export const GENOMATCH_PRIVACY_URL = GENOMATCH_COMPANY.privacyUrl;
+
+export const GENOMATCH_SUPPORT_URL = GENOMATCH_COMPANY.supportUrl;
+export const GENOMATCH_DELETE_ACCOUNT_URL = GENOMATCH_COMPANY.deleteAccountUrl;

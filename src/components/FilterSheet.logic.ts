@@ -1,6 +1,7 @@
 import type { DiscoveryProfile, DistanceBand, Genotype } from '../types/database';
 import type { DiscoveryInterest } from '../lib/discoveryInterest';
 import { orderDiscoveryInterests } from '../lib/discoveryInterest';
+import { profileMatchesInterestedIn } from '../lib/profileGender';
 
 /** Minimum lifestyle-overlap percent for the "high match" discovery filter. */
 export const HIGH_LIFESTYLE_MATCH_MIN = 75;
@@ -52,6 +53,9 @@ export function applyDiscoveryFilters(
 ): DiscoveryProfile[] {
   return profiles.filter((p) => {
     if (filters.compatibilityMode === 'high' && p.lifestyleMatch < HIGH_LIFESTYLE_MATCH_MIN) {
+      return false;
+    }
+    if (!profileMatchesInterestedIn(p.gender, filters.interestedIn)) {
       return false;
     }
     if (filters.verifiedOnly && !p.genotypeVerified) {

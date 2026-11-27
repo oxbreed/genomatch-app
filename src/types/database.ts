@@ -61,6 +61,7 @@ export type DiscoveryProfile = {
   name: string;
   age: number | null;
   city: string;
+  gender?: string | null;
   distanceBand?: DistanceBand | null;
   genotype: Genotype;
   lifestyleMatch: number;

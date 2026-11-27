@@ -60,6 +60,7 @@ export function mapProfileRow(
     name: row.display_name?.trim() || 'GenoMatch Member',
     age: ageFromDateOfBirth(row.date_of_birth),
     city: row.city?.trim() || 'Nearby',
+    gender: row.gender ?? null,
     distanceBand: options?.distanceBand ?? null,
     genotype,
     lifestyleMatch: computeLifestyleMatch(

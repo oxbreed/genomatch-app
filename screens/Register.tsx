@@ -25,6 +25,7 @@ import { formatSecurityError } from '../src/lib/security';
 import { supabase } from '../src/lib/supabase';
 import { validateEmail } from '../src/lib/validation';
 import { GENOTYPE_SELF_REPORT_DISCLAIMER } from '../src/constants/healthDisclaimers';
+import CommunityGuidelines from './CommunityGuidelines';
 import PrivacyPolicy from './PrivacyPolicy';
 import TermsOfService from './TermsOfService';
 
@@ -52,11 +53,12 @@ export default function Register({
   const [genotype, setGenotype] = useState('');
   const [showPass, setShowPass] = useState(false);
   const [ageConfirmed, setAgeConfirmed] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [focusedField, setFocusedField] = useState<'email' | 'password' | null>(null);
-  const [legalDoc, setLegalDoc] = useState<null | 'privacy' | 'terms'>(null);
+  const [legalDoc, setLegalDoc] = useState<null | 'privacy' | 'terms' | 'guidelines'>(null);
 
   const introOpacity = useRef(new Animated.Value(0)).current;
   const introTranslateY = useRef(new Animated.Value(18)).current;
@@ -121,6 +123,10 @@ export default function Register({
       setError('You must confirm that you are at least 18 years old.');
       return;
     }
+    if (!termsAccepted) {
+      setError('You must agree to the Terms of Service, Privacy Policy, and Community Guidelines.');
+      return;
+    }
 
     setError('');
     setSuccessMessage('');
@@ -174,6 +180,9 @@ export default function Register({
   }
   if (legalDoc === 'terms') {
     return <TermsOfService onBack={() => setLegalDoc(null)} />;
+  }
+  if (legalDoc === 'guidelines') {
+    return <CommunityGuidelines onBack={() => setLegalDoc(null)} />;
   }
 
   const onCtaPressIn = () => {
@@ -419,22 +428,42 @@ export default function Register({
                 </Text>
               </Pressable>
 
-              <Text style={styles.legalText}>
-                By continuing you agree to our{' '}
-                <Text
-                  style={styles.legalLink}
-                  onPress={() => setLegalDoc('terms')}
-                >
-                  Terms of Service
+              <Pressable
+                style={styles.ageConfirmRow}
+                onPress={() => setTermsAccepted((prev) => !prev)}
+                accessibilityRole="checkbox"
+                accessibilityState={{ checked: termsAccepted }}
+              >
+                <View style={[styles.ageConfirmBox, termsAccepted && styles.ageConfirmBoxChecked]}>
+                  {termsAccepted ? (
+                    <Ionicons name="checkmark" size={14} color={COLORS.ivory} />
+                  ) : null}
+                </View>
+                <Text style={styles.ageConfirmText}>
+                  I agree to the{' '}
+                  <Text
+                    style={styles.legalLink}
+                    onPress={() => setLegalDoc('terms')}
+                  >
+                    Terms of Service
+                  </Text>
+                  {', '}
+                  <Text
+                    style={styles.legalLink}
+                    onPress={() => setLegalDoc('privacy')}
+                  >
+                    Privacy Policy
+                  </Text>
+                  {', and '}
+                  <Text
+                    style={styles.legalLink}
+                    onPress={() => setLegalDoc('guidelines')}
+                  >
+                    Community Guidelines
+                  </Text>
+                  , including a zero-tolerance policy for objectionable content.
                 </Text>
-                {' '}and{' '}
-                <Text
-                  style={styles.legalLink}
-                  onPress={() => setLegalDoc('privacy')}
-                >
-                  Privacy Policy
-                </Text>
-              </Text>
+              </Pressable>
         </AuthFormCard>
       </ScrollView>
     </KeyboardAvoidingView>

@@ -7,7 +7,7 @@ import {
 
 export type LegalSection = { title: string; body: string };
 
-export const LEGAL_UPDATED = 'September 2026';
+export const LEGAL_UPDATED = 'November 2026';
 
 export const PRIVACY_POLICY_SECTIONS: LegalSection[] = [
   {
@@ -17,12 +17,12 @@ export const PRIVACY_POLICY_SECTIONS: LegalSection[] = [
   {
     title: 'Data We Collect',
     body:
-      'We collect information you provide when using GenoMatch, including your name, email address, genotype, profile photos, messages with matches, and location (city only). We also collect technical data needed to operate the app securely.',
+      'We collect the account and profile information you provide: name, email address, date of birth, gender, interests, relationship goals, messages with matches, and the genotype you enter (AA, AS, SS, AC, or SC). Genotype is sensitive, health-adjacent information. We also collect profile photos; an identity-review selfie (used to check that you are a real person and not shown as your public profile photo); approximate location (the city you choose, and if you allow it, a coarse device location used to set that city and nearby matching — we store rounded coordinates, not a precise live trail); and a push-notification token if you grant notification permission. The camera is used only when you take a live selfie for photo or identity review. We also collect technical data needed to operate the app securely.',
   },
   {
     title: 'How We Use Your Data',
     body:
-      'We use your data to show your profile to other adults, including the genotype you enter so you can find compatible matches, to let mutual matches message each other, and to keep the service working. GenoMatch does not provide medical advice; talk to a qualified health professional.',
+      'We use your data to show your profile to other adults, including the genotype you enter so you can find compatible matches, to let mutual matches message each other, to review identity selfies and photos, to send optional match and message notifications if you allow them, and to keep the service working. We do not use this data to track you across other companies’ apps or websites, and we do not use it for third-party advertising. GenoMatch does not provide medical advice; talk to a qualified health professional.',
   },
   {
     title: 'Genotype Data',
@@ -32,7 +32,7 @@ export const PRIVACY_POLICY_SECTIONS: LegalSection[] = [
   {
     title: 'Data Sharing',
     body:
-      'We do not sell your personal data. We share data only with service providers essential to operating the app: Supabase (secure storage and authentication) and Cloudinary (profile photo hosting).',
+      'We do not sell your personal data. We share data only with service providers essential to operating the app: Supabase (secure storage and authentication), Cloudinary (photo hosting, including profile photos and identity-review selfies), and Expo or Apple or Google (delivering push notifications if you opted in).',
   },
   {
     title: 'Your Rights',
@@ -56,7 +56,7 @@ export const PRIVACY_POLICY_SECTIONS: LegalSection[] = [
 export const TERMS_OF_SERVICE_SECTIONS: LegalSection[] = [
   {
     title: 'Agreement',
-    body: `These terms govern use of GenoMatch, operated by ${GENOMATCH_OPERATOR_INTRO}. By creating an account you agree to these terms, our Privacy Policy, and our Community Guidelines.`,
+    body: `These terms govern use of GenoMatch, operated by ${GENOMATCH_OPERATOR_INTRO}. By creating an account you agree to these terms, our Privacy Policy, and our Community Guidelines, including a zero-tolerance policy for objectionable content.`,
   },
   {
     title: 'Eligibility',
@@ -72,6 +72,11 @@ export const TERMS_OF_SERVICE_SECTIONS: LegalSection[] = [
     title: 'Your account',
     body:
       'You are responsible for the accuracy of your profile, including your genotype, photos, and age. Do not impersonate anyone else. You may delete your account at any time from Profile → Delete Account.',
+  },
+  {
+    title: 'Zero tolerance',
+    body:
+      'There is no tolerance for objectionable content or abusive behaviour on GenoMatch. Do not post nudity, harassment, hate speech, scams, sexual solicitations, threats, or anything involving minors. Use report and block on profiles and in chat if you see a violation. Every report is reviewed, blocking takes effect immediately, and we may remove content or permanently ban accounts that break these rules. Serious cases may be reported to the authorities.',
   },
   {
     title: 'Photos and messages',
