@@ -36,13 +36,13 @@ export function getGenotypeRiskShort(
 
 const NEUTRAL_INSIGHT: Omit<FamilyPlanningInsight, 'pairLabel'> = {
   tier: 'awareness',
-  title: 'Self-reported only',
-  summary: 'These letters are what each person typed in. GenoMatch does not assess health or family outcomes.',
-  detail: 'This is not a lab test, a diagnosis, or medical advice.',
+  title: 'Genotype compatibility',
+  summary: 'These letters are the genotypes you each entered, so you can see compatibility at a glance.',
+  detail: 'GenoMatch does not provide medical advice; talk to a qualified health professional.',
   icon: 'information-circle-outline',
 };
 
-/** Profile note for two self-reported genotypes. No health interpretation. */
+/** Profile note for two self-reported genotypes. Letters only — no clinical interpretation. */
 export function getFamilyPlanningInsight(
   viewerGenotype: Genotype | null,
   candidateGenotype: Genotype

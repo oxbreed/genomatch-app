@@ -22,12 +22,12 @@ export const PRIVACY_POLICY_SECTIONS: LegalSection[] = [
   {
     title: 'How We Use Your Data',
     body:
-      'We use your data to show your profile to other adults, to let mutual matches message each other, and to keep the service working. We do not use genotype to calculate a health result.',
+      'We use your data to show your profile to other adults, including the genotype you enter so you can find compatible matches, to let mutual matches message each other, and to keep the service working. GenoMatch does not provide medical advice; talk to a qualified health professional.',
   },
   {
     title: 'Genotype Data',
     body:
-      'Genotype is something you type in. We treat it as sensitive information, show it on your profile, and never sell it. GenoMatch does not diagnose, predict disease, or give medical advice.',
+      'Genotype is something you type in. We treat it as sensitive information, show it on your profile, and never sell it. GenoMatch does not provide medical advice, diagnosis, or laboratory testing.',
   },
   {
     title: 'Data Sharing',
@@ -66,7 +66,7 @@ export const TERMS_OF_SERVICE_SECTIONS: LegalSection[] = [
   {
     title: 'Not medical advice',
     body:
-      'GenoMatch is a dating app. A genotype on a profile is self-reported. The app does not diagnose, predict disease risk, or replace a clinician.',
+      'GenoMatch is a genotype-aware dating app. A genotype on a profile is self-reported. GenoMatch does not provide medical advice; talk to a qualified health professional.',
   },
   {
     title: 'Your account',
@@ -132,7 +132,7 @@ export const COMMUNITY_GUIDELINES_SECTIONS: LegalSection[] = [
   {
     title: 'Genotype Integrity',
     body:
-      'Do not misrepresent your genotype. Other members may read what you enter. A verified badge means you completed the in-app check, not a medical test.',
+      'Do not misrepresent your genotype. Other members may read what you enter. A verified badge means you completed the in-app check, not a laboratory test.',
   },
   {
     title: 'Reporting',

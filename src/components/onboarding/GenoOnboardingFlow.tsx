@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Animated,
+  Linking,
   NativeScrollEvent,
   NativeSyntheticEvent,
   Pressable,
@@ -28,6 +29,8 @@ import GenoOnboardingSlidePage from './GenoOnboardingSlidePage';
 import GenoPremiumOnboardingBackdrop from './GenoPremiumOnboardingBackdrop';
 import GenoWordmark from './GenoWordmark';
 import { GENO_ONBOARDING_SLIDES } from './onboardingSlides';
+import { GENOMATCH_PRIVACY_URL } from '../../constants/company';
+import { GENOTYPE_SELF_REPORT_DISCLAIMER } from '../../constants/healthDisclaimers';
 import {
   ONBOARDING_AGE_SLOT_HEIGHT,
   ONBOARDING_BOTTOM_PAD,
@@ -236,6 +239,18 @@ export default function GenoOnboardingFlow({
               <Text style={styles.signInLink}>Sign in</Text>
             </Pressable>
           ) : null}
+
+          <Text style={styles.disclaimer}>{GENOTYPE_SELF_REPORT_DISCLAIMER}</Text>
+          <Pressable
+            onPress={() => {
+              void Linking.openURL(GENOMATCH_PRIVACY_URL);
+            }}
+            hitSlop={8}
+            accessibilityRole="link"
+            accessibilityLabel="Open Privacy Policy"
+          >
+            <Text style={styles.privacyLink}>Privacy Policy</Text>
+          </Pressable>
         </View>
       </View>
     </Animated.View>
@@ -325,5 +340,19 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.bodyStrong,
     fontSize: 14,
     color: LOGO_RED_BRIGHT,
+  },
+  disclaimer: {
+    ...TYPOGRAPHY.body,
+    fontSize: 11,
+    lineHeight: 16,
+    color: creamAlpha(0.5),
+    textAlign: 'center',
+    paddingHorizontal: 8,
+  },
+  privacyLink: {
+    ...TYPOGRAPHY.bodyStrong,
+    fontSize: 12,
+    color: creamAlpha(0.85),
+    textDecorationLine: 'underline',
   },
 });

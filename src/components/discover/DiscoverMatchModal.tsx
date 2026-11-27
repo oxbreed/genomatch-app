@@ -248,7 +248,7 @@ export default function DiscoverMatchModal({
                     </GenoMirrorSteelFill>
                   </GenoMirrorRimFrame>
                   <Text style={styles.compatDisclaimer} numberOfLines={3}>
-                    Educational information only. Not medical advice.
+                    Self-reported genotypes. GenoMatch does not provide medical advice.
                   </Text>
                 </>
               ) : null}

@@ -342,8 +342,8 @@ export default function Register({
                   <Ionicons name="shield-checkmark" size={16} color={COLORS.verified} />
                 </View>
                 <Text style={styles.privacyText}>
-                  Your genotype is kept private and used for compatibility only.{' '}
-                  {GENOTYPE_SELF_REPORT_DISCLAIMER}
+                  Share your genotype so you can find compatible matches. It appears on your
+                  profile. {GENOTYPE_SELF_REPORT_DISCLAIMER}
                 </Text>
               </View>
 

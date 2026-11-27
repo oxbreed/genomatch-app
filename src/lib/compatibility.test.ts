@@ -23,11 +23,11 @@ describe('getGenotypeRiskShort', () => {
 });
 
 describe('getFamilyPlanningInsight', () => {
-  it('states that the letters are self-reported and not a health result', () => {
+  it('states the pair as self-reported genotype compatibility', () => {
     const insight = getFamilyPlanningInsight('AS', 'AS');
     expect(insight.tier).toBe('awareness');
-    expect(insight.title).toBe('Self-reported only');
-    expect(insight.summary).toMatch(/does not assess health/i);
+    expect(insight.title).toBe('Genotype compatibility');
+    expect(insight.summary).toMatch(/genotypes you each entered/i);
     expect(`${insight.summary} ${insight.detail}`).not.toMatch(/sickle|disease|counsel|%|risk/i);
   });
 

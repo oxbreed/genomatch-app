@@ -33,8 +33,8 @@ describe('SC genotype pairings', () => {
   it.each(SC_PAIRS)('returns the same non-clinical note for %s × %s', (a, b) => {
     const insight = getFamilyPlanningInsight(a, b);
     expect(insight.pairLabel).toBe(`${a} × ${b}`);
-    expect(insight.title).toBe('Self-reported only');
-    expect(insight.summary).toMatch(/does not assess health/i);
+    expect(insight.title).toBe('Genotype compatibility');
+    expect(insight.summary).toMatch(/genotypes you each entered/i);
     expect(getGenotypeRiskShort(a, b)).toBeNull();
   });
 

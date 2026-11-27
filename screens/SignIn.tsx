@@ -262,7 +262,7 @@ export default function SignIn({
                   <Ionicons name="lock-closed" size={16} color={COLORS.verified} />
                 </View>
                 <Text style={styles.trustText}>
-                  Secure sign-in with encrypted genotype-aware matching.
+                  Sign in to keep finding compatible, genotype-aware matches.
                 </Text>
               </View>
 

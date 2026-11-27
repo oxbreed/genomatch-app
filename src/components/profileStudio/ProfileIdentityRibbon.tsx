@@ -23,7 +23,7 @@ export default function ProfileIdentityRibbon({ verified, genotype, onVerify }: 
           <View style={styles.copy}>
             <Text style={styles.title}>Self-attested member</Text>
             <Text style={styles.sub}>
-              {genotype} genotype confirmed in-app — not a lab test or government ID.
+              {genotype} genotype confirmed in-app — not a laboratory test or government ID.
             </Text>
           </View>
         </View>

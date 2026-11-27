@@ -125,7 +125,7 @@ export default function FamilyPlanningCard({
       <Text style={[styles.detail, { color: textSecondary }]}>{insight.detail}</Text>
 
       <Text style={[styles.disclaimer, { color: dark ? 'rgba(250, 248, 245,0.55)' : COLORS.textSubtle }]}>
-        Self-reported profile detail. Not a lab test or medical advice.
+        Self-reported. GenoMatch does not provide medical advice; talk to a qualified health professional.
       </Text>
     </View>
   );

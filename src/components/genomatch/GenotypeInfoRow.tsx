@@ -22,9 +22,9 @@ export default function GenotypeInfoRow({
   return (
     <View style={styles.row}>
       <View style={styles.textCol}>
-        <Text style={styles.label}>Genotype</Text>
+        <Text style={styles.label}>Genotype compatibility</Text>
         <Text style={styles.pairing}>{pairing}</Text>
-        <Text style={styles.note}>Self-reported. Not a health result.</Text>
+        <Text style={styles.note}>Self-reported. GenoMatch does not provide medical advice.</Text>
       </View>
       {onLearnMore ? (
         <Pressable

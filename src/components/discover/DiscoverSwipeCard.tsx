@@ -174,7 +174,7 @@ export default function DiscoverSwipeCard({
             ]}
           />
           <Text style={styles.compatText} numberOfLines={1}>
-            {profile.lifestyleMatch}% match
+            Lifestyle {profile.lifestyleMatch}% match
           </Text>
         </View>
       </Pressable>

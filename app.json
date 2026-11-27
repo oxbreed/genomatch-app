@@ -7,7 +7,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "description": "GenoMatch is a dating app for adults 18 and over. Members may share a self-reported genotype as educational context only. GenoMatch is not a medical service, lab test, or diagnosis.",
+    "description": "GenoMatch is a genotype-aware dating app for adults 18 and over. Share your genotype so you can find compatible matches. GenoMatch does not provide medical advice; talk to a qualified health professional.",
     "primaryColor": "#0B0C0E",
     "runtimeVersion": {
       "policy": "appVersion"

@@ -311,7 +311,7 @@ export default function DiscoverProfileSheet({
                 <View style={styles.bondHeader}>
                   <GenoBondMark size={18} opacity={0.75} />
                   <Text style={styles.bondKicker}>
-                    {hideGenotype ? 'Lifestyle match' : 'Genotype bond'}
+                    {hideGenotype ? 'Lifestyle match' : 'Genotype compatibility'}
                   </Text>
                 </View>
                 <GenoCompatRing percent={profile.lifestyleMatch} size={96} />
@@ -326,7 +326,7 @@ export default function DiscoverProfileSheet({
                 </View>
               ) : null}
               {!hideGenotype ? (
-                <Text style={styles.bondDisclaimer}>Informational only — not medical advice.</Text>
+                <Text style={styles.bondDisclaimer}>Self-reported. GenoMatch does not provide medical advice.</Text>
               ) : null}
 
               {profile.bio?.trim() ? (

@@ -23,12 +23,12 @@ const SECTIONS = [
   {
     title: 'How We Use Your Data',
     body:
-      'We use your data to show your profile to other adults, to let mutual matches message each other, and to keep the service working. We do not use genotype to calculate a health result.',
+      'We use your data to show your profile to other adults, including the genotype you enter so you can find compatible matches, to let mutual matches message each other, and to keep the service working. GenoMatch does not provide medical advice; talk to a qualified health professional.',
   },
   {
     title: 'Genotype Data',
     body:
-      'Genotype is something you type in. We treat it as sensitive information, show it on your profile, and never sell it. GenoMatch does not diagnose, predict disease, or give medical advice.',
+      'Genotype is something you type in. We treat it as sensitive information, show it on your profile, and never sell it. GenoMatch does not provide medical advice, diagnosis, or laboratory testing.',
   },
   {
     title: 'Data Sharing',

@@ -12,6 +12,7 @@ export const GENOMATCH_COMPANY = {
   contactEmail: 'hello@genomatch.app',
   privacyEmail: 'privacy@genomatch.app',
   website: 'genomatch.app',
+  privacyUrl: 'https://www.genomatch.app/privacy',
   parentLegalName: OXBREED_PARENT.legalName,
 } as const;
 
@@ -23,3 +24,5 @@ export const GENOMATCH_CONTACT_LINE = `${GENOMATCH_COMPANY.contactEmail} · ${GE
 export const GENOMATCH_ABOUT_LINE = `${GENOMATCH_COMPANY.legalName} · ${GENOMATCH_COMPANY.contactEmail} · ${GENOMATCH_COMPANY.website}`;
 
 export const GENOMATCH_PARENT_LINE = `A product of ${GENOMATCH_COMPANY.parentLegalName}`;
+
+export const GENOMATCH_PRIVACY_URL = GENOMATCH_COMPANY.privacyUrl;

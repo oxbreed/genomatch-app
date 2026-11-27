@@ -1,4 +1,4 @@
-import type { DiscoveryProfile, DistanceBand } from '../types/database';
+import type { DiscoveryProfile, DistanceBand, Genotype } from '../types/database';
 import type { DiscoveryInterest } from '../lib/discoveryInterest';
 import { orderDiscoveryInterests } from '../lib/discoveryInterest';
 
@@ -14,6 +14,7 @@ export type DiscoveryFilters = {
   maxAge: string;
   relationshipGoal: 'any' | 'marriage' | 'serious' | 'casual' | 'friendship';
   verifiedOnly: boolean;
+  selectedGenotypes: Genotype[];
 };
 
 export const DEFAULT_DISCOVERY_FILTERS: DiscoveryFilters = {
@@ -25,6 +26,7 @@ export const DEFAULT_DISCOVERY_FILTERS: DiscoveryFilters = {
   maxAge: '',
   relationshipGoal: 'any',
   verifiedOnly: false,
+  selectedGenotypes: [],
 };
 
 export function countActiveDiscoveryFilters(filters: DiscoveryFilters): number {
@@ -36,6 +38,7 @@ export function countActiveDiscoveryFilters(filters: DiscoveryFilters): number {
   if (filters.maxAge.trim().length > 0) count += 1;
   if (filters.relationshipGoal !== 'any') count += 1;
   if (filters.verifiedOnly) count += 1;
+  if (filters.selectedGenotypes.length > 0) count += 1;
   return count;
 }
 
@@ -52,6 +55,12 @@ export function applyDiscoveryFilters(
       return false;
     }
     if (filters.verifiedOnly && !p.genotypeVerified) {
+      return false;
+    }
+    if (
+      filters.selectedGenotypes.length > 0 &&
+      !filters.selectedGenotypes.includes(p.genotype)
+    ) {
       return false;
     }
     const cityQuery = filters.city.trim().toLowerCase();
@@ -99,5 +108,6 @@ export function normalizeDiscoveryFilters(draft: DiscoveryFilters): DiscoveryFil
     maxAge,
     relationshipGoal: draft.relationshipGoal,
     verifiedOnly: draft.verifiedOnly,
+    selectedGenotypes: [...draft.selectedGenotypes],
   };
 }

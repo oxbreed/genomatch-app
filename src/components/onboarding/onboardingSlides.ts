@@ -1,5 +1,6 @@
 import type { ComponentProps } from 'react';
 import { Ionicons } from '@expo/vector-icons';
+import { GENOTYPE_VALUE_PROP } from '../../constants/healthDisclaimers';
 
 type IonName = ComponentProps<typeof Ionicons>['name'];
 
@@ -14,23 +15,23 @@ export type GenoOnboardingSlide = {
 export const GENO_ONBOARDING_SLIDES: GenoOnboardingSlide[] = [
   {
     icon: 'git-network-outline',
-    kicker: 'Dating, 18+',
-    title: 'Meet people on purpose',
-    body: 'Add a self-reported genotype to your profile if you want to. GenoMatch does not turn those letters into a health result.',
-    highlights: ['You type it in yourself', 'Built for Nigeria & West Africa'],
+    kicker: 'Genotype-aware dating',
+    title: 'Find compatible matches',
+    body: GENOTYPE_VALUE_PROP,
+    highlights: ['Genotype from the first step', 'AA, AS, SS, AC, or SC'],
   },
   {
     icon: 'heart-half-outline',
-    kicker: 'Rich profiles',
-    title: 'More than a photo',
-    body: 'See bios, interests, and relationship goals so every match feels intentional.',
-    highlights: ['Story-driven profiles', 'Compatibility at a glance'],
+    kicker: 'See it on every profile',
+    title: 'Compatibility at a glance',
+    body: 'Every Discover profile shows the genotype that member entered, alongside interests and relationship goals. You choose how you use that information.',
+    highlights: ['Genotype badge on Discover', 'You enter it yourself'],
   },
   {
     icon: 'sparkles-outline',
     kicker: 'Get started',
-    title: 'Create your profile',
-    body: 'Confirm your age, set up your profile, and start connecting with confidence.',
-    highlights: ['Guided from match to message', 'Private & verification-ready'],
+    title: 'Share your genotype',
+    body: 'Create your profile, add your genotype, and start meeting people. Confirm you are 18 or over to continue.',
+    highlights: ['Genotype is required to join', 'Private & verification-ready'],
   },
 ];

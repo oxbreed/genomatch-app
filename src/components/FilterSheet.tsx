@@ -25,7 +25,7 @@ import {
   normalizeDiscoveryFilters,
   type DiscoveryFilters,
 } from './FilterSheet.logic';
-import type { DiscoveryProfile } from '../types/database';
+import type { DiscoveryProfile, Genotype } from '../types/database';
 
 export type { DiscoveryFilters };
 export {
@@ -35,6 +35,14 @@ export {
   hasActiveDiscoveryFilters,
   normalizeDiscoveryFilters,
 };
+
+const GENOTYPE_FILTER_OPTIONS: Genotype[] = ['AA', 'AS', 'SS', 'AC', 'SC'];
+
+function toggleSelectedGenotype(current: Genotype[], value: Genotype): Genotype[] {
+  return current.includes(value)
+    ? current.filter((item) => item !== value)
+    : [...current, value];
+}
 
 const RELATIONSHIP_OPTIONS: {
   id: DiscoveryFilters['relationshipGoal'];
@@ -142,6 +150,51 @@ export default function FilterSheet({
                 keyboardShouldPersistTaps="handled"
                 showsVerticalScrollIndicator={false}
               >
+                <Text style={styles.sectionLabel}>Genotype compatibility</Text>
+                <Text style={styles.distanceHint}>
+                  Every Discover card shows the genotype that member entered. Limit the deck to
+                  specific letters if you want to.
+                </Text>
+                <View style={styles.toggleRow}>
+                  {GENOTYPE_FILTER_OPTIONS.map((genotype) => {
+                    const active = draft.selectedGenotypes.includes(genotype);
+                    return (
+                      <Pressable
+                        key={genotype}
+                        style={[styles.toggleChip, active && styles.toggleChipActive]}
+                        onPress={() =>
+                          setDraft((d) => ({
+                            ...d,
+                            selectedGenotypes: toggleSelectedGenotype(d.selectedGenotypes, genotype),
+                          }))
+                        }
+                        accessibilityRole="button"
+                        accessibilityState={{ selected: active }}
+                        accessibilityLabel={`Genotype ${genotype}`}
+                      >
+                        <Text style={[styles.toggleChipText, active && styles.toggleChipTextActive]}>
+                          {genotype}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+
+                <View style={styles.verifyRow}>
+                  <View style={styles.verifyCopy}>
+                    <Text style={styles.sectionLabel}>Self-verified members only</Text>
+                    <Text style={styles.verifyHint}>
+                      Show profiles that confirmed their genotype
+                    </Text>
+                  </View>
+                  <Switch
+                    value={draft.verifiedOnly}
+                    onValueChange={(verifiedOnly) => setDraft((d) => ({ ...d, verifiedOnly }))}
+                    trackColor={{ false: COLORS.border, true: COLORS.metallicSilver }}
+                    thumbColor={draft.verifiedOnly ? COLORS.gold : COLORS.white}
+                  />
+                </View>
+
                 <Text style={styles.sectionLabel}>Lifestyle match</Text>
                 <View style={styles.toggleRow}>
                   {(['all', 'high'] as const).map((mode) => (
@@ -163,21 +216,6 @@ export default function FilterSheet({
                       </Text>
                     </Pressable>
                   ))}
-                </View>
-
-                <View style={styles.verifyRow}>
-                  <View style={styles.verifyCopy}>
-                    <Text style={styles.sectionLabel}>Self-verified members only</Text>
-                    <Text style={styles.verifyHint}>
-                      Show profiles that confirmed their genotype
-                    </Text>
-                  </View>
-                  <Switch
-                    value={draft.verifiedOnly}
-                    onValueChange={(verifiedOnly) => setDraft((d) => ({ ...d, verifiedOnly }))}
-                    trackColor={{ false: COLORS.border, true: COLORS.metallicSilver }}
-                    thumbColor={draft.verifiedOnly ? COLORS.gold : COLORS.white}
-                  />
                 </View>
 
                 <Text style={styles.sectionLabel}>Show me</Text>
@@ -443,7 +481,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
     marginBottom: 8,
   },
-  toggleRow: { gap: 8 },
+  toggleRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   toggleChip: {
     paddingVertical: 12,
     paddingHorizontal: 14,
