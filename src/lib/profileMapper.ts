@@ -1,6 +1,9 @@
 import type { DiscoveryProfile, DistanceBand, Genotype, ProfileRow } from '../types/database';
 import { computeLifestyleMatch } from './lifestyleMatch';
 import { isNewMember, resolvePresenceState } from './presence';
+import { ageFromDateOfBirth } from './validation';
+
+export { ageFromDateOfBirth };
 
 const GRADIENTS: [string, string][] = [
   ['#C62222', '#0B0C0E'],
@@ -9,19 +12,6 @@ const GRADIENTS: [string, string][] = [
   ['#6A4C93', '#4A2C6A'],
   ['#C99A4B', '#8B6914'],
 ];
-
-export function ageFromDateOfBirth(dob: string | null): number | null {
-  if (!dob) return null;
-  const birth = new Date(dob);
-  if (Number.isNaN(birth.getTime())) return null;
-  const today = new Date();
-  let age = today.getFullYear() - birth.getFullYear();
-  const monthDiff = today.getMonth() - birth.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-    age -= 1;
-  }
-  return age;
-}
 
 export function gradientFromId(id: string): [string, string] {
   let hash = 0;

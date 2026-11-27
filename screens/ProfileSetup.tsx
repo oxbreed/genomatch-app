@@ -51,7 +51,11 @@ import {
 import { pickAndUploadProfilePhoto } from '../src/lib/photoUpload';
 import { getCurrentProfile } from '../src/lib/profiles';
 import { supabase } from '../src/lib/supabase';
-import { dateOfBirthFromAge, isMinimumAge } from '../src/lib/validation';
+import {
+  ageFromDateOfBirth,
+  dateOfBirthFromParts,
+  isAdultDateOfBirth,
+} from '../src/lib/validation';
 
 type IonName = ComponentProps<typeof Ionicons>['name'];
 
@@ -86,7 +90,9 @@ type Gender = (typeof GENDERS)[number];
 export default function ProfileSetup({ onComplete }: { onComplete: () => void }) {
   const [step, setStep] = useState(0);
   const [displayName, setDisplayName] = useState('');
-  const [age, setAge] = useState('');
+  const [birthDay, setBirthDay] = useState('');
+  const [birthMonth, setBirthMonth] = useState('');
+  const [birthYear, setBirthYear] = useState('');
   const [gender, setGender] = useState<Gender | ''>('');
   const [city, setCity] = useState('');
   const [deviceLocation, setDeviceLocation] = useState<DeviceLocation | null>(null);
@@ -100,6 +106,8 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+  const dateOfBirth = dateOfBirthFromParts(birthDay, birthMonth, birthYear);
+  const profileAge = ageFromDateOfBirth(dateOfBirth);
 
   const progressAnim = useRef(new Animated.Value(1 / TOTAL_STEPS)).current;
   const contentOpacity = useRef(new Animated.Value(1)).current;
@@ -207,9 +215,8 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
   const validateStep = (): string | null => {
     if (step === 0) {
       if (!displayName.trim()) return 'Please enter your display name.';
-      const ageNum = parseInt(age, 10);
-      if (!age || !isMinimumAge(ageNum)) {
-        return 'You must be at least 18 years old to use GenoMatch.';
+      if (!dateOfBirth || !isAdultDateOfBirth(dateOfBirth)) {
+        return 'Enter your real birthday. You must be at least 18 years old.';
       }
       if (!gender) return 'Please select your gender.';
       if (!city.trim()) {
@@ -265,12 +272,14 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
         throw new Error('You must be signed in to complete your profile.');
       }
 
-      const ageNum = parseInt(age, 10);
+      if (!dateOfBirth) {
+        throw new Error('Enter your real birthday. You must be at least 18 years old.');
+      }
       const profilePayload = {
         display_name: displayName.trim(),
         city: city.trim(),
         bio: bio.trim(),
-        date_of_birth: dateOfBirthFromAge(ageNum),
+        date_of_birth: dateOfBirth,
         gender,
         interests,
         relationship_goal: relationshipGoal,
@@ -384,16 +393,45 @@ export default function ProfileSetup({ onComplete }: { onComplete: () => void })
               autoCapitalize="words"
             />
 
-            <Text style={styles.label}>Age</Text>
-            <TextInput
-              style={styles.input}
-              value={age}
-              onChangeText={(text) => setAge(text.replace(/[^0-9]/g, ''))}
-              placeholder="18+"
-              placeholderTextColor="rgba(11, 12, 14, 0.35)"
-              keyboardType="number-pad"
-              maxLength={3}
-            />
+            <Text style={styles.label}>Date of birth</Text>
+            <Text style={styles.hint}>
+              Your age is worked out from this date. It goes up on your birthday.
+            </Text>
+            <View style={styles.dobRow}>
+              <TextInput
+                style={[styles.input, styles.dobInput]}
+                value={birthDay}
+                onChangeText={(text) => setBirthDay(text.replace(/[^0-9]/g, '').slice(0, 2))}
+                placeholder="DD"
+                placeholderTextColor="rgba(11, 12, 14, 0.35)"
+                keyboardType="number-pad"
+                maxLength={2}
+                accessibilityLabel="Birth day"
+              />
+              <TextInput
+                style={[styles.input, styles.dobInput]}
+                value={birthMonth}
+                onChangeText={(text) => setBirthMonth(text.replace(/[^0-9]/g, '').slice(0, 2))}
+                placeholder="MM"
+                placeholderTextColor="rgba(11, 12, 14, 0.35)"
+                keyboardType="number-pad"
+                maxLength={2}
+                accessibilityLabel="Birth month"
+              />
+              <TextInput
+                style={[styles.input, styles.dobInput, styles.dobYear]}
+                value={birthYear}
+                onChangeText={(text) => setBirthYear(text.replace(/[^0-9]/g, '').slice(0, 4))}
+                placeholder="YYYY"
+                placeholderTextColor="rgba(11, 12, 14, 0.35)"
+                keyboardType="number-pad"
+                maxLength={4}
+                accessibilityLabel="Birth year"
+              />
+            </View>
+            {profileAge != null ? (
+              <Text style={styles.hint}>Your profile will show age {profileAge}.</Text>
+            ) : null}
 
             <Text style={styles.label}>Gender</Text>
             <View style={styles.genderRow}>
@@ -767,6 +805,18 @@ const styles = StyleSheet.create({
     marginTop: -4,
     marginBottom: 10,
     fontWeight: '500',
+  },
+  dobRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  dobInput: {
+    flex: 1,
+    textAlign: 'center',
+    paddingHorizontal: 8,
+  },
+  dobYear: {
+    flex: 1.4,
   },
   input: {
     height: 52,
