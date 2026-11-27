@@ -1,6 +1,6 @@
-# App Store metadata draft (for review — not submitted)
+# App Store metadata (approved)
 
-Draft only. Do not paste into App Store Connect until Olusegun approves the wording. This is not a live submission.
+Approved by Olusegun on 27 Nov 2026 (UK time). The wording below is locked as drafted in PR #19. It has not been pasted into App Store Connect and has not been submitted.
 
 **Name:** GenoMatch  
 **Subtitle:** Genotype-aware dating  
